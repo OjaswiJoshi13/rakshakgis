@@ -135,8 +135,8 @@ No chunk may transition to `IN_PROGRESS` until all its listed prerequisite depen
 
 | Chunk ID | Module | Title | Assigned | Dependencies | Status |
 | --- | --- | --- | --- | --- | --- |
-| **M1-00** | Platform | Repository Audit & State Initialization | M1 | None | **VERIFIED** |
-| **M1-01** | Platform | Repository & Docker Foundation | M1 | M1-00 | **BLOCKED** |
+| **M1-00** | Platform | Repository Audit & State Initialization | M1 | None | **COMMITTED** |
+| **M1-01** | Platform | Repository & Docker Foundation | M1 | M1-00 | **PLANNED** |
 | **M2-01** | Backend | FastAPI Foundation & Core App Setup | M2 | M1-01 | **BLOCKED** |
 | **M2-02** | Backend | PostgreSQL / PostGIS Engine Setup | M2 | M2-01 | **BLOCKED** |
 | **M2-03** | Backend | Database Models & Alembic Migrations | M2 | M2-02 | **BLOCKED** |
@@ -187,23 +187,23 @@ No chunk may transition to `IN_PROGRESS` until all its listed prerequisite depen
 
 ## Current Work
 
-- **Active Chunk:** M1-00 (Repository Audit & State Initialization)
-- **Assignee:** M1 / Antigravity
-- **Status:** `VERIFIED`
-- **Scope:** Repository synchronization, filesystem audit, classification against specification, initialization of `PROJECT_STATE.md`.
+- **Active Chunk:** None
+- **Next Eligible Chunk:** M1-01 (Repository & Docker Foundation)
+- **Status:** Ready to start M1-01 (prerequisite M1-00 committed)
 
 ---
 
 ## Blocked Work
 
-All subsequent chunks (M1-01 through DOC-01) remain in `BLOCKED` status awaiting formal independent review, verification, and commit of their respective prerequisites.
+Chunks M2-01 through DOC-01 remain in `BLOCKED` status awaiting completion and commit of their respective prerequisites. Chunk M1-01 is unblocked (`PLANNED`).
 
 ---
 
 ## Completed / Verified / Committed Work
 
 - Initial repository structure scaffold commit: `4c0bcc8` (`.env.example`, `.gitignore`, `README.md`, `docker-compose.yml`).
-- M1-00: Repository Audit & State Initialization — VERIFIED.
+- M1-00: Repository Audit & State Initialization — COMMITTED.
+  Commit: `3816b09`
 
 ---
 
@@ -226,6 +226,6 @@ All subsequent chunks (M1-01 through DOC-01) remain in `BLOCKED` status awaiting
 
 ## Last Updated
 
-- **Timestamp:** 2026-09-04 00:25:00 IST
+- **Timestamp:** 2026-09-04 00:30:00 IST
 - **Updated By:** M1 (Antigravity Agent)
-- **Status Summary:** Chunk M1-00 verified by independent review.
+- **Status Summary:** Chunk M1-00 finalized as COMMITTED; Chunk M1-01 unblocked to PLANNED.
