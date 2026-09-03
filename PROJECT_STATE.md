@@ -136,7 +136,7 @@ No chunk may transition to `IN_PROGRESS` until all its listed prerequisite depen
 | Chunk ID | Module | Title | Assigned | Dependencies | Status |
 | --- | --- | --- | --- | --- | --- |
 | **M1-00** | Platform | Repository Audit & State Initialization | M1 | None | **COMMITTED** |
-| **M1-01** | Platform | Repository & Docker Foundation | M1 | M1-00 | **PLANNED** |
+| **M1-01** | Platform | Repository & Docker Foundation | M1 | M1-00 | **VERIFIED** |
 | **M2-01** | Backend | FastAPI Foundation & Core App Setup | M2 | M1-01 | **BLOCKED** |
 | **M2-02** | Backend | PostgreSQL / PostGIS Engine Setup | M2 | M2-01 | **BLOCKED** |
 | **M2-03** | Backend | Database Models & Alembic Migrations | M2 | M2-02 | **BLOCKED** |
@@ -187,45 +187,47 @@ No chunk may transition to `IN_PROGRESS` until all its listed prerequisite depen
 
 ## Current Work
 
-- **Active Chunk:** None
-- **Next Eligible Chunk:** M1-01 (Repository & Docker Foundation)
-- **Status:** Ready to start M1-01 (prerequisite M1-00 committed)
+- **Active Chunk:** M1-01 (Repository & Docker Foundation)
+- **Assignee:** M1 / Antigravity
+- **Status:** `VERIFIED`
+- **Scope:** Independent review passed; verified Docker Compose infrastructure, PostGIS 3.4.3 runtime, named volume persistence, and backend image build with native GDAL/GEOS/PROJ dependencies.
 
 ---
 
 ## Blocked Work
 
-Chunks M2-01 through DOC-01 remain in `BLOCKED` status awaiting completion and commit of their respective prerequisites. Chunk M1-01 is unblocked (`PLANNED`).
+Chunks M2-01 through DOC-01 remain in `BLOCKED` status awaiting completion, review, and commit of their respective prerequisites. Chunk M2-01 requires M1-01 to be `COMMITTED`.
 
 ---
 
 ## Completed / Verified / Committed Work
 
 - Initial repository structure scaffold commit: `4c0bcc8` (`.env.example`, `.gitignore`, `README.md`, `docker-compose.yml`).
-- M1-00: Repository Audit & State Initialization — COMMITTED.
-  Commit: `3816b09`
+- M1-00: Repository Audit & State Initialization — COMMITTED (Commit: `3816b09`).
+- M1-01: Repository & Docker Foundation — VERIFIED (Independent validation passed: Docker Compose config, image build with GDAL/GEOS/PROJ/libpq, PostGIS 3.4.3 runtime health, and volume persistence confirmed; backend ASGI application deferred to M2-01).
 
 ---
 
 ## Known Issues
 
-1. **Untracked Empty Files:** `backend/app/__init__.py` and `backend/app/main.py` exist locally as 0-byte untracked files alongside `requirements.txt`.
-2. **Untracked Virtual Environment:** `backend/venv/` exists locally and contains Python 3.11.9 with pre-installed packages matching `requirements.txt`. It is properly ignored by `.gitignore`.
-3. **Placeholder 0-byte Files:** `docker-compose.yml`, `.env.example`, and `README.md` are empty 0-byte files tracked in Git that require population during Chunk M1-01.
-4. **Empty Frontend Directory:** `frontend/` contains no scaffolding, package files, or build tool configuration.
+1. **Backend Application Placeholder:** `backend/app/main.py` is currently a placeholder file. The container command `uvicorn app.main:app` will become fully functional upon completion of Chunk M2-01 (FastAPI Foundation).
+2. **Untracked Host Virtual Environment:** `backend/venv/` exists locally on Windows host and is properly ignored by `.gitignore`. The Docker service isolates this via an anonymous volume (`/app/venv`).
+3. **Empty Frontend Directory:** `frontend/` contains no scaffolding, package files, or build tool configuration (scheduled for Chunk M5-01).
 
 ---
 
 ## Integration Notes
 
-- Host environment has Python 3.11.9, Node v22.14.0, npm 11.11.1, and Docker 29.2.1 available.
-- Python dependencies in `requirements.txt` cover GeoPandas, Rasterio, Shapely, SQLAlchemy, GeoAlchemy2, FastAPI, and Uvicorn.
-- Future chunks must ensure `backend/venv` or containerized environments preserve these geospatial library bindings (GDAL/GEOS/PROJ).
+- Docker Compose defines two core services: `db` (`postgis/postgis:16-3.4`) and `backend` (`python:3.11-slim-bookworm` with native GDAL 3.6.2, GEOS 3.11.1, PROJ 9.1.1, and libpq 15.19).
+- Backend image successfully built with all 44 pinned Python dependencies from `requirements.txt` (GeoPandas, Rasterio, Shapely, GeoAlchemy2, FastAPI).
+- Database service verified healthy and queryable with PostGIS 3.4.3 on port 5432 using named persistent volume `rakshakgis_pgdata`.
+- Backend container mounts `./backend:/app` for real-time hot-reloading during development.
+- Environment variables are defined via `.env.example` with documented defaults; zero secrets are tracked in Git.
 
 ---
 
 ## Last Updated
 
-- **Timestamp:** 2026-09-04 00:30:00 IST
+- **Timestamp:** 2026-09-04 01:00:00 IST
 - **Updated By:** M1 (Antigravity Agent)
-- **Status Summary:** Chunk M1-00 finalized as COMMITTED; Chunk M1-01 unblocked to PLANNED.
+- **Status Summary:** Chunk M1-01 independently reviewed and verified; committing foundation milestone.

@@ -1,4 +1,49 @@
-venv/
-__pycache__/
-*.pyc
+# Environment and Secrets
 .env
+.env.*
+!.env.example
+
+# Python Bytecode and Caches
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+
+# Python Virtual Environments
+.venv/
+venv/
+backend/venv/
+env/
+ENV/
+build/
+dist/
+*.egg-info/
+
+# Frontend Dependencies and Builds
+node_modules/
+.next/
+.cache/
+dist-ssr/
+
+# Testing, Coverage, and Linting Caches
+.pytest_cache/
+.mypy_cache/
+.ruff_cache/
+coverage/
+htmlcov/
+.coverage
+.coverage.*
+
+# Logs and Databases
+*.log
+*.sqlite
+*.sqlite3
+
+# Operating System and Editor Files
+.DS_Store
+Thumbs.db
+.idea/
+.vscode/
+*.swp
+*.swo
+*~

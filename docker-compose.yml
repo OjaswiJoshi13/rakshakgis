@@ -1,0 +1,62 @@
+services:
+  # Database Service: PostgreSQL 16 with PostGIS 3.4 spatial extensions
+  db:
+    image: postgis/postgis:16-3.4
+    container_name: rakshakgis-db
+    restart: unless-stopped
+    environment:
+      POSTGRES_DB: ${POSTGRES_DB:-rakshakgis}
+      POSTGRES_USER: ${POSTGRES_USER:-rakshak}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-rakshak_dev_secret}
+    ports:
+      - "${POSTGRES_PORT:-5432}:5432"
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_USER:-rakshak} -d ${POSTGRES_DB:-rakshakgis}"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+      start_period: 10s
+    networks:
+      - rakshak_network
+
+  # Backend Service: FastAPI application with GDAL/GEOS/PROJ geospatial support
+  backend:
+    build:
+      context: .
+      dockerfile: backend/Dockerfile
+    container_name: rakshakgis-backend
+    restart: unless-stopped
+    environment:
+      DATABASE_URL: ${DATABASE_URL:-postgresql://${POSTGRES_USER:-rakshak}:${POSTGRES_PASSWORD:-rakshak_dev_secret}@db:5432/${POSTGRES_DB:-rakshakgis}}
+      APP_ENV: ${APP_ENV:-development}
+      DATA_MODE: ${DATA_MODE:-demo}
+      JWT_SECRET: ${JWT_SECRET:-}
+      IMD_API_KEY: ${IMD_API_KEY:-}
+      IMD_BASE_URL: ${IMD_BASE_URL:-}
+      GEOSERVER_URL: ${GEOSERVER_URL:-}
+      GEOSERVER_USER: ${GEOSERVER_USER:-}
+      GEOSERVER_PASSWORD: ${GEOSERVER_PASSWORD:-}
+      OSM_ROUTING_URL: ${OSM_ROUTING_URL:-}
+      MAP_STYLE_URL: ${MAP_STYLE_URL:-}
+      LLM_API_KEY: ${LLM_API_KEY:-}
+    ports:
+      - "${BACKEND_PORT:-8000}:8000"
+    volumes:
+      - ./backend:/app
+      - /app/venv
+    depends_on:
+      db:
+        condition: service_healthy
+    networks:
+      - rakshak_network
+
+volumes:
+  pgdata:
+    name: rakshakgis_pgdata
+
+networks:
+  rakshak_network:
+    name: rakshakgis_network
+    driver: bridge
