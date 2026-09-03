@@ -135,7 +135,7 @@ No chunk may transition to `IN_PROGRESS` until all its listed prerequisite depen
 
 | Chunk ID | Module | Title | Assigned | Dependencies | Status |
 | --- | --- | --- | --- | --- | --- |
-| **M1-00** | Platform | Repository Audit & State Initialization | M1 | None | **AWAITING_REVIEW** |
+| **M1-00** | Platform | Repository Audit & State Initialization | M1 | None | **VERIFIED** |
 | **M1-01** | Platform | Repository & Docker Foundation | M1 | M1-00 | **BLOCKED** |
 | **M2-01** | Backend | FastAPI Foundation & Core App Setup | M2 | M1-01 | **BLOCKED** |
 | **M2-02** | Backend | PostgreSQL / PostGIS Engine Setup | M2 | M2-01 | **BLOCKED** |
@@ -189,7 +189,7 @@ No chunk may transition to `IN_PROGRESS` until all its listed prerequisite depen
 
 - **Active Chunk:** M1-00 (Repository Audit & State Initialization)
 - **Assignee:** M1 / Antigravity
-- **Status:** `AWAITING_REVIEW`
+- **Status:** `VERIFIED`
 - **Scope:** Repository synchronization, filesystem audit, classification against specification, initialization of `PROJECT_STATE.md`.
 
 ---
@@ -203,7 +203,7 @@ All subsequent chunks (M1-01 through DOC-01) remain in `BLOCKED` status awaiting
 ## Completed / Verified / Committed Work
 
 - Initial repository structure scaffold commit: `4c0bcc8` (`.env.example`, `.gitignore`, `README.md`, `docker-compose.yml`).
-- M1-00: Repository Audit & State Initialization — `IMPLEMENTED` / `AWAITING_REVIEW`.
+- M1-00: Repository Audit & State Initialization — VERIFIED.
 
 ---
 
@@ -226,6 +226,6 @@ All subsequent chunks (M1-01 through DOC-01) remain in `BLOCKED` status awaiting
 
 ## Last Updated
 
-- **Timestamp:** 2026-09-03 22:38:00 IST
+- **Timestamp:** 2026-09-04 00:25:00 IST
 - **Updated By:** M1 (Antigravity Agent)
-- **Status Summary:** Chunk M1-00 implemented; awaiting GPT verification before commit.
+- **Status Summary:** Chunk M1-00 verified by independent review.
