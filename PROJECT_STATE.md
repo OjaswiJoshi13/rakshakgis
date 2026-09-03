@@ -136,8 +136,8 @@ No chunk may transition to `IN_PROGRESS` until all its listed prerequisite depen
 | Chunk ID | Module | Title | Assigned | Dependencies | Status |
 | --- | --- | --- | --- | --- | --- |
 | **M1-00** | Platform | Repository Audit & State Initialization | M1 | None | **COMMITTED** |
-| **M1-01** | Platform | Repository & Docker Foundation | M1 | M1-00 | **VERIFIED** |
-| **M2-01** | Backend | FastAPI Foundation & Core App Setup | M2 | M1-01 | **BLOCKED** |
+| **M1-01** | Platform | Repository & Docker Foundation | M1 | M1-00 | **COMMITTED** |
+| **M2-01** | Backend | FastAPI Foundation & Core App Setup | M2 | M1-01 | **PLANNED** |
 | **M2-02** | Backend | PostgreSQL / PostGIS Engine Setup | M2 | M2-01 | **BLOCKED** |
 | **M2-03** | Backend | Database Models & Alembic Migrations | M2 | M2-02 | **BLOCKED** |
 | **M2-04** | Backend | Common API & Error Infrastructure | M2 | M2-03 | **BLOCKED** |
@@ -187,16 +187,15 @@ No chunk may transition to `IN_PROGRESS` until all its listed prerequisite depen
 
 ## Current Work
 
-- **Active Chunk:** M1-01 (Repository & Docker Foundation)
-- **Assignee:** M1 / Antigravity
-- **Status:** `VERIFIED`
-- **Scope:** Independent review passed; verified Docker Compose infrastructure, PostGIS 3.4.3 runtime, named volume persistence, and backend image build with native GDAL/GEOS/PROJ dependencies.
+- **Active Chunk:** None
+- **Next Eligible Chunk:** M2-01 (FastAPI Foundation & Core App Setup)
+- **Status:** Ready to start M2-01 (prerequisite M1-01 committed)
 
 ---
 
 ## Blocked Work
 
-Chunks M2-01 through DOC-01 remain in `BLOCKED` status awaiting completion, review, and commit of their respective prerequisites. Chunk M2-01 requires M1-01 to be `COMMITTED`.
+Chunks M2-02 through DOC-01 remain in `BLOCKED` status awaiting completion and commit of their respective prerequisites. Chunk M2-01 is unblocked (`PLANNED`).
 
 ---
 
@@ -204,7 +203,7 @@ Chunks M2-01 through DOC-01 remain in `BLOCKED` status awaiting completion, revi
 
 - Initial repository structure scaffold commit: `4c0bcc8` (`.env.example`, `.gitignore`, `README.md`, `docker-compose.yml`).
 - M1-00: Repository Audit & State Initialization — COMMITTED (Commit: `3816b09`).
-- M1-01: Repository & Docker Foundation — VERIFIED (Independent validation passed: Docker Compose config, image build with GDAL/GEOS/PROJ/libpq, PostGIS 3.4.3 runtime health, and volume persistence confirmed; backend ASGI application deferred to M2-01).
+- M1-01: Repository & Docker Foundation — COMMITTED (Commit: `bb79e25`).
 
 ---
 
@@ -228,6 +227,6 @@ Chunks M2-01 through DOC-01 remain in `BLOCKED` status awaiting completion, revi
 
 ## Last Updated
 
-- **Timestamp:** 2026-09-04 01:00:00 IST
+- **Timestamp:** 2026-09-04 01:05:00 IST
 - **Updated By:** M1 (Antigravity Agent)
-- **Status Summary:** Chunk M1-01 independently reviewed and verified; committing foundation milestone.
+- **Status Summary:** Chunk M1-01 finalized as COMMITTED; Chunk M2-01 unblocked to PLANNED.
