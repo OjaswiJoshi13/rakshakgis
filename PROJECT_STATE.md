@@ -139,10 +139,10 @@ No chunk may transition to `IN_PROGRESS` until all its listed prerequisite depen
 | **M1-01** | Platform | Repository & Docker Foundation | M1 | M1-00 | **COMMITTED** |
 | **M2-01** | Backend | FastAPI Foundation & Core App Setup | M2 | M1-01 | **COMMITTED** |
 | **M2-02** | Backend | PostgreSQL / PostGIS Engine Setup | M2 | M2-01 | **COMMITTED** |
-| **M2-03** | Backend | Database Models & Alembic Migrations | M2 | M2-02 | **PLANNED** |
-| **M2-04** | Backend | Common API & Error Infrastructure | M2 | M2-03 | **BLOCKED** |
+| **M2-03** | Backend | Database Models & Alembic Migrations | M2 | M2-02 | **COMMITTED** |
+| **M2-04** | Backend | Common API & Error Infrastructure | M2 | M2-03 | **PLANNED** |
 | **M2-05** | Backend | Authentication Backend (JWT / RBAC) | M2 | M2-04 | **BLOCKED** |
-| **M3-01** | Risk/GIS | Region Profiles Configuration | M3 | M2-03 | **BLOCKED** |
+| **M3-01** | Risk/GIS | Region Profiles Configuration | M3 | M2-03 | **PLANNED** |
 | **M3-02** | Risk/GIS | Demo & Synthetic Datasets | M3 | M3-01 | **BLOCKED** |
 | **M3-03** | Risk/GIS | Provider Interfaces & Mock Adapters | M3 | M3-01 | **BLOCKED** |
 | **M3-04** | Risk/GIS | Data Validation & Ingestion Pipelines | M3 | M3-02, M3-03 | **BLOCKED** |
@@ -155,7 +155,7 @@ No chunk may transition to `IN_PROGRESS` until all its listed prerequisite depen
 | **M3-11** | Risk/GIS | Dynamic Red Zones & Threshold Triggers | M3 | M3-10 | **BLOCKED** |
 | **M3-12** | Risk/GIS | Relocation Priority Scoring Backend | M3 | M3-08, M3-09 | **BLOCKED** |
 | **M3-13** | Risk/GIS | Data Source Freshness & Telemetry Backend | M3 | M3-03 | **BLOCKED** |
-| **M4-01** | Relocation | Candidate Relocation Sites Backend | M4 | M2-03 | **BLOCKED** |
+| **M4-01** | Relocation | Candidate Relocation Sites Backend | M4 | M2-03 | **PLANNED** |
 | **M4-02** | Relocation | Multi-Criteria Site Suitability Engine | M4 | M4-01, M3-06 | **BLOCKED** |
 | **M4-03** | Relocation | Carrying Capacity & Infrastructure Sizing | M4 | M4-02 | **BLOCKED** |
 | **M4-04** | Relocation | Relocation Matching & Assignment Engine | M4 | M3-12, M4-03 | **BLOCKED** |
@@ -188,14 +188,14 @@ No chunk may transition to `IN_PROGRESS` until all its listed prerequisite depen
 ## Current Work
 
 - **Active Chunk:** None
-- **Next Eligible Chunk:** M2-03 (Database Models & Alembic Migrations)
-- **Status:** Ready to start M2-03 (prerequisite M2-02 committed)
+- **Next Eligible Chunks:** M2-04 (Common API & Error Infrastructure), M3-01 (Region Profiles Configuration), M4-01 (Candidate Relocation Sites Backend)
+- **Status:** Prerequisite M2-03 committed; downstream chunks M2-04, M3-01, M4-01 unblocked to PLANNED
 
 ---
 
 ## Blocked Work
 
-Chunks M2-04 through DOC-01 remain in `BLOCKED` status awaiting completion, independent verification, and commit of their respective prerequisites. Chunk M2-03 is unblocked (`PLANNED`).
+Chunks M2-05 through DOC-01 (except unblocked M2-04, M3-01, M4-01) remain in `BLOCKED` status awaiting completion, independent verification, and commit of their respective prerequisites.
 
 ---
 
@@ -205,7 +205,77 @@ Chunks M2-04 through DOC-01 remain in `BLOCKED` status awaiting completion, inde
 - M1-00: Repository Audit & State Initialization — COMMITTED (Commit: `3816b09`).
 - M1-01: Repository & Docker Foundation — COMMITTED (Commit: `bb79e25`).
 - M2-01: FastAPI Foundation & Core App Setup — COMMITTED (Commit: `f115a76`).
-- M2-02: PostgreSQL / PostGIS Engine Setup — COMMITTED (Commit: `feat(database): establish PostgreSQL and PostGIS connectivity`).
+- M2-02: PostgreSQL / PostGIS Engine Setup — COMMITTED (Commit: `e15149a`).
+- M2-03: Database Models & Alembic Migrations — COMMITTED (Commit: `d271153`).
+
+---
+
+## Chunk M2-03 Implementation Record
+
+- **Status:** `COMMITTED`
+- **Files Created:**
+  - `backend/alembic.ini` (Alembic configuration)
+  - `backend/alembic/env.py` (Alembic environment with dynamic DB URL & PostGIS system table filters)
+  - `backend/alembic/script.py.mako` (Migration template)
+  - `backend/alembic/versions/.gitkeep`
+  - `backend/alembic/versions/20260904_7f762509fde4_initial_schema.py` (Initial deterministic migration for all 29 tables)
+  - `backend/app/models/__init__.py` (Central registry exporting all 29 models and Base)
+  - `backend/app/models/geographic.py` (Region, District, Block, Village)
+  - `backend/app/models/hazards.py` (HazardLayer, HazardObservation, LandslideEvent, FloodEvent, RainfallRecord, DisasterEvent)
+  - `backend/app/models/vulnerability.py` (PopulationProfile, VulnerabilityProfile)
+  - `backend/app/models/risk.py` (RiskScore, RiskFactor, RedZone)
+  - `backend/app/models/relocation.py` (CandidateSite, SiteCapacity, Infrastructure, RelocationPriority, RelocationAssignment, Route)
+  - `backend/app/models/scenarios.py` (Scenario, ScenarioRun)
+  - `backend/app/models/telemetry.py` (DataSource, DataIngestionRun, Alert)
+  - `backend/app/models/governance.py` (User, OfficerDecision, AuditLog)
+  - `backend/tests/test_models.py` (Automated tests for models, schema, spatial SRID, and migrations)
+- **Files Modified:**
+  - `requirements.txt` (Added `alembic==1.19.1` and `Mako==1.4.1`)
+  - `PROJECT_STATE.md` (Updated status to `AWAITING_REVIEW` and documented implementation record)
+- **Files Removed:**
+  - None
+- **Migration Revision:** `7f762509fde4`
+- **Database Tables Created (29 Domain Tables):**
+  - `regions`, `districts`, `blocks`, `villages`
+  - `hazard_layers`, `hazard_observations`, `landslide_events`, `flood_events`, `rainfall_records`, `disaster_events`
+  - `population_profiles`, `vulnerability_profiles`
+  - `candidate_sites`, `site_capacities`, `infrastructure`
+  - `risk_scores`, `risk_factors`, `red_zones`
+  - `relocation_priorities`, `relocation_assignments`, `routes`
+  - `scenarios`, `scenario_runs`
+  - `alerts`, `data_sources`, `data_ingestion_runs`
+  - `officer_decisions`, `audit_logs`, `users`
+- **PostGIS Spatial Columns (17 columns, WGS 84 SRID 4326 with GiST indexes):**
+  - `blocks.boundary` (MULTIPOLYGON, 4326)
+  - `candidate_sites.boundary` (POLYGON, 4326)
+  - `candidate_sites.location` (POINT, 4326)
+  - `disaster_events.affected_area` (MULTIPOLYGON, 4326)
+  - `disaster_events.epicenter_or_center` (POINT, 4326)
+  - `districts.boundary` (MULTIPOLYGON, 4326)
+  - `flood_events.inundation_polygon` (MULTIPOLYGON, 4326)
+  - `hazard_observations.location` (POINT, 4326)
+  - `infrastructure.location` (POINT, 4326)
+  - `landslide_events.location` (POINT, 4326)
+  - `landslide_events.scar_polygon` (POLYGON, 4326)
+  - `rainfall_records.station_location` (POINT, 4326)
+  - `red_zones.geometry` (MULTIPOLYGON, 4326)
+  - `regions.boundary` (MULTIPOLYGON, 4326)
+  - `routes.path` (LINESTRING, 4326)
+  - `villages.boundary` (POLYGON, 4326)
+  - `villages.location` (POINT, 4326)
+- **Alembic Verification Commands Executed:**
+  - `alembic upgrade head` -> Successfully applied revision `7f762509fde4`
+  - `alembic current` -> `7f762509fde4 (head)`
+  - `alembic downgrade base` -> Successfully reverted to clean database
+  - `alembic upgrade head` -> Deterministically reapplied all 29 tables & spatial indexes
+- **Automated Test Results:**
+  - Ran `pytest tests -v` in `rakshakgis-backend`: **23 passed, 0 failed** in 1.92s
+  - All existing M2-01 (health/core) and M2-02 (database engine/readiness) tests pass 100%
+  - 8 new model & migration tests pass 100%
+- **Endpoint Verification:**
+  - `GET /health` -> HTTP 200 OK (remains database-independent)
+  - `GET /ready` -> HTTP 200 OK (PostgreSQL 16.4 & PostGIS 3.4.3 connected)
+- **Known Issues or Ambiguities:** None.
 
 ---
 
@@ -219,18 +289,19 @@ Chunks M2-04 through DOC-01 remain in `BLOCKED` status awaiting completion, inde
 ## Integration Notes
 
 - Docker Compose defines two core services: `db` (`postgis/postgis:16-3.4`) and `backend` (`python:3.11-slim-bookworm` with native GDAL 3.6.2, GEOS 3.11.1, PROJ 9.1.1, and libpq 15.19).
-- Backend image successfully built with all 44 pinned Python dependencies from `requirements.txt` (GeoPandas, Rasterio, Shapely, GeoAlchemy2, FastAPI).
+- Backend image contains all pinned Python dependencies from `requirements.txt` including `alembic==1.19.1` and `Mako==1.4.1`.
 - Database service verified healthy and queryable with PostGIS 3.4.3 on port 5432 using named persistent volume `rakshakgis_pgdata`.
 - Backend container mounts `./backend:/app` for real-time hot-reloading during development.
 - Environment variables are defined via `.env.example` with documented defaults; zero secrets are tracked in Git.
 - Chunk M2-01 established FastAPI application entrypoint with `/health`, `/`, and `/api/v1` routes and automated test suite.
 - Chunk M2-02 established PostgreSQL & PostGIS engine connectivity, `SessionLocal`, `get_db()`, `/ready` endpoint, and spatial capability verification.
-- Automated tests verified: 15 passed in container (Python 3.11) and host (Python 3.13).
+- Chunk M2-03 established Alembic migration foundation and all 29 SQLAlchemy ORM models with PostGIS spatial types (SRID 4326).
+- Automated tests verified: 23 passed in container (Python 3.11).
 
 ---
 
 ## Last Updated
 
-- **Timestamp:** 2026-09-04 15:45:00 IST
+- **Timestamp:** 2026-09-04 16:30:00 IST
 - **Updated By:** M2 (Antigravity Agent)
-- **Status Summary:** Chunk M2-02 finalized as COMMITTED; Chunk M2-03 unblocked to PLANNED.
+- **Status Summary:** Chunk M2-03 finalized and COMMITTED; downstream chunks M2-04, M3-01, M4-01 unblocked to PLANNED.
