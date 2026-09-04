@@ -67,6 +67,7 @@ def test_docs_and_openapi_endpoints(client: TestClient):
     assert schema["info"]["title"] == "RakshakGIS"
     assert schema["info"]["version"] == "0.1.0"
     assert "/health" in schema["paths"]
+    assert "/ready" in schema["paths"]
     assert "/" in schema["paths"]
     assert "/api/v1" in schema["paths"]
 

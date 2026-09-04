@@ -138,8 +138,8 @@ No chunk may transition to `IN_PROGRESS` until all its listed prerequisite depen
 | **M1-00** | Platform | Repository Audit & State Initialization | M1 | None | **COMMITTED** |
 | **M1-01** | Platform | Repository & Docker Foundation | M1 | M1-00 | **COMMITTED** |
 | **M2-01** | Backend | FastAPI Foundation & Core App Setup | M2 | M1-01 | **COMMITTED** |
-| **M2-02** | Backend | PostgreSQL / PostGIS Engine Setup | M2 | M2-01 | **PLANNED** |
-| **M2-03** | Backend | Database Models & Alembic Migrations | M2 | M2-02 | **BLOCKED** |
+| **M2-02** | Backend | PostgreSQL / PostGIS Engine Setup | M2 | M2-01 | **COMMITTED** |
+| **M2-03** | Backend | Database Models & Alembic Migrations | M2 | M2-02 | **PLANNED** |
 | **M2-04** | Backend | Common API & Error Infrastructure | M2 | M2-03 | **BLOCKED** |
 | **M2-05** | Backend | Authentication Backend (JWT / RBAC) | M2 | M2-04 | **BLOCKED** |
 | **M3-01** | Risk/GIS | Region Profiles Configuration | M3 | M2-03 | **BLOCKED** |
@@ -188,14 +188,14 @@ No chunk may transition to `IN_PROGRESS` until all its listed prerequisite depen
 ## Current Work
 
 - **Active Chunk:** None
-- **Next Eligible Chunk:** M2-02 (PostgreSQL / PostGIS Engine Setup)
-- **Status:** Ready to start M2-02 (prerequisite M2-01 committed)
+- **Next Eligible Chunk:** M2-03 (Database Models & Alembic Migrations)
+- **Status:** Ready to start M2-03 (prerequisite M2-02 committed)
 
 ---
 
 ## Blocked Work
 
-Chunks M2-03 through DOC-01 remain in `BLOCKED` status awaiting completion, independent verification, and commit of their respective prerequisites. Chunk M2-02 is unblocked (`PLANNED`).
+Chunks M2-04 through DOC-01 remain in `BLOCKED` status awaiting completion, independent verification, and commit of their respective prerequisites. Chunk M2-03 is unblocked (`PLANNED`).
 
 ---
 
@@ -204,7 +204,8 @@ Chunks M2-03 through DOC-01 remain in `BLOCKED` status awaiting completion, inde
 - Initial repository structure scaffold commit: `4c0bcc8` (`.env.example`, `.gitignore`, `README.md`, `docker-compose.yml`).
 - M1-00: Repository Audit & State Initialization — COMMITTED (Commit: `3816b09`).
 - M1-01: Repository & Docker Foundation — COMMITTED (Commit: `bb79e25`).
-- M2-01: FastAPI Foundation & Core App Setup — COMMITTED (Commit: `feat(backend): establish FastAPI application foundation`).
+- M2-01: FastAPI Foundation & Core App Setup — COMMITTED (Commit: `f115a76`).
+- M2-02: PostgreSQL / PostGIS Engine Setup — COMMITTED (Commit: `feat(database): establish PostgreSQL and PostGIS connectivity`).
 
 ---
 
@@ -223,12 +224,13 @@ Chunks M2-03 through DOC-01 remain in `BLOCKED` status awaiting completion, inde
 - Backend container mounts `./backend:/app` for real-time hot-reloading during development.
 - Environment variables are defined via `.env.example` with documented defaults; zero secrets are tracked in Git.
 - Chunk M2-01 established FastAPI application entrypoint with `/health`, `/`, and `/api/v1` routes and automated test suite.
-- Automated tests verified: 8 passed in container (Python 3.11) and host (Python 3.13).
+- Chunk M2-02 established PostgreSQL & PostGIS engine connectivity, `SessionLocal`, `get_db()`, `/ready` endpoint, and spatial capability verification.
+- Automated tests verified: 15 passed in container (Python 3.11) and host (Python 3.13).
 
 ---
 
 ## Last Updated
 
-- **Timestamp:** 2026-09-04 15:15:00 IST
+- **Timestamp:** 2026-09-04 15:45:00 IST
 - **Updated By:** M2 (Antigravity Agent)
-- **Status Summary:** Chunk M2-01 finalized as COMMITTED; Chunk M2-02 unblocked to PLANNED.
+- **Status Summary:** Chunk M2-02 finalized as COMMITTED; Chunk M2-03 unblocked to PLANNED.

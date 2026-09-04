@@ -3,11 +3,12 @@
 from contextlib import asynccontextmanager
 from typing import AsyncGenerator
 
-from fastapi import FastAPI
+from fastapi import FastAPI, Response, status
 from fastapi.middleware.cors import CORSMiddleware
 
 from app.api.routes import api_router
 from app.core.config import get_settings
+from app.core.database import check_db_readiness
 from app.core.logging import setup_logging
 
 settings = get_settings()
@@ -59,6 +60,15 @@ def health_check() -> dict:
         "data_mode": settings.DATA_MODE,
         "version": settings.VERSION,
     }
+
+
+@app.get("/ready", tags=["Health"])
+def readiness_check(response: Response) -> dict:
+    """Service readiness endpoint verifying database and PostGIS connectivity."""
+    readiness = check_db_readiness()
+    if readiness.get("status") != "ready":
+        response.status_code = status.HTTP_503_SERVICE_UNAVAILABLE
+    return readiness
 
 
 @app.get("/", tags=["System"])

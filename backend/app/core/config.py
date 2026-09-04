@@ -25,6 +25,28 @@ class Settings(BaseSettings):
     DATA_MODE: str = "demo"
     BACKEND_PORT: int = 8000
 
+    # Database configuration matching .env.example
+    POSTGRES_DB: str = "rakshakgis"
+    POSTGRES_USER: str = "rakshak"
+    POSTGRES_PASSWORD: str = "rakshak_dev_secret"
+    POSTGRES_HOST: str = "db"
+    POSTGRES_PORT: int = 5432
+    DATABASE_URL: str = ""
+
+    @field_validator("DATABASE_URL", mode="after")
+    @classmethod
+    def assemble_database_url(cls, v: str, info) -> str:
+        """Resolve database URL from DATABASE_URL or component environment variables."""
+        if v and "${" not in v:
+            return v
+        data = info.data
+        user = data.get("POSTGRES_USER", "rakshak")
+        password = data.get("POSTGRES_PASSWORD", "rakshak_dev_secret")
+        host = data.get("POSTGRES_HOST", "db")
+        port = data.get("POSTGRES_PORT", 5432)
+        db = data.get("POSTGRES_DB", "rakshakgis")
+        return f"postgresql://{user}:{password}@{host}:{port}/{db}"
+
     # CORS configuration for local frontend development (Next.js / Vite)
     CORS_ORIGINS: Union[List[str], str] = [
         "http://localhost:3000",
