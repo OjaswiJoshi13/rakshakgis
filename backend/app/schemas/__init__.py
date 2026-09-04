@@ -1,5 +1,10 @@
 """Application schemas module."""
 
+from app.schemas.auth import (
+    LoginRequest,
+    TokenResponse,
+    UserRead,
+)
 from app.schemas.common import (
     ErrorDetail,
     ErrorResponse,
@@ -11,7 +16,10 @@ from app.schemas.common import (
 __all__ = [
     "ErrorDetail",
     "ErrorResponse",
+    "LoginRequest",
     "PaginatedResponse",
     "PaginationMetadata",
     "ResponseEnvelope",
+    "TokenResponse",
+    "UserRead",
 ]

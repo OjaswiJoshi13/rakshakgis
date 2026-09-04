@@ -141,7 +141,7 @@ No chunk may transition to `IN_PROGRESS` until all its listed prerequisite depen
 | **M2-02** | Backend | PostgreSQL / PostGIS Engine Setup | M2 | M2-01 | **COMMITTED** |
 | **M2-03** | Backend | Database Models & Alembic Migrations | M2 | M2-02 | **COMMITTED** |
 | **M2-04** | Backend | Common API & Error Infrastructure | M2 | M2-03 | **COMMITTED** |
-| **M2-05** | Backend | Authentication Backend (JWT / RBAC) | M2 | M2-04 | **PLANNED** |
+| **M2-05** | Backend | Authentication Backend (JWT / RBAC) | M2 | M2-04 | **COMMITTED** |
 | **M3-01** | Risk/GIS | Region Profiles Configuration | M3 | M2-03 | **PLANNED** |
 | **M3-02** | Risk/GIS | Demo & Synthetic Datasets | M3 | M3-01 | **BLOCKED** |
 | **M3-03** | Risk/GIS | Provider Interfaces & Mock Adapters | M3 | M3-01 | **BLOCKED** |
@@ -188,14 +188,14 @@ No chunk may transition to `IN_PROGRESS` until all its listed prerequisite depen
 ## Current Work
 
 - **Active Chunk:** None
-- **Next Eligible Chunks:** M2-05 (Authentication Backend (JWT / RBAC)), M3-01 (Region Profiles Configuration), M4-01 (Candidate Relocation Sites Backend)
-- **Status:** Prerequisite M2-04 committed; downstream chunk M2-05 unblocked to PLANNED alongside M3-01 and M4-01
+- **Next Eligible Chunks:** M3-01 (Region Profiles Configuration), M4-01 (Candidate Relocation Sites Backend)
+- **Status:** Chunk M2-05 finalized and committed; M3-01 and M4-01 ready for execution.
 
 ---
 
 ## Blocked Work
 
-Chunks M3-02 through DOC-01 (except unblocked M2-05, M3-01, M4-01) remain in `BLOCKED` status awaiting completion, independent verification, and commit of their respective prerequisites.
+Chunks M3-02 through DOC-01 (except unblocked M3-01 and M4-01) remain in `BLOCKED` status awaiting completion, independent verification, and commit of their respective prerequisites.
 
 ---
 
@@ -207,7 +207,8 @@ Chunks M3-02 through DOC-01 (except unblocked M2-05, M3-01, M4-01) remain in `BL
 - M2-01: FastAPI Foundation & Core App Setup — COMMITTED (Commit: `f115a76`).
 - M2-02: PostgreSQL / PostGIS Engine Setup — COMMITTED (Commit: `e15149a`).
 - M2-03: Database Models & Alembic Migrations — COMMITTED (Commit: `3448035`).
-- M2-04: Common API & Error Infrastructure — COMMITTED (Commit: `feat(api): standardize common error handling and request tracing`).
+- M2-04: Common API & Error Infrastructure — COMMITTED (Commit: `d81bbeb`).
+- M2-05: Backend Authentication Backend (JWT / RBAC) — COMMITTED (Commit: `feat(auth): implement JWT authentication and RBAC`).
 
 ---
 
@@ -317,6 +318,48 @@ Chunks M3-02 through DOC-01 (except unblocked M2-05, M3-01, M4-01) remain in `BL
 
 ---
 
+## Chunk M2-05 Implementation Record
+
+- **Status:** `COMMITTED`
+- **Scope:** Backend Authentication Backend (JWT / RBAC)
+- **Files Created:**
+  - `backend/app/core/security.py` (Password hashing/verification via `bcrypt`, JWT access token issuance/decoding via `pyjwt`)
+  - `backend/app/schemas/auth.py` (Pydantic models: `LoginRequest`, `TokenResponse`, `UserRead`)
+  - `backend/app/api/deps.py` (`UserRole` enum, `get_current_user` dependency, `require_roles` RBAC callable)
+  - `backend/app/api/v1/__init__.py` (API v1 package marker)
+  - `backend/app/api/v1/auth.py` (`POST /api/v1/auth/login`, `GET /api/v1/auth/me`)
+  - `backend/tests/test_auth.py` (25 automated tests covering password hashing, JWT operations, production configuration validation, login, me, and RBAC authorization)
+- **Files Modified:**
+  - `requirements.txt` (Added `bcrypt==5.0.0` and `pyjwt==2.13.0`)
+  - `backend/app/core/config.py` (Added `JWT_SECRET`, `JWT_ALGORITHM`, `ACCESS_TOKEN_EXPIRE_MINUTES`, and production validation check)
+  - `backend/app/schemas/__init__.py` (Exported auth schemas: `LoginRequest`, `TokenResponse`, `UserRead`)
+  - `backend/app/api/routes.py` (Mounted `auth_router` under prefix `/auth`)
+  - `PROJECT_STATE.md` (Updated M2-05 to `COMMITTED` and documented implementation record)
+- **Files Removed:** None.
+- **Automated Test Results:**
+  - Full suite command: `wsl -e docker exec rakshakgis-backend pytest tests -v`
+  - Result: **62 passed, 0 failed, 3 warnings in 4.34s**
+  - Breakdown:
+    - 25 tests in `tests/test_auth.py` (bcrypt hashing/uniqueness, JWT issuance/expiry/signatures, production fallback rejection, login by username/email, 401 invalid credentials, sanitized `/me` without password leak, RBAC admin/officer/responder roles and 403 forbidden checks, OpenAPI documentation)
+    - 14 tests in `tests/test_error_handling.py` (M2-04 common API error contract and correlation ID)
+    - 7 tests in `tests/test_database.py` (M2-02 PostgreSQL / PostGIS engine and readiness)
+    - 8 tests in `tests/test_health.py` (M2-01 health, root, /api/v1, docs)
+    - 8 tests in `tests/test_models.py` (M2-03 Alembic head and 29 ORM models)
+- **Live Endpoint Verification:**
+  - `GET /health` -> HTTP 200 with `x-request-id`
+  - `GET /ready` -> HTTP 200 with `x-request-id`
+  - `GET /` -> HTTP 200 with `x-request-id`
+  - `GET /api/v1` -> HTTP 200 with `x-request-id`
+  - `GET /openapi.json` -> HTTP 200 with `LoginRequest`, `TokenResponse`, `UserRead` schemas
+  - `POST /api/v1/auth/login` -> HTTP 200 with `access_token`, `token_type: bearer`, and `expires_in`
+  - `POST /api/v1/auth/login` (bad credentials) -> HTTP 401 `UNAUTHORIZED` with structured `ErrorResponse`
+  - `GET /api/v1/auth/me` (with Bearer token) -> HTTP 200 with sanitized `UserRead` strictly excluding `hashed_password`
+  - `GET /api/v1/auth/me` (without token) -> HTTP 401 `UNAUTHORIZED` with structured `ErrorResponse`
+  - Protected role endpoints properly return HTTP 403 `FORBIDDEN` when role is insufficient
+- **Known Issues or Ambiguities:** None.
+
+---
+
 ## Known Issues
 
 1. **Untracked Host Virtual Environment:** `backend/venv/` exists locally on Windows host and is properly ignored by `.gitignore`. The Docker service isolates this via an anonymous volume (`/app/venv`).
@@ -327,7 +370,7 @@ Chunks M3-02 through DOC-01 (except unblocked M2-05, M3-01, M4-01) remain in `BL
 ## Integration Notes
 
 - Docker Compose defines two core services: `db` (`postgis/postgis:16-3.4`) and `backend` (`python:3.11-slim-bookworm` with native GDAL 3.6.2, GEOS 3.11.1, PROJ 9.1.1, and libpq 15.19).
-- Backend image contains all pinned Python dependencies from `requirements.txt` including `alembic==1.19.1` and `Mako==1.4.1`.
+- Backend image contains all pinned Python dependencies from `requirements.txt` including `alembic==1.19.1`, `Mako==1.4.1`, `bcrypt==5.0.0`, and `pyjwt==2.13.0`.
 - Database service verified healthy and queryable with PostGIS 3.4.3 on port 5432 using named persistent volume `rakshakgis_pgdata`.
 - Backend container mounts `./backend:/app` for real-time hot-reloading during development.
 - Environment variables are defined via `.env.example` with documented defaults; zero secrets are tracked in Git.
@@ -335,12 +378,13 @@ Chunks M3-02 through DOC-01 (except unblocked M2-05, M3-01, M4-01) remain in `BL
 - Chunk M2-02 established PostgreSQL & PostGIS engine connectivity, `SessionLocal`, `get_db()`, `/ready` endpoint, and spatial capability verification.
 - Chunk M2-03 established Alembic migration foundation and all 29 SQLAlchemy ORM models with PostGIS spatial types (SRID 4326).
 - Chunk M2-04 established common API schemas, standardized error responses, exception hierarchy, correlation ID middleware (`X-Request-ID`), and centralized error handlers.
-- Automated tests verified: 37 passed in container (Python 3.11).
+- Chunk M2-05 established password hashing with bcrypt, JWT token operations with pyjwt, current-user authentication dependency, RBAC authorization (`require_roles`), and auth API endpoints (`/login`, `/me`).
+- Automated tests verified: 62 passed in container (Python 3.11).
 
 ---
 
 ## Last Updated
 
-- **Timestamp:** 2026-09-04 17:15:00 IST
+- **Timestamp:** 2026-09-04 18:25:00 IST
 - **Updated By:** M2 (Antigravity Agent)
-- **Status Summary:** Chunk M2-04 finalized and COMMITTED; downstream chunk M2-05 unblocked to PLANNED.
+- **Status Summary:** Chunk M2-05 finalized and COMMITTED; downstream chunks M3-01 and M4-01 ready for execution.

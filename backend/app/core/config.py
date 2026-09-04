@@ -47,6 +47,27 @@ class Settings(BaseSettings):
         db = data.get("POSTGRES_DB", "rakshakgis")
         return f"postgresql://{user}:{password}@{host}:{port}/{db}"
 
+    # Authentication & Security configuration matching .env.example
+    JWT_SECRET: str = "replace_with_a_secure_random_jwt_secret_in_production"
+    JWT_ALGORITHM: str = "HS256"
+    ACCESS_TOKEN_EXPIRE_MINUTES: int = 1440  # 24 hours
+
+    @field_validator("JWT_SECRET", mode="after")
+    @classmethod
+    def assemble_jwt_secret(cls, v: str, info) -> str:
+        """Ensure JWT secret is configuration-driven with explicit non-production fallback."""
+        data = info.data
+        app_env = data.get("APP_ENV", "development")
+        cleaned = v.strip() if v else ""
+        if app_env == "production":
+            if not cleaned or cleaned == "replace_with_a_secure_random_jwt_secret_in_production":
+                raise ValueError(
+                    "A secure, non-default JWT_SECRET environment variable is mandatory in production."
+                )
+        if not cleaned:
+            return "replace_with_a_secure_random_jwt_secret_in_production"
+        return cleaned
+
     # CORS configuration for local frontend development (Next.js / Vite)
     CORS_ORIGINS: Union[List[str], str] = [
         "http://localhost:3000",
