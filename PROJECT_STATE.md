@@ -155,7 +155,7 @@ No chunk may transition to `IN_PROGRESS` until all its listed prerequisite depen
 | **M3-11** | Risk/GIS | Dynamic Red Zones & Threshold Triggers | M3 | M3-10 | **BLOCKED** |
 | **M3-12** | Risk/GIS | Relocation Priority Scoring Backend | M3 | M3-08, M3-09 | **BLOCKED** |
 | **M3-13** | Risk/GIS | Data Source Freshness & Telemetry Backend | M3 | M3-03 | **BLOCKED** |
-| **M4-01** | Relocation | Candidate Relocation Sites Backend | M4 | M2-03 | **AWAITING_REVIEW** |
+| **M4-01** | Relocation | Candidate Relocation Sites Backend | M4 | M2-03 | **COMMITTED** |
 | **M4-02** | Relocation | Multi-Criteria Site Suitability Engine | M4 | M4-01, M3-06 | **BLOCKED** |
 | **M4-03** | Relocation | Carrying Capacity & Infrastructure Sizing | M4 | M4-02 | **BLOCKED** |
 | **M4-04** | Relocation | Relocation Matching & Assignment Engine | M4 | M3-12, M4-03 | **BLOCKED** |
@@ -187,9 +187,9 @@ No chunk may transition to `IN_PROGRESS` until all its listed prerequisite depen
 
 ## Current Work
 
-- **Active Chunk:** None (Chunk M4-01 awaiting review)
-- **Next Eligible Chunks:** M3-08 (Risk Explainability & Factor Contribution), M3-09 (Vulnerability & Exposure Scoring Engine)
-- **Status:** Chunk M3-07 independently reviewed and COMMITTED; Chunk M4-01 awaiting independent review.
+- **Active Chunk:** None
+- **Next Eligible Chunks:** M3-08 (Risk Explainability & Factor Contribution), M3-09 (Vulnerability & Exposure Scoring Engine), M4-02 (Multi-Criteria Site Suitability Engine)
+- **Status:** Chunk M4-01 independently reviewed and COMMITTED (Commit: `5c100603b77e45a47a8c6420f405819166e58609`); Chunk M4-02 is now ELIGIBLE because M4-01 is COMMITTED and M3-06 is already COMMITTED; Chunks M3-08 and M3-09 are also eligible independently.
 
 ---
 
@@ -216,6 +216,7 @@ Chunks M3-08 through DOC-01 (except unblocked M3-01, M3-02, M3-03, M3-04, M3-05,
 - M3-05: Risk Normalization Engine — COMMITTED (Commit: `feat(m3): add risk normalization engine`).
 - M3-06: Multi-Hazard Risk Computation Engine — COMMITTED (Commit: `feat(m3): add multi-hazard risk computation engine`).
 - M3-07: Risk Classification & Grading — COMMITTED (Commit: `feat(m3): add risk classification and grading`).
+- M4-01: Candidate Relocation Sites Backend — COMMITTED (Commit: `5c100603b77e45a47a8c6420f405819166e58609`).
 
 ---
 
@@ -369,7 +370,8 @@ Chunks M3-08 through DOC-01 (except unblocked M3-01, M3-02, M3-03, M3-04, M3-05,
 
 ## Chunk M4-01 Implementation Record
 
-- **Status:** `AWAITING_REVIEW`
+- **Status:** `COMMITTED`
+- **Commit:** `5c100603b77e45a47a8c6420f405819166e58609`
 - **Scope:** Candidate Relocation Sites Backend
 - **Files Created:**
   - `backend/app/schemas/sites.py` (Pydantic schemas for `GeoJSONPoint`, `GeoJSONPolygon`, `CandidateSiteRead`, `CandidateSiteDetailRead`, `CandidateSiteCreate`, `CandidateSiteUpdate`, `SiteCapacityRead`, `InfrastructureRead`)
@@ -377,7 +379,7 @@ Chunks M3-08 through DOC-01 (except unblocked M3-01, M3-02, M3-03, M3-04, M3-05,
   - `backend/tests/test_sites.py` (Automated unit and API integration tests for M4-01)
 - **Files Modified:**
   - `backend/app/api/routes.py` (Registered candidate relocation sites router under `/api/v1/sites`)
-  - `PROJECT_STATE.md` (Documented M4-01 implementation record, updated chunk registry and metadata to AWAITING_REVIEW)
+  - `PROJECT_STATE.md` (Documented M4-01 implementation record, updated chunk registry and metadata to COMMITTED)
 - **Files Removed:** None
 - **API Endpoints Implemented:**
   - `GET /api/v1/sites` — List paginated candidate sites with filters (`district_id`, `status`, `min_elevation_m`, `max_elevation_m`, `min_area_sq_m`, `max_area_sq_m`, `search`).
@@ -730,6 +732,6 @@ Chunks M3-08 through DOC-01 (except unblocked M3-01, M3-02, M3-03, M3-04, M3-05,
 
 ## Last Updated
 
-- **Timestamp:** 2026-09-05 02:11:00 IST
-- **Updated By:** M3 (Antigravity Agent)
-- **Status Summary:** Chunk M3-07 independently reviewed and COMMITTED; all 196 automated tests verified against live PostGIS database container.
+- **Timestamp:** 2026-09-05 02:22:00 IST
+- **Updated By:** M4 (Bookkeeping Correction)
+- **Status Summary:** Chunk M4-01 independently reviewed and COMMITTED (Commit: `5c100603b77e45a47a8c6420f405819166e58609`); Chunk M4-02 is now eligible; Chunks M3-08 and M3-09 are eligible independently.
