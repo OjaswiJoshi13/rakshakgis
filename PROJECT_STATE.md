@@ -137,8 +137,8 @@ No chunk may transition to `IN_PROGRESS` until all its listed prerequisite depen
 | --- | --- | --- | --- | --- | --- |
 | **M1-00** | Platform | Repository Audit & State Initialization | M1 | None | **COMMITTED** |
 | **M1-01** | Platform | Repository & Docker Foundation | M1 | M1-00 | **COMMITTED** |
-| **M2-01** | Backend | FastAPI Foundation & Core App Setup | M2 | M1-01 | **PLANNED** |
-| **M2-02** | Backend | PostgreSQL / PostGIS Engine Setup | M2 | M2-01 | **BLOCKED** |
+| **M2-01** | Backend | FastAPI Foundation & Core App Setup | M2 | M1-01 | **COMMITTED** |
+| **M2-02** | Backend | PostgreSQL / PostGIS Engine Setup | M2 | M2-01 | **PLANNED** |
 | **M2-03** | Backend | Database Models & Alembic Migrations | M2 | M2-02 | **BLOCKED** |
 | **M2-04** | Backend | Common API & Error Infrastructure | M2 | M2-03 | **BLOCKED** |
 | **M2-05** | Backend | Authentication Backend (JWT / RBAC) | M2 | M2-04 | **BLOCKED** |
@@ -188,14 +188,14 @@ No chunk may transition to `IN_PROGRESS` until all its listed prerequisite depen
 ## Current Work
 
 - **Active Chunk:** None
-- **Next Eligible Chunk:** M2-01 (FastAPI Foundation & Core App Setup)
-- **Status:** Ready to start M2-01 (prerequisite M1-01 committed)
+- **Next Eligible Chunk:** M2-02 (PostgreSQL / PostGIS Engine Setup)
+- **Status:** Ready to start M2-02 (prerequisite M2-01 committed)
 
 ---
 
 ## Blocked Work
 
-Chunks M2-02 through DOC-01 remain in `BLOCKED` status awaiting completion and commit of their respective prerequisites. Chunk M2-01 is unblocked (`PLANNED`).
+Chunks M2-03 through DOC-01 remain in `BLOCKED` status awaiting completion, independent verification, and commit of their respective prerequisites. Chunk M2-02 is unblocked (`PLANNED`).
 
 ---
 
@@ -204,14 +204,14 @@ Chunks M2-02 through DOC-01 remain in `BLOCKED` status awaiting completion and c
 - Initial repository structure scaffold commit: `4c0bcc8` (`.env.example`, `.gitignore`, `README.md`, `docker-compose.yml`).
 - M1-00: Repository Audit & State Initialization — COMMITTED (Commit: `3816b09`).
 - M1-01: Repository & Docker Foundation — COMMITTED (Commit: `bb79e25`).
+- M2-01: FastAPI Foundation & Core App Setup — COMMITTED (Commit: `feat(backend): establish FastAPI application foundation`).
 
 ---
 
 ## Known Issues
 
-1. **Backend Application Placeholder:** `backend/app/main.py` is currently a placeholder file. The container command `uvicorn app.main:app` will become fully functional upon completion of Chunk M2-01 (FastAPI Foundation).
-2. **Untracked Host Virtual Environment:** `backend/venv/` exists locally on Windows host and is properly ignored by `.gitignore`. The Docker service isolates this via an anonymous volume (`/app/venv`).
-3. **Empty Frontend Directory:** `frontend/` contains no scaffolding, package files, or build tool configuration (scheduled for Chunk M5-01).
+1. **Untracked Host Virtual Environment:** `backend/venv/` exists locally on Windows host and is properly ignored by `.gitignore`. The Docker service isolates this via an anonymous volume (`/app/venv`).
+2. **Empty Frontend Directory:** `frontend/` contains no scaffolding, package files, or build tool configuration (scheduled for Chunk M5-01).
 
 ---
 
@@ -222,11 +222,13 @@ Chunks M2-02 through DOC-01 remain in `BLOCKED` status awaiting completion and c
 - Database service verified healthy and queryable with PostGIS 3.4.3 on port 5432 using named persistent volume `rakshakgis_pgdata`.
 - Backend container mounts `./backend:/app` for real-time hot-reloading during development.
 - Environment variables are defined via `.env.example` with documented defaults; zero secrets are tracked in Git.
+- Chunk M2-01 established FastAPI application entrypoint with `/health`, `/`, and `/api/v1` routes and automated test suite.
+- Automated tests verified: 8 passed in container (Python 3.11) and host (Python 3.13).
 
 ---
 
 ## Last Updated
 
-- **Timestamp:** 2026-09-04 01:05:00 IST
-- **Updated By:** M1 (Antigravity Agent)
-- **Status Summary:** Chunk M1-01 finalized as COMMITTED; Chunk M2-01 unblocked to PLANNED.
+- **Timestamp:** 2026-09-04 15:15:00 IST
+- **Updated By:** M2 (Antigravity Agent)
+- **Status Summary:** Chunk M2-01 finalized as COMMITTED; Chunk M2-02 unblocked to PLANNED.
