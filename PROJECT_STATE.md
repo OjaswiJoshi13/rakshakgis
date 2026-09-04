@@ -146,7 +146,7 @@ No chunk may transition to `IN_PROGRESS` until all its listed prerequisite depen
 | **M3-02** | Risk/GIS | Demo & Synthetic Datasets | M3 | M3-01 | **COMMITTED** |
 | **M3-03** | Risk/GIS | Provider Interfaces & Mock Adapters | M3 | M3-01 | **VERIFIED** |
 | **M3-04** | Risk/GIS | Data Validation & Ingestion Pipelines | M3 | M3-02, M3-03 | **COMMITTED** |
-| **M3-05** | Risk/GIS | Risk Normalization Engine | M3 | M3-04 | **BLOCKED** |
+| **M3-05** | Risk/GIS | Risk Normalization Engine | M3 | M3-04 | **COMMITTED** |
 | **M3-06** | Risk/GIS | Multi-Hazard Risk Computation Engine | M3 | M3-05 | **BLOCKED** |
 | **M3-07** | Risk/GIS | Risk Classification & Grading | M3 | M3-06 | **BLOCKED** |
 | **M3-08** | Risk/GIS | Risk Explainability & Factor Contribution | M3 | M3-07 | **BLOCKED** |
@@ -188,14 +188,14 @@ No chunk may transition to `IN_PROGRESS` until all its listed prerequisite depen
 ## Current Work
 
 - **Active Chunk:** None (Chunk M4-01 implemented and awaiting review)
-- **Next Eligible Chunks:** M3-05 (Risk Normalization Engine)
-- **Status:** Chunk M3-04 (Data Validation & Ingestion Pipelines) independently reviewed and COMMITTED; Chunk M4-01 (Candidate Relocation Sites Backend) implemented and awaiting independent review.
+- **Next Eligible Chunks:** M3-06 (Multi-Hazard Risk Computation Engine)
+- **Status:** Chunk M3-05 independently reviewed and COMMITTED; Chunk M4-01 awaiting independent review.
 
 ---
 
 ## Blocked Work
 
-Chunks M3-05 through DOC-01 (except unblocked M3-01, M3-02, M3-03, M3-04, and M4-01) remain in `BLOCKED` status awaiting completion, independent verification, and commit of their respective prerequisites.
+Chunks M3-06 through DOC-01 (except unblocked M3-01, M3-02, M3-03, M3-04, M3-05, and M4-01) remain in `BLOCKED` status awaiting completion, independent verification, and commit of their respective prerequisites.
 
 ---
 
@@ -558,6 +558,47 @@ Chunks M3-05 through DOC-01 (except unblocked M3-01, M3-02, M3-03, M3-04, and M4
 
 ---
 
+## Chunk M3-05 Implementation Record
+
+- **Status:** `COMMITTED`
+- **Scope:** Risk Normalization Engine
+- **Scope Discipline:** Strictly limited to transforming validated heterogeneous hazard and exposure observations into comparable factor values on a standardized `0.0 — 100.0` scale. Zero composite risk computation ($Risk = 0.30H + 0.20F + ...$), zero multi-hazard aggregation, zero risk banding (SAFE, MODERATE, HIGH, CRITICAL), zero Red Zones, zero relocation priorities, zero live external API calls, and zero database migrations implemented. Demographic exposure and vulnerability scoring ($D$ and $V$) are explicitly deferred to Chunk M3-09.
+- **Normalization Modules (`app.core.risk.normalization`):**
+  - Exception Hierarchy (`errors.py`): `NormalizationError` base class, `NormalizationConfigError`, `InvalidInputError`, `UnsupportedFactorError`.
+  - Typed Contracts (`contracts.py`): `FactorCategory` enum, `NormalizationMethod` enum, `NormalizationStatus` enum, `LinearRangeConfig` (with bounds validation), `PiecewiseThresholdConfig` (with monotonicity validation), `CategoricalSeverityPolicy` (with score validation), `NormalizationExplainability` metadata envelope, and `NormalizationResult` output envelope with strict invariants ($0.0 \le \text{normalized\_value} \le 100.0$; missing/unavailable records strictly mapped to `normalized_value=None`).
+  - Mathematical Methods (`methods.py`): Pure deterministic functions: `linear_normalize()`, `piecewise_threshold_normalize()`, and `categorical_severity_normalize()` with explicit clamping tracking and NaN/Inf rejection.
+  - Normalization Coordinator (`engine.py`): `RiskNormalizationEngine` integrating M3-01 `RegionProfile` thresholds (`rainfall_heavy_24h_mm = 64.5`, `rainfall_very_heavy_24h_mm = 115.5`, `seismic_critical_mmi = 7.0`), factor normalizers (`normalize_rainfall()`, `normalize_flood()`, `normalize_landslide()`, `normalize_hazard_observation()`, `normalize_categorical()`), and universal record normalizer `normalize_record()` handling canonical M3-04 records.
+  - Public Package Exports (`__init__.py`): Re-exported under `app.core.risk` and `app.core.risk.normalization`.
+  - Technical Documentation (`README.md`): Architecture, 0–100 scale contract, supported methods, configuration sourcing, clamping behavior, safety-critical missing/unknown handling, explainability metadata, and strict boundary definition.
+- **Files Created:**
+  - `backend/app/core/risk/__init__.py` (Top-level risk module exports)
+  - `backend/app/core/risk/normalization/__init__.py` (Normalization package exports)
+  - `backend/app/core/risk/normalization/contracts.py` (Typed schemas, policy models, and result envelopes)
+  - `backend/app/core/risk/normalization/errors.py` (Normalization exception hierarchy)
+  - `backend/app/core/risk/normalization/methods.py` (Pure mathematical scaling and interpolation methods)
+  - `backend/app/core/risk/normalization/engine.py` (Normalization engine with profile integration)
+  - `backend/app/core/risk/normalization/README.md` (Architecture and technical reference)
+  - `backend/tests/test_risk_normalization.py` (22 comprehensive unit tests covering all required invariants)
+- **Files Modified:**
+  - `PROJECT_STATE.md` (Updated M3-05 to `AWAITING_REVIEW`, updated current/blocked work, added implementation record, updated integration notes)
+- **Files Removed:** None.
+- **Automated Test Results:**
+  - M3-05 normalization suite: `docker exec rakshakgis-backend pytest tests/test_risk_normalization.py -v`
+  - Result: **22 passed, 0 failed, 2 warnings in 0.57s**
+  - Ingestion suite regression: `docker exec rakshakgis-backend pytest tests/test_ingestion.py -v`
+  - Result: **20 passed, 0 failed, 2 warnings in 0.71s**
+  - Provider suite regression: `docker exec rakshakgis-backend pytest tests/test_providers.py -v`
+  - Result: **15 passed, 0 failed, 2 warnings in 0.36s**
+  - Synthetic dataset regression: `docker exec rakshakgis-backend pytest tests/test_synthetic_data.py -v`
+  - Result: **12 passed, 0 failed, 2 warnings in 0.43s**
+  - Full backend regression: `docker exec rakshakgis-backend pytest tests -v`
+  - Result: **154 passed, 0 failed, 4 warnings in 6.38s**
+- **Known Issues or Ambiguities / Limitations:**
+  - Demographic exposure ($D$) and vulnerability scoring ($V$) are explicitly deferred to M3-09; population records return `NormalizationStatus.DEFERRED` with `normalized_value=None`.
+  - Composite multi-hazard risk scoring ($0.30H + 0.20F + 0.15R + 0.15S + 0.10D + 0.10V$) is deferred to M3-06.
+
+---
+
 ## Known Issues
 
 1. **Untracked Host Virtual Environment:** `backend/venv/` exists locally on Windows host and is properly ignored by `.gitignore`. The Docker service isolates this via an anonymous volume (`/app/venv`).
@@ -582,12 +623,13 @@ Chunks M3-05 through DOC-01 (except unblocked M3-01, M3-02, M3-03, M3-04, and M4
 - Chunk M3-02 established deterministic synthetic Himalayan pilot dataset (40 villages, 12 candidate relocation sites, 30 hazard events, seed 26191) with GeoJSON fixtures and Pydantic loader schemas.
 - Chunk M3-03 established provider-adapter abstraction layer (`app.data.providers`) with typed contracts, exception hierarchy, registry, and deterministic mock adapters consuming M3-02 fixtures.
 - Chunk M3-04 established data validation and ingestion pipeline (`app.data.ingestion`) with multi-stage validators, intra-batch deduplication, canonicalization, and deterministic `IngestionResult` envelopes.
-- Automated tests verified: 132 passed in container (Python 3.11).
+- Chunk M3-05 established risk normalization engine (`app.core.risk.normalization`) transforming heterogeneous hazard observations to comparable 0.0 - 100.0 factors with M3-01 profile thresholds, clamping tracking, explainability metadata, and safety-critical missing/unknown handling.
+- Automated tests verified: 154 passed in container (Python 3.11).
 
 ---
 
 ## Last Updated
 
-- **Timestamp:** 2026-09-05 00:43:00 IST
+- **Timestamp:** 2026-09-05 01:35:00 IST
 - **Updated By:** M3 (Antigravity Agent)
-- **Status Summary:** Chunk M3-04 independently reviewed and COMMITTED; all 132 automated tests verified against live PostGIS database container.
+- **Status Summary:** Chunk M3-05 independently reviewed and COMMITTED; all 154 automated tests verified against live PostGIS database container.
