@@ -1,0 +1,18 @@
+{
+  "candidate_site_count": 12,
+  "dataset_id": "rakshakgis_himalayan_pilot_v1",
+  "disclaimer": "DEMO / SYNTHETIC DATASET for SIH Problem Statement 26191. Generated deterministically using fixed pseudo-random seed 26191. Not official Government of Uttarakhand, Survey of India, or Census data. Do NOT use for official administrative actions or statutory land acquisition.",
+  "generation_method": "deterministic_prng",
+  "generator_seed": 26191,
+  "geographic_bounding_box": {
+    "max_lat": 30.7,
+    "max_lon": 79.85,
+    "min_lat": 30.2,
+    "min_lon": 79.1
+  },
+  "hazard_event_count": 30,
+  "pilot_region_profile": "himalayan_pilot",
+  "source_type": "synthetic",
+  "version": "1.0.0",
+  "village_count": 40
+}

@@ -143,7 +143,7 @@ No chunk may transition to `IN_PROGRESS` until all its listed prerequisite depen
 | **M2-04** | Backend | Common API & Error Infrastructure | M2 | M2-03 | **COMMITTED** |
 | **M2-05** | Backend | Authentication Backend (JWT / RBAC) | M2 | M2-04 | **COMMITTED** |
 | **M3-01** | Risk/GIS | Region Profiles Configuration | M3 | M2-03 | **COMMITTED** |
-| **M3-02** | Risk/GIS | Demo & Synthetic Datasets | M3 | M3-01 | **BLOCKED** |
+| **M3-02** | Risk/GIS | Demo & Synthetic Datasets | M3 | M3-01 | **COMMITTED** |
 | **M3-03** | Risk/GIS | Provider Interfaces & Mock Adapters | M3 | M3-01 | **BLOCKED** |
 | **M3-04** | Risk/GIS | Data Validation & Ingestion Pipelines | M3 | M3-02, M3-03 | **BLOCKED** |
 | **M3-05** | Risk/GIS | Risk Normalization Engine | M3 | M3-04 | **BLOCKED** |
@@ -188,14 +188,14 @@ No chunk may transition to `IN_PROGRESS` until all its listed prerequisite depen
 ## Current Work
 
 - **Active Chunk:** None (Chunk M4-01 implemented and awaiting review)
-- **Next Eligible Chunks:** M3-02 (Demo & Synthetic Datasets), M3-03 (Provider Interfaces & Mock Adapters)
-- **Status:** Chunk M3-01 independently verified and COMMITTED; Chunk M4-01 (Candidate Relocation Sites Backend) implemented and awaiting independent review.
+- **Next Eligible Chunks:** M3-03 (Provider Interfaces & Mock Adapters)
+- **Status:** Chunk M3-02 independently verified and COMMITTED; Chunk M4-01 (Candidate Relocation Sites Backend) implemented and awaiting independent review.
 
 ---
 
 ## Blocked Work
 
-Chunks M3-02 through DOC-01 (except unblocked M3-01 and M4-01) remain in `BLOCKED` status awaiting completion, independent verification, and commit of their respective prerequisites.
+Chunks M3-03 through DOC-01 (except unblocked M3-01, M3-02, and M4-01) remain in `BLOCKED` status awaiting completion, independent verification, and commit of their respective prerequisites.
 
 ---
 
@@ -210,6 +210,7 @@ Chunks M3-02 through DOC-01 (except unblocked M3-01 and M4-01) remain in `BLOCKE
 - M2-04: Common API & Error Infrastructure — COMMITTED (Commit: `d81bbeb`).
 - M2-05: Backend Authentication Backend (JWT / RBAC) — COMMITTED (Commit: `feat(auth): implement JWT authentication and RBAC`).
 - M3-01: Region Profiles Configuration — COMMITTED (Commit: `feat(m3): add regional configuration profiles`).
+- M3-02: Demo & Synthetic Datasets — COMMITTED (Commit: `feat(m3): add demo synthetic datasets`).
 
 ---
 
@@ -424,6 +425,42 @@ Chunks M3-02 through DOC-01 (except unblocked M3-01 and M4-01) remain in `BLOCKE
 
 ---
 
+## Chunk M3-02 Implementation Record
+
+- **Status:** `COMMITTED`
+- **Scope:** Demo & Synthetic Datasets for Himalayan Pilot (Chamoli District)
+- **Deterministic Seed:** `26191` (Fixed pseudo-random seed from SIH Problem Statement 26191)
+- **Pilot Region Profile ID:** `himalayan_pilot` (From Chunk M3-01 `RegionProfileRegistry`)
+- **Dataset Scales & Entities Generated:**
+  - **40 Villages (`villages.geojson`):** GeoJSON FeatureCollection spanning Joshimath (15), Dasholi (13), Karnaprayag (7), and Ghat (5) blocks. Contains WGS84 Point geometry, non-negative populations (190–920), households, demographic breakdowns (elderly, children, disabled, livestock), vulnerability indices, infrastructure indicators, road connectivity, and physical hazard indicators.
+  - **12 Candidate Relocation Sites (`candidate_sites.geojson`):** GeoJSON FeatureCollection with closed-ring bounding polygons, area (9,500–85,000 m²), slope (5.8°–24.0°), hazard buffer distances (220–1,400 m), carrying capacities, road access, and water supply (35–90 LPD). Includes 7 suitable sites, 4 intentionally rejected sites (slope > 15°, buffer < 500m, water < 70 LPD), and 1 constrained site (capacity bottleneck of 18 households) for downstream M4 suitability engine verification.
+  - **30 Hazard Events (`hazard_events.json`):** Incident observations covering all 4 required hazard categories (10 landslides, 8 extreme/heavy rainfall readings exceeding IMD 64.5/115.5 mm thresholds, 6 seismic events MMI 5.5–7.2, and 6 flash flood / cloudburst runoffs).
+  - **Dataset Metadata Manifest (`himalayan_pilot_metadata.json`):** Dataset versioning, bounds, counts, and non-official synthetic disclaimers.
+- **Files Created:**
+  - `backend/app/data/__init__.py` (Data package initialization)
+  - `backend/app/data/synthetic/__init__.py` (Public package exports)
+  - `backend/app/data/synthetic/constants.py` (Deterministic seed, block specs, settlement and site registries)
+  - `backend/app/data/synthetic/schemas.py` (Pydantic models and GeoJSON validators)
+  - `backend/app/data/synthetic/generator.py` (Deterministic dataset generator and fixture serializer)
+  - `backend/app/data/synthetic/loader.py` (In-memory loader and direct GeoJSON dictionary accessor helpers)
+  - `backend/app/data/synthetic/README.md` (Dataset documentation, schema descriptions, and consumption guide)
+  - `backend/app/data/synthetic/fixtures/himalayan_pilot_metadata.json`
+  - `backend/app/data/synthetic/fixtures/villages.geojson`
+  - `backend/app/data/synthetic/fixtures/candidate_sites.geojson`
+  - `backend/app/data/synthetic/fixtures/hazard_events.json`
+  - `backend/tests/test_synthetic_data.py` (12 automated tests covering counts, GeoJSON topology, demographic bounds, hazard references, intentional rejection cases, determinism, and zero PII)
+- **Files Modified:**
+  - `PROJECT_STATE.md` (Updated M3-02 to `COMMITTED`, added implementation record, updated integration notes)
+- **Files Removed:** None.
+- **Automated Test Results:**
+  - Synthetic dataset suite command: `docker exec rakshakgis-backend pytest tests/test_synthetic_data.py -v`
+  - Result: **12 passed, 0 failed, 2 warnings in 0.41s**
+  - Full backend regression command: `docker exec rakshakgis-backend pytest tests -v`
+  - Result: **97 passed, 0 failed, 4 warnings in 6.36s**
+- **Known Issues or Ambiguities:** None.
+
+---
+
 ## Known Issues
 
 1. **Untracked Host Virtual Environment:** `backend/venv/` exists locally on Windows host and is properly ignored by `.gitignore`. The Docker service isolates this via an anonymous volume (`/app/venv`).
@@ -445,12 +482,13 @@ Chunks M3-02 through DOC-01 (except unblocked M3-01 and M4-01) remain in `BLOCKE
 - Chunk M2-05 established password hashing with bcrypt, JWT token operations with pyjwt, current-user authentication dependency, RBAC authorization (`require_roles`), and auth API endpoints (`/login`, `/me`).
 - Chunk M4-01 established candidate relocation sites backend API (`/api/v1/sites`), Pydantic GeoJSON Point/Polygon schemas with coordinate bounds and closed-ring validation, pagination and domain filters, RBAC mutation enforcement (`ADMIN`, `DISTRICT_OFFICER`), and relational detail loading.
 - Chunk M3-01 established typed, immutable regional configuration system (`app.core.profiles`) with deterministic validation, registry resolver, Himalayan pilot profile, and future Riverine/Coastal templates.
-- Automated tests verified: 85 passed in container (Python 3.11).
+- Chunk M3-02 established deterministic synthetic Himalayan pilot dataset (40 villages, 12 candidate relocation sites, 30 hazard events, seed 26191) with GeoJSON fixtures and Pydantic loader schemas.
+- Automated tests verified: 97 passed in container (Python 3.11).
 
 ---
 
 ## Last Updated
 
-- **Timestamp:** 2026-09-05 00:03:00 IST
+- **Timestamp:** 2026-09-05 00:15:00 IST
 - **Updated By:** M3 (Antigravity Agent)
-- **Status Summary:** Chunk M3-01 independently verified and COMMITTED; all 85 automated tests verified against live PostGIS database container.
+- **Status Summary:** Chunk M3-02 independently verified and COMMITTED; all 97 automated tests verified against live PostGIS database container.

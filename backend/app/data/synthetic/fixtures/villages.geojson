@@ -1,0 +1,2646 @@
+{
+  "type": "FeatureCollection",
+  "name": "synthetic_himalayan_villages",
+  "features": [
+    {
+      "type": "Feature",
+      "id": "HIM-VILL-001",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          79.55621,
+          30.53357
+        ]
+      },
+      "properties": {
+        "id": "HIM-VILL-001",
+        "name": "Sunil",
+        "region_code": "uttarakhand_himalayan",
+        "district_code": "chamoli",
+        "district_name": "Chamoli District",
+        "block_code": "joshimath",
+        "block_name": "Joshimath Block",
+        "census_code": "044101",
+        "population": 507,
+        "households": 113,
+        "demographics": {
+          "elderly_count": 55,
+          "children_count": 96,
+          "disabled_count": 17,
+          "livestock_count": 160
+        },
+        "vulnerability": {
+          "social_vulnerability_index": 0.392,
+          "economic_vulnerability_index": 0.785,
+          "structural_vulnerability_index": 0.839,
+          "road_connectivity_index": 0.886,
+          "poverty_ratio": 0.199,
+          "kuccha_housing_ratio": 0.279
+        },
+        "infrastructure": {
+          "has_primary_school": true,
+          "has_health_subcenter": false,
+          "has_piped_water": true,
+          "has_electricity": true,
+          "has_telecom_coverage": true
+        },
+        "accessibility": {
+          "distance_to_motorable_road_km": 0.8,
+          "road_type": "paved",
+          "evacuation_route_condition": "critical_chokepoints",
+          "is_winter_cutoff_prone": true
+        },
+        "hazards": {
+          "elevation_m": 2242.2,
+          "slope_deg": 32.6,
+          "historical_landslide_count": 2,
+          "active_subsidence": true,
+          "distance_to_river_m": 259.0,
+          "soil_type": "colluvial_scree",
+          "geological_formation": "Garhwal_Group_Quartzite"
+        },
+        "provenance": {
+          "is_synthetic": true,
+          "data_source": "DEMO_SYNTHETIC_GENERATOR",
+          "pilot_region": "himalayan_pilot",
+          "generator_seed": 26191,
+          "disclaimer": "DEMO / SYNTHETIC DATASET for SIH Problem Statement 26191. Generated deterministically using fixed pseudo-random seed 26191. Not official Government of Uttarakhand, Survey of India, or Census data. Do NOT use for official administrative actions or statutory land acquisition."
+        }
+      }
+    },
+    {
+      "type": "Feature",
+      "id": "HIM-VILL-002",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          79.59017,
+          30.51535
+        ]
+      },
+      "properties": {
+        "id": "HIM-VILL-002",
+        "name": "Ravigram",
+        "region_code": "uttarakhand_himalayan",
+        "district_code": "chamoli",
+        "district_name": "Chamoli District",
+        "block_code": "joshimath",
+        "block_name": "Joshimath Block",
+        "census_code": "044102",
+        "population": 607,
+        "households": 143,
+        "demographics": {
+          "elderly_count": 85,
+          "children_count": 93,
+          "disabled_count": 12,
+          "livestock_count": 240
+        },
+        "vulnerability": {
+          "social_vulnerability_index": 0.758,
+          "economic_vulnerability_index": 0.737,
+          "structural_vulnerability_index": 0.735,
+          "road_connectivity_index": 0.629,
+          "poverty_ratio": 0.238,
+          "kuccha_housing_ratio": 0.646
+        },
+        "infrastructure": {
+          "has_primary_school": true,
+          "has_health_subcenter": false,
+          "has_piped_water": true,
+          "has_electricity": true,
+          "has_telecom_coverage": true
+        },
+        "accessibility": {
+          "distance_to_motorable_road_km": 2.6,
+          "road_type": "unpaved",
+          "evacuation_route_condition": "poor",
+          "is_winter_cutoff_prone": false
+        },
+        "hazards": {
+          "elevation_m": 2042.1,
+          "slope_deg": 29.0,
+          "historical_landslide_count": 6,
+          "active_subsidence": true,
+          "distance_to_river_m": 1162.9,
+          "soil_type": "morainic_gravel",
+          "geological_formation": "Central_Crystalline_Gneiss"
+        },
+        "provenance": {
+          "is_synthetic": true,
+          "data_source": "DEMO_SYNTHETIC_GENERATOR",
+          "pilot_region": "himalayan_pilot",
+          "generator_seed": 26191,
+          "disclaimer": "DEMO / SYNTHETIC DATASET for SIH Problem Statement 26191. Generated deterministically using fixed pseudo-random seed 26191. Not official Government of Uttarakhand, Survey of India, or Census data. Do NOT use for official administrative actions or statutory land acquisition."
+        }
+      }
+    },
+    {
+      "type": "Feature",
+      "id": "HIM-VILL-003",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          79.55852,
+          30.58066
+        ]
+      },
+      "properties": {
+        "id": "HIM-VILL-003",
+        "name": "Marwari",
+        "region_code": "uttarakhand_himalayan",
+        "district_code": "chamoli",
+        "district_name": "Chamoli District",
+        "block_code": "joshimath",
+        "block_name": "Joshimath Block",
+        "census_code": "044103",
+        "population": 471,
+        "households": 111,
+        "demographics": {
+          "elderly_count": 54,
+          "children_count": 76,
+          "disabled_count": 12,
+          "livestock_count": 107
+        },
+        "vulnerability": {
+          "social_vulnerability_index": 0.29,
+          "economic_vulnerability_index": 0.622,
+          "structural_vulnerability_index": 0.749,
+          "road_connectivity_index": 0.7,
+          "poverty_ratio": 0.334,
+          "kuccha_housing_ratio": 0.34
+        },
+        "infrastructure": {
+          "has_primary_school": true,
+          "has_health_subcenter": true,
+          "has_piped_water": true,
+          "has_electricity": true,
+          "has_telecom_coverage": true
+        },
+        "accessibility": {
+          "distance_to_motorable_road_km": 2.1,
+          "road_type": "unpaved",
+          "evacuation_route_condition": "critical_chokepoints",
+          "is_winter_cutoff_prone": true
+        },
+        "hazards": {
+          "elevation_m": 2462.0,
+          "slope_deg": 39.6,
+          "historical_landslide_count": 5,
+          "active_subsidence": false,
+          "distance_to_river_m": 1381.9,
+          "soil_type": "fluvial_terrace_alluvium",
+          "geological_formation": "Chamoli_Metavolcanic_Formation"
+        },
+        "provenance": {
+          "is_synthetic": true,
+          "data_source": "DEMO_SYNTHETIC_GENERATOR",
+          "pilot_region": "himalayan_pilot",
+          "generator_seed": 26191,
+          "disclaimer": "DEMO / SYNTHETIC DATASET for SIH Problem Statement 26191. Generated deterministically using fixed pseudo-random seed 26191. Not official Government of Uttarakhand, Survey of India, or Census data. Do NOT use for official administrative actions or statutory land acquisition."
+        }
+      }
+    },
+    {
+      "type": "Feature",
+      "id": "HIM-VILL-004",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          79.5248,
+          30.54224
+        ]
+      },
+      "properties": {
+        "id": "HIM-VILL-004",
+        "name": "Manohar Bagh",
+        "region_code": "uttarakhand_himalayan",
+        "district_code": "chamoli",
+        "district_name": "Chamoli District",
+        "block_code": "joshimath",
+        "block_name": "Joshimath Block",
+        "census_code": "044104",
+        "population": 525,
+        "households": 110,
+        "demographics": {
+          "elderly_count": 76,
+          "children_count": 100,
+          "disabled_count": 15,
+          "livestock_count": 91
+        },
+        "vulnerability": {
+          "social_vulnerability_index": 0.759,
+          "economic_vulnerability_index": 0.331,
+          "structural_vulnerability_index": 0.641,
+          "road_connectivity_index": 0.586,
+          "poverty_ratio": 0.383,
+          "kuccha_housing_ratio": 0.623
+        },
+        "infrastructure": {
+          "has_primary_school": true,
+          "has_health_subcenter": false,
+          "has_piped_water": true,
+          "has_electricity": true,
+          "has_telecom_coverage": false
+        },
+        "accessibility": {
+          "distance_to_motorable_road_km": 2.9,
+          "road_type": "unpaved",
+          "evacuation_route_condition": "critical_chokepoints",
+          "is_winter_cutoff_prone": false
+        },
+        "hazards": {
+          "elevation_m": 2006.8,
+          "slope_deg": 33.7,
+          "historical_landslide_count": 2,
+          "active_subsidence": true,
+          "distance_to_river_m": 1412.1,
+          "soil_type": "debris_mantled_slope",
+          "geological_formation": "Vaikrita_Group_Schist"
+        },
+        "provenance": {
+          "is_synthetic": true,
+          "data_source": "DEMO_SYNTHETIC_GENERATOR",
+          "pilot_region": "himalayan_pilot",
+          "generator_seed": 26191,
+          "disclaimer": "DEMO / SYNTHETIC DATASET for SIH Problem Statement 26191. Generated deterministically using fixed pseudo-random seed 26191. Not official Government of Uttarakhand, Survey of India, or Census data. Do NOT use for official administrative actions or statutory land acquisition."
+        }
+      }
+    },
+    {
+      "type": "Feature",
+      "id": "HIM-VILL-005",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          79.56419,
+          30.60456
+        ]
+      },
+      "properties": {
+        "id": "HIM-VILL-005",
+        "name": "Parsari",
+        "region_code": "uttarakhand_himalayan",
+        "district_code": "chamoli",
+        "district_name": "Chamoli District",
+        "block_code": "joshimath",
+        "block_name": "Joshimath Block",
+        "census_code": "044105",
+        "population": 565,
+        "households": 131,
+        "demographics": {
+          "elderly_count": 54,
+          "children_count": 89,
+          "disabled_count": 12,
+          "livestock_count": 147
+        },
+        "vulnerability": {
+          "social_vulnerability_index": 0.566,
+          "economic_vulnerability_index": 0.421,
+          "structural_vulnerability_index": 0.775,
+          "road_connectivity_index": 0.586,
+          "poverty_ratio": 0.212,
+          "kuccha_housing_ratio": 0.369
+        },
+        "infrastructure": {
+          "has_primary_school": true,
+          "has_health_subcenter": true,
+          "has_piped_water": true,
+          "has_electricity": true,
+          "has_telecom_coverage": true
+        },
+        "accessibility": {
+          "distance_to_motorable_road_km": 2.9,
+          "road_type": "unpaved",
+          "evacuation_route_condition": "poor",
+          "is_winter_cutoff_prone": false
+        },
+        "hazards": {
+          "elevation_m": 2176.7,
+          "slope_deg": 24.0,
+          "historical_landslide_count": 2,
+          "active_subsidence": false,
+          "distance_to_river_m": 1441.9,
+          "soil_type": "colluvial_scree",
+          "geological_formation": "Garhwal_Group_Quartzite"
+        },
+        "provenance": {
+          "is_synthetic": true,
+          "data_source": "DEMO_SYNTHETIC_GENERATOR",
+          "pilot_region": "himalayan_pilot",
+          "generator_seed": 26191,
+          "disclaimer": "DEMO / SYNTHETIC DATASET for SIH Problem Statement 26191. Generated deterministically using fixed pseudo-random seed 26191. Not official Government of Uttarakhand, Survey of India, or Census data. Do NOT use for official administrative actions or statutory land acquisition."
+        }
+      }
+    },
+    {
+      "type": "Feature",
+      "id": "HIM-VILL-006",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          79.55543,
+          30.58687
+        ]
+      },
+      "properties": {
+        "id": "HIM-VILL-006",
+        "name": "Singhdhar",
+        "region_code": "uttarakhand_himalayan",
+        "district_code": "chamoli",
+        "district_name": "Chamoli District",
+        "block_code": "joshimath",
+        "block_name": "Joshimath Block",
+        "census_code": "044106",
+        "population": 539,
+        "households": 126,
+        "demographics": {
+          "elderly_count": 52,
+          "children_count": 96,
+          "disabled_count": 15,
+          "livestock_count": 129
+        },
+        "vulnerability": {
+          "social_vulnerability_index": 0.508,
+          "economic_vulnerability_index": 0.557,
+          "structural_vulnerability_index": 0.596,
+          "road_connectivity_index": 0.457,
+          "poverty_ratio": 0.33,
+          "kuccha_housing_ratio": 0.406
+        },
+        "infrastructure": {
+          "has_primary_school": true,
+          "has_health_subcenter": true,
+          "has_piped_water": true,
+          "has_electricity": true,
+          "has_telecom_coverage": false
+        },
+        "accessibility": {
+          "distance_to_motorable_road_km": 3.8,
+          "road_type": "unpaved",
+          "evacuation_route_condition": "critical_chokepoints",
+          "is_winter_cutoff_prone": false
+        },
+        "hazards": {
+          "elevation_m": 1863.1,
+          "slope_deg": 35.6,
+          "historical_landslide_count": 5,
+          "active_subsidence": true,
+          "distance_to_river_m": 1064.8,
+          "soil_type": "morainic_gravel",
+          "geological_formation": "Central_Crystalline_Gneiss"
+        },
+        "provenance": {
+          "is_synthetic": true,
+          "data_source": "DEMO_SYNTHETIC_GENERATOR",
+          "pilot_region": "himalayan_pilot",
+          "generator_seed": 26191,
+          "disclaimer": "DEMO / SYNTHETIC DATASET for SIH Problem Statement 26191. Generated deterministically using fixed pseudo-random seed 26191. Not official Government of Uttarakhand, Survey of India, or Census data. Do NOT use for official administrative actions or statutory land acquisition."
+        }
+      }
+    },
+    {
+      "type": "Feature",
+      "id": "HIM-VILL-007",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          79.5489,
+          30.60828
+        ]
+      },
+      "properties": {
+        "id": "HIM-VILL-007",
+        "name": "Gandhinagar",
+        "region_code": "uttarakhand_himalayan",
+        "district_code": "chamoli",
+        "district_name": "Chamoli District",
+        "block_code": "joshimath",
+        "block_name": "Joshimath Block",
+        "census_code": "044107",
+        "population": 858,
+        "households": 187,
+        "demographics": {
+          "elderly_count": 86,
+          "children_count": 158,
+          "disabled_count": 28,
+          "livestock_count": 293
+        },
+        "vulnerability": {
+          "social_vulnerability_index": 0.358,
+          "economic_vulnerability_index": 0.402,
+          "structural_vulnerability_index": 0.455,
+          "road_connectivity_index": 0.886,
+          "poverty_ratio": 0.204,
+          "kuccha_housing_ratio": 0.556
+        },
+        "infrastructure": {
+          "has_primary_school": true,
+          "has_health_subcenter": true,
+          "has_piped_water": true,
+          "has_electricity": false,
+          "has_telecom_coverage": true
+        },
+        "accessibility": {
+          "distance_to_motorable_road_km": 0.8,
+          "road_type": "paved",
+          "evacuation_route_condition": "critical_chokepoints",
+          "is_winter_cutoff_prone": false
+        },
+        "hazards": {
+          "elevation_m": 2171.6,
+          "slope_deg": 40.2,
+          "historical_landslide_count": 2,
+          "active_subsidence": false,
+          "distance_to_river_m": 179.9,
+          "soil_type": "fluvial_terrace_alluvium",
+          "geological_formation": "Chamoli_Metavolcanic_Formation"
+        },
+        "provenance": {
+          "is_synthetic": true,
+          "data_source": "DEMO_SYNTHETIC_GENERATOR",
+          "pilot_region": "himalayan_pilot",
+          "generator_seed": 26191,
+          "disclaimer": "DEMO / SYNTHETIC DATASET for SIH Problem Statement 26191. Generated deterministically using fixed pseudo-random seed 26191. Not official Government of Uttarakhand, Survey of India, or Census data. Do NOT use for official administrative actions or statutory land acquisition."
+        }
+      }
+    },
+    {
+      "type": "Feature",
+      "id": "HIM-VILL-008",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          79.59032,
+          30.55896
+        ]
+      },
+      "properties": {
+        "id": "HIM-VILL-008",
+        "name": "Helang",
+        "region_code": "uttarakhand_himalayan",
+        "district_code": "chamoli",
+        "district_name": "Chamoli District",
+        "block_code": "joshimath",
+        "block_name": "Joshimath Block",
+        "census_code": "044108",
+        "population": 885,
+        "households": 185,
+        "demographics": {
+          "elderly_count": 127,
+          "children_count": 174,
+          "disabled_count": 22,
+          "livestock_count": 324
+        },
+        "vulnerability": {
+          "social_vulnerability_index": 0.746,
+          "economic_vulnerability_index": 0.392,
+          "structural_vulnerability_index": 0.848,
+          "road_connectivity_index": 0.843,
+          "poverty_ratio": 0.37,
+          "kuccha_housing_ratio": 0.421
+        },
+        "infrastructure": {
+          "has_primary_school": true,
+          "has_health_subcenter": false,
+          "has_piped_water": false,
+          "has_electricity": false,
+          "has_telecom_coverage": true
+        },
+        "accessibility": {
+          "distance_to_motorable_road_km": 1.1,
+          "road_type": "paved",
+          "evacuation_route_condition": "poor",
+          "is_winter_cutoff_prone": false
+        },
+        "hazards": {
+          "elevation_m": 2064.6,
+          "slope_deg": 25.8,
+          "historical_landslide_count": 4,
+          "active_subsidence": false,
+          "distance_to_river_m": 177.8,
+          "soil_type": "debris_mantled_slope",
+          "geological_formation": "Vaikrita_Group_Schist"
+        },
+        "provenance": {
+          "is_synthetic": true,
+          "data_source": "DEMO_SYNTHETIC_GENERATOR",
+          "pilot_region": "himalayan_pilot",
+          "generator_seed": 26191,
+          "disclaimer": "DEMO / SYNTHETIC DATASET for SIH Problem Statement 26191. Generated deterministically using fixed pseudo-random seed 26191. Not official Government of Uttarakhand, Survey of India, or Census data. Do NOT use for official administrative actions or statutory land acquisition."
+        }
+      }
+    },
+    {
+      "type": "Feature",
+      "id": "HIM-VILL-009",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          79.65246,
+          30.513
+        ]
+      },
+      "properties": {
+        "id": "HIM-VILL-009",
+        "name": "Urgam",
+        "region_code": "uttarakhand_himalayan",
+        "district_code": "chamoli",
+        "district_name": "Chamoli District",
+        "block_code": "joshimath",
+        "block_name": "Joshimath Block",
+        "census_code": "044109",
+        "population": 565,
+        "households": 120,
+        "demographics": {
+          "elderly_count": 79,
+          "children_count": 79,
+          "disabled_count": 13,
+          "livestock_count": 180
+        },
+        "vulnerability": {
+          "social_vulnerability_index": 0.313,
+          "economic_vulnerability_index": 0.462,
+          "structural_vulnerability_index": 0.36,
+          "road_connectivity_index": 0.486,
+          "poverty_ratio": 0.222,
+          "kuccha_housing_ratio": 0.456
+        },
+        "infrastructure": {
+          "has_primary_school": true,
+          "has_health_subcenter": true,
+          "has_piped_water": true,
+          "has_electricity": true,
+          "has_telecom_coverage": true
+        },
+        "accessibility": {
+          "distance_to_motorable_road_km": 3.6,
+          "road_type": "unpaved",
+          "evacuation_route_condition": "critical_chokepoints",
+          "is_winter_cutoff_prone": false
+        },
+        "hazards": {
+          "elevation_m": 2008.6,
+          "slope_deg": 35.4,
+          "historical_landslide_count": 4,
+          "active_subsidence": false,
+          "distance_to_river_m": 221.9,
+          "soil_type": "colluvial_scree",
+          "geological_formation": "Garhwal_Group_Quartzite"
+        },
+        "provenance": {
+          "is_synthetic": true,
+          "data_source": "DEMO_SYNTHETIC_GENERATOR",
+          "pilot_region": "himalayan_pilot",
+          "generator_seed": 26191,
+          "disclaimer": "DEMO / SYNTHETIC DATASET for SIH Problem Statement 26191. Generated deterministically using fixed pseudo-random seed 26191. Not official Government of Uttarakhand, Survey of India, or Census data. Do NOT use for official administrative actions or statutory land acquisition."
+        }
+      }
+    },
+    {
+      "type": "Feature",
+      "id": "HIM-VILL-010",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          79.64828,
+          30.56379
+        ]
+      },
+      "properties": {
+        "id": "HIM-VILL-010",
+        "name": "Chai",
+        "region_code": "uttarakhand_himalayan",
+        "district_code": "chamoli",
+        "district_name": "Chamoli District",
+        "block_code": "joshimath",
+        "block_name": "Joshimath Block",
+        "census_code": "044110",
+        "population": 349,
+        "households": 74,
+        "demographics": {
+          "elderly_count": 40,
+          "children_count": 56,
+          "disabled_count": 6,
+          "livestock_count": 86
+        },
+        "vulnerability": {
+          "social_vulnerability_index": 0.322,
+          "economic_vulnerability_index": 0.706,
+          "structural_vulnerability_index": 0.475,
+          "road_connectivity_index": 0.714,
+          "poverty_ratio": 0.194,
+          "kuccha_housing_ratio": 0.56
+        },
+        "infrastructure": {
+          "has_primary_school": true,
+          "has_health_subcenter": false,
+          "has_piped_water": false,
+          "has_electricity": true,
+          "has_telecom_coverage": true
+        },
+        "accessibility": {
+          "distance_to_motorable_road_km": 2.0,
+          "road_type": "paved",
+          "evacuation_route_condition": "poor",
+          "is_winter_cutoff_prone": false
+        },
+        "hazards": {
+          "elevation_m": 2184.1,
+          "slope_deg": 26.4,
+          "historical_landslide_count": 3,
+          "active_subsidence": false,
+          "distance_to_river_m": 583.7,
+          "soil_type": "morainic_gravel",
+          "geological_formation": "Central_Crystalline_Gneiss"
+        },
+        "provenance": {
+          "is_synthetic": true,
+          "data_source": "DEMO_SYNTHETIC_GENERATOR",
+          "pilot_region": "himalayan_pilot",
+          "generator_seed": 26191,
+          "disclaimer": "DEMO / SYNTHETIC DATASET for SIH Problem Statement 26191. Generated deterministically using fixed pseudo-random seed 26191. Not official Government of Uttarakhand, Survey of India, or Census data. Do NOT use for official administrative actions or statutory land acquisition."
+        }
+      }
+    },
+    {
+      "type": "Feature",
+      "id": "HIM-VILL-011",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          79.53863,
+          30.60291
+        ]
+      },
+      "properties": {
+        "id": "HIM-VILL-011",
+        "name": "Tapovan",
+        "region_code": "uttarakhand_himalayan",
+        "district_code": "chamoli",
+        "district_name": "Chamoli District",
+        "block_code": "joshimath",
+        "block_name": "Joshimath Block",
+        "census_code": "044111",
+        "population": 873,
+        "households": 185,
+        "demographics": {
+          "elderly_count": 86,
+          "children_count": 168,
+          "disabled_count": 14,
+          "livestock_count": 181
+        },
+        "vulnerability": {
+          "social_vulnerability_index": 0.302,
+          "economic_vulnerability_index": 0.813,
+          "structural_vulnerability_index": 0.411,
+          "road_connectivity_index": 0.414,
+          "poverty_ratio": 0.426,
+          "kuccha_housing_ratio": 0.207
+        },
+        "infrastructure": {
+          "has_primary_school": true,
+          "has_health_subcenter": true,
+          "has_piped_water": true,
+          "has_electricity": true,
+          "has_telecom_coverage": true
+        },
+        "accessibility": {
+          "distance_to_motorable_road_km": 4.1,
+          "road_type": "unpaved",
+          "evacuation_route_condition": "critical_chokepoints",
+          "is_winter_cutoff_prone": true
+        },
+        "hazards": {
+          "elevation_m": 2507.1,
+          "slope_deg": 33.0,
+          "historical_landslide_count": 5,
+          "active_subsidence": false,
+          "distance_to_river_m": 1472.0,
+          "soil_type": "fluvial_terrace_alluvium",
+          "geological_formation": "Chamoli_Metavolcanic_Formation"
+        },
+        "provenance": {
+          "is_synthetic": true,
+          "data_source": "DEMO_SYNTHETIC_GENERATOR",
+          "pilot_region": "himalayan_pilot",
+          "generator_seed": 26191,
+          "disclaimer": "DEMO / SYNTHETIC DATASET for SIH Problem Statement 26191. Generated deterministically using fixed pseudo-random seed 26191. Not official Government of Uttarakhand, Survey of India, or Census data. Do NOT use for official administrative actions or statutory land acquisition."
+        }
+      }
+    },
+    {
+      "type": "Feature",
+      "id": "HIM-VILL-012",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          79.56465,
+          30.59157
+        ]
+      },
+      "properties": {
+        "id": "HIM-VILL-012",
+        "name": "Reni",
+        "region_code": "uttarakhand_himalayan",
+        "district_code": "chamoli",
+        "district_name": "Chamoli District",
+        "block_code": "joshimath",
+        "block_name": "Joshimath Block",
+        "census_code": "044112",
+        "population": 223,
+        "households": 52,
+        "demographics": {
+          "elderly_count": 21,
+          "children_count": 40,
+          "disabled_count": 4,
+          "livestock_count": 55
+        },
+        "vulnerability": {
+          "social_vulnerability_index": 0.6,
+          "economic_vulnerability_index": 0.575,
+          "structural_vulnerability_index": 0.634,
+          "road_connectivity_index": 0.886,
+          "poverty_ratio": 0.312,
+          "kuccha_housing_ratio": 0.298
+        },
+        "infrastructure": {
+          "has_primary_school": true,
+          "has_health_subcenter": true,
+          "has_piped_water": true,
+          "has_electricity": true,
+          "has_telecom_coverage": true
+        },
+        "accessibility": {
+          "distance_to_motorable_road_km": 0.8,
+          "road_type": "paved",
+          "evacuation_route_condition": "critical_chokepoints",
+          "is_winter_cutoff_prone": false
+        },
+        "hazards": {
+          "elevation_m": 1818.2,
+          "slope_deg": 37.7,
+          "historical_landslide_count": 5,
+          "active_subsidence": false,
+          "distance_to_river_m": 273.7,
+          "soil_type": "debris_mantled_slope",
+          "geological_formation": "Vaikrita_Group_Schist"
+        },
+        "provenance": {
+          "is_synthetic": true,
+          "data_source": "DEMO_SYNTHETIC_GENERATOR",
+          "pilot_region": "himalayan_pilot",
+          "generator_seed": 26191,
+          "disclaimer": "DEMO / SYNTHETIC DATASET for SIH Problem Statement 26191. Generated deterministically using fixed pseudo-random seed 26191. Not official Government of Uttarakhand, Survey of India, or Census data. Do NOT use for official administrative actions or statutory land acquisition."
+        }
+      }
+    },
+    {
+      "type": "Feature",
+      "id": "HIM-VILL-013",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          79.54281,
+          30.58632
+        ]
+      },
+      "properties": {
+        "id": "HIM-VILL-013",
+        "name": "Saldhar",
+        "region_code": "uttarakhand_himalayan",
+        "district_code": "chamoli",
+        "district_name": "Chamoli District",
+        "block_code": "joshimath",
+        "block_name": "Joshimath Block",
+        "census_code": "044113",
+        "population": 413,
+        "households": 87,
+        "demographics": {
+          "elderly_count": 40,
+          "children_count": 73,
+          "disabled_count": 11,
+          "livestock_count": 114
+        },
+        "vulnerability": {
+          "social_vulnerability_index": 0.579,
+          "economic_vulnerability_index": 0.65,
+          "structural_vulnerability_index": 0.53,
+          "road_connectivity_index": 0.386,
+          "poverty_ratio": 0.33,
+          "kuccha_housing_ratio": 0.577
+        },
+        "infrastructure": {
+          "has_primary_school": true,
+          "has_health_subcenter": false,
+          "has_piped_water": false,
+          "has_electricity": true,
+          "has_telecom_coverage": true
+        },
+        "accessibility": {
+          "distance_to_motorable_road_km": 4.3,
+          "road_type": "unpaved",
+          "evacuation_route_condition": "critical_chokepoints",
+          "is_winter_cutoff_prone": true
+        },
+        "hazards": {
+          "elevation_m": 2647.5,
+          "slope_deg": 34.6,
+          "historical_landslide_count": 3,
+          "active_subsidence": false,
+          "distance_to_river_m": 1349.7,
+          "soil_type": "colluvial_scree",
+          "geological_formation": "Garhwal_Group_Quartzite"
+        },
+        "provenance": {
+          "is_synthetic": true,
+          "data_source": "DEMO_SYNTHETIC_GENERATOR",
+          "pilot_region": "himalayan_pilot",
+          "generator_seed": 26191,
+          "disclaimer": "DEMO / SYNTHETIC DATASET for SIH Problem Statement 26191. Generated deterministically using fixed pseudo-random seed 26191. Not official Government of Uttarakhand, Survey of India, or Census data. Do NOT use for official administrative actions or statutory land acquisition."
+        }
+      }
+    },
+    {
+      "type": "Feature",
+      "id": "HIM-VILL-014",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          79.65594,
+          30.56333
+        ]
+      },
+      "properties": {
+        "id": "HIM-VILL-014",
+        "name": "Subhai",
+        "region_code": "uttarakhand_himalayan",
+        "district_code": "chamoli",
+        "district_name": "Chamoli District",
+        "block_code": "joshimath",
+        "block_name": "Joshimath Block",
+        "census_code": "044114",
+        "population": 221,
+        "households": 47,
+        "demographics": {
+          "elderly_count": 24,
+          "children_count": 42,
+          "disabled_count": 5,
+          "livestock_count": 43
+        },
+        "vulnerability": {
+          "social_vulnerability_index": 0.256,
+          "economic_vulnerability_index": 0.553,
+          "structural_vulnerability_index": 0.843,
+          "road_connectivity_index": 0.643,
+          "poverty_ratio": 0.435,
+          "kuccha_housing_ratio": 0.647
+        },
+        "infrastructure": {
+          "has_primary_school": true,
+          "has_health_subcenter": true,
+          "has_piped_water": true,
+          "has_electricity": true,
+          "has_telecom_coverage": true
+        },
+        "accessibility": {
+          "distance_to_motorable_road_km": 2.5,
+          "road_type": "unpaved",
+          "evacuation_route_condition": "critical_chokepoints",
+          "is_winter_cutoff_prone": false
+        },
+        "hazards": {
+          "elevation_m": 2104.0,
+          "slope_deg": 33.5,
+          "historical_landslide_count": 3,
+          "active_subsidence": false,
+          "distance_to_river_m": 1133.1,
+          "soil_type": "morainic_gravel",
+          "geological_formation": "Central_Crystalline_Gneiss"
+        },
+        "provenance": {
+          "is_synthetic": true,
+          "data_source": "DEMO_SYNTHETIC_GENERATOR",
+          "pilot_region": "himalayan_pilot",
+          "generator_seed": 26191,
+          "disclaimer": "DEMO / SYNTHETIC DATASET for SIH Problem Statement 26191. Generated deterministically using fixed pseudo-random seed 26191. Not official Government of Uttarakhand, Survey of India, or Census data. Do NOT use for official administrative actions or statutory land acquisition."
+        }
+      }
+    },
+    {
+      "type": "Feature",
+      "id": "HIM-VILL-015",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          79.66037,
+          30.55419
+        ]
+      },
+      "properties": {
+        "id": "HIM-VILL-015",
+        "name": "Lata",
+        "region_code": "uttarakhand_himalayan",
+        "district_code": "chamoli",
+        "district_name": "Chamoli District",
+        "block_code": "joshimath",
+        "block_name": "Joshimath Block",
+        "census_code": "044115",
+        "population": 210,
+        "households": 43,
+        "demographics": {
+          "elderly_count": 23,
+          "children_count": 36,
+          "disabled_count": 6,
+          "livestock_count": 67
+        },
+        "vulnerability": {
+          "social_vulnerability_index": 0.624,
+          "economic_vulnerability_index": 0.455,
+          "structural_vulnerability_index": 0.412,
+          "road_connectivity_index": 0.871,
+          "poverty_ratio": 0.36,
+          "kuccha_housing_ratio": 0.517
+        },
+        "infrastructure": {
+          "has_primary_school": true,
+          "has_health_subcenter": true,
+          "has_piped_water": true,
+          "has_electricity": true,
+          "has_telecom_coverage": true
+        },
+        "accessibility": {
+          "distance_to_motorable_road_km": 0.9,
+          "road_type": "paved",
+          "evacuation_route_condition": "critical_chokepoints",
+          "is_winter_cutoff_prone": true
+        },
+        "hazards": {
+          "elevation_m": 2362.3,
+          "slope_deg": 33.2,
+          "historical_landslide_count": 2,
+          "active_subsidence": false,
+          "distance_to_river_m": 326.6,
+          "soil_type": "fluvial_terrace_alluvium",
+          "geological_formation": "Chamoli_Metavolcanic_Formation"
+        },
+        "provenance": {
+          "is_synthetic": true,
+          "data_source": "DEMO_SYNTHETIC_GENERATOR",
+          "pilot_region": "himalayan_pilot",
+          "generator_seed": 26191,
+          "disclaimer": "DEMO / SYNTHETIC DATASET for SIH Problem Statement 26191. Generated deterministically using fixed pseudo-random seed 26191. Not official Government of Uttarakhand, Survey of India, or Census data. Do NOT use for official administrative actions or statutory land acquisition."
+        }
+      }
+    },
+    {
+      "type": "Feature",
+      "id": "HIM-VILL-016",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          79.34125,
+          30.43572
+        ]
+      },
+      "properties": {
+        "id": "HIM-VILL-016",
+        "name": "Tangani",
+        "region_code": "uttarakhand_himalayan",
+        "district_code": "chamoli",
+        "district_name": "Chamoli District",
+        "block_code": "dasholi",
+        "block_name": "Dasholi Block (Gopeshwar)",
+        "census_code": "044116",
+        "population": 537,
+        "households": 112,
+        "demographics": {
+          "elderly_count": 60,
+          "children_count": 88,
+          "disabled_count": 18,
+          "livestock_count": 174
+        },
+        "vulnerability": {
+          "social_vulnerability_index": 0.705,
+          "economic_vulnerability_index": 0.549,
+          "structural_vulnerability_index": 0.684,
+          "road_connectivity_index": 0.829,
+          "poverty_ratio": 0.419,
+          "kuccha_housing_ratio": 0.207
+        },
+        "infrastructure": {
+          "has_primary_school": true,
+          "has_health_subcenter": false,
+          "has_piped_water": true,
+          "has_electricity": true,
+          "has_telecom_coverage": true
+        },
+        "accessibility": {
+          "distance_to_motorable_road_km": 1.2,
+          "road_type": "paved",
+          "evacuation_route_condition": "fair",
+          "is_winter_cutoff_prone": false
+        },
+        "hazards": {
+          "elevation_m": 1419.6,
+          "slope_deg": 18.6,
+          "historical_landslide_count": 3,
+          "active_subsidence": false,
+          "distance_to_river_m": 1358.9,
+          "soil_type": "debris_mantled_slope",
+          "geological_formation": "Vaikrita_Group_Schist"
+        },
+        "provenance": {
+          "is_synthetic": true,
+          "data_source": "DEMO_SYNTHETIC_GENERATOR",
+          "pilot_region": "himalayan_pilot",
+          "generator_seed": 26191,
+          "disclaimer": "DEMO / SYNTHETIC DATASET for SIH Problem Statement 26191. Generated deterministically using fixed pseudo-random seed 26191. Not official Government of Uttarakhand, Survey of India, or Census data. Do NOT use for official administrative actions or statutory land acquisition."
+        }
+      }
+    },
+    {
+      "type": "Feature",
+      "id": "HIM-VILL-017",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          79.37474,
+          30.47
+        ]
+      },
+      "properties": {
+        "id": "HIM-VILL-017",
+        "name": "Gulabkoti",
+        "region_code": "uttarakhand_himalayan",
+        "district_code": "chamoli",
+        "district_name": "Chamoli District",
+        "block_code": "dasholi",
+        "block_name": "Dasholi Block (Gopeshwar)",
+        "census_code": "044117",
+        "population": 645,
+        "households": 140,
+        "demographics": {
+          "elderly_count": 90,
+          "children_count": 110,
+          "disabled_count": 15,
+          "livestock_count": 233
+        },
+        "vulnerability": {
+          "social_vulnerability_index": 0.526,
+          "economic_vulnerability_index": 0.635,
+          "structural_vulnerability_index": 0.736,
+          "road_connectivity_index": 0.971,
+          "poverty_ratio": 0.356,
+          "kuccha_housing_ratio": 0.22
+        },
+        "infrastructure": {
+          "has_primary_school": false,
+          "has_health_subcenter": true,
+          "has_piped_water": true,
+          "has_electricity": true,
+          "has_telecom_coverage": true
+        },
+        "accessibility": {
+          "distance_to_motorable_road_km": 0.2,
+          "road_type": "paved",
+          "evacuation_route_condition": "fair",
+          "is_winter_cutoff_prone": false
+        },
+        "hazards": {
+          "elevation_m": 1831.2,
+          "slope_deg": 15.6,
+          "historical_landslide_count": 3,
+          "active_subsidence": false,
+          "distance_to_river_m": 234.8,
+          "soil_type": "colluvial_scree",
+          "geological_formation": "Garhwal_Group_Quartzite"
+        },
+        "provenance": {
+          "is_synthetic": true,
+          "data_source": "DEMO_SYNTHETIC_GENERATOR",
+          "pilot_region": "himalayan_pilot",
+          "generator_seed": 26191,
+          "disclaimer": "DEMO / SYNTHETIC DATASET for SIH Problem Statement 26191. Generated deterministically using fixed pseudo-random seed 26191. Not official Government of Uttarakhand, Survey of India, or Census data. Do NOT use for official administrative actions or statutory land acquisition."
+        }
+      }
+    },
+    {
+      "type": "Feature",
+      "id": "HIM-VILL-018",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          79.38031,
+          30.40056
+        ]
+      },
+      "properties": {
+        "id": "HIM-VILL-018",
+        "name": "Pakhi",
+        "region_code": "uttarakhand_himalayan",
+        "district_code": "chamoli",
+        "district_name": "Chamoli District",
+        "block_code": "dasholi",
+        "block_name": "Dasholi Block (Gopeshwar)",
+        "census_code": "044118",
+        "population": 253,
+        "households": 53,
+        "demographics": {
+          "elderly_count": 27,
+          "children_count": 36,
+          "disabled_count": 5,
+          "livestock_count": 93
+        },
+        "vulnerability": {
+          "social_vulnerability_index": 0.53,
+          "economic_vulnerability_index": 0.365,
+          "structural_vulnerability_index": 0.488,
+          "road_connectivity_index": 0.814,
+          "poverty_ratio": 0.439,
+          "kuccha_housing_ratio": 0.242
+        },
+        "infrastructure": {
+          "has_primary_school": true,
+          "has_health_subcenter": false,
+          "has_piped_water": true,
+          "has_electricity": true,
+          "has_telecom_coverage": true
+        },
+        "accessibility": {
+          "distance_to_motorable_road_km": 1.3,
+          "road_type": "paved",
+          "evacuation_route_condition": "poor",
+          "is_winter_cutoff_prone": false
+        },
+        "hazards": {
+          "elevation_m": 1849.4,
+          "slope_deg": 27.4,
+          "historical_landslide_count": 2,
+          "active_subsidence": false,
+          "distance_to_river_m": 805.2,
+          "soil_type": "morainic_gravel",
+          "geological_formation": "Central_Crystalline_Gneiss"
+        },
+        "provenance": {
+          "is_synthetic": true,
+          "data_source": "DEMO_SYNTHETIC_GENERATOR",
+          "pilot_region": "himalayan_pilot",
+          "generator_seed": 26191,
+          "disclaimer": "DEMO / SYNTHETIC DATASET for SIH Problem Statement 26191. Generated deterministically using fixed pseudo-random seed 26191. Not official Government of Uttarakhand, Survey of India, or Census data. Do NOT use for official administrative actions or statutory land acquisition."
+        }
+      }
+    },
+    {
+      "type": "Feature",
+      "id": "HIM-VILL-019",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          79.41948,
+          30.42343
+        ]
+      },
+      "properties": {
+        "id": "HIM-VILL-019",
+        "name": "Pipalkoti",
+        "region_code": "uttarakhand_himalayan",
+        "district_code": "chamoli",
+        "district_name": "Chamoli District",
+        "block_code": "dasholi",
+        "block_name": "Dasholi Block (Gopeshwar)",
+        "census_code": "044119",
+        "population": 755,
+        "households": 165,
+        "demographics": {
+          "elderly_count": 69,
+          "children_count": 131,
+          "disabled_count": 22,
+          "livestock_count": 222
+        },
+        "vulnerability": {
+          "social_vulnerability_index": 0.673,
+          "economic_vulnerability_index": 0.405,
+          "structural_vulnerability_index": 0.654,
+          "road_connectivity_index": 0.814,
+          "poverty_ratio": 0.256,
+          "kuccha_housing_ratio": 0.203
+        },
+        "infrastructure": {
+          "has_primary_school": true,
+          "has_health_subcenter": true,
+          "has_piped_water": false,
+          "has_electricity": true,
+          "has_telecom_coverage": false
+        },
+        "accessibility": {
+          "distance_to_motorable_road_km": 1.3,
+          "road_type": "paved",
+          "evacuation_route_condition": "poor",
+          "is_winter_cutoff_prone": false
+        },
+        "hazards": {
+          "elevation_m": 1431.5,
+          "slope_deg": 24.3,
+          "historical_landslide_count": 0,
+          "active_subsidence": false,
+          "distance_to_river_m": 331.6,
+          "soil_type": "fluvial_terrace_alluvium",
+          "geological_formation": "Chamoli_Metavolcanic_Formation"
+        },
+        "provenance": {
+          "is_synthetic": true,
+          "data_source": "DEMO_SYNTHETIC_GENERATOR",
+          "pilot_region": "himalayan_pilot",
+          "generator_seed": 26191,
+          "disclaimer": "DEMO / SYNTHETIC DATASET for SIH Problem Statement 26191. Generated deterministically using fixed pseudo-random seed 26191. Not official Government of Uttarakhand, Survey of India, or Census data. Do NOT use for official administrative actions or statutory land acquisition."
+        }
+      }
+    },
+    {
+      "type": "Feature",
+      "id": "HIM-VILL-020",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          79.38798,
+          30.40971
+        ]
+      },
+      "properties": {
+        "id": "HIM-VILL-020",
+        "name": "Birahi",
+        "region_code": "uttarakhand_himalayan",
+        "district_code": "chamoli",
+        "district_name": "Chamoli District",
+        "block_code": "dasholi",
+        "block_name": "Dasholi Block (Gopeshwar)",
+        "census_code": "044120",
+        "population": 424,
+        "households": 90,
+        "demographics": {
+          "elderly_count": 51,
+          "children_count": 74,
+          "disabled_count": 7,
+          "livestock_count": 150
+        },
+        "vulnerability": {
+          "social_vulnerability_index": 0.254,
+          "economic_vulnerability_index": 0.315,
+          "structural_vulnerability_index": 0.586,
+          "road_connectivity_index": 0.629,
+          "poverty_ratio": 0.368,
+          "kuccha_housing_ratio": 0.215
+        },
+        "infrastructure": {
+          "has_primary_school": true,
+          "has_health_subcenter": false,
+          "has_piped_water": true,
+          "has_electricity": true,
+          "has_telecom_coverage": false
+        },
+        "accessibility": {
+          "distance_to_motorable_road_km": 2.6,
+          "road_type": "unpaved",
+          "evacuation_route_condition": "poor",
+          "is_winter_cutoff_prone": false
+        },
+        "hazards": {
+          "elevation_m": 1669.1,
+          "slope_deg": 22.3,
+          "historical_landslide_count": 2,
+          "active_subsidence": false,
+          "distance_to_river_m": 1292.8,
+          "soil_type": "debris_mantled_slope",
+          "geological_formation": "Vaikrita_Group_Schist"
+        },
+        "provenance": {
+          "is_synthetic": true,
+          "data_source": "DEMO_SYNTHETIC_GENERATOR",
+          "pilot_region": "himalayan_pilot",
+          "generator_seed": 26191,
+          "disclaimer": "DEMO / SYNTHETIC DATASET for SIH Problem Statement 26191. Generated deterministically using fixed pseudo-random seed 26191. Not official Government of Uttarakhand, Survey of India, or Census data. Do NOT use for official administrative actions or statutory land acquisition."
+        }
+      }
+    },
+    {
+      "type": "Feature",
+      "id": "HIM-VILL-021",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          79.45197,
+          30.40625
+        ]
+      },
+      "properties": {
+        "id": "HIM-VILL-021",
+        "name": "Batula",
+        "region_code": "uttarakhand_himalayan",
+        "district_code": "chamoli",
+        "district_name": "Chamoli District",
+        "block_code": "dasholi",
+        "block_name": "Dasholi Block (Gopeshwar)",
+        "census_code": "044121",
+        "population": 782,
+        "households": 174,
+        "demographics": {
+          "elderly_count": 109,
+          "children_count": 125,
+          "disabled_count": 22,
+          "livestock_count": 261
+        },
+        "vulnerability": {
+          "social_vulnerability_index": 0.26,
+          "economic_vulnerability_index": 0.664,
+          "structural_vulnerability_index": 0.625,
+          "road_connectivity_index": 0.886,
+          "poverty_ratio": 0.337,
+          "kuccha_housing_ratio": 0.568
+        },
+        "infrastructure": {
+          "has_primary_school": true,
+          "has_health_subcenter": true,
+          "has_piped_water": true,
+          "has_electricity": true,
+          "has_telecom_coverage": true
+        },
+        "accessibility": {
+          "distance_to_motorable_road_km": 0.8,
+          "road_type": "paved",
+          "evacuation_route_condition": "poor",
+          "is_winter_cutoff_prone": false
+        },
+        "hazards": {
+          "elevation_m": 1497.5,
+          "slope_deg": 25.0,
+          "historical_landslide_count": 2,
+          "active_subsidence": false,
+          "distance_to_river_m": 459.7,
+          "soil_type": "colluvial_scree",
+          "geological_formation": "Garhwal_Group_Quartzite"
+        },
+        "provenance": {
+          "is_synthetic": true,
+          "data_source": "DEMO_SYNTHETIC_GENERATOR",
+          "pilot_region": "himalayan_pilot",
+          "generator_seed": 26191,
+          "disclaimer": "DEMO / SYNTHETIC DATASET for SIH Problem Statement 26191. Generated deterministically using fixed pseudo-random seed 26191. Not official Government of Uttarakhand, Survey of India, or Census data. Do NOT use for official administrative actions or statutory land acquisition."
+        }
+      }
+    },
+    {
+      "type": "Feature",
+      "id": "HIM-VILL-022",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          79.35332,
+          30.42822
+        ]
+      },
+      "properties": {
+        "id": "HIM-VILL-022",
+        "name": "Chamoli Gaon",
+        "region_code": "uttarakhand_himalayan",
+        "district_code": "chamoli",
+        "district_name": "Chamoli District",
+        "block_code": "dasholi",
+        "block_name": "Dasholi Block (Gopeshwar)",
+        "census_code": "044122",
+        "population": 204,
+        "households": 44,
+        "demographics": {
+          "elderly_count": 19,
+          "children_count": 35,
+          "disabled_count": 5,
+          "livestock_count": 49
+        },
+        "vulnerability": {
+          "social_vulnerability_index": 0.526,
+          "economic_vulnerability_index": 0.611,
+          "structural_vulnerability_index": 0.352,
+          "road_connectivity_index": 0.629,
+          "poverty_ratio": 0.38,
+          "kuccha_housing_ratio": 0.386
+        },
+        "infrastructure": {
+          "has_primary_school": true,
+          "has_health_subcenter": false,
+          "has_piped_water": true,
+          "has_electricity": true,
+          "has_telecom_coverage": true
+        },
+        "accessibility": {
+          "distance_to_motorable_road_km": 2.6,
+          "road_type": "unpaved",
+          "evacuation_route_condition": "fair",
+          "is_winter_cutoff_prone": false
+        },
+        "hazards": {
+          "elevation_m": 1867.4,
+          "slope_deg": 15.5,
+          "historical_landslide_count": 1,
+          "active_subsidence": false,
+          "distance_to_river_m": 1151.5,
+          "soil_type": "morainic_gravel",
+          "geological_formation": "Central_Crystalline_Gneiss"
+        },
+        "provenance": {
+          "is_synthetic": true,
+          "data_source": "DEMO_SYNTHETIC_GENERATOR",
+          "pilot_region": "himalayan_pilot",
+          "generator_seed": 26191,
+          "disclaimer": "DEMO / SYNTHETIC DATASET for SIH Problem Statement 26191. Generated deterministically using fixed pseudo-random seed 26191. Not official Government of Uttarakhand, Survey of India, or Census data. Do NOT use for official administrative actions or statutory land acquisition."
+        }
+      }
+    },
+    {
+      "type": "Feature",
+      "id": "HIM-VILL-023",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          79.40065,
+          30.47768
+        ]
+      },
+      "properties": {
+        "id": "HIM-VILL-023",
+        "name": "Dewal Gaon",
+        "region_code": "uttarakhand_himalayan",
+        "district_code": "chamoli",
+        "district_name": "Chamoli District",
+        "block_code": "dasholi",
+        "block_name": "Dasholi Block (Gopeshwar)",
+        "census_code": "044123",
+        "population": 632,
+        "households": 147,
+        "demographics": {
+          "elderly_count": 89,
+          "children_count": 101,
+          "disabled_count": 13,
+          "livestock_count": 178
+        },
+        "vulnerability": {
+          "social_vulnerability_index": 0.454,
+          "economic_vulnerability_index": 0.571,
+          "structural_vulnerability_index": 0.393,
+          "road_connectivity_index": 0.7,
+          "poverty_ratio": 0.247,
+          "kuccha_housing_ratio": 0.255
+        },
+        "infrastructure": {
+          "has_primary_school": true,
+          "has_health_subcenter": true,
+          "has_piped_water": true,
+          "has_electricity": true,
+          "has_telecom_coverage": true
+        },
+        "accessibility": {
+          "distance_to_motorable_road_km": 2.1,
+          "road_type": "unpaved",
+          "evacuation_route_condition": "fair",
+          "is_winter_cutoff_prone": false
+        },
+        "hazards": {
+          "elevation_m": 1725.6,
+          "slope_deg": 19.5,
+          "historical_landslide_count": 2,
+          "active_subsidence": false,
+          "distance_to_river_m": 496.4,
+          "soil_type": "fluvial_terrace_alluvium",
+          "geological_formation": "Chamoli_Metavolcanic_Formation"
+        },
+        "provenance": {
+          "is_synthetic": true,
+          "data_source": "DEMO_SYNTHETIC_GENERATOR",
+          "pilot_region": "himalayan_pilot",
+          "generator_seed": 26191,
+          "disclaimer": "DEMO / SYNTHETIC DATASET for SIH Problem Statement 26191. Generated deterministically using fixed pseudo-random seed 26191. Not official Government of Uttarakhand, Survey of India, or Census data. Do NOT use for official administrative actions or statutory land acquisition."
+        }
+      }
+    },
+    {
+      "type": "Feature",
+      "id": "HIM-VILL-024",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          79.43612,
+          30.47415
+        ]
+      },
+      "properties": {
+        "id": "HIM-VILL-024",
+        "name": "Mandal",
+        "region_code": "uttarakhand_himalayan",
+        "district_code": "chamoli",
+        "district_name": "Chamoli District",
+        "block_code": "dasholi",
+        "block_name": "Dasholi Block (Gopeshwar)",
+        "census_code": "044124",
+        "population": 410,
+        "households": 91,
+        "demographics": {
+          "elderly_count": 37,
+          "children_count": 62,
+          "disabled_count": 6,
+          "livestock_count": 103
+        },
+        "vulnerability": {
+          "social_vulnerability_index": 0.567,
+          "economic_vulnerability_index": 0.414,
+          "structural_vulnerability_index": 0.816,
+          "road_connectivity_index": 0.629,
+          "poverty_ratio": 0.309,
+          "kuccha_housing_ratio": 0.461
+        },
+        "infrastructure": {
+          "has_primary_school": true,
+          "has_health_subcenter": true,
+          "has_piped_water": true,
+          "has_electricity": true,
+          "has_telecom_coverage": true
+        },
+        "accessibility": {
+          "distance_to_motorable_road_km": 2.6,
+          "road_type": "unpaved",
+          "evacuation_route_condition": "fair",
+          "is_winter_cutoff_prone": false
+        },
+        "hazards": {
+          "elevation_m": 1696.6,
+          "slope_deg": 14.2,
+          "historical_landslide_count": 2,
+          "active_subsidence": false,
+          "distance_to_river_m": 1465.2,
+          "soil_type": "debris_mantled_slope",
+          "geological_formation": "Vaikrita_Group_Schist"
+        },
+        "provenance": {
+          "is_synthetic": true,
+          "data_source": "DEMO_SYNTHETIC_GENERATOR",
+          "pilot_region": "himalayan_pilot",
+          "generator_seed": 26191,
+          "disclaimer": "DEMO / SYNTHETIC DATASET for SIH Problem Statement 26191. Generated deterministically using fixed pseudo-random seed 26191. Not official Government of Uttarakhand, Survey of India, or Census data. Do NOT use for official administrative actions or statutory land acquisition."
+        }
+      }
+    },
+    {
+      "type": "Feature",
+      "id": "HIM-VILL-025",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          79.34351,
+          30.40829
+        ]
+      },
+      "properties": {
+        "id": "HIM-VILL-025",
+        "name": "Siroli",
+        "region_code": "uttarakhand_himalayan",
+        "district_code": "chamoli",
+        "district_name": "Chamoli District",
+        "block_code": "dasholi",
+        "block_name": "Dasholi Block (Gopeshwar)",
+        "census_code": "044125",
+        "population": 426,
+        "households": 89,
+        "demographics": {
+          "elderly_count": 44,
+          "children_count": 71,
+          "disabled_count": 14,
+          "livestock_count": 141
+        },
+        "vulnerability": {
+          "social_vulnerability_index": 0.687,
+          "economic_vulnerability_index": 0.544,
+          "structural_vulnerability_index": 0.761,
+          "road_connectivity_index": 0.943,
+          "poverty_ratio": 0.338,
+          "kuccha_housing_ratio": 0.334
+        },
+        "infrastructure": {
+          "has_primary_school": true,
+          "has_health_subcenter": false,
+          "has_piped_water": true,
+          "has_electricity": true,
+          "has_telecom_coverage": true
+        },
+        "accessibility": {
+          "distance_to_motorable_road_km": 0.4,
+          "road_type": "paved",
+          "evacuation_route_condition": "poor",
+          "is_winter_cutoff_prone": false
+        },
+        "hazards": {
+          "elevation_m": 1799.0,
+          "slope_deg": 27.3,
+          "historical_landslide_count": 2,
+          "active_subsidence": false,
+          "distance_to_river_m": 1386.4,
+          "soil_type": "colluvial_scree",
+          "geological_formation": "Garhwal_Group_Quartzite"
+        },
+        "provenance": {
+          "is_synthetic": true,
+          "data_source": "DEMO_SYNTHETIC_GENERATOR",
+          "pilot_region": "himalayan_pilot",
+          "generator_seed": 26191,
+          "disclaimer": "DEMO / SYNTHETIC DATASET for SIH Problem Statement 26191. Generated deterministically using fixed pseudo-random seed 26191. Not official Government of Uttarakhand, Survey of India, or Census data. Do NOT use for official administrative actions or statutory land acquisition."
+        }
+      }
+    },
+    {
+      "type": "Feature",
+      "id": "HIM-VILL-026",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          79.33164,
+          30.39946
+        ]
+      },
+      "properties": {
+        "id": "HIM-VILL-026",
+        "name": "Gopeshwar Dealdhar",
+        "region_code": "uttarakhand_himalayan",
+        "district_code": "chamoli",
+        "district_name": "Chamoli District",
+        "block_code": "dasholi",
+        "block_name": "Dasholi Block (Gopeshwar)",
+        "census_code": "044126",
+        "population": 631,
+        "households": 134,
+        "demographics": {
+          "elderly_count": 56,
+          "children_count": 100,
+          "disabled_count": 15,
+          "livestock_count": 129
+        },
+        "vulnerability": {
+          "social_vulnerability_index": 0.271,
+          "economic_vulnerability_index": 0.381,
+          "structural_vulnerability_index": 0.435,
+          "road_connectivity_index": 0.857,
+          "poverty_ratio": 0.407,
+          "kuccha_housing_ratio": 0.55
+        },
+        "infrastructure": {
+          "has_primary_school": true,
+          "has_health_subcenter": false,
+          "has_piped_water": false,
+          "has_electricity": true,
+          "has_telecom_coverage": false
+        },
+        "accessibility": {
+          "distance_to_motorable_road_km": 1.0,
+          "road_type": "paved",
+          "evacuation_route_condition": "fair",
+          "is_winter_cutoff_prone": false
+        },
+        "hazards": {
+          "elevation_m": 1708.5,
+          "slope_deg": 21.8,
+          "historical_landslide_count": 2,
+          "active_subsidence": false,
+          "distance_to_river_m": 82.2,
+          "soil_type": "morainic_gravel",
+          "geological_formation": "Central_Crystalline_Gneiss"
+        },
+        "provenance": {
+          "is_synthetic": true,
+          "data_source": "DEMO_SYNTHETIC_GENERATOR",
+          "pilot_region": "himalayan_pilot",
+          "generator_seed": 26191,
+          "disclaimer": "DEMO / SYNTHETIC DATASET for SIH Problem Statement 26191. Generated deterministically using fixed pseudo-random seed 26191. Not official Government of Uttarakhand, Survey of India, or Census data. Do NOT use for official administrative actions or statutory land acquisition."
+        }
+      }
+    },
+    {
+      "type": "Feature",
+      "id": "HIM-VILL-027",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          79.42294,
+          30.46293
+        ]
+      },
+      "properties": {
+        "id": "HIM-VILL-027",
+        "name": "Kundabagar",
+        "region_code": "uttarakhand_himalayan",
+        "district_code": "chamoli",
+        "district_name": "Chamoli District",
+        "block_code": "dasholi",
+        "block_name": "Dasholi Block (Gopeshwar)",
+        "census_code": "044127",
+        "population": 610,
+        "households": 128,
+        "demographics": {
+          "elderly_count": 83,
+          "children_count": 105,
+          "disabled_count": 19,
+          "livestock_count": 113
+        },
+        "vulnerability": {
+          "social_vulnerability_index": 0.465,
+          "economic_vulnerability_index": 0.481,
+          "structural_vulnerability_index": 0.46,
+          "road_connectivity_index": 0.9,
+          "poverty_ratio": 0.349,
+          "kuccha_housing_ratio": 0.501
+        },
+        "infrastructure": {
+          "has_primary_school": true,
+          "has_health_subcenter": true,
+          "has_piped_water": true,
+          "has_electricity": true,
+          "has_telecom_coverage": true
+        },
+        "accessibility": {
+          "distance_to_motorable_road_km": 0.7,
+          "road_type": "paved",
+          "evacuation_route_condition": "fair",
+          "is_winter_cutoff_prone": false
+        },
+        "hazards": {
+          "elevation_m": 1895.7,
+          "slope_deg": 18.4,
+          "historical_landslide_count": 0,
+          "active_subsidence": false,
+          "distance_to_river_m": 862.4,
+          "soil_type": "fluvial_terrace_alluvium",
+          "geological_formation": "Chamoli_Metavolcanic_Formation"
+        },
+        "provenance": {
+          "is_synthetic": true,
+          "data_source": "DEMO_SYNTHETIC_GENERATOR",
+          "pilot_region": "himalayan_pilot",
+          "generator_seed": 26191,
+          "disclaimer": "DEMO / SYNTHETIC DATASET for SIH Problem Statement 26191. Generated deterministically using fixed pseudo-random seed 26191. Not official Government of Uttarakhand, Survey of India, or Census data. Do NOT use for official administrative actions or statutory land acquisition."
+        }
+      }
+    },
+    {
+      "type": "Feature",
+      "id": "HIM-VILL-028",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          79.44786,
+          30.38649
+        ]
+      },
+      "properties": {
+        "id": "HIM-VILL-028",
+        "name": "Balkhila",
+        "region_code": "uttarakhand_himalayan",
+        "district_code": "chamoli",
+        "district_name": "Chamoli District",
+        "block_code": "dasholi",
+        "block_name": "Dasholi Block (Gopeshwar)",
+        "census_code": "044128",
+        "population": 205,
+        "households": 42,
+        "demographics": {
+          "elderly_count": 30,
+          "children_count": 42,
+          "disabled_count": 5,
+          "livestock_count": 58
+        },
+        "vulnerability": {
+          "social_vulnerability_index": 0.555,
+          "economic_vulnerability_index": 0.761,
+          "structural_vulnerability_index": 0.836,
+          "road_connectivity_index": 0.857,
+          "poverty_ratio": 0.397,
+          "kuccha_housing_ratio": 0.412
+        },
+        "infrastructure": {
+          "has_primary_school": true,
+          "has_health_subcenter": true,
+          "has_piped_water": true,
+          "has_electricity": true,
+          "has_telecom_coverage": true
+        },
+        "accessibility": {
+          "distance_to_motorable_road_km": 1.0,
+          "road_type": "paved",
+          "evacuation_route_condition": "fair",
+          "is_winter_cutoff_prone": false
+        },
+        "hazards": {
+          "elevation_m": 1540.7,
+          "slope_deg": 21.2,
+          "historical_landslide_count": 0,
+          "active_subsidence": false,
+          "distance_to_river_m": 436.0,
+          "soil_type": "debris_mantled_slope",
+          "geological_formation": "Vaikrita_Group_Schist"
+        },
+        "provenance": {
+          "is_synthetic": true,
+          "data_source": "DEMO_SYNTHETIC_GENERATOR",
+          "pilot_region": "himalayan_pilot",
+          "generator_seed": 26191,
+          "disclaimer": "DEMO / SYNTHETIC DATASET for SIH Problem Statement 26191. Generated deterministically using fixed pseudo-random seed 26191. Not official Government of Uttarakhand, Survey of India, or Census data. Do NOT use for official administrative actions or statutory land acquisition."
+        }
+      }
+    },
+    {
+      "type": "Feature",
+      "id": "HIM-VILL-029",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          79.30629,
+          30.2678
+        ]
+      },
+      "properties": {
+        "id": "HIM-VILL-029",
+        "name": "Umra Narayan",
+        "region_code": "uttarakhand_himalayan",
+        "district_code": "chamoli",
+        "district_name": "Chamoli District",
+        "block_code": "karnaprayag",
+        "block_name": "Karnaprayag Block",
+        "census_code": "044129",
+        "population": 391,
+        "households": 85,
+        "demographics": {
+          "elderly_count": 44,
+          "children_count": 78,
+          "disabled_count": 11,
+          "livestock_count": 73
+        },
+        "vulnerability": {
+          "social_vulnerability_index": 0.357,
+          "economic_vulnerability_index": 0.315,
+          "structural_vulnerability_index": 0.583,
+          "road_connectivity_index": 0.771,
+          "poverty_ratio": 0.193,
+          "kuccha_housing_ratio": 0.344
+        },
+        "infrastructure": {
+          "has_primary_school": true,
+          "has_health_subcenter": true,
+          "has_piped_water": true,
+          "has_electricity": true,
+          "has_telecom_coverage": true
+        },
+        "accessibility": {
+          "distance_to_motorable_road_km": 1.6,
+          "road_type": "paved",
+          "evacuation_route_condition": "good",
+          "is_winter_cutoff_prone": false
+        },
+        "hazards": {
+          "elevation_m": 1115.6,
+          "slope_deg": 9.8,
+          "historical_landslide_count": 0,
+          "active_subsidence": false,
+          "distance_to_river_m": 190.1,
+          "soil_type": "colluvial_scree",
+          "geological_formation": "Garhwal_Group_Quartzite"
+        },
+        "provenance": {
+          "is_synthetic": true,
+          "data_source": "DEMO_SYNTHETIC_GENERATOR",
+          "pilot_region": "himalayan_pilot",
+          "generator_seed": 26191,
+          "disclaimer": "DEMO / SYNTHETIC DATASET for SIH Problem Statement 26191. Generated deterministically using fixed pseudo-random seed 26191. Not official Government of Uttarakhand, Survey of India, or Census data. Do NOT use for official administrative actions or statutory land acquisition."
+        }
+      }
+    },
+    {
+      "type": "Feature",
+      "id": "HIM-VILL-030",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          79.22493,
+          30.32103
+        ]
+      },
+      "properties": {
+        "id": "HIM-VILL-030",
+        "name": "Simli",
+        "region_code": "uttarakhand_himalayan",
+        "district_code": "chamoli",
+        "district_name": "Chamoli District",
+        "block_code": "karnaprayag",
+        "block_name": "Karnaprayag Block",
+        "census_code": "044130",
+        "population": 728,
+        "households": 152,
+        "demographics": {
+          "elderly_count": 75,
+          "children_count": 150,
+          "disabled_count": 17,
+          "livestock_count": 182
+        },
+        "vulnerability": {
+          "social_vulnerability_index": 0.483,
+          "economic_vulnerability_index": 0.76,
+          "structural_vulnerability_index": 0.622,
+          "road_connectivity_index": 0.9,
+          "poverty_ratio": 0.261,
+          "kuccha_housing_ratio": 0.541
+        },
+        "infrastructure": {
+          "has_primary_school": false,
+          "has_health_subcenter": true,
+          "has_piped_water": false,
+          "has_electricity": true,
+          "has_telecom_coverage": true
+        },
+        "accessibility": {
+          "distance_to_motorable_road_km": 0.7,
+          "road_type": "paved",
+          "evacuation_route_condition": "fair",
+          "is_winter_cutoff_prone": false
+        },
+        "hazards": {
+          "elevation_m": 1193.4,
+          "slope_deg": 17.0,
+          "historical_landslide_count": 1,
+          "active_subsidence": false,
+          "distance_to_river_m": 477.7,
+          "soil_type": "morainic_gravel",
+          "geological_formation": "Central_Crystalline_Gneiss"
+        },
+        "provenance": {
+          "is_synthetic": true,
+          "data_source": "DEMO_SYNTHETIC_GENERATOR",
+          "pilot_region": "himalayan_pilot",
+          "generator_seed": 26191,
+          "disclaimer": "DEMO / SYNTHETIC DATASET for SIH Problem Statement 26191. Generated deterministically using fixed pseudo-random seed 26191. Not official Government of Uttarakhand, Survey of India, or Census data. Do NOT use for official administrative actions or statutory land acquisition."
+        }
+      }
+    },
+    {
+      "type": "Feature",
+      "id": "HIM-VILL-031",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          79.24786,
+          30.23154
+        ]
+      },
+      "properties": {
+        "id": "HIM-VILL-031",
+        "name": "Nauti",
+        "region_code": "uttarakhand_himalayan",
+        "district_code": "chamoli",
+        "district_name": "Chamoli District",
+        "block_code": "karnaprayag",
+        "block_name": "Karnaprayag Block",
+        "census_code": "044131",
+        "population": 194,
+        "households": 45,
+        "demographics": {
+          "elderly_count": 20,
+          "children_count": 28,
+          "disabled_count": 3,
+          "livestock_count": 46
+        },
+        "vulnerability": {
+          "social_vulnerability_index": 0.484,
+          "economic_vulnerability_index": 0.757,
+          "structural_vulnerability_index": 0.675,
+          "road_connectivity_index": 0.786,
+          "poverty_ratio": 0.223,
+          "kuccha_housing_ratio": 0.636
+        },
+        "infrastructure": {
+          "has_primary_school": true,
+          "has_health_subcenter": true,
+          "has_piped_water": true,
+          "has_electricity": true,
+          "has_telecom_coverage": true
+        },
+        "accessibility": {
+          "distance_to_motorable_road_km": 1.5,
+          "road_type": "paved",
+          "evacuation_route_condition": "good",
+          "is_winter_cutoff_prone": false
+        },
+        "hazards": {
+          "elevation_m": 991.5,
+          "slope_deg": 10.8,
+          "historical_landslide_count": 0,
+          "active_subsidence": false,
+          "distance_to_river_m": 364.4,
+          "soil_type": "fluvial_terrace_alluvium",
+          "geological_formation": "Chamoli_Metavolcanic_Formation"
+        },
+        "provenance": {
+          "is_synthetic": true,
+          "data_source": "DEMO_SYNTHETIC_GENERATOR",
+          "pilot_region": "himalayan_pilot",
+          "generator_seed": 26191,
+          "disclaimer": "DEMO / SYNTHETIC DATASET for SIH Problem Statement 26191. Generated deterministically using fixed pseudo-random seed 26191. Not official Government of Uttarakhand, Survey of India, or Census data. Do NOT use for official administrative actions or statutory land acquisition."
+        }
+      }
+    },
+    {
+      "type": "Feature",
+      "id": "HIM-VILL-032",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          79.22577,
+          30.27964
+        ]
+      },
+      "properties": {
+        "id": "HIM-VILL-032",
+        "name": "Ranikhet Marg Gaon",
+        "region_code": "uttarakhand_himalayan",
+        "district_code": "chamoli",
+        "district_name": "Chamoli District",
+        "block_code": "karnaprayag",
+        "block_name": "Karnaprayag Block",
+        "census_code": "044132",
+        "population": 408,
+        "households": 86,
+        "demographics": {
+          "elderly_count": 54,
+          "children_count": 59,
+          "disabled_count": 6,
+          "livestock_count": 83
+        },
+        "vulnerability": {
+          "social_vulnerability_index": 0.774,
+          "economic_vulnerability_index": 0.401,
+          "structural_vulnerability_index": 0.833,
+          "road_connectivity_index": 0.743,
+          "poverty_ratio": 0.27,
+          "kuccha_housing_ratio": 0.205
+        },
+        "infrastructure": {
+          "has_primary_school": true,
+          "has_health_subcenter": false,
+          "has_piped_water": false,
+          "has_electricity": true,
+          "has_telecom_coverage": true
+        },
+        "accessibility": {
+          "distance_to_motorable_road_km": 1.8,
+          "road_type": "paved",
+          "evacuation_route_condition": "good",
+          "is_winter_cutoff_prone": false
+        },
+        "hazards": {
+          "elevation_m": 1108.3,
+          "slope_deg": 10.7,
+          "historical_landslide_count": 2,
+          "active_subsidence": false,
+          "distance_to_river_m": 1351.3,
+          "soil_type": "debris_mantled_slope",
+          "geological_formation": "Vaikrita_Group_Schist"
+        },
+        "provenance": {
+          "is_synthetic": true,
+          "data_source": "DEMO_SYNTHETIC_GENERATOR",
+          "pilot_region": "himalayan_pilot",
+          "generator_seed": 26191,
+          "disclaimer": "DEMO / SYNTHETIC DATASET for SIH Problem Statement 26191. Generated deterministically using fixed pseudo-random seed 26191. Not official Government of Uttarakhand, Survey of India, or Census data. Do NOT use for official administrative actions or statutory land acquisition."
+        }
+      }
+    },
+    {
+      "type": "Feature",
+      "id": "HIM-VILL-033",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          79.2254,
+          30.32394
+        ]
+      },
+      "properties": {
+        "id": "HIM-VILL-033",
+        "name": "Langasu",
+        "region_code": "uttarakhand_himalayan",
+        "district_code": "chamoli",
+        "district_name": "Chamoli District",
+        "block_code": "karnaprayag",
+        "block_name": "Karnaprayag Block",
+        "census_code": "044133",
+        "population": 912,
+        "households": 195,
+        "demographics": {
+          "elderly_count": 100,
+          "children_count": 137,
+          "disabled_count": 22,
+          "livestock_count": 212
+        },
+        "vulnerability": {
+          "social_vulnerability_index": 0.46,
+          "economic_vulnerability_index": 0.349,
+          "structural_vulnerability_index": 0.78,
+          "road_connectivity_index": 0.943,
+          "poverty_ratio": 0.338,
+          "kuccha_housing_ratio": 0.325
+        },
+        "infrastructure": {
+          "has_primary_school": true,
+          "has_health_subcenter": false,
+          "has_piped_water": true,
+          "has_electricity": true,
+          "has_telecom_coverage": true
+        },
+        "accessibility": {
+          "distance_to_motorable_road_km": 0.4,
+          "road_type": "paved",
+          "evacuation_route_condition": "fair",
+          "is_winter_cutoff_prone": false
+        },
+        "hazards": {
+          "elevation_m": 1258.8,
+          "slope_deg": 14.5,
+          "historical_landslide_count": 0,
+          "active_subsidence": false,
+          "distance_to_river_m": 1343.9,
+          "soil_type": "colluvial_scree",
+          "geological_formation": "Garhwal_Group_Quartzite"
+        },
+        "provenance": {
+          "is_synthetic": true,
+          "data_source": "DEMO_SYNTHETIC_GENERATOR",
+          "pilot_region": "himalayan_pilot",
+          "generator_seed": 26191,
+          "disclaimer": "DEMO / SYNTHETIC DATASET for SIH Problem Statement 26191. Generated deterministically using fixed pseudo-random seed 26191. Not official Government of Uttarakhand, Survey of India, or Census data. Do NOT use for official administrative actions or statutory land acquisition."
+        }
+      }
+    },
+    {
+      "type": "Feature",
+      "id": "HIM-VILL-034",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          79.30869,
+          30.29208
+        ]
+      },
+      "properties": {
+        "id": "HIM-VILL-034",
+        "name": "Mehalchauri",
+        "region_code": "uttarakhand_himalayan",
+        "district_code": "chamoli",
+        "district_name": "Chamoli District",
+        "block_code": "karnaprayag",
+        "block_name": "Karnaprayag Block",
+        "census_code": "044134",
+        "population": 858,
+        "households": 186,
+        "demographics": {
+          "elderly_count": 85,
+          "children_count": 121,
+          "disabled_count": 16,
+          "livestock_count": 157
+        },
+        "vulnerability": {
+          "social_vulnerability_index": 0.507,
+          "economic_vulnerability_index": 0.508,
+          "structural_vulnerability_index": 0.661,
+          "road_connectivity_index": 0.843,
+          "poverty_ratio": 0.267,
+          "kuccha_housing_ratio": 0.605
+        },
+        "infrastructure": {
+          "has_primary_school": false,
+          "has_health_subcenter": false,
+          "has_piped_water": true,
+          "has_electricity": true,
+          "has_telecom_coverage": true
+        },
+        "accessibility": {
+          "distance_to_motorable_road_km": 1.1,
+          "road_type": "paved",
+          "evacuation_route_condition": "good",
+          "is_winter_cutoff_prone": false
+        },
+        "hazards": {
+          "elevation_m": 1292.1,
+          "slope_deg": 12.3,
+          "historical_landslide_count": 1,
+          "active_subsidence": false,
+          "distance_to_river_m": 1261.7,
+          "soil_type": "morainic_gravel",
+          "geological_formation": "Central_Crystalline_Gneiss"
+        },
+        "provenance": {
+          "is_synthetic": true,
+          "data_source": "DEMO_SYNTHETIC_GENERATOR",
+          "pilot_region": "himalayan_pilot",
+          "generator_seed": 26191,
+          "disclaimer": "DEMO / SYNTHETIC DATASET for SIH Problem Statement 26191. Generated deterministically using fixed pseudo-random seed 26191. Not official Government of Uttarakhand, Survey of India, or Census data. Do NOT use for official administrative actions or statutory land acquisition."
+        }
+      }
+    },
+    {
+      "type": "Feature",
+      "id": "HIM-VILL-035",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          79.18103,
+          30.32787
+        ]
+      },
+      "properties": {
+        "id": "HIM-VILL-035",
+        "name": "Kaleshwar",
+        "region_code": "uttarakhand_himalayan",
+        "district_code": "chamoli",
+        "district_name": "Chamoli District",
+        "block_code": "karnaprayag",
+        "block_name": "Karnaprayag Block",
+        "census_code": "044135",
+        "population": 614,
+        "households": 145,
+        "demographics": {
+          "elderly_count": 80,
+          "children_count": 90,
+          "disabled_count": 18,
+          "livestock_count": 157
+        },
+        "vulnerability": {
+          "social_vulnerability_index": 0.512,
+          "economic_vulnerability_index": 0.456,
+          "structural_vulnerability_index": 0.693,
+          "road_connectivity_index": 0.857,
+          "poverty_ratio": 0.22,
+          "kuccha_housing_ratio": 0.532
+        },
+        "infrastructure": {
+          "has_primary_school": true,
+          "has_health_subcenter": true,
+          "has_piped_water": true,
+          "has_electricity": true,
+          "has_telecom_coverage": true
+        },
+        "accessibility": {
+          "distance_to_motorable_road_km": 1.0,
+          "road_type": "paved",
+          "evacuation_route_condition": "fair",
+          "is_winter_cutoff_prone": false
+        },
+        "hazards": {
+          "elevation_m": 1135.8,
+          "slope_deg": 17.8,
+          "historical_landslide_count": 0,
+          "active_subsidence": false,
+          "distance_to_river_m": 796.5,
+          "soil_type": "fluvial_terrace_alluvium",
+          "geological_formation": "Chamoli_Metavolcanic_Formation"
+        },
+        "provenance": {
+          "is_synthetic": true,
+          "data_source": "DEMO_SYNTHETIC_GENERATOR",
+          "pilot_region": "himalayan_pilot",
+          "generator_seed": 26191,
+          "disclaimer": "DEMO / SYNTHETIC DATASET for SIH Problem Statement 26191. Generated deterministically using fixed pseudo-random seed 26191. Not official Government of Uttarakhand, Survey of India, or Census data. Do NOT use for official administrative actions or statutory land acquisition."
+        }
+      }
+    },
+    {
+      "type": "Feature",
+      "id": "HIM-VILL-036",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          79.47678,
+          30.30947
+        ]
+      },
+      "properties": {
+        "id": "HIM-VILL-036",
+        "name": "Sitel",
+        "region_code": "uttarakhand_himalayan",
+        "district_code": "chamoli",
+        "district_name": "Chamoli District",
+        "block_code": "ghat",
+        "block_name": "Ghat Block (Nandakini Valley)",
+        "census_code": "044136",
+        "population": 562,
+        "households": 126,
+        "demographics": {
+          "elderly_count": 52,
+          "children_count": 85,
+          "disabled_count": 18,
+          "livestock_count": 171
+        },
+        "vulnerability": {
+          "social_vulnerability_index": 0.774,
+          "economic_vulnerability_index": 0.772,
+          "structural_vulnerability_index": 0.602,
+          "road_connectivity_index": 0.343,
+          "poverty_ratio": 0.366,
+          "kuccha_housing_ratio": 0.261
+        },
+        "infrastructure": {
+          "has_primary_school": true,
+          "has_health_subcenter": true,
+          "has_piped_water": true,
+          "has_electricity": true,
+          "has_telecom_coverage": true
+        },
+        "accessibility": {
+          "distance_to_motorable_road_km": 4.6,
+          "road_type": "footpath",
+          "evacuation_route_condition": "poor",
+          "is_winter_cutoff_prone": true
+        },
+        "hazards": {
+          "elevation_m": 2039.0,
+          "slope_deg": 26.4,
+          "historical_landslide_count": 3,
+          "active_subsidence": false,
+          "distance_to_river_m": 576.2,
+          "soil_type": "debris_mantled_slope",
+          "geological_formation": "Vaikrita_Group_Schist"
+        },
+        "provenance": {
+          "is_synthetic": true,
+          "data_source": "DEMO_SYNTHETIC_GENERATOR",
+          "pilot_region": "himalayan_pilot",
+          "generator_seed": 26191,
+          "disclaimer": "DEMO / SYNTHETIC DATASET for SIH Problem Statement 26191. Generated deterministically using fixed pseudo-random seed 26191. Not official Government of Uttarakhand, Survey of India, or Census data. Do NOT use for official administrative actions or statutory land acquisition."
+        }
+      }
+    },
+    {
+      "type": "Feature",
+      "id": "HIM-VILL-037",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          79.4231,
+          30.34515
+        ]
+      },
+      "properties": {
+        "id": "HIM-VILL-037",
+        "name": "Kanol",
+        "region_code": "uttarakhand_himalayan",
+        "district_code": "chamoli",
+        "district_name": "Chamoli District",
+        "block_code": "ghat",
+        "block_name": "Ghat Block (Nandakini Valley)",
+        "census_code": "044137",
+        "population": 882,
+        "households": 205,
+        "demographics": {
+          "elderly_count": 80,
+          "children_count": 127,
+          "disabled_count": 22,
+          "livestock_count": 232
+        },
+        "vulnerability": {
+          "social_vulnerability_index": 0.507,
+          "economic_vulnerability_index": 0.568,
+          "structural_vulnerability_index": 0.475,
+          "road_connectivity_index": 0.686,
+          "poverty_ratio": 0.379,
+          "kuccha_housing_ratio": 0.455
+        },
+        "infrastructure": {
+          "has_primary_school": true,
+          "has_health_subcenter": false,
+          "has_piped_water": true,
+          "has_electricity": true,
+          "has_telecom_coverage": true
+        },
+        "accessibility": {
+          "distance_to_motorable_road_km": 2.2,
+          "road_type": "unpaved",
+          "evacuation_route_condition": "poor",
+          "is_winter_cutoff_prone": true
+        },
+        "hazards": {
+          "elevation_m": 1953.7,
+          "slope_deg": 27.9,
+          "historical_landslide_count": 2,
+          "active_subsidence": false,
+          "distance_to_river_m": 915.6,
+          "soil_type": "colluvial_scree",
+          "geological_formation": "Garhwal_Group_Quartzite"
+        },
+        "provenance": {
+          "is_synthetic": true,
+          "data_source": "DEMO_SYNTHETIC_GENERATOR",
+          "pilot_region": "himalayan_pilot",
+          "generator_seed": 26191,
+          "disclaimer": "DEMO / SYNTHETIC DATASET for SIH Problem Statement 26191. Generated deterministically using fixed pseudo-random seed 26191. Not official Government of Uttarakhand, Survey of India, or Census data. Do NOT use for official administrative actions or statutory land acquisition."
+        }
+      }
+    },
+    {
+      "type": "Feature",
+      "id": "HIM-VILL-038",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          79.42314,
+          30.26842
+        ]
+      },
+      "properties": {
+        "id": "HIM-VILL-038",
+        "name": "Sutol",
+        "region_code": "uttarakhand_himalayan",
+        "district_code": "chamoli",
+        "district_name": "Chamoli District",
+        "block_code": "ghat",
+        "block_name": "Ghat Block (Nandakini Valley)",
+        "census_code": "044138",
+        "population": 358,
+        "households": 82,
+        "demographics": {
+          "elderly_count": 37,
+          "children_count": 60,
+          "disabled_count": 11,
+          "livestock_count": 105
+        },
+        "vulnerability": {
+          "social_vulnerability_index": 0.713,
+          "economic_vulnerability_index": 0.454,
+          "structural_vulnerability_index": 0.413,
+          "road_connectivity_index": 0.471,
+          "poverty_ratio": 0.305,
+          "kuccha_housing_ratio": 0.425
+        },
+        "infrastructure": {
+          "has_primary_school": true,
+          "has_health_subcenter": true,
+          "has_piped_water": true,
+          "has_electricity": true,
+          "has_telecom_coverage": false
+        },
+        "accessibility": {
+          "distance_to_motorable_road_km": 3.7,
+          "road_type": "footpath",
+          "evacuation_route_condition": "poor",
+          "is_winter_cutoff_prone": true
+        },
+        "hazards": {
+          "elevation_m": 1974.4,
+          "slope_deg": 20.3,
+          "historical_landslide_count": 2,
+          "active_subsidence": false,
+          "distance_to_river_m": 1497.0,
+          "soil_type": "morainic_gravel",
+          "geological_formation": "Central_Crystalline_Gneiss"
+        },
+        "provenance": {
+          "is_synthetic": true,
+          "data_source": "DEMO_SYNTHETIC_GENERATOR",
+          "pilot_region": "himalayan_pilot",
+          "generator_seed": 26191,
+          "disclaimer": "DEMO / SYNTHETIC DATASET for SIH Problem Statement 26191. Generated deterministically using fixed pseudo-random seed 26191. Not official Government of Uttarakhand, Survey of India, or Census data. Do NOT use for official administrative actions or statutory land acquisition."
+        }
+      }
+    },
+    {
+      "type": "Feature",
+      "id": "HIM-VILL-039",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          79.44521,
+          30.33513
+        ]
+      },
+      "properties": {
+        "id": "HIM-VILL-039",
+        "name": "Pagna",
+        "region_code": "uttarakhand_himalayan",
+        "district_code": "chamoli",
+        "district_name": "Chamoli District",
+        "block_code": "ghat",
+        "block_name": "Ghat Block (Nandakini Valley)",
+        "census_code": "044139",
+        "population": 269,
+        "households": 62,
+        "demographics": {
+          "elderly_count": 36,
+          "children_count": 48,
+          "disabled_count": 5,
+          "livestock_count": 76
+        },
+        "vulnerability": {
+          "social_vulnerability_index": 0.468,
+          "economic_vulnerability_index": 0.446,
+          "structural_vulnerability_index": 0.375,
+          "road_connectivity_index": 0.829,
+          "poverty_ratio": 0.318,
+          "kuccha_housing_ratio": 0.354
+        },
+        "infrastructure": {
+          "has_primary_school": true,
+          "has_health_subcenter": false,
+          "has_piped_water": false,
+          "has_electricity": true,
+          "has_telecom_coverage": true
+        },
+        "accessibility": {
+          "distance_to_motorable_road_km": 1.2,
+          "road_type": "unpaved",
+          "evacuation_route_condition": "poor",
+          "is_winter_cutoff_prone": false
+        },
+        "hazards": {
+          "elevation_m": 1684.4,
+          "slope_deg": 21.2,
+          "historical_landslide_count": 3,
+          "active_subsidence": false,
+          "distance_to_river_m": 984.0,
+          "soil_type": "fluvial_terrace_alluvium",
+          "geological_formation": "Chamoli_Metavolcanic_Formation"
+        },
+        "provenance": {
+          "is_synthetic": true,
+          "data_source": "DEMO_SYNTHETIC_GENERATOR",
+          "pilot_region": "himalayan_pilot",
+          "generator_seed": 26191,
+          "disclaimer": "DEMO / SYNTHETIC DATASET for SIH Problem Statement 26191. Generated deterministically using fixed pseudo-random seed 26191. Not official Government of Uttarakhand, Survey of India, or Census data. Do NOT use for official administrative actions or statutory land acquisition."
+        }
+      }
+    },
+    {
+      "type": "Feature",
+      "id": "HIM-VILL-040",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          79.48578,
+          30.27989
+        ]
+      },
+      "properties": {
+        "id": "HIM-VILL-040",
+        "name": "Ramni",
+        "region_code": "uttarakhand_himalayan",
+        "district_code": "chamoli",
+        "district_name": "Chamoli District",
+        "block_code": "ghat",
+        "block_name": "Ghat Block (Nandakini Valley)",
+        "census_code": "044140",
+        "population": 916,
+        "households": 215,
+        "demographics": {
+          "elderly_count": 102,
+          "children_count": 168,
+          "disabled_count": 31,
+          "livestock_count": 219
+        },
+        "vulnerability": {
+          "social_vulnerability_index": 0.295,
+          "economic_vulnerability_index": 0.378,
+          "structural_vulnerability_index": 0.469,
+          "road_connectivity_index": 0.386,
+          "poverty_ratio": 0.192,
+          "kuccha_housing_ratio": 0.585
+        },
+        "infrastructure": {
+          "has_primary_school": true,
+          "has_health_subcenter": false,
+          "has_piped_water": true,
+          "has_electricity": true,
+          "has_telecom_coverage": true
+        },
+        "accessibility": {
+          "distance_to_motorable_road_km": 4.3,
+          "road_type": "footpath",
+          "evacuation_route_condition": "poor",
+          "is_winter_cutoff_prone": false
+        },
+        "hazards": {
+          "elevation_m": 1688.1,
+          "slope_deg": 34.0,
+          "historical_landslide_count": 4,
+          "active_subsidence": false,
+          "distance_to_river_m": 537.5,
+          "soil_type": "debris_mantled_slope",
+          "geological_formation": "Vaikrita_Group_Schist"
+        },
+        "provenance": {
+          "is_synthetic": true,
+          "data_source": "DEMO_SYNTHETIC_GENERATOR",
+          "pilot_region": "himalayan_pilot",
+          "generator_seed": 26191,
+          "disclaimer": "DEMO / SYNTHETIC DATASET for SIH Problem Statement 26191. Generated deterministically using fixed pseudo-random seed 26191. Not official Government of Uttarakhand, Survey of India, or Census data. Do NOT use for official administrative actions or statutory land acquisition."
+        }
+      }
+    }
+  ]
+}

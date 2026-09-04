@@ -1,0 +1,752 @@
+[
+  {
+    "description": "Rain-triggered rotational debris slump across uphill road corridor; 120m highway cut off.",
+    "hazard_type": "landslide",
+    "id": "HIM-EVT-001",
+    "intensity_unit": "cu_m_debris_volume",
+    "intensity_value": 18500.0,
+    "location": {
+      "coordinates": [
+        79.5575,
+        30.53472
+      ],
+      "type": "Point"
+    },
+    "observed_at": "2024-07-18T14:30:00Z",
+    "provenance": {
+      "data_source": "DEMO_SYNTHETIC_GENERATOR",
+      "disclaimer": "DEMO / SYNTHETIC DATASET for SIH Problem Statement 26191. Generated deterministically using fixed pseudo-random seed 26191. Not official Government of Uttarakhand, Survey of India, or Census data. Do NOT use for official administrative actions or statutory land acquisition.",
+      "generator_seed": 26191,
+      "is_synthetic": true,
+      "pilot_region": "himalayan_pilot"
+    },
+    "severity": "critical",
+    "village_id": "HIM-VILL-001",
+    "village_name": "Sunil"
+  },
+  {
+    "description": "Translational rockslide from fractured gneiss escarpment; blocked local drainage channel.",
+    "hazard_type": "landslide",
+    "id": "HIM-EVT-002",
+    "intensity_unit": "cu_m_debris_volume",
+    "intensity_value": 8200.0,
+    "location": {
+      "coordinates": [
+        79.5571,
+        30.57886
+      ],
+      "type": "Point"
+    },
+    "observed_at": "2024-08-04T09:15:00Z",
+    "provenance": {
+      "data_source": "DEMO_SYNTHETIC_GENERATOR",
+      "disclaimer": "DEMO / SYNTHETIC DATASET for SIH Problem Statement 26191. Generated deterministically using fixed pseudo-random seed 26191. Not official Government of Uttarakhand, Survey of India, or Census data. Do NOT use for official administrative actions or statutory land acquisition.",
+      "generator_seed": 26191,
+      "is_synthetic": true,
+      "pilot_region": "himalayan_pilot"
+    },
+    "severity": "very_high",
+    "village_id": "HIM-VILL-003",
+    "village_name": "Marwari"
+  },
+  {
+    "description": "Active ground fissures and foundation subsidence following 48-hour continuous downpour.",
+    "hazard_type": "landslide",
+    "id": "HIM-EVT-003",
+    "intensity_unit": "cu_m_debris_volume",
+    "intensity_value": 24000.0,
+    "location": {
+      "coordinates": [
+        79.52419,
+        30.5412
+      ],
+      "type": "Point"
+    },
+    "observed_at": "2024-08-11T21:00:00Z",
+    "provenance": {
+      "data_source": "DEMO_SYNTHETIC_GENERATOR",
+      "disclaimer": "DEMO / SYNTHETIC DATASET for SIH Problem Statement 26191. Generated deterministically using fixed pseudo-random seed 26191. Not official Government of Uttarakhand, Survey of India, or Census data. Do NOT use for official administrative actions or statutory land acquisition.",
+      "generator_seed": 26191,
+      "is_synthetic": true,
+      "pilot_region": "himalayan_pilot"
+    },
+    "severity": "critical",
+    "village_id": "HIM-VILL-004",
+    "village_name": "Manohar Bagh"
+  },
+  {
+    "description": "Debris flow in seasonal gully washing out pedestrian bridge and power transmission pole.",
+    "hazard_type": "landslide",
+    "id": "HIM-EVT-004",
+    "intensity_unit": "cu_m_debris_volume",
+    "intensity_value": 4500.0,
+    "location": {
+      "coordinates": [
+        79.58972,
+        30.55959
+      ],
+      "type": "Point"
+    },
+    "observed_at": "2024-08-22T06:45:00Z",
+    "provenance": {
+      "data_source": "DEMO_SYNTHETIC_GENERATOR",
+      "disclaimer": "DEMO / SYNTHETIC DATASET for SIH Problem Statement 26191. Generated deterministically using fixed pseudo-random seed 26191. Not official Government of Uttarakhand, Survey of India, or Census data. Do NOT use for official administrative actions or statutory land acquisition.",
+      "generator_seed": 26191,
+      "is_synthetic": true,
+      "pilot_region": "himalayan_pilot"
+    },
+    "severity": "high",
+    "village_id": "HIM-VILL-008",
+    "village_name": "Helang"
+  },
+  {
+    "description": "Slope toe failure along river bank during high discharge pulse.",
+    "hazard_type": "landslide",
+    "id": "HIM-EVT-005",
+    "intensity_unit": "cu_m_debris_volume",
+    "intensity_value": 12000.0,
+    "location": {
+      "coordinates": [
+        79.53777,
+        30.6
+      ],
+      "type": "Point"
+    },
+    "observed_at": "2025-07-02T11:20:00Z",
+    "provenance": {
+      "data_source": "DEMO_SYNTHETIC_GENERATOR",
+      "disclaimer": "DEMO / SYNTHETIC DATASET for SIH Problem Statement 26191. Generated deterministically using fixed pseudo-random seed 26191. Not official Government of Uttarakhand, Survey of India, or Census data. Do NOT use for official administrative actions or statutory land acquisition.",
+      "generator_seed": 26191,
+      "is_synthetic": true,
+      "pilot_region": "himalayan_pilot"
+    },
+    "severity": "very_high",
+    "village_id": "HIM-VILL-011",
+    "village_name": "Tapovan"
+  },
+  {
+    "description": "Major chronic landslide zone reactivation on NH-58 corridor; road blocked for 3 days.",
+    "hazard_type": "landslide",
+    "id": "HIM-EVT-006",
+    "intensity_unit": "cu_m_debris_volume",
+    "intensity_value": 31000.0,
+    "location": {
+      "coordinates": [
+        79.34386,
+        30.43763
+      ],
+      "type": "Point"
+    },
+    "observed_at": "2025-07-19T17:50:00Z",
+    "provenance": {
+      "data_source": "DEMO_SYNTHETIC_GENERATOR",
+      "disclaimer": "DEMO / SYNTHETIC DATASET for SIH Problem Statement 26191. Generated deterministically using fixed pseudo-random seed 26191. Not official Government of Uttarakhand, Survey of India, or Census data. Do NOT use for official administrative actions or statutory land acquisition.",
+      "generator_seed": 26191,
+      "is_synthetic": true,
+      "pilot_region": "himalayan_pilot"
+    },
+    "severity": "critical",
+    "village_id": "HIM-VILL-016",
+    "village_name": "Tangani"
+  },
+  {
+    "description": "Shallow mudflow encroaching on terraced agricultural fields.",
+    "hazard_type": "landslide",
+    "id": "HIM-EVT-007",
+    "intensity_unit": "cu_m_debris_volume",
+    "intensity_value": 6200.0,
+    "location": {
+      "coordinates": [
+        79.38995,
+        30.41087
+      ],
+      "type": "Point"
+    },
+    "observed_at": "2025-08-08T03:10:00Z",
+    "provenance": {
+      "data_source": "DEMO_SYNTHETIC_GENERATOR",
+      "disclaimer": "DEMO / SYNTHETIC DATASET for SIH Problem Statement 26191. Generated deterministically using fixed pseudo-random seed 26191. Not official Government of Uttarakhand, Survey of India, or Census data. Do NOT use for official administrative actions or statutory land acquisition.",
+      "generator_seed": 26191,
+      "is_synthetic": true,
+      "pilot_region": "himalayan_pilot"
+    },
+    "severity": "high",
+    "village_id": "HIM-VILL-020",
+    "village_name": "Birahi"
+  },
+  {
+    "description": "Localized cut-slope slip along forest access route.",
+    "hazard_type": "landslide",
+    "id": "HIM-EVT-008",
+    "intensity_unit": "cu_m_debris_volume",
+    "intensity_value": 2100.0,
+    "location": {
+      "coordinates": [
+        79.43544,
+        30.47291
+      ],
+      "type": "Point"
+    },
+    "observed_at": "2025-08-15T16:00:00Z",
+    "provenance": {
+      "data_source": "DEMO_SYNTHETIC_GENERATOR",
+      "disclaimer": "DEMO / SYNTHETIC DATASET for SIH Problem Statement 26191. Generated deterministically using fixed pseudo-random seed 26191. Not official Government of Uttarakhand, Survey of India, or Census data. Do NOT use for official administrative actions or statutory land acquisition.",
+      "generator_seed": 26191,
+      "is_synthetic": true,
+      "pilot_region": "himalayan_pilot"
+    },
+    "severity": "moderate",
+    "village_id": "HIM-VILL-024",
+    "village_name": "Mandal"
+  },
+  {
+    "description": "Debris avalanche into Nandakini tributary causing temporary backwater pooling.",
+    "hazard_type": "landslide",
+    "id": "HIM-EVT-009",
+    "intensity_unit": "cu_m_debris_volume",
+    "intensity_value": 15400.0,
+    "location": {
+      "coordinates": [
+        79.47754,
+        30.31028
+      ],
+      "type": "Point"
+    },
+    "observed_at": "2026-07-10T12:00:00Z",
+    "provenance": {
+      "data_source": "DEMO_SYNTHETIC_GENERATOR",
+      "disclaimer": "DEMO / SYNTHETIC DATASET for SIH Problem Statement 26191. Generated deterministically using fixed pseudo-random seed 26191. Not official Government of Uttarakhand, Survey of India, or Census data. Do NOT use for official administrative actions or statutory land acquisition.",
+      "generator_seed": 26191,
+      "is_synthetic": true,
+      "pilot_region": "himalayan_pilot"
+    },
+    "severity": "very_high",
+    "village_id": "HIM-VILL-036",
+    "village_name": "Sitel"
+  },
+  {
+    "description": "Steep scree chute slip damaging water supply pipeline.",
+    "hazard_type": "landslide",
+    "id": "HIM-EVT-010",
+    "intensity_unit": "cu_m_debris_volume",
+    "intensity_value": 5800.0,
+    "location": {
+      "coordinates": [
+        79.42126,
+        30.26681
+      ],
+      "type": "Point"
+    },
+    "observed_at": "2026-07-28T08:30:00Z",
+    "provenance": {
+      "data_source": "DEMO_SYNTHETIC_GENERATOR",
+      "disclaimer": "DEMO / SYNTHETIC DATASET for SIH Problem Statement 26191. Generated deterministically using fixed pseudo-random seed 26191. Not official Government of Uttarakhand, Survey of India, or Census data. Do NOT use for official administrative actions or statutory land acquisition.",
+      "generator_seed": 26191,
+      "is_synthetic": true,
+      "pilot_region": "himalayan_pilot"
+    },
+    "severity": "high",
+    "village_id": "HIM-VILL-038",
+    "village_name": "Sutol"
+  },
+  {
+    "description": "Very heavy rainfall exceeding IMD critical threshold (115.5 mm); surface runoff saturation.",
+    "hazard_type": "rainfall",
+    "id": "HIM-EVT-011",
+    "intensity_unit": "mm_per_24h",
+    "intensity_value": 142.5,
+    "location": {
+      "coordinates": [
+        79.58744,
+        30.5132
+      ],
+      "type": "Point"
+    },
+    "observed_at": "2024-07-17T23:59:00Z",
+    "provenance": {
+      "data_source": "DEMO_SYNTHETIC_GENERATOR",
+      "disclaimer": "DEMO / SYNTHETIC DATASET for SIH Problem Statement 26191. Generated deterministically using fixed pseudo-random seed 26191. Not official Government of Uttarakhand, Survey of India, or Census data. Do NOT use for official administrative actions or statutory land acquisition.",
+      "generator_seed": 26191,
+      "is_synthetic": true,
+      "pilot_region": "himalayan_pilot"
+    },
+    "severity": "critical",
+    "village_id": "HIM-VILL-002",
+    "village_name": "Ravigram"
+  },
+  {
+    "description": "Heavy localized monsoon rainfall exceeding IMD warning threshold (64.5 mm).",
+    "hazard_type": "rainfall",
+    "id": "HIM-EVT-012",
+    "intensity_unit": "mm_per_24h",
+    "intensity_value": 88.0,
+    "location": {
+      "coordinates": [
+        79.65212,
+        30.51394
+      ],
+      "type": "Point"
+    },
+    "observed_at": "2024-08-10T23:59:00Z",
+    "provenance": {
+      "data_source": "DEMO_SYNTHETIC_GENERATOR",
+      "disclaimer": "DEMO / SYNTHETIC DATASET for SIH Problem Statement 26191. Generated deterministically using fixed pseudo-random seed 26191. Not official Government of Uttarakhand, Survey of India, or Census data. Do NOT use for official administrative actions or statutory land acquisition.",
+      "generator_seed": 26191,
+      "is_synthetic": true,
+      "pilot_region": "himalayan_pilot"
+    },
+    "severity": "very_high",
+    "village_id": "HIM-VILL-009",
+    "village_name": "Urgam"
+  },
+  {
+    "description": "Cloudburst event in upper Rishi Ganga catchment delivering torrential precipitation.",
+    "hazard_type": "rainfall",
+    "id": "HIM-EVT-013",
+    "intensity_unit": "mm_per_24h",
+    "intensity_value": 165.0,
+    "location": {
+      "coordinates": [
+        79.56668,
+        30.59234
+      ],
+      "type": "Point"
+    },
+    "observed_at": "2025-06-25T23:59:00Z",
+    "provenance": {
+      "data_source": "DEMO_SYNTHETIC_GENERATOR",
+      "disclaimer": "DEMO / SYNTHETIC DATASET for SIH Problem Statement 26191. Generated deterministically using fixed pseudo-random seed 26191. Not official Government of Uttarakhand, Survey of India, or Census data. Do NOT use for official administrative actions or statutory land acquisition.",
+      "generator_seed": 26191,
+      "is_synthetic": true,
+      "pilot_region": "himalayan_pilot"
+    },
+    "severity": "critical",
+    "village_id": "HIM-VILL-012",
+    "village_name": "Reni"
+  },
+  {
+    "description": "Sustained monsoon rain exceeding IMD heavy rainfall mark (64.5 mm).",
+    "hazard_type": "rainfall",
+    "id": "HIM-EVT-014",
+    "intensity_unit": "mm_per_24h",
+    "intensity_value": 78.5,
+    "location": {
+      "coordinates": [
+        79.4187,
+        30.42115
+      ],
+      "type": "Point"
+    },
+    "observed_at": "2025-07-18T23:59:00Z",
+    "provenance": {
+      "data_source": "DEMO_SYNTHETIC_GENERATOR",
+      "disclaimer": "DEMO / SYNTHETIC DATASET for SIH Problem Statement 26191. Generated deterministically using fixed pseudo-random seed 26191. Not official Government of Uttarakhand, Survey of India, or Census data. Do NOT use for official administrative actions or statutory land acquisition.",
+      "generator_seed": 26191,
+      "is_synthetic": true,
+      "pilot_region": "himalayan_pilot"
+    },
+    "severity": "high",
+    "village_id": "HIM-VILL-019",
+    "village_name": "Pipalkoti"
+  },
+  {
+    "description": "Very heavy rainfall surpassing IMD 115.5 mm trigger; urban drainage surcharge.",
+    "hazard_type": "rainfall",
+    "id": "HIM-EVT-015",
+    "intensity_unit": "mm_per_24h",
+    "intensity_value": 118.0,
+    "location": {
+      "coordinates": [
+        79.33333,
+        30.39812
+      ],
+      "type": "Point"
+    },
+    "observed_at": "2025-08-07T23:59:00Z",
+    "provenance": {
+      "data_source": "DEMO_SYNTHETIC_GENERATOR",
+      "disclaimer": "DEMO / SYNTHETIC DATASET for SIH Problem Statement 26191. Generated deterministically using fixed pseudo-random seed 26191. Not official Government of Uttarakhand, Survey of India, or Census data. Do NOT use for official administrative actions or statutory land acquisition.",
+      "generator_seed": 26191,
+      "is_synthetic": true,
+      "pilot_region": "himalayan_pilot"
+    },
+    "severity": "very_high",
+    "village_id": "HIM-VILL-026",
+    "village_name": "Gopeshwar Dealdhar"
+  },
+  {
+    "description": "Heavy rainfall triggering rise in Pindar river gauge.",
+    "hazard_type": "rainfall",
+    "id": "HIM-EVT-016",
+    "intensity_unit": "mm_per_24h",
+    "intensity_value": 72.0,
+    "location": {
+      "coordinates": [
+        79.22234,
+        30.32317
+      ],
+      "type": "Point"
+    },
+    "observed_at": "2025-08-14T23:59:00Z",
+    "provenance": {
+      "data_source": "DEMO_SYNTHETIC_GENERATOR",
+      "disclaimer": "DEMO / SYNTHETIC DATASET for SIH Problem Statement 26191. Generated deterministically using fixed pseudo-random seed 26191. Not official Government of Uttarakhand, Survey of India, or Census data. Do NOT use for official administrative actions or statutory land acquisition.",
+      "generator_seed": 26191,
+      "is_synthetic": true,
+      "pilot_region": "himalayan_pilot"
+    },
+    "severity": "high",
+    "village_id": "HIM-VILL-030",
+    "village_name": "Simli"
+  },
+  {
+    "description": "Cloudburst pulse causing intense slope gullying and boulder transport.",
+    "hazard_type": "rainfall",
+    "id": "HIM-EVT-017",
+    "intensity_unit": "mm_per_24h",
+    "intensity_value": 155.0,
+    "location": {
+      "coordinates": [
+        79.42484,
+        30.34322
+      ],
+      "type": "Point"
+    },
+    "observed_at": "2026-07-09T23:59:00Z",
+    "provenance": {
+      "data_source": "DEMO_SYNTHETIC_GENERATOR",
+      "disclaimer": "DEMO / SYNTHETIC DATASET for SIH Problem Statement 26191. Generated deterministically using fixed pseudo-random seed 26191. Not official Government of Uttarakhand, Survey of India, or Census data. Do NOT use for official administrative actions or statutory land acquisition.",
+      "generator_seed": 26191,
+      "is_synthetic": true,
+      "pilot_region": "himalayan_pilot"
+    },
+    "severity": "critical",
+    "village_id": "HIM-VILL-037",
+    "village_name": "Kanol"
+  },
+  {
+    "description": "High intensity rainfall event saturating colluvial soil mantle.",
+    "hazard_type": "rainfall",
+    "id": "HIM-EVT-018",
+    "intensity_unit": "mm_per_24h",
+    "intensity_value": 82.5,
+    "location": {
+      "coordinates": [
+        79.44249,
+        30.3348
+      ],
+      "type": "Point"
+    },
+    "observed_at": "2026-07-27T23:59:00Z",
+    "provenance": {
+      "data_source": "DEMO_SYNTHETIC_GENERATOR",
+      "disclaimer": "DEMO / SYNTHETIC DATASET for SIH Problem Statement 26191. Generated deterministically using fixed pseudo-random seed 26191. Not official Government of Uttarakhand, Survey of India, or Census data. Do NOT use for official administrative actions or statutory land acquisition.",
+      "generator_seed": 26191,
+      "is_synthetic": true,
+      "pilot_region": "himalayan_pilot"
+    },
+    "severity": "high",
+    "village_id": "HIM-VILL-039",
+    "village_name": "Pagna"
+  },
+  {
+    "description": "Seismic tremor exceeding critical threshold MMI VII; widespread plaster cracks in masonry.",
+    "hazard_type": "seismic",
+    "id": "HIM-EVT-019",
+    "intensity_unit": "mmi_intensity",
+    "intensity_value": 7.2,
+    "location": {
+      "coordinates": [
+        79.55567,
+        30.53174
+      ],
+      "type": "Point"
+    },
+    "observed_at": "2024-09-05T04:12:30Z",
+    "provenance": {
+      "data_source": "DEMO_SYNTHETIC_GENERATOR",
+      "disclaimer": "DEMO / SYNTHETIC DATASET for SIH Problem Statement 26191. Generated deterministically using fixed pseudo-random seed 26191. Not official Government of Uttarakhand, Survey of India, or Census data. Do NOT use for official administrative actions or statutory land acquisition.",
+      "generator_seed": 26191,
+      "is_synthetic": true,
+      "pilot_region": "himalayan_pilot"
+    },
+    "severity": "critical",
+    "village_id": "HIM-VILL-001",
+    "village_name": "Sunil"
+  },
+  {
+    "description": "Significant ground motion shaking Zone V fault lines; partial wall collapse in older structures.",
+    "hazard_type": "seismic",
+    "id": "HIM-EVT-020",
+    "intensity_unit": "mmi_intensity",
+    "intensity_value": 6.8,
+    "location": {
+      "coordinates": [
+        79.56349,
+        30.60479
+      ],
+      "type": "Point"
+    },
+    "observed_at": "2024-09-05T04:12:30Z",
+    "provenance": {
+      "data_source": "DEMO_SYNTHETIC_GENERATOR",
+      "disclaimer": "DEMO / SYNTHETIC DATASET for SIH Problem Statement 26191. Generated deterministically using fixed pseudo-random seed 26191. Not official Government of Uttarakhand, Survey of India, or Census data. Do NOT use for official administrative actions or statutory land acquisition.",
+      "generator_seed": 26191,
+      "is_synthetic": true,
+      "pilot_region": "himalayan_pilot"
+    },
+    "severity": "very_high",
+    "village_id": "HIM-VILL-005",
+    "village_name": "Parsari"
+  },
+  {
+    "description": "Moderate regional earthquake centered on Main Central Thrust (MCT).",
+    "hazard_type": "seismic",
+    "id": "HIM-EVT-021",
+    "intensity_unit": "mmi_intensity",
+    "intensity_value": 5.8,
+    "location": {
+      "coordinates": [
+        79.3753,
+        30.47297
+      ],
+      "type": "Point"
+    },
+    "observed_at": "2025-03-14T18:44:10Z",
+    "provenance": {
+      "data_source": "DEMO_SYNTHETIC_GENERATOR",
+      "disclaimer": "DEMO / SYNTHETIC DATASET for SIH Problem Statement 26191. Generated deterministically using fixed pseudo-random seed 26191. Not official Government of Uttarakhand, Survey of India, or Census data. Do NOT use for official administrative actions or statutory land acquisition.",
+      "generator_seed": 26191,
+      "is_synthetic": true,
+      "pilot_region": "himalayan_pilot"
+    },
+    "severity": "high",
+    "village_id": "HIM-VILL-017",
+    "village_name": "Gulabkoti"
+  },
+  {
+    "description": "Strong ground vibration felt across Dasholi block valleys.",
+    "hazard_type": "seismic",
+    "id": "HIM-EVT-022",
+    "intensity_unit": "mmi_intensity",
+    "intensity_value": 5.5,
+    "location": {
+      "coordinates": [
+        79.45064,
+        30.40593
+      ],
+      "type": "Point"
+    },
+    "observed_at": "2025-03-14T18:44:10Z",
+    "provenance": {
+      "data_source": "DEMO_SYNTHETIC_GENERATOR",
+      "disclaimer": "DEMO / SYNTHETIC DATASET for SIH Problem Statement 26191. Generated deterministically using fixed pseudo-random seed 26191. Not official Government of Uttarakhand, Survey of India, or Census data. Do NOT use for official administrative actions or statutory land acquisition.",
+      "generator_seed": 26191,
+      "is_synthetic": true,
+      "pilot_region": "himalayan_pilot"
+    },
+    "severity": "high",
+    "village_id": "HIM-VILL-021",
+    "village_name": "Batula"
+  },
+  {
+    "description": "Alaknanda lineament seismic event triggering minor rockfalls along road cuttings.",
+    "hazard_type": "seismic",
+    "id": "HIM-EVT-023",
+    "intensity_unit": "mmi_intensity",
+    "intensity_value": 6.4,
+    "location": {
+      "coordinates": [
+        79.30339,
+        30.26928
+      ],
+      "type": "Point"
+    },
+    "observed_at": "2026-01-20T02:08:45Z",
+    "provenance": {
+      "data_source": "DEMO_SYNTHETIC_GENERATOR",
+      "disclaimer": "DEMO / SYNTHETIC DATASET for SIH Problem Statement 26191. Generated deterministically using fixed pseudo-random seed 26191. Not official Government of Uttarakhand, Survey of India, or Census data. Do NOT use for official administrative actions or statutory land acquisition.",
+      "generator_seed": 26191,
+      "is_synthetic": true,
+      "pilot_region": "himalayan_pilot"
+    },
+    "severity": "very_high",
+    "village_id": "HIM-VILL-029",
+    "village_name": "Umra Narayan"
+  },
+  {
+    "description": "Deep crustal tremor causing noticeable shaking of hillside settlements.",
+    "hazard_type": "seismic",
+    "id": "HIM-EVT-024",
+    "intensity_unit": "mmi_intensity",
+    "intensity_value": 5.9,
+    "location": {
+      "coordinates": [
+        79.22355,
+        30.32482
+      ],
+      "type": "Point"
+    },
+    "observed_at": "2026-01-20T02:08:45Z",
+    "provenance": {
+      "data_source": "DEMO_SYNTHETIC_GENERATOR",
+      "disclaimer": "DEMO / SYNTHETIC DATASET for SIH Problem Statement 26191. Generated deterministically using fixed pseudo-random seed 26191. Not official Government of Uttarakhand, Survey of India, or Census data. Do NOT use for official administrative actions or statutory land acquisition.",
+      "generator_seed": 26191,
+      "is_synthetic": true,
+      "pilot_region": "himalayan_pilot"
+    },
+    "severity": "high",
+    "village_id": "HIM-VILL-033",
+    "village_name": "Langasu"
+  },
+  {
+    "description": "Alaknanda flash flood surge submerging riverside pedestrian paths and low terraces.",
+    "hazard_type": "flash_flood",
+    "id": "HIM-EVT-025",
+    "intensity_unit": "meters_above_danger_level",
+    "intensity_value": 3.8,
+    "location": {
+      "coordinates": [
+        79.55741,
+        30.57857
+      ],
+      "type": "Point"
+    },
+    "observed_at": "2024-07-20T19:30:00Z",
+    "provenance": {
+      "data_source": "DEMO_SYNTHETIC_GENERATOR",
+      "disclaimer": "DEMO / SYNTHETIC DATASET for SIH Problem Statement 26191. Generated deterministically using fixed pseudo-random seed 26191. Not official Government of Uttarakhand, Survey of India, or Census data. Do NOT use for official administrative actions or statutory land acquisition.",
+      "generator_seed": 26191,
+      "is_synthetic": true,
+      "pilot_region": "himalayan_pilot"
+    },
+    "severity": "critical",
+    "village_id": "HIM-VILL-003",
+    "village_name": "Marwari"
+  },
+  {
+    "description": "Dhauliganga torrent surge eroding toe of valley slopes and scouring bridge piers.",
+    "hazard_type": "flash_flood",
+    "id": "HIM-EVT-026",
+    "intensity_unit": "meters_above_danger_level",
+    "intensity_value": 2.6,
+    "location": {
+      "coordinates": [
+        79.54107,
+        30.60502
+      ],
+      "type": "Point"
+    },
+    "observed_at": "2024-08-15T15:40:00Z",
+    "provenance": {
+      "data_source": "DEMO_SYNTHETIC_GENERATOR",
+      "disclaimer": "DEMO / SYNTHETIC DATASET for SIH Problem Statement 26191. Generated deterministically using fixed pseudo-random seed 26191. Not official Government of Uttarakhand, Survey of India, or Census data. Do NOT use for official administrative actions or statutory land acquisition.",
+      "generator_seed": 26191,
+      "is_synthetic": true,
+      "pilot_region": "himalayan_pilot"
+    },
+    "severity": "very_high",
+    "village_id": "HIM-VILL-011",
+    "village_name": "Tapovan"
+  },
+  {
+    "description": "Glacial lake runoff and debris surge inundating confluence zone.",
+    "hazard_type": "flash_flood",
+    "id": "HIM-EVT-027",
+    "intensity_unit": "meters_above_danger_level",
+    "intensity_value": 4.5,
+    "location": {
+      "coordinates": [
+        79.56249,
+        30.59379
+      ],
+      "type": "Point"
+    },
+    "observed_at": "2025-06-26T02:15:00Z",
+    "provenance": {
+      "data_source": "DEMO_SYNTHETIC_GENERATOR",
+      "disclaimer": "DEMO / SYNTHETIC DATASET for SIH Problem Statement 26191. Generated deterministically using fixed pseudo-random seed 26191. Not official Government of Uttarakhand, Survey of India, or Census data. Do NOT use for official administrative actions or statutory land acquisition.",
+      "generator_seed": 26191,
+      "is_synthetic": true,
+      "pilot_region": "himalayan_pilot"
+    },
+    "severity": "critical",
+    "village_id": "HIM-VILL-012",
+    "village_name": "Reni"
+  },
+  {
+    "description": "Birahi Ganga river discharge peak overtopping protective gabion revetment.",
+    "hazard_type": "flash_flood",
+    "id": "HIM-EVT-028",
+    "intensity_unit": "meters_above_danger_level",
+    "intensity_value": 1.9,
+    "location": {
+      "coordinates": [
+        79.39045,
+        30.41269
+      ],
+      "type": "Point"
+    },
+    "observed_at": "2025-08-08T06:00:00Z",
+    "provenance": {
+      "data_source": "DEMO_SYNTHETIC_GENERATOR",
+      "disclaimer": "DEMO / SYNTHETIC DATASET for SIH Problem Statement 26191. Generated deterministically using fixed pseudo-random seed 26191. Not official Government of Uttarakhand, Survey of India, or Census data. Do NOT use for official administrative actions or statutory land acquisition.",
+      "generator_seed": 26191,
+      "is_synthetic": true,
+      "pilot_region": "himalayan_pilot"
+    },
+    "severity": "high",
+    "village_id": "HIM-VILL-020",
+    "village_name": "Birahi"
+  },
+  {
+    "description": "Pindar river flood pulse washing through low-lying agricultural benches.",
+    "hazard_type": "flash_flood",
+    "id": "HIM-EVT-029",
+    "intensity_unit": "meters_above_danger_level",
+    "intensity_value": 1.7,
+    "location": {
+      "coordinates": [
+        79.22615,
+        30.32381
+      ],
+      "type": "Point"
+    },
+    "observed_at": "2025-08-15T04:20:00Z",
+    "provenance": {
+      "data_source": "DEMO_SYNTHETIC_GENERATOR",
+      "disclaimer": "DEMO / SYNTHETIC DATASET for SIH Problem Statement 26191. Generated deterministically using fixed pseudo-random seed 26191. Not official Government of Uttarakhand, Survey of India, or Census data. Do NOT use for official administrative actions or statutory land acquisition.",
+      "generator_seed": 26191,
+      "is_synthetic": true,
+      "pilot_region": "himalayan_pilot"
+    },
+    "severity": "high",
+    "village_id": "HIM-VILL-030",
+    "village_name": "Simli"
+  },
+  {
+    "description": "Nandakini river sudden hydrograph spike following cloudburst in upper reach.",
+    "hazard_type": "flash_flood",
+    "id": "HIM-EVT-030",
+    "intensity_unit": "meters_above_danger_level",
+    "intensity_value": 2.9,
+    "location": {
+      "coordinates": [
+        79.4786,
+        30.30761
+      ],
+      "type": "Point"
+    },
+    "observed_at": "2026-07-10T14:15:00Z",
+    "provenance": {
+      "data_source": "DEMO_SYNTHETIC_GENERATOR",
+      "disclaimer": "DEMO / SYNTHETIC DATASET for SIH Problem Statement 26191. Generated deterministically using fixed pseudo-random seed 26191. Not official Government of Uttarakhand, Survey of India, or Census data. Do NOT use for official administrative actions or statutory land acquisition.",
+      "generator_seed": 26191,
+      "is_synthetic": true,
+      "pilot_region": "himalayan_pilot"
+    },
+    "severity": "very_high",
+    "village_id": "HIM-VILL-036",
+    "village_name": "Sitel"
+  }
+]

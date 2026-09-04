@@ -1,0 +1,942 @@
+{
+  "type": "FeatureCollection",
+  "name": "synthetic_himalayan_candidate_sites",
+  "features": [
+    {
+      "type": "Feature",
+      "id": "HIM-SITE-001",
+      "geometry": {
+        "type": "Polygon",
+        "coordinates": [
+          [
+            [
+              79.153483,
+              30.29069
+            ],
+            [
+              79.156517,
+              30.29069
+            ],
+            [
+              79.156517,
+              30.29331
+            ],
+            [
+              79.153483,
+              30.29331
+            ],
+            [
+              79.153483,
+              30.29069
+            ]
+          ]
+        ]
+      },
+      "properties": {
+        "id": "HIM-SITE-001",
+        "name": "Gauchar Aerodrome Terrace Flat",
+        "district_code": "chamoli",
+        "district_name": "Chamoli District",
+        "block_code": "karnaprayag",
+        "site_type": "government_revenue_land",
+        "status": "approved",
+        "suitability": {
+          "area_sq_m": 85000.0,
+          "terrain_slope_deg": 6.2,
+          "elevation_m": 1150.0,
+          "soil_stability": "consolidated_alluvium",
+          "hazard_buffer_distance_m": 1200.0,
+          "road_width_m": 7.0,
+          "distance_to_highway_km": 0.2,
+          "all_weather_access": true,
+          "water_supply_lpd_per_capita": 85.0,
+          "water_source_distance_m": 250.0,
+          "perennial_water_source": true,
+          "distance_to_health_center_km": 1.2,
+          "distance_to_school_km": 0.8,
+          "distance_to_emergency_km": 2.0,
+          "distance_to_market_km": 1.5,
+          "distance_to_farmland_km": 0.5,
+          "livelihood_potential": "high",
+          "expansion_potential": "high",
+          "suitability_category": "suitable",
+          "rejection_reason": null
+        },
+        "capacity": {
+          "max_households": 180,
+          "max_population": 750,
+          "allocated_households": 0,
+          "allocated_population": 0,
+          "available_households": 180,
+          "available_population": 750,
+          "sanitation_units": 45
+        },
+        "provenance": {
+          "is_synthetic": true,
+          "data_source": "DEMO_SYNTHETIC_GENERATOR",
+          "pilot_region": "himalayan_pilot",
+          "generator_seed": 26191,
+          "disclaimer": "DEMO / SYNTHETIC DATASET for SIH Problem Statement 26191. Generated deterministically using fixed pseudo-random seed 26191. Not official Government of Uttarakhand, Survey of India, or Census data. Do NOT use for official administrative actions or statutory land acquisition."
+        }
+      }
+    },
+    {
+      "type": "Feature",
+      "id": "HIM-SITE-002",
+      "geometry": {
+        "type": "Polygon",
+        "coordinates": [
+          [
+            [
+              79.430778,
+              30.430947
+            ],
+            [
+              79.433222,
+              30.430947
+            ],
+            [
+              79.433222,
+              30.433053
+            ],
+            [
+              79.430778,
+              30.433053
+            ],
+            [
+              79.430778,
+              30.430947
+            ]
+          ]
+        ]
+      },
+      "properties": {
+        "id": "HIM-SITE-002",
+        "name": "Pipalkoti North Plateau",
+        "district_code": "chamoli",
+        "district_name": "Chamoli District",
+        "block_code": "dasholi",
+        "site_type": "panchayat_land",
+        "status": "approved",
+        "suitability": {
+          "area_sq_m": 55000.0,
+          "terrain_slope_deg": 7.5,
+          "elevation_m": 1380.0,
+          "soil_stability": "consolidated_terrace_gravel",
+          "hazard_buffer_distance_m": 950.0,
+          "road_width_m": 5.5,
+          "distance_to_highway_km": 0.8,
+          "all_weather_access": true,
+          "water_supply_lpd_per_capita": 80.0,
+          "water_source_distance_m": 350.0,
+          "perennial_water_source": true,
+          "distance_to_health_center_km": 1.8,
+          "distance_to_school_km": 1.0,
+          "distance_to_emergency_km": 3.5,
+          "distance_to_market_km": 1.2,
+          "distance_to_farmland_km": 0.8,
+          "livelihood_potential": "high",
+          "expansion_potential": "moderate",
+          "suitability_category": "suitable",
+          "rejection_reason": null
+        },
+        "capacity": {
+          "max_households": 120,
+          "max_population": 500,
+          "allocated_households": 0,
+          "allocated_population": 0,
+          "available_households": 120,
+          "available_population": 500,
+          "sanitation_units": 30
+        },
+        "provenance": {
+          "is_synthetic": true,
+          "data_source": "DEMO_SYNTHETIC_GENERATOR",
+          "pilot_region": "himalayan_pilot",
+          "generator_seed": 26191,
+          "disclaimer": "DEMO / SYNTHETIC DATASET for SIH Problem Statement 26191. Generated deterministically using fixed pseudo-random seed 26191. Not official Government of Uttarakhand, Survey of India, or Census data. Do NOT use for official administrative actions or statutory land acquisition."
+        }
+      }
+    },
+    {
+      "type": "Feature",
+      "id": "HIM-SITE-003",
+      "geometry": {
+        "type": "Polygon",
+        "coordinates": [
+          [
+            [
+              79.229705,
+              30.263882
+            ],
+            [
+              79.232295,
+              30.263882
+            ],
+            [
+              79.232295,
+              30.266118
+            ],
+            [
+              79.229705,
+              30.266118
+            ],
+            [
+              79.229705,
+              30.263882
+            ]
+          ]
+        ]
+      },
+      "properties": {
+        "id": "HIM-SITE-003",
+        "name": "Simli River Terrace Bench",
+        "district_code": "chamoli",
+        "district_name": "Chamoli District",
+        "block_code": "karnaprayag",
+        "site_type": "government_revenue_land",
+        "status": "approved",
+        "suitability": {
+          "area_sq_m": 62000.0,
+          "terrain_slope_deg": 5.8,
+          "elevation_m": 1080.0,
+          "soil_stability": "stable_fluvial_terrace",
+          "hazard_buffer_distance_m": 1400.0,
+          "road_width_m": 6.0,
+          "distance_to_highway_km": 0.4,
+          "all_weather_access": true,
+          "water_supply_lpd_per_capita": 90.0,
+          "water_source_distance_m": 200.0,
+          "perennial_water_source": true,
+          "distance_to_health_center_km": 2.1,
+          "distance_to_school_km": 1.2,
+          "distance_to_emergency_km": 4.0,
+          "distance_to_market_km": 2.0,
+          "distance_to_farmland_km": 0.4,
+          "livelihood_potential": "high",
+          "expansion_potential": "high",
+          "suitability_category": "suitable",
+          "rejection_reason": null
+        },
+        "capacity": {
+          "max_households": 140,
+          "max_population": 580,
+          "allocated_households": 0,
+          "allocated_population": 0,
+          "available_households": 140,
+          "available_population": 580,
+          "sanitation_units": 35
+        },
+        "provenance": {
+          "is_synthetic": true,
+          "data_source": "DEMO_SYNTHETIC_GENERATOR",
+          "pilot_region": "himalayan_pilot",
+          "generator_seed": 26191,
+          "disclaimer": "DEMO / SYNTHETIC DATASET for SIH Problem Statement 26191. Generated deterministically using fixed pseudo-random seed 26191. Not official Government of Uttarakhand, Survey of India, or Census data. Do NOT use for official administrative actions or statutory land acquisition."
+        }
+      }
+    },
+    {
+      "type": "Feature",
+      "id": "HIM-SITE-004",
+      "geometry": {
+        "type": "Polygon",
+        "coordinates": [
+          [
+            [
+              79.322932,
+              30.45508
+            ],
+            [
+              79.325068,
+              30.45508
+            ],
+            [
+              79.325068,
+              30.45692
+            ],
+            [
+              79.322932,
+              30.45692
+            ],
+            [
+              79.322932,
+              30.45508
+            ]
+          ]
+        ]
+      },
+      "properties": {
+        "id": "HIM-SITE-004",
+        "name": "Mandal Valley Lower Shelf",
+        "district_code": "chamoli",
+        "district_name": "Chamoli District",
+        "block_code": "dasholi",
+        "site_type": "plateau_terrace",
+        "status": "approved",
+        "suitability": {
+          "area_sq_m": 42000.0,
+          "terrain_slope_deg": 8.2,
+          "elevation_m": 1550.0,
+          "soil_stability": "consolidated_alluvium",
+          "hazard_buffer_distance_m": 800.0,
+          "road_width_m": 4.5,
+          "distance_to_highway_km": 1.5,
+          "all_weather_access": true,
+          "water_supply_lpd_per_capita": 75.0,
+          "water_source_distance_m": 400.0,
+          "perennial_water_source": true,
+          "distance_to_health_center_km": 3.0,
+          "distance_to_school_km": 1.5,
+          "distance_to_emergency_km": 6.0,
+          "distance_to_market_km": 3.5,
+          "distance_to_farmland_km": 1.0,
+          "livelihood_potential": "moderate",
+          "expansion_potential": "moderate",
+          "suitability_category": "suitable",
+          "rejection_reason": null
+        },
+        "capacity": {
+          "max_households": 90,
+          "max_population": 380,
+          "allocated_households": 0,
+          "allocated_population": 0,
+          "available_households": 90,
+          "available_population": 380,
+          "sanitation_units": 24
+        },
+        "provenance": {
+          "is_synthetic": true,
+          "data_source": "DEMO_SYNTHETIC_GENERATOR",
+          "pilot_region": "himalayan_pilot",
+          "generator_seed": 26191,
+          "disclaimer": "DEMO / SYNTHETIC DATASET for SIH Problem Statement 26191. Generated deterministically using fixed pseudo-random seed 26191. Not official Government of Uttarakhand, Survey of India, or Census data. Do NOT use for official administrative actions or statutory land acquisition."
+        }
+      }
+    },
+    {
+      "type": "Feature",
+      "id": "HIM-SITE-005",
+      "geometry": {
+        "type": "Polygon",
+        "coordinates": [
+          [
+            [
+              79.28786,
+              30.311016
+            ],
+            [
+              79.29014,
+              30.311016
+            ],
+            [
+              79.29014,
+              30.312984
+            ],
+            [
+              79.28786,
+              30.312984
+            ],
+            [
+              79.28786,
+              30.311016
+            ]
+          ]
+        ]
+      },
+      "properties": {
+        "id": "HIM-SITE-005",
+        "name": "Langasu East Ridge Flat",
+        "district_code": "chamoli",
+        "district_name": "Chamoli District",
+        "block_code": "karnaprayag",
+        "site_type": "government_revenue_land",
+        "status": "approved",
+        "suitability": {
+          "area_sq_m": 48000.0,
+          "terrain_slope_deg": 9.0,
+          "elevation_m": 1220.0,
+          "soil_stability": "stable_metamorphic_bedrock",
+          "hazard_buffer_distance_m": 1100.0,
+          "road_width_m": 5.0,
+          "distance_to_highway_km": 1.0,
+          "all_weather_access": true,
+          "water_supply_lpd_per_capita": 75.0,
+          "water_source_distance_m": 500.0,
+          "perennial_water_source": true,
+          "distance_to_health_center_km": 2.5,
+          "distance_to_school_km": 1.4,
+          "distance_to_emergency_km": 5.0,
+          "distance_to_market_km": 2.8,
+          "distance_to_farmland_km": 0.7,
+          "livelihood_potential": "moderate",
+          "expansion_potential": "moderate",
+          "suitability_category": "suitable",
+          "rejection_reason": null
+        },
+        "capacity": {
+          "max_households": 105,
+          "max_population": 440,
+          "allocated_households": 0,
+          "allocated_population": 0,
+          "available_households": 105,
+          "available_population": 440,
+          "sanitation_units": 26
+        },
+        "provenance": {
+          "is_synthetic": true,
+          "data_source": "DEMO_SYNTHETIC_GENERATOR",
+          "pilot_region": "himalayan_pilot",
+          "generator_seed": 26191,
+          "disclaimer": "DEMO / SYNTHETIC DATASET for SIH Problem Statement 26191. Generated deterministically using fixed pseudo-random seed 26191. Not official Government of Uttarakhand, Survey of India, or Census data. Do NOT use for official administrative actions or statutory land acquisition."
+        }
+      }
+    },
+    {
+      "type": "Feature",
+      "id": "HIM-SITE-006",
+      "geometry": {
+        "type": "Polygon",
+        "coordinates": [
+          [
+            [
+              79.403985,
+              30.407124
+            ],
+            [
+              79.406015,
+              30.407124
+            ],
+            [
+              79.406015,
+              30.408876
+            ],
+            [
+              79.403985,
+              30.408876
+            ],
+            [
+              79.403985,
+              30.407124
+            ]
+          ]
+        ]
+      },
+      "properties": {
+        "id": "HIM-SITE-006",
+        "name": "Birahi Upper Safe Terrace",
+        "district_code": "chamoli",
+        "district_name": "Chamoli District",
+        "block_code": "dasholi",
+        "site_type": "panchayat_land",
+        "status": "approved",
+        "suitability": {
+          "area_sq_m": 38000.0,
+          "terrain_slope_deg": 10.5,
+          "elevation_m": 1420.0,
+          "soil_stability": "consolidated_scree_terrace",
+          "hazard_buffer_distance_m": 750.0,
+          "road_width_m": 4.0,
+          "distance_to_highway_km": 1.2,
+          "all_weather_access": true,
+          "water_supply_lpd_per_capita": 72.0,
+          "water_source_distance_m": 450.0,
+          "perennial_water_source": true,
+          "distance_to_health_center_km": 3.8,
+          "distance_to_school_km": 2.0,
+          "distance_to_emergency_km": 7.0,
+          "distance_to_market_km": 4.0,
+          "distance_to_farmland_km": 1.2,
+          "livelihood_potential": "moderate",
+          "expansion_potential": "low",
+          "suitability_category": "suitable",
+          "rejection_reason": null
+        },
+        "capacity": {
+          "max_households": 80,
+          "max_population": 330,
+          "allocated_households": 0,
+          "allocated_population": 0,
+          "available_households": 80,
+          "available_population": 330,
+          "sanitation_units": 20
+        },
+        "provenance": {
+          "is_synthetic": true,
+          "data_source": "DEMO_SYNTHETIC_GENERATOR",
+          "pilot_region": "himalayan_pilot",
+          "generator_seed": 26191,
+          "disclaimer": "DEMO / SYNTHETIC DATASET for SIH Problem Statement 26191. Generated deterministically using fixed pseudo-random seed 26191. Not official Government of Uttarakhand, Survey of India, or Census data. Do NOT use for official administrative actions or statutory land acquisition."
+        }
+      }
+    },
+    {
+      "type": "Feature",
+      "id": "HIM-SITE-007",
+      "geometry": {
+        "type": "Polygon",
+        "coordinates": [
+          [
+            [
+              79.196837,
+              30.243996
+            ],
+            [
+              79.199163,
+              30.243996
+            ],
+            [
+              79.199163,
+              30.246004
+            ],
+            [
+              79.196837,
+              30.246004
+            ],
+            [
+              79.196837,
+              30.243996
+            ]
+          ]
+        ]
+      },
+      "properties": {
+        "id": "HIM-SITE-007",
+        "name": "Nauti Plateau Ground",
+        "district_code": "chamoli",
+        "district_name": "Chamoli District",
+        "block_code": "karnaprayag",
+        "site_type": "inter_mountain_basin",
+        "status": "approved",
+        "suitability": {
+          "area_sq_m": 50000.0,
+          "terrain_slope_deg": 8.0,
+          "elevation_m": 1600.0,
+          "soil_stability": "stable_bedrock",
+          "hazard_buffer_distance_m": 900.0,
+          "road_width_m": 4.5,
+          "distance_to_highway_km": 2.0,
+          "all_weather_access": true,
+          "water_supply_lpd_per_capita": 78.0,
+          "water_source_distance_m": 380.0,
+          "perennial_water_source": true,
+          "distance_to_health_center_km": 4.0,
+          "distance_to_school_km": 1.8,
+          "distance_to_emergency_km": 8.0,
+          "distance_to_market_km": 4.5,
+          "distance_to_farmland_km": 0.6,
+          "livelihood_potential": "moderate",
+          "expansion_potential": "moderate",
+          "suitability_category": "suitable",
+          "rejection_reason": null
+        },
+        "capacity": {
+          "max_households": 110,
+          "max_population": 460,
+          "allocated_households": 0,
+          "allocated_population": 0,
+          "available_households": 110,
+          "available_population": 460,
+          "sanitation_units": 28
+        },
+        "provenance": {
+          "is_synthetic": true,
+          "data_source": "DEMO_SYNTHETIC_GENERATOR",
+          "pilot_region": "himalayan_pilot",
+          "generator_seed": 26191,
+          "disclaimer": "DEMO / SYNTHETIC DATASET for SIH Problem Statement 26191. Generated deterministically using fixed pseudo-random seed 26191. Not official Government of Uttarakhand, Survey of India, or Census data. Do NOT use for official administrative actions or statutory land acquisition."
+        }
+      }
+    },
+    {
+      "type": "Feature",
+      "id": "HIM-SITE-008",
+      "geometry": {
+        "type": "Polygon",
+        "coordinates": [
+          [
+            [
+              79.561175,
+              30.56129
+            ],
+            [
+              79.562825,
+              30.56129
+            ],
+            [
+              79.562825,
+              30.56271
+            ],
+            [
+              79.561175,
+              30.56271
+            ],
+            [
+              79.561175,
+              30.56129
+            ]
+          ]
+        ]
+      },
+      "properties": {
+        "id": "HIM-SITE-008",
+        "name": "Joshimath Upper Escarpment",
+        "district_code": "chamoli",
+        "district_name": "Chamoli District",
+        "block_code": "joshimath",
+        "site_type": "plateau_terrace",
+        "status": "proposed",
+        "suitability": {
+          "area_sq_m": 25000.0,
+          "terrain_slope_deg": 19.5,
+          "elevation_m": 2250.0,
+          "soil_stability": "unconsolidated_morainic_debris",
+          "hazard_buffer_distance_m": 550.0,
+          "road_width_m": 3.0,
+          "distance_to_highway_km": 2.5,
+          "all_weather_access": false,
+          "water_supply_lpd_per_capita": 50.0,
+          "water_source_distance_m": 800.0,
+          "perennial_water_source": false,
+          "distance_to_health_center_km": 5.0,
+          "distance_to_school_km": 3.0,
+          "distance_to_emergency_km": 6.0,
+          "distance_to_market_km": 4.5,
+          "distance_to_farmland_km": 2.0,
+          "livelihood_potential": "low",
+          "expansion_potential": "none",
+          "suitability_category": "rejected",
+          "rejection_reason": "Terrain slope 19.5\u00b0 exceeds maximum safe relocation limit (15.0\u00b0); active slope creep danger."
+        },
+        "capacity": {
+          "max_households": 40,
+          "max_population": 160,
+          "allocated_households": 0,
+          "allocated_population": 0,
+          "available_households": 40,
+          "available_population": 160,
+          "sanitation_units": 8
+        },
+        "provenance": {
+          "is_synthetic": true,
+          "data_source": "DEMO_SYNTHETIC_GENERATOR",
+          "pilot_region": "himalayan_pilot",
+          "generator_seed": 26191,
+          "disclaimer": "DEMO / SYNTHETIC DATASET for SIH Problem Statement 26191. Generated deterministically using fixed pseudo-random seed 26191. Not official Government of Uttarakhand, Survey of India, or Census data. Do NOT use for official administrative actions or statutory land acquisition."
+        }
+      }
+    },
+    {
+      "type": "Feature",
+      "id": "HIM-SITE-009",
+      "geometry": {
+        "type": "Polygon",
+        "coordinates": [
+          [
+            [
+              79.577262,
+              30.547365
+            ],
+            [
+              79.578738,
+              30.547365
+            ],
+            [
+              79.578738,
+              30.548635
+            ],
+            [
+              79.577262,
+              30.548635
+            ],
+            [
+              79.577262,
+              30.547365
+            ]
+          ]
+        ]
+      },
+      "properties": {
+        "id": "HIM-SITE-009",
+        "name": "Marwari Ridge Slope",
+        "district_code": "chamoli",
+        "district_name": "Chamoli District",
+        "block_code": "joshimath",
+        "site_type": "panchayat_land",
+        "status": "proposed",
+        "suitability": {
+          "area_sq_m": 20000.0,
+          "terrain_slope_deg": 24.0,
+          "elevation_m": 1980.0,
+          "soil_stability": "fractured_gneiss_colluvium",
+          "hazard_buffer_distance_m": 600.0,
+          "road_width_m": 2.5,
+          "distance_to_highway_km": 1.8,
+          "all_weather_access": false,
+          "water_supply_lpd_per_capita": 40.0,
+          "water_source_distance_m": 950.0,
+          "perennial_water_source": false,
+          "distance_to_health_center_km": 6.5,
+          "distance_to_school_km": 4.0,
+          "distance_to_emergency_km": 8.5,
+          "distance_to_market_km": 5.0,
+          "distance_to_farmland_km": 2.5,
+          "livelihood_potential": "low",
+          "expansion_potential": "none",
+          "suitability_category": "rejected",
+          "rejection_reason": "Terrain slope 24.0\u00b0 severely violates safety threshold (15.0\u00b0); fractured bedrock prone to rockfall."
+        },
+        "capacity": {
+          "max_households": 30,
+          "max_population": 120,
+          "allocated_households": 0,
+          "allocated_population": 0,
+          "available_households": 30,
+          "available_population": 120,
+          "sanitation_units": 6
+        },
+        "provenance": {
+          "is_synthetic": true,
+          "data_source": "DEMO_SYNTHETIC_GENERATOR",
+          "pilot_region": "himalayan_pilot",
+          "generator_seed": 26191,
+          "disclaimer": "DEMO / SYNTHETIC DATASET for SIH Problem Statement 26191. Generated deterministically using fixed pseudo-random seed 26191. Not official Government of Uttarakhand, Survey of India, or Census data. Do NOT use for official administrative actions or statutory land acquisition."
+        }
+      }
+    },
+    {
+      "type": "Feature",
+      "id": "HIM-SITE-010",
+      "geometry": {
+        "type": "Polygon",
+        "coordinates": [
+          [
+            [
+              79.504067,
+              30.520197
+            ],
+            [
+              79.505933,
+              30.520197
+            ],
+            [
+              79.505933,
+              30.521803
+            ],
+            [
+              79.504067,
+              30.521803
+            ],
+            [
+              79.504067,
+              30.520197
+            ]
+          ]
+        ]
+      },
+      "properties": {
+        "id": "HIM-SITE-010",
+        "name": "Helang Nala Confluence Bench",
+        "district_code": "chamoli",
+        "district_name": "Chamoli District",
+        "block_code": "joshimath",
+        "site_type": "government_revenue_land",
+        "status": "proposed",
+        "suitability": {
+          "area_sq_m": 32000.0,
+          "terrain_slope_deg": 9.5,
+          "elevation_m": 1450.0,
+          "soil_stability": "active_debris_alluvium",
+          "hazard_buffer_distance_m": 220.0,
+          "road_width_m": 4.0,
+          "distance_to_highway_km": 0.5,
+          "all_weather_access": true,
+          "water_supply_lpd_per_capita": 75.0,
+          "water_source_distance_m": 150.0,
+          "perennial_water_source": true,
+          "distance_to_health_center_km": 4.5,
+          "distance_to_school_km": 2.5,
+          "distance_to_emergency_km": 9.0,
+          "distance_to_market_km": 4.0,
+          "distance_to_farmland_km": 1.0,
+          "livelihood_potential": "moderate",
+          "expansion_potential": "none",
+          "suitability_category": "rejected",
+          "rejection_reason": "Hazard buffer distance 220.0m is inside the 500.0m mandatory exclusion buffer of active landslide runout."
+        },
+        "capacity": {
+          "max_households": 60,
+          "max_population": 250,
+          "allocated_households": 0,
+          "allocated_population": 0,
+          "available_households": 60,
+          "available_population": 250,
+          "sanitation_units": 15
+        },
+        "provenance": {
+          "is_synthetic": true,
+          "data_source": "DEMO_SYNTHETIC_GENERATOR",
+          "pilot_region": "himalayan_pilot",
+          "generator_seed": 26191,
+          "disclaimer": "DEMO / SYNTHETIC DATASET for SIH Problem Statement 26191. Generated deterministically using fixed pseudo-random seed 26191. Not official Government of Uttarakhand, Survey of India, or Census data. Do NOT use for official administrative actions or statutory land acquisition."
+        }
+      }
+    },
+    {
+      "type": "Feature",
+      "id": "HIM-SITE-011",
+      "geometry": {
+        "type": "Polygon",
+        "coordinates": [
+          [
+            [
+              79.461025,
+              30.48416
+            ],
+            [
+              79.462975,
+              30.48416
+            ],
+            [
+              79.462975,
+              30.48584
+            ],
+            [
+              79.461025,
+              30.48584
+            ],
+            [
+              79.461025,
+              30.48416
+            ]
+          ]
+        ]
+      },
+      "properties": {
+        "id": "HIM-SITE-011",
+        "name": "Tangani Dry Hill Crest",
+        "district_code": "chamoli",
+        "district_name": "Chamoli District",
+        "block_code": "dasholi",
+        "site_type": "panchayat_land",
+        "status": "proposed",
+        "suitability": {
+          "area_sq_m": 35000.0,
+          "terrain_slope_deg": 11.0,
+          "elevation_m": 1750.0,
+          "soil_stability": "stable_quartzite_ridge",
+          "hazard_buffer_distance_m": 700.0,
+          "road_width_m": 3.5,
+          "distance_to_highway_km": 2.2,
+          "all_weather_access": false,
+          "water_supply_lpd_per_capita": 35.0,
+          "water_source_distance_m": 1400.0,
+          "perennial_water_source": false,
+          "distance_to_health_center_km": 5.5,
+          "distance_to_school_km": 3.2,
+          "distance_to_emergency_km": 10.0,
+          "distance_to_market_km": 5.5,
+          "distance_to_farmland_km": 1.8,
+          "livelihood_potential": "low",
+          "expansion_potential": "none",
+          "suitability_category": "rejected",
+          "rejection_reason": "Per capita water supply (35.0 LPD) fails minimum rural hill standard (70.0 LPD); non-perennial seasonal source."
+        },
+        "capacity": {
+          "max_households": 50,
+          "max_population": 200,
+          "allocated_households": 0,
+          "allocated_population": 0,
+          "available_households": 50,
+          "available_population": 200,
+          "sanitation_units": 10
+        },
+        "provenance": {
+          "is_synthetic": true,
+          "data_source": "DEMO_SYNTHETIC_GENERATOR",
+          "pilot_region": "himalayan_pilot",
+          "generator_seed": 26191,
+          "disclaimer": "DEMO / SYNTHETIC DATASET for SIH Problem Statement 26191. Generated deterministically using fixed pseudo-random seed 26191. Not official Government of Uttarakhand, Survey of India, or Census data. Do NOT use for official administrative actions or statutory land acquisition."
+        }
+      }
+    },
+    {
+      "type": "Feature",
+      "id": "HIM-SITE-012",
+      "geometry": {
+        "type": "Polygon",
+        "coordinates": [
+          [
+            [
+              79.377492,
+              30.387562
+            ],
+            [
+              79.378508,
+              30.387562
+            ],
+            [
+              79.378508,
+              30.388438
+            ],
+            [
+              79.377492,
+              30.388438
+            ],
+            [
+              79.377492,
+              30.387562
+            ]
+          ]
+        ]
+      },
+      "properties": {
+        "id": "HIM-SITE-012",
+        "name": "Batula Pocket Terrace",
+        "district_code": "chamoli",
+        "district_name": "Chamoli District",
+        "block_code": "dasholi",
+        "site_type": "panchayat_land",
+        "status": "proposed",
+        "suitability": {
+          "area_sq_m": 9500.0,
+          "terrain_slope_deg": 8.0,
+          "elevation_m": 1340.0,
+          "soil_stability": "consolidated_terrace",
+          "hazard_buffer_distance_m": 850.0,
+          "road_width_m": 4.0,
+          "distance_to_highway_km": 1.0,
+          "all_weather_access": true,
+          "water_supply_lpd_per_capita": 70.0,
+          "water_source_distance_m": 300.0,
+          "perennial_water_source": true,
+          "distance_to_health_center_km": 3.0,
+          "distance_to_school_km": 1.5,
+          "distance_to_emergency_km": 6.5,
+          "distance_to_market_km": 3.0,
+          "distance_to_farmland_km": 0.5,
+          "livelihood_potential": "moderate",
+          "expansion_potential": "none",
+          "suitability_category": "constrained",
+          "rejection_reason": "Carrying capacity (18 households) is insufficient for typical village relocation demand; cannot support full community transfer."
+        },
+        "capacity": {
+          "max_households": 18,
+          "max_population": 72,
+          "allocated_households": 0,
+          "allocated_population": 0,
+          "available_households": 18,
+          "available_population": 72,
+          "sanitation_units": 5
+        },
+        "provenance": {
+          "is_synthetic": true,
+          "data_source": "DEMO_SYNTHETIC_GENERATOR",
+          "pilot_region": "himalayan_pilot",
+          "generator_seed": 26191,
+          "disclaimer": "DEMO / SYNTHETIC DATASET for SIH Problem Statement 26191. Generated deterministically using fixed pseudo-random seed 26191. Not official Government of Uttarakhand, Survey of India, or Census data. Do NOT use for official administrative actions or statutory land acquisition."
+        }
+      }
+    }
+  ]
+}
