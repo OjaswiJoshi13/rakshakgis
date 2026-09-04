@@ -148,7 +148,7 @@ No chunk may transition to `IN_PROGRESS` until all its listed prerequisite depen
 | **M3-04** | Risk/GIS | Data Validation & Ingestion Pipelines | M3 | M3-02, M3-03 | **COMMITTED** |
 | **M3-05** | Risk/GIS | Risk Normalization Engine | M3 | M3-04 | **COMMITTED** |
 | **M3-06** | Risk/GIS | Multi-Hazard Risk Computation Engine | M3 | M3-05 | **COMMITTED** |
-| **M3-07** | Risk/GIS | Risk Classification & Grading | M3 | M3-06 | **AWAITING_REVIEW** |
+| **M3-07** | Risk/GIS | Risk Classification & Grading | M3 | M3-06 | **COMMITTED** |
 | **M3-08** | Risk/GIS | Risk Explainability & Factor Contribution | M3 | M3-07 | **BLOCKED** |
 | **M3-09** | Risk/GIS | Vulnerability & Exposure Scoring Engine | M3 | M3-06 | **BLOCKED** |
 | **M3-10** | Risk/GIS | Permanent Red Zones Demarcation | M3 | M3-07 | **BLOCKED** |
@@ -187,9 +187,9 @@ No chunk may transition to `IN_PROGRESS` until all its listed prerequisite depen
 
 ## Current Work
 
-- **Active Chunk:** Chunk M3-07 (Risk Classification & Grading) — AWAITING_REVIEW; Chunk M4-01 (Candidate Relocation Sites Backend) — AWAITING_REVIEW
+- **Active Chunk:** None (Chunk M4-01 awaiting review)
 - **Next Eligible Chunks:** M3-08 (Risk Explainability & Factor Contribution), M3-09 (Vulnerability & Exposure Scoring Engine)
-- **Status:** Chunk M3-07 implemented and awaiting independent review; Chunk M3-06 COMMITTED; Chunk M4-01 awaiting independent review.
+- **Status:** Chunk M3-07 independently reviewed and COMMITTED; Chunk M4-01 awaiting independent review.
 
 ---
 
@@ -215,6 +215,7 @@ Chunks M3-08 through DOC-01 (except unblocked M3-01, M3-02, M3-03, M3-04, M3-05,
 - M3-04: Data Validation & Ingestion Pipelines — COMMITTED (Commit: `feat(m3): add data validation and ingestion pipeline`).
 - M3-05: Risk Normalization Engine — COMMITTED (Commit: `feat(m3): add risk normalization engine`).
 - M3-06: Multi-Hazard Risk Computation Engine — COMMITTED (Commit: `feat(m3): add multi-hazard risk computation engine`).
+- M3-07: Risk Classification & Grading — COMMITTED (Commit: `feat(m3): add risk classification and grading`).
 
 ---
 
@@ -648,9 +649,10 @@ Chunks M3-08 through DOC-01 (except unblocked M3-01, M3-02, M3-03, M3-04, M3-05,
 
 ## Chunk M3-07 Implementation Record
 
-- **Status:** `AWAITING_REVIEW`
+- **Status:** `COMMITTED`
 - **Scope:** Risk Classification & Grading Engine
 - **Scope Discipline:** Strictly limited to classifying an already computed composite risk score ($0.0 \le \text{Risk} \le 100.0$) into its authoritative categorical risk band (`SAFE`, `MODERATE`, `HIGH`, `VERY_HIGH`, `CRITICAL`). Zero risk score recalculation (reusing M3-06 outputs), zero Red Zone demarcation (M3-10 / M3-11), zero relocation priority (M3-12), zero site suitability/routing (M4), zero live external APIs, zero database migrations, zero LLMs.
+- **Independent Review:** Verified and approved with PASS by independent review. Exact cutoffs and boundaries verified; input safety and NaN/Inf rejection verified; original score preservation verified; 23 focused tests and 196 total regression tests passing.
 - **Risk Classification Modules (`app.core.risk.classification`):**
   - Exception Hierarchy (`errors.py`): `RiskClassificationError` base class, `InvalidRiskScoreError`, `ClassificationBandConfigError`.
   - Typed Contracts (`contracts.py`): Re-exports `RiskBand` enum from `app.core.profiles.models`, `RiskScoreBandsConfig` (with monotonicity validation and `from_profile()` factory), `RiskClassificationExplainability` (selected band, score, interval notation, lower/upper bounds, inclusivity flags, audit trail), and `RiskClassificationResult` envelope with numerical invariants ($0.0 \le \text{score} \le 100.0$; preserves original continuous score and village ID).
@@ -672,7 +674,7 @@ Chunks M3-08 through DOC-01 (except unblocked M3-01, M3-02, M3-03, M3-04, M3-05,
   - `backend/tests/test_risk_classification.py` (23 automated unit tests covering all boundary values, interval ranges, invalid inputs, NaN/Inf rejection, determinism, M3-06 integration, and scope boundary checks)
 - **Files Modified:**
   - `backend/app/core/risk/__init__.py` (Re-exported M3-07 classification classes alongside M3-05 and M3-06)
-  - `PROJECT_STATE.md` (Updated M3-07 status to `AWAITING_REVIEW`, added implementation record, updated integration notes)
+  - `PROJECT_STATE.md` (Updated M3-07 status to `COMMITTED`, added implementation record, updated integration notes)
 - **Files Removed:** None.
 - **Automated Test Results:**
   - Classification suite command: `docker exec rakshakgis-backend pytest tests/test_risk_classification.py -v`
@@ -728,6 +730,6 @@ Chunks M3-08 through DOC-01 (except unblocked M3-01, M3-02, M3-03, M3-04, M3-05,
 
 ## Last Updated
 
-- **Timestamp:** 2026-09-05 02:02:00 IST
+- **Timestamp:** 2026-09-05 02:11:00 IST
 - **Updated By:** M3 (Antigravity Agent)
-- **Status Summary:** Chunk M3-07 implemented and awaiting independent review; Chunk M3-06 COMMITTED; all 196 automated tests verified against live PostGIS database container.
+- **Status Summary:** Chunk M3-07 independently reviewed and COMMITTED; all 196 automated tests verified against live PostGIS database container.
