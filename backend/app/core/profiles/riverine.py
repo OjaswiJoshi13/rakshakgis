@@ -1,0 +1,146 @@
+"""Template Riverine floodplain region profile for RakshakGIS."""
+
+from app.core.profiles.models import (
+    CompositeRiskWeights,
+    DangerLevel,
+    DemographicVulnerabilityFactors,
+    DynamicRedZoneTriggers,
+    HazardParameters,
+    HazardThresholds,
+    HazardWeights,
+    MultiHazardRiskWeights,
+    PermanentRedZoneCriteria,
+    ProfileMetadata,
+    RedZoneThresholds,
+    RegionProfile,
+    RegionProfileId,
+    RegionType,
+    RelocationPriorityCutoffs,
+    RelocationPriorityParameters,
+    RelocationPriorityWeights,
+    RiskScoreBands,
+    ScenarioBounds,
+    SiteCapacityAssumptions,
+    UncertaintyNotes,
+    VulnerabilityParameters,
+    VulnerabilityWeights,
+)
+
+RIVERINE_TEMPLATE_PROFILE = RegionProfile(
+    metadata=ProfileMetadata(
+        id=RegionProfileId.RIVERINE_TEMPLATE,
+        name="Riverine Floodplain Template Profile",
+        description=(
+            "Plains and riverine flood basin profile emphasizing riverine inundation, "
+            "embankment breaching, and waterlogged access route vulnerability."
+        ),
+        region_type=RegionType.RIVERINE,
+        is_pilot=False,
+        pilot_label=None,
+        methodology_notice=(
+            "Template configuration for future multi-region expansion; not an active pilot."
+        ),
+        version="1.0.0",
+        author="RakshakGIS Team M3",
+    ),
+    risk_weights=CompositeRiskWeights(
+        hazard_weight=0.30,
+        flood_weight=0.20,
+        rainfall_weight=0.15,
+        seismic_weight=0.15,
+        demographic_weight=0.10,
+        vulnerability_weight=0.10,
+    ),
+    risk_bands=RiskScoreBands(
+        safe_max=25.0,
+        moderate_max=50.0,
+        high_max=70.0,
+        very_high_max=85.0,
+        critical_max=100.0,
+    ),
+    hazard_parameters=HazardParameters(
+        weights=HazardWeights(
+            flood=0.50,
+            rainfall=0.30,
+            landslide=0.05,
+            seismic=0.15,
+            coastal_storm_surge=0.0,
+        ),
+        thresholds=HazardThresholds(
+            slope_warning_deg=8.0,
+            slope_critical_deg=15.0,
+            rainfall_heavy_24h_mm=64.5,
+            rainfall_very_heavy_24h_mm=115.5,
+            seismic_critical_mmi=7.0,
+            glof_susceptibility_enabled=False,
+        ),
+    ),
+    vulnerability_parameters=VulnerabilityParameters(
+        component_weights=VulnerabilityWeights(
+            social_weight=0.25,
+            economic_weight=0.30,
+            structural_weight=0.25,
+            road_connectivity_weight=0.20,
+        ),
+        demographic_factors=DemographicVulnerabilityFactors(
+            elderly_multiplier=1.20,
+            children_multiplier=1.20,
+            disabled_multiplier=1.50,
+        ),
+    ),
+    red_zone_thresholds=RedZoneThresholds(
+        permanent_criteria=PermanentRedZoneCriteria(
+            min_slope_deg=15.0,
+            min_historical_landslides=0,
+            active_subsidence_triggers_permanent=True,
+            default_danger_level=DangerLevel.UNINHABITABLE,
+        ),
+        dynamic_triggers=DynamicRedZoneTriggers(
+            rainfall_trigger_24h_mm=75.0,
+            seismic_trigger_mmi=6.0,
+            slope_trigger_min_deg=5.0,
+            default_danger_level=DangerLevel.VERY_HIGH,
+        ),
+    ),
+    relocation_priority_parameters=RelocationPriorityParameters(
+        cutoffs=RelocationPriorityCutoffs(
+            monitor_max=39.99,
+            medium_term_min=40.0,
+            short_term_min=60.0,
+            immediate_min=80.0,
+        ),
+        weights=RelocationPriorityWeights(
+            risk_weight=0.40,
+            exposure_weight=0.25,
+            vulnerability_weight=0.20,
+            historical_impact_weight=0.10,
+            accessibility_weight=0.05,
+        ),
+    ),
+    site_capacity_assumptions=SiteCapacityAssumptions(
+        max_safe_slope_deg=5.0,
+        hazard_buffer_m=1000.0,
+        water_supply_lpd_per_capita=55.0,
+        land_area_sq_m_per_household=150.0,
+        min_road_access_width_m=5.5,
+    ),
+    scenario_bounds=ScenarioBounds(
+        min_rainfall_multiplier=0.5,
+        max_rainfall_multiplier=2.5,
+        default_rainfall_multiplier=1.2,
+        min_seismic_intensity_mmi=1.0,
+        max_seismic_intensity_mmi=8.0,
+        max_road_blockage_percentage=100.0,
+    ),
+    uncertainty_notes=UncertaintyNotes(
+        provisional_parameters=[
+            "Embankment failure probability and backwater flood extents require local HEC-RAS hydraulic models."
+        ],
+        data_gap_notes=[
+            "Basin-wide stage-discharge rating curves from Central Water Commission (CWC) pending integration."
+        ],
+        configuration_required=[
+            "Regional flood frequency analysis parameters for 25-year and 100-year return periods."
+        ],
+    ),
+)

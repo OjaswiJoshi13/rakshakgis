@@ -1,0 +1,146 @@
+"""Template Coastal region profile for RakshakGIS."""
+
+from app.core.profiles.models import (
+    CompositeRiskWeights,
+    DangerLevel,
+    DemographicVulnerabilityFactors,
+    DynamicRedZoneTriggers,
+    HazardParameters,
+    HazardThresholds,
+    HazardWeights,
+    MultiHazardRiskWeights,
+    PermanentRedZoneCriteria,
+    ProfileMetadata,
+    RedZoneThresholds,
+    RegionProfile,
+    RegionProfileId,
+    RegionType,
+    RelocationPriorityCutoffs,
+    RelocationPriorityParameters,
+    RelocationPriorityWeights,
+    RiskScoreBands,
+    ScenarioBounds,
+    SiteCapacityAssumptions,
+    UncertaintyNotes,
+    VulnerabilityParameters,
+    VulnerabilityWeights,
+)
+
+COASTAL_TEMPLATE_PROFILE = RegionProfile(
+    metadata=ProfileMetadata(
+        id=RegionProfileId.COASTAL_TEMPLATE,
+        name="Coastal Maritime Template Profile",
+        description=(
+            "Low-lying maritime coastal profile focusing on cyclone landfall, "
+            "storm surge inundation, saltwater intrusion, and coastal shoreline erosion."
+        ),
+        region_type=RegionType.COASTAL,
+        is_pilot=False,
+        pilot_label=None,
+        methodology_notice=(
+            "Template configuration for future multi-region expansion; not an active pilot."
+        ),
+        version="1.0.0",
+        author="RakshakGIS Team M3",
+    ),
+    risk_weights=CompositeRiskWeights(
+        hazard_weight=0.30,
+        flood_weight=0.20,
+        rainfall_weight=0.15,
+        seismic_weight=0.15,
+        demographic_weight=0.10,
+        vulnerability_weight=0.10,
+    ),
+    risk_bands=RiskScoreBands(
+        safe_max=25.0,
+        moderate_max=50.0,
+        high_max=70.0,
+        very_high_max=85.0,
+        critical_max=100.0,
+    ),
+    hazard_parameters=HazardParameters(
+        weights=HazardWeights(
+            coastal_storm_surge=0.40,
+            flood=0.30,
+            rainfall=0.20,
+            seismic=0.10,
+            landslide=0.0,
+        ),
+        thresholds=HazardThresholds(
+            slope_warning_deg=5.0,
+            slope_critical_deg=10.0,
+            rainfall_heavy_24h_mm=64.5,
+            rainfall_very_heavy_24h_mm=115.5,
+            seismic_critical_mmi=6.5,
+            glof_susceptibility_enabled=False,
+        ),
+    ),
+    vulnerability_parameters=VulnerabilityParameters(
+        component_weights=VulnerabilityWeights(
+            social_weight=0.20,
+            economic_weight=0.35,
+            structural_weight=0.30,
+            road_connectivity_weight=0.15,
+        ),
+        demographic_factors=DemographicVulnerabilityFactors(
+            elderly_multiplier=1.25,
+            children_multiplier=1.20,
+            disabled_multiplier=1.50,
+        ),
+    ),
+    red_zone_thresholds=RedZoneThresholds(
+        permanent_criteria=PermanentRedZoneCriteria(
+            min_slope_deg=10.0,
+            min_historical_landslides=0,
+            active_subsidence_triggers_permanent=True,
+            default_danger_level=DangerLevel.UNINHABITABLE,
+        ),
+        dynamic_triggers=DynamicRedZoneTriggers(
+            rainfall_trigger_24h_mm=80.0,
+            seismic_trigger_mmi=6.0,
+            slope_trigger_min_deg=3.0,
+            default_danger_level=DangerLevel.VERY_HIGH,
+        ),
+    ),
+    relocation_priority_parameters=RelocationPriorityParameters(
+        cutoffs=RelocationPriorityCutoffs(
+            monitor_max=39.99,
+            medium_term_min=40.0,
+            short_term_min=60.0,
+            immediate_min=80.0,
+        ),
+        weights=RelocationPriorityWeights(
+            risk_weight=0.40,
+            exposure_weight=0.25,
+            vulnerability_weight=0.20,
+            historical_impact_weight=0.10,
+            accessibility_weight=0.05,
+        ),
+    ),
+    site_capacity_assumptions=SiteCapacityAssumptions(
+        max_safe_slope_deg=4.0,
+        hazard_buffer_m=1500.0,
+        water_supply_lpd_per_capita=70.0,
+        land_area_sq_m_per_household=130.0,
+        min_road_access_width_m=5.0,
+    ),
+    scenario_bounds=ScenarioBounds(
+        min_rainfall_multiplier=0.5,
+        max_rainfall_multiplier=3.0,
+        default_rainfall_multiplier=1.0,
+        min_seismic_intensity_mmi=1.0,
+        max_seismic_intensity_mmi=7.5,
+        max_road_blockage_percentage=100.0,
+    ),
+    uncertainty_notes=UncertaintyNotes(
+        provisional_parameters=[
+            "Storm surge heights are parameterized; full hydrodynamic coupling (ADCIRC/SLOSH) required."
+        ],
+        data_gap_notes=[
+            "High-resolution coastal bathymetry and sea wall defense conditions needed."
+        ],
+        configuration_required=[
+            "Coastal Regulation Zone (CRZ) statutory buffer boundaries per regional master plan."
+        ],
+    ),
+)
