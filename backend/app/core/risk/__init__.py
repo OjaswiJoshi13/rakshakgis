@@ -1,13 +1,25 @@
-"""Risk engine and risk modeling module for RakshakGIS.
+"""Risk engine and risk modeling module for RakshakGIS."""
 
-Note: M3-05 provides the Risk Normalization Engine only.
-Multi-hazard composite risk calculation is deferred to M3-06.
-"""
-
+from app.core.risk.computation import (
+    CompositeRiskExplainability,
+    CompositeRiskResult,
+    InsufficientFactorsError,
+    InvalidFactorValueError,
+    MultiHazardRiskEngine,
+    REQUIRED_FACTORS,
+    RiskComputationError,
+    RiskComputationStatus,
+    RiskFactorInput,
+    RiskFactorType,
+    RiskWeightsConfig,
+    WeightConfigurationError,
+)
 from app.core.risk.normalization import (
     CategoricalSeverityPolicy,
     FactorCategory,
+    InvalidInputError,
     LinearRangeConfig,
+    NormalizationConfigError,
     NormalizationError,
     NormalizationExplainability,
     NormalizationMethod,
@@ -15,12 +27,19 @@ from app.core.risk.normalization import (
     NormalizationStatus,
     PiecewiseThresholdConfig,
     RiskNormalizationEngine,
+    UnsupportedFactorError,
+    categorical_severity_normalize,
+    linear_normalize,
+    piecewise_threshold_normalize,
 )
 
 __all__ = [
+    # M3-05 Normalization
     "CategoricalSeverityPolicy",
     "FactorCategory",
+    "InvalidInputError",
     "LinearRangeConfig",
+    "NormalizationConfigError",
     "NormalizationError",
     "NormalizationExplainability",
     "NormalizationMethod",
@@ -28,4 +47,21 @@ __all__ = [
     "NormalizationStatus",
     "PiecewiseThresholdConfig",
     "RiskNormalizationEngine",
+    "UnsupportedFactorError",
+    "categorical_severity_normalize",
+    "linear_normalize",
+    "piecewise_threshold_normalize",
+    # M3-06 Computation
+    "CompositeRiskExplainability",
+    "CompositeRiskResult",
+    "InsufficientFactorsError",
+    "InvalidFactorValueError",
+    "MultiHazardRiskEngine",
+    "REQUIRED_FACTORS",
+    "RiskComputationError",
+    "RiskComputationStatus",
+    "RiskFactorInput",
+    "RiskFactorType",
+    "RiskWeightsConfig",
+    "WeightConfigurationError",
 ]
