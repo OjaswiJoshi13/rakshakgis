@@ -155,7 +155,7 @@ No chunk may transition to `IN_PROGRESS` until all its listed prerequisite depen
 | **M3-11** | Risk/GIS | Dynamic Red Zones & Threshold Triggers | M3 | M3-10 | **BLOCKED** |
 | **M3-12** | Risk/GIS | Relocation Priority Scoring Backend | M3 | M3-08, M3-09 | **BLOCKED** |
 | **M3-13** | Risk/GIS | Data Source Freshness & Telemetry Backend | M3 | M3-03 | **BLOCKED** |
-| **M4-01** | Relocation | Candidate Relocation Sites Backend | M4 | M2-03 | **PLANNED** |
+| **M4-01** | Relocation | Candidate Relocation Sites Backend | M4 | M2-03 | **AWAITING_REVIEW** |
 | **M4-02** | Relocation | Multi-Criteria Site Suitability Engine | M4 | M4-01, M3-06 | **BLOCKED** |
 | **M4-03** | Relocation | Carrying Capacity & Infrastructure Sizing | M4 | M4-02 | **BLOCKED** |
 | **M4-04** | Relocation | Relocation Matching & Assignment Engine | M4 | M3-12, M4-03 | **BLOCKED** |
@@ -187,9 +187,9 @@ No chunk may transition to `IN_PROGRESS` until all its listed prerequisite depen
 
 ## Current Work
 
-- **Active Chunk:** None
-- **Next Eligible Chunks:** M3-01 (Region Profiles Configuration), M4-01 (Candidate Relocation Sites Backend)
-- **Status:** Chunk M2-05 finalized and committed; M3-01 and M4-01 ready for execution.
+- **Active Chunk:** None (M4-01 implemented and awaiting review)
+- **Next Eligible Chunks:** M3-01 (Region Profiles Configuration)
+- **Status:** Chunk M4-01 implemented and awaiting independent review; M3-01 ready for execution.
 
 ---
 
@@ -360,6 +360,35 @@ Chunks M3-02 through DOC-01 (except unblocked M3-01 and M4-01) remain in `BLOCKE
 
 ---
 
+## Chunk M4-01 Implementation Record
+
+- **Status:** `AWAITING_REVIEW`
+- **Scope:** Candidate Relocation Sites Backend
+- **Files Created:**
+  - `backend/app/schemas/sites.py` (Pydantic schemas for `GeoJSONPoint`, `GeoJSONPolygon`, `CandidateSiteRead`, `CandidateSiteDetailRead`, `CandidateSiteCreate`, `CandidateSiteUpdate`, `SiteCapacityRead`, `InfrastructureRead`)
+  - `backend/app/api/v1/sites.py` (API router for candidate relocation sites: `GET /sites`, `GET /sites/{id}`, `POST /sites`, `PATCH /sites/{id}`, `DELETE /sites/{id}`)
+  - `backend/tests/test_sites.py` (Automated unit and API integration tests for M4-01)
+- **Files Modified:**
+  - `backend/app/api/routes.py` (Registered candidate relocation sites router under `/api/v1/sites`)
+  - `PROJECT_STATE.md` (Documented M4-01 implementation record, updated chunk registry and metadata to AWAITING_REVIEW)
+- **Files Removed:** None
+- **API Endpoints Implemented:**
+  - `GET /api/v1/sites` — List paginated candidate sites with filters (`district_id`, `status`, `min_elevation_m`, `max_elevation_m`, `min_area_sq_m`, `max_area_sq_m`, `search`).
+  - `GET /api/v1/sites/{id}` — Get detailed candidate site by ID including loaded `capacities` and `infrastructures`.
+  - `POST /api/v1/sites` — Create new candidate site (Requires `ADMIN` or `DISTRICT_OFFICER` role). Returns `404` for non-existent `district_id`, `422` for invalid spatial geometries.
+  - `PATCH /api/v1/sites/{id}` — Partially update candidate site (Requires `ADMIN` or `DISTRICT_OFFICER` role).
+  - `DELETE /api/v1/sites/{id}` — Delete candidate site (Requires `ADMIN` or `DISTRICT_OFFICER` role).
+- **Automated Test Results:**
+  - Container Environment: Docker Compose `rakshakgis-backend` (Python 3.11.16) & `rakshakgis-db` (PostgreSQL 16.4 / PostGIS 3.4.3).
+  - Complete backend test suite command: `docker exec rakshakgis-backend pytest tests -v`
+  - Result: **74 passed, 4 warnings in 6.26s** (0 failed, 0 errors).
+  - M4-01 Candidate Sites test suite command: `docker exec rakshakgis-backend pytest tests/test_sites.py -v`
+  - Result: **12 passed, 3 warnings in 1.03s** (0 failed, 0 errors).
+  - All 14 M2-04 error handling tests pass cleanly with `backend/tests/test_error_handling.py` unweakened and unmodified.
+- **Known Issues or Ambiguities:** None.
+
+---
+
 ## Known Issues
 
 1. **Untracked Host Virtual Environment:** `backend/venv/` exists locally on Windows host and is properly ignored by `.gitignore`. The Docker service isolates this via an anonymous volume (`/app/venv`).
@@ -379,12 +408,13 @@ Chunks M3-02 through DOC-01 (except unblocked M3-01 and M4-01) remain in `BLOCKE
 - Chunk M2-03 established Alembic migration foundation and all 29 SQLAlchemy ORM models with PostGIS spatial types (SRID 4326).
 - Chunk M2-04 established common API schemas, standardized error responses, exception hierarchy, correlation ID middleware (`X-Request-ID`), and centralized error handlers.
 - Chunk M2-05 established password hashing with bcrypt, JWT token operations with pyjwt, current-user authentication dependency, RBAC authorization (`require_roles`), and auth API endpoints (`/login`, `/me`).
-- Automated tests verified: 62 passed in container (Python 3.11).
+- Chunk M4-01 established candidate relocation sites backend API (`/api/v1/sites`), Pydantic GeoJSON Point/Polygon schemas with coordinate bounds and closed-ring validation, pagination and domain filters, RBAC mutation enforcement (`ADMIN`, `DISTRICT_OFFICER`), and relational detail loading.
+- Automated tests verified: 74 passed, 4 warnings in container (Python 3.11) with live PostGIS 3.4.3 database.
 
 ---
 
 ## Last Updated
 
-- **Timestamp:** 2026-09-04 18:25:00 IST
-- **Updated By:** M2 (Antigravity Agent)
-- **Status Summary:** Chunk M2-05 finalized and COMMITTED; downstream chunks M3-01 and M4-01 ready for execution.
+- **Timestamp:** 2026-09-04 22:45:00 IST
+- **Updated By:** M4 (Antigravity Agent)
+- **Status Summary:** Chunk M4-01 implemented and awaiting independent review; all 74 backend tests passing cleanly against live PostGIS database container.
