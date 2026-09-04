@@ -148,7 +148,7 @@ No chunk may transition to `IN_PROGRESS` until all its listed prerequisite depen
 | **M3-04** | Risk/GIS | Data Validation & Ingestion Pipelines | M3 | M3-02, M3-03 | **COMMITTED** |
 | **M3-05** | Risk/GIS | Risk Normalization Engine | M3 | M3-04 | **COMMITTED** |
 | **M3-06** | Risk/GIS | Multi-Hazard Risk Computation Engine | M3 | M3-05 | **COMMITTED** |
-| **M3-07** | Risk/GIS | Risk Classification & Grading | M3 | M3-06 | **BLOCKED** |
+| **M3-07** | Risk/GIS | Risk Classification & Grading | M3 | M3-06 | **AWAITING_REVIEW** |
 | **M3-08** | Risk/GIS | Risk Explainability & Factor Contribution | M3 | M3-07 | **BLOCKED** |
 | **M3-09** | Risk/GIS | Vulnerability & Exposure Scoring Engine | M3 | M3-06 | **BLOCKED** |
 | **M3-10** | Risk/GIS | Permanent Red Zones Demarcation | M3 | M3-07 | **BLOCKED** |
@@ -187,15 +187,15 @@ No chunk may transition to `IN_PROGRESS` until all its listed prerequisite depen
 
 ## Current Work
 
-- **Active Chunk:** None (Chunk M4-01 awaiting review)
-- **Next Eligible Chunks:** M3-07 (Risk Classification & Grading)
-- **Status:** Chunk M3-06 independently reviewed and COMMITTED; Chunk M4-01 awaiting independent review.
+- **Active Chunk:** Chunk M3-07 (Risk Classification & Grading) — AWAITING_REVIEW; Chunk M4-01 (Candidate Relocation Sites Backend) — AWAITING_REVIEW
+- **Next Eligible Chunks:** M3-08 (Risk Explainability & Factor Contribution), M3-09 (Vulnerability & Exposure Scoring Engine)
+- **Status:** Chunk M3-07 implemented and awaiting independent review; Chunk M3-06 COMMITTED; Chunk M4-01 awaiting independent review.
 
 ---
 
 ## Blocked Work
 
-Chunks M3-07 through DOC-01 (except unblocked M3-01, M3-02, M3-03, M3-04, M3-05, M3-06, and M4-01) remain in `BLOCKED` status awaiting completion, independent verification, and commit of their respective prerequisites.
+Chunks M3-08 through DOC-01 (except unblocked M3-01, M3-02, M3-03, M3-04, M3-05, M3-06, M3-07, and M4-01) remain in `BLOCKED` status awaiting completion, independent verification, and commit of their respective prerequisites.
 
 ---
 
@@ -641,8 +641,57 @@ Chunks M3-07 through DOC-01 (except unblocked M3-01, M3-02, M3-03, M3-04, M3-05,
   - Full backend regression: `docker exec rakshakgis-backend pytest tests -v`
   - Result: **173 passed, 0 failed, 4 warnings in 6.78s**
 - **Known Issues or Ambiguities / Limitations:**
-  - Categorical risk tier classification (e.g. `SAFE`, `MODERATE`, `HIGH`, `CRITICAL`) is deferred to Chunk M3-07.
+  - Categorical risk tier classification (e.g. `SAFE`, `MODERATE`, `HIGH`, `CRITICAL`) is implemented in Chunk M3-07.
   - Demographic exposure ($D$) and social vulnerability ($V$) scoring engine is deferred to Chunk M3-09; however, the engine accepts their normalized factor values whenever provided.
+
+---
+
+## Chunk M3-07 Implementation Record
+
+- **Status:** `AWAITING_REVIEW`
+- **Scope:** Risk Classification & Grading Engine
+- **Scope Discipline:** Strictly limited to classifying an already computed composite risk score ($0.0 \le \text{Risk} \le 100.0$) into its authoritative categorical risk band (`SAFE`, `MODERATE`, `HIGH`, `VERY_HIGH`, `CRITICAL`). Zero risk score recalculation (reusing M3-06 outputs), zero Red Zone demarcation (M3-10 / M3-11), zero relocation priority (M3-12), zero site suitability/routing (M4), zero live external APIs, zero database migrations, zero LLMs.
+- **Risk Classification Modules (`app.core.risk.classification`):**
+  - Exception Hierarchy (`errors.py`): `RiskClassificationError` base class, `InvalidRiskScoreError`, `ClassificationBandConfigError`.
+  - Typed Contracts (`contracts.py`): Re-exports `RiskBand` enum from `app.core.profiles.models`, `RiskScoreBandsConfig` (with monotonicity validation and `from_profile()` factory), `RiskClassificationExplainability` (selected band, score, interval notation, lower/upper bounds, inclusivity flags, audit trail), and `RiskClassificationResult` envelope with numerical invariants ($0.0 \le \text{score} \le 100.0$; preserves original continuous score and village ID).
+  - Classification Engine (`engine.py`): `RiskClassificationEngine` executing authoritative interval logic:
+    - $[0.0, 25.0) \implies \text{SAFE}$
+    - $[25.0, 50.0) \implies \text{MODERATE}$
+    - $[50.0, 70.0) \implies \text{HIGH}$
+    - $[70.0, 85.0) \implies \text{VERY\_HIGH}$
+    - $[85.0, 100.0] \implies \text{CRITICAL}$
+  - Safety-Critical Input Validation: Rejects negative scores ($< 0.0$), scores $> 100.0$, `NaN`, $\pm\infty$, non-numeric/boolean types, and incomplete `CompositeRiskResult` objects (`status != COMPUTED`) with `InvalidRiskScoreError`. Strictly refuses to clamp invalid inputs.
+  - Public Package Exports (`__init__.py`): Re-exported under `app.core.risk` and `app.core.risk.classification`.
+  - Technical Documentation (`README.md`): Interval specifications, boundary behaviors, explainability metadata, and chunk boundaries.
+- **Files Created:**
+  - `backend/app/core/risk/classification/__init__.py` (Package exports)
+  - `backend/app/core/risk/classification/contracts.py` (Typed schemas, result envelopes, explainability models)
+  - `backend/app/core/risk/classification/errors.py` (Classification exception hierarchy)
+  - `backend/app/core/risk/classification/engine.py` (Risk classification engine implementation)
+  - `backend/app/core/risk/classification/README.md` (Architecture, cutoffs, and boundary specification)
+  - `backend/tests/test_risk_classification.py` (23 automated unit tests covering all boundary values, interval ranges, invalid inputs, NaN/Inf rejection, determinism, M3-06 integration, and scope boundary checks)
+- **Files Modified:**
+  - `backend/app/core/risk/__init__.py` (Re-exported M3-07 classification classes alongside M3-05 and M3-06)
+  - `PROJECT_STATE.md` (Updated M3-07 status to `AWAITING_REVIEW`, added implementation record, updated integration notes)
+- **Files Removed:** None.
+- **Automated Test Results:**
+  - Classification suite command: `docker exec rakshakgis-backend pytest tests/test_risk_classification.py -v`
+  - Result: **23 passed, 0 failed, 2 warnings in 1.68s**
+  - Computation suite regression: `docker exec rakshakgis-backend pytest tests/test_risk_computation.py -v`
+  - Result: **19 passed, 0 failed, 2 warnings in 0.52s**
+  - Risk normalization suite regression: `docker exec rakshakgis-backend pytest tests/test_risk_normalization.py -v`
+  - Result: **22 passed, 0 failed, 2 warnings in 0.58s**
+  - Ingestion suite regression: `docker exec rakshakgis-backend pytest tests/test_ingestion.py -v`
+  - Result: **20 passed, 0 failed, 2 warnings in 0.70s**
+  - Provider suite regression: `docker exec rakshakgis-backend pytest tests/test_providers.py -v`
+  - Result: **15 passed, 0 failed, 2 warnings in 0.44s**
+  - Synthetic dataset regression: `docker exec rakshakgis-backend pytest tests/test_synthetic_data.py -v`
+  - Result: **12 passed, 0 failed, 2 warnings in 0.42s**
+  - Full backend regression: `docker exec rakshakgis-backend pytest tests -v`
+  - Result: **196 passed, 0 failed, 4 warnings in 6.89s**
+- **Known Issues or Ambiguities / Limitations:**
+  - Demographic exposure ($D$) and social vulnerability ($V$) scoring engine is deferred to Chunk M3-09.
+  - Permanent and dynamic Red Zone demarcation is deferred to Chunks M3-10 and M3-11.
 
 ---
 
@@ -672,12 +721,13 @@ Chunks M3-07 through DOC-01 (except unblocked M3-01, M3-02, M3-03, M3-04, M3-05,
 - Chunk M3-04 established data validation and ingestion pipeline (`app.data.ingestion`) with multi-stage validators, intra-batch deduplication, canonicalization, and deterministic `IngestionResult` envelopes.
 - Chunk M3-05 established risk normalization engine (`app.core.risk.normalization`) transforming heterogeneous hazard observations to comparable 0.0 - 100.0 factors with M3-01 profile thresholds, clamping tracking, explainability metadata, and safety-critical missing/unknown handling.
 - Chunk M3-06 established multi-hazard risk computation engine (`app.core.risk.computation`) implementing $Risk = 0.30H + 0.20F + 0.15R + 0.15S + 0.10D + 0.10V$, weighted explainability breakdown, strict $[0.0, 100.0]$ bounds, and safe missing-factor handling.
-- Automated tests verified: 173 passed in container (Python 3.11).
+- Chunk M3-07 established risk classification and grading engine (`app.core.risk.classification`) evaluating authoritative risk bands (SAFE, MODERATE, HIGH, VERY_HIGH, CRITICAL) with explicit boundary transitions, explainability metadata, and strict rejection of invalid scores.
+- Automated tests verified: 196 passed in container (Python 3.11).
 
 ---
 
 ## Last Updated
 
-- **Timestamp:** 2026-09-05 01:51:00 IST
+- **Timestamp:** 2026-09-05 02:02:00 IST
 - **Updated By:** M3 (Antigravity Agent)
-- **Status Summary:** Chunk M3-06 independently reviewed and COMMITTED; all 173 automated tests verified against live PostGIS database container.
+- **Status Summary:** Chunk M3-07 implemented and awaiting independent review; Chunk M3-06 COMMITTED; all 196 automated tests verified against live PostGIS database container.

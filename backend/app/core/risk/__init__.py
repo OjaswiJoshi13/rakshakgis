@@ -1,5 +1,15 @@
 """Risk engine and risk modeling module for RakshakGIS."""
 
+from app.core.risk.classification import (
+    ClassificationBandConfigError,
+    InvalidRiskScoreError,
+    RiskBand,
+    RiskClassificationEngine,
+    RiskClassificationError,
+    RiskClassificationExplainability,
+    RiskClassificationResult,
+    RiskScoreBandsConfig,
+)
 from app.core.risk.computation import (
     CompositeRiskExplainability,
     CompositeRiskResult,
@@ -64,4 +74,13 @@ __all__ = [
     "RiskFactorType",
     "RiskWeightsConfig",
     "WeightConfigurationError",
+    # M3-07 Classification
+    "ClassificationBandConfigError",
+    "InvalidRiskScoreError",
+    "RiskBand",
+    "RiskClassificationEngine",
+    "RiskClassificationError",
+    "RiskClassificationExplainability",
+    "RiskClassificationResult",
+    "RiskScoreBandsConfig",
 ]
