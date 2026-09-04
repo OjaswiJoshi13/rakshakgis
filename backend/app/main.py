@@ -9,7 +9,10 @@ from fastapi.middleware.cors import CORSMiddleware
 from app.api.routes import api_router
 from app.core.config import get_settings
 from app.core.database import check_db_readiness
+from app.core.error_handlers import register_error_handlers
 from app.core.logging import setup_logging
+from app.core.middleware import RequestIDMiddleware
+from app.schemas.common import ErrorResponse
 
 settings = get_settings()
 logger = setup_logging()
@@ -37,7 +40,18 @@ app = FastAPI(
     redoc_url="/redoc",
     openapi_url="/openapi.json",
     lifespan=lifespan,
+    responses={
+        400: {"model": ErrorResponse, "description": "Bad Request"},
+        401: {"model": ErrorResponse, "description": "Unauthorized"},
+        403: {"model": ErrorResponse, "description": "Forbidden"},
+        404: {"model": ErrorResponse, "description": "Resource Not Found"},
+        422: {"model": ErrorResponse, "description": "Validation Error"},
+        500: {"model": ErrorResponse, "description": "Internal Server Error"},
+    },
 )
+
+# Register request correlation ID middleware
+app.add_middleware(RequestIDMiddleware)
 
 # Configure CORS for local development
 if settings.CORS_ORIGINS:
@@ -48,6 +62,9 @@ if settings.CORS_ORIGINS:
         allow_methods=["*"],
         allow_headers=["*"],
     )
+
+# Register centralized exception handlers for standard error contract
+register_error_handlers(app)
 
 
 @app.get("/health", tags=["Health"])
