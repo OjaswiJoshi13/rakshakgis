@@ -1,4 +1,4 @@
-"""Permanent Red Zone Demarcation package (Chunk M3-10)."""
+"""Permanent and Dynamic Red Zone Demarcation package (Chunks M3-10 & M3-11)."""
 
 from app.core.risk.red_zone.contracts import (
     DangerLevel,
@@ -9,6 +9,17 @@ from app.core.risk.red_zone.contracts import (
     RedZoneType,
     TriggerAudit,
 )
+from app.core.risk.red_zone.dynamic_contracts import (
+    ComparisonOperator,
+    DynamicHazardIndicator,
+    DynamicHazardObservation,
+    DynamicRedZoneCandidate,
+    DynamicRedZoneExplainability,
+    DynamicThresholdConfig,
+    DynamicTriggerStatus,
+    SingleTriggerEvaluation,
+)
+from app.core.risk.red_zone.dynamic_engine import DynamicRedZoneEngine
 from app.core.risk.red_zone.engine import PermanentRedZoneEngine
 from app.core.risk.red_zone.errors import (
     InsufficientGeophysicalDataError,
@@ -25,17 +36,27 @@ from app.core.risk.red_zone.geometry import (
 )
 
 __all__ = [
-    # Engine
+    # Engines
     "PermanentRedZoneEngine",
+    "DynamicRedZoneEngine",
     # Enums
     "RedZoneStatus",
     "RedZoneType",
     "DangerLevel",
-    # Contracts
+    "DynamicTriggerStatus",
+    "DynamicHazardIndicator",
+    "ComparisonOperator",
+    # M3-10 Permanent Contracts
     "GeophysicalObservationInput",
     "TriggerAudit",
     "PermanentRedZoneExplainability",
     "PermanentRedZoneCandidate",
+    # M3-11 Dynamic Contracts
+    "DynamicThresholdConfig",
+    "DynamicHazardObservation",
+    "SingleTriggerEvaluation",
+    "DynamicRedZoneExplainability",
+    "DynamicRedZoneCandidate",
     # Geometry Utilities
     "create_geodesic_buffer",
     "normalize_to_multipolygon",
@@ -48,3 +69,4 @@ __all__ = [
     "SpatialGeometryError",
     "RedZoneConfigError",
 ]
+

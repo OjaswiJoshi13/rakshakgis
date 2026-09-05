@@ -152,7 +152,7 @@ No chunk may transition to `IN_PROGRESS` until all its listed prerequisite depen
 | **M3-08** | Risk/GIS | Risk Explainability & Factor Contribution | M3 | M3-07 | **COMMITTED** |
 | **M3-09** | Risk/GIS | Vulnerability & Exposure Scoring Engine | M3 | M3-06 | **COMMITTED** |
 | **M3-10** | Risk/GIS | Permanent Red Zones Demarcation | M3 | M3-07 | **COMMITTED** |
-| **M3-11** | Risk/GIS | Dynamic Red Zones & Threshold Triggers | M3 | M3-10 | **BLOCKED** |
+| **M3-11** | Risk/GIS | Dynamic Red Zones & Threshold Triggers | M3 | M3-10 | **COMMITTED** |
 | **M3-12** | Risk/GIS | Relocation Priority Scoring Backend | M3 | M3-08, M3-09 | **BLOCKED** |
 | **M3-13** | Risk/GIS | Data Source Freshness & Telemetry Backend | M3 | M3-03 | **BLOCKED** |
 | **M4-01** | Relocation | Candidate Relocation Sites Backend | M4 | M2-03 | **COMMITTED** |
@@ -187,9 +187,9 @@ No chunk may transition to `IN_PROGRESS` until all its listed prerequisite depen
 
 ## Current Work
 
-- **Active Chunk:** None (Chunk M3-10 completed and COMMITTED)
-- **Next Eligible Chunks:** Chunk M3-11: Dynamic Red Zones & Threshold Triggers (prerequisite M3-10 committed); Chunk M3-12: Relocation Priority Scoring Backend (prerequisites M3-08 and M3-09 committed); Chunk M5-02: Authentication UI & Session Handling (once M5-01 committed); Chunk M5-03: API Client & State Management Setup (once M5-01 committed)
-- **Status:** Chunk M3-10 COMMITTED. 43 focused M3-10 unit and regression tests passing; 161 related risk engine tests passing; 327 full backend tests passing (100% clean regression). Prerequisite dependencies M3-07 and M3-09 verified COMMITTED.
+- **Active Chunk:** None (Chunk M3-11 COMMITTED)
+- **Next Eligible Chunks:** Chunk M3-12: Relocation Priority Scoring Backend (prerequisites M3-08 and M3-09 committed; M3-11 committed); Chunk M5-02: Authentication UI & Session Handling (once M5-01 committed); Chunk M5-03: API Client & State Management Setup (once M5-01 committed)
+- **Status:** Chunk M3-11 COMMITTED following independent review approval and threshold-unavailable semantic correction. 38 focused M3-11 unit and boundary tests passing; 43 M3-10 tests passing; 365 full backend tests passing (100% clean regression). Prerequisites M3-07, M3-09, and M3-10 verified COMMITTED.
 
 
 ---
@@ -1148,6 +1148,61 @@ Chunks M3-08 through DOC-01 (except committed M3-01 through M3-07, M4-01 through
 
 ---
 
+## Chunk M3-11 Implementation Record
+
+- **Status:** `COMMITTED`
+- **Architectural & Formalization Decisions:**
+  - **Dynamic Red Zone Demarcation Subsystem:**
+    - Established `DynamicRedZoneEngine` in `backend/app/core/risk/red_zone/dynamic_engine.py` representing temporary, event-driven hazard demarcation separately from M3-10 permanent geophysical red zones.
+    - Explicit 3-state evaluation model: `NO_TRIGGER`, `TRIGGERED`, `INSUFFICIENT_DATA` (represented by typed `DynamicTriggerStatus` enum).
+    - Missing or unavailable observations strictly yield `INSUFFICIENT_DATA` (never coerced to safe or 0.0). In strict mode (`strict=True`), raises `InsufficientGeophysicalDataError`.
+    - **Threshold-Unavailable Semantic Correction:** If an observation exists but its required dynamic threshold is unavailable/unconfigured in the regional profile (e.g. unconfigured `water_level_m_above_danger`, `debris_volume_cu_m`, or other absent thresholds), the engine cannot evaluate trigger status and strictly returns `DynamicTriggerStatus.INSUFFICIENT_DATA` with `danger_level = None`, `is_candidate = False`, and an explicit audit/explainability note identifying the missing threshold configuration. An unconfigured threshold is NEVER treated as `NO_TRIGGER`, `0`, `SAFE`, a fabricated/default threshold, or any danger level. In strict mode, raises `InsufficientGeophysicalDataError`.
+    - `NO_TRIGGER` strictly means the trigger was evaluated against an available threshold and did not fire (`value < threshold`).
+    - Input values of `NaN`, $\pm\infty$, or values violating physical domains strictly raise `InvalidGeophysicalDataError`.
+  - **Profile-Driven Regional Trigger Resolution:**
+    - Engine contains zero hardcoded regional threshold constants. Thresholds strictly resolve from `RegionProfile` (`red_zone_thresholds.dynamic_triggers` and `site_capacity_assumptions.hazard_buffer_m`).
+    - Tested across Himalayan Pilot (64.5 mm rain, 6.0 MMI seismic, 25.0° slope, 500m buffer), Coastal Template (80.0 mm rain, 1500m buffer), and Riverine Template (75.0 mm rain, 1000m buffer).
+    - Demonstrated that changing profile thresholds changes dynamic trigger decisions without modifying engine code.
+  - **Supported Dynamic Indicators:**
+    - 24h rainfall precipitation (`rainfall_24h_mm`).
+    - Seismic intensity (`seismic_intensity_mmi`).
+    - Terrain slope angle (`slope_deg`).
+    - Hydrological flood water level above danger (`water_level_m_above_danger`).
+    - Landslide debris volume (`debris_volume_cu_m`).
+    - Compound triggers (e.g. concurrent heavy rainfall exceedance on steep slope).
+  - **Deterministic Boundary Behavior:**
+    - Aligns with IMD standard (`is_heavy_rain >= 64.5 mm`).
+    - Explicit, typed `ComparisonOperator` (`>=`, `>`, `<`, `<=`, `==`) with boundary tests covering `value < T`, `value == T`, `value > T`.
+  - **Spatial Geometry & Overlap Dissolution:**
+    - Point-based sensor and settlement observations buffered via metric geodesic circular buffer (`create_geodesic_buffer`).
+    - Polygon observations normalized to valid `MultiPolygon` in EPSG:4326 (SRID 4326).
+    - Missing location data safely produces `geometry = None` without fabricating polygons.
+    - Multiple overlapping dynamic candidates deterministically dissolved via `shapely.ops.unary_union`, preserving all contributing observation IDs, village IDs, and source provenance records.
+  - **Strict Governance & DangerLevel Invariants:**
+    - Output envelopes are candidate proposals only (`is_temporary = True`, `is_candidate = True` iff `TRIGGERED`, `is_active = False`, `declared_by_officer_id = None`, `declared_at = None`).
+    - Candidate outputs strictly assign profile `default_danger_level` when `TRIGGERED`; `danger_level = None` when `NO_TRIGGER` or `INSUFFICIENT_DATA`. Never invents or escalates danger levels.
+- **Files Created:**
+  - `backend/app/core/risk/red_zone/dynamic_contracts.py` (Typed schemas, enums, `DynamicThresholdConfig`, `DynamicHazardObservation`, `DynamicRedZoneCandidate`, `DynamicRedZoneExplainability`)
+  - `backend/app/core/risk/red_zone/dynamic_engine.py` (Core `DynamicRedZoneEngine` candidate evaluation coordinator and overlap dissolution)
+  - `backend/tests/test_dynamic_red_zones.py` (38 unit, boundary, and threshold-unavailable regression tests covering all 15 required categories)
+- **Files Modified:**
+  - `backend/app/core/risk/red_zone/__init__.py` (Re-exported dynamic red zone engine and contracts)
+  - `backend/app/core/risk/red_zone/README.md` (Updated documentation detailing permanent vs dynamic separation, profile resolution, indicators, threshold-unavailable semantics, missing data policy, and governance boundaries)
+  - `PROJECT_STATE.md` (Updated registry status to AWAITING_REVIEW, documented implementation details, semantic correction, and test metrics)
+- **Files Removed:** None
+- **Commands Executed & Results:**
+  - `wsl -e docker exec rakshakgis-backend pytest tests/test_dynamic_red_zones.py -v` -> Exited 0, 38 passed in 2.72s (100%)
+  - `wsl -e docker exec rakshakgis-backend pytest tests/test_permanent_red_zones.py -v` -> Exited 0, 43 passed in 2.50s (100% M3-10 regression pass)
+  - `wsl -e docker exec rakshakgis-backend pytest tests -v` -> Exited 0, 365 passed, 4 warnings in 14.53s (100% full backend regression pass)
+- **Scope Boundaries & Invariants Preserved:**
+  - Status marked `AWAITING_REVIEW` (not marked VERIFIED or COMMITTED).
+  - Relocation Priority Scoring (M3-12) left completely untouched.
+  - Scenario simulator integration (M4-06) and real-time alerts UI (M6-05) left completely untouched.
+  - Officer legal declaration workflow remains in M6-08.
+  - Zero LLM usage; 100% deterministic algorithms.
+
+---
+
 ## Known Issues
 
 1. **Untracked Host Virtual Environment:** `backend/venv/` exists locally on Windows host and is properly ignored by `.gitignore`. The Docker service isolates this via an anonymous volume (`/app/venv`).
@@ -1181,13 +1236,15 @@ Chunks M3-08 through DOC-01 (except committed M3-01 through M3-07, M4-01 through
 - Chunk M5-01 established frontend application foundation (Next.js 14 App Router, React 18, TypeScript, Tailwind CSS), design system tokens aligning with backend Risk Bands and Relocation Priority Cutoffs, WCAG 2.1 AA accessible UI primitives (Button, Badge, RiskBadge, RelocationBadge, Card, MetricCard, Alert, StatusIndicator), command center operational layout shell (CommandHeader, Sidebar, StatusBar, AppLayout), and automated test suite (29 Vitest tests passing, 0 lint errors, production build verified).
 - Chunk M3-09 established vulnerability & exposure scoring engine (`app.core.risk.vulnerability`) implementing demographic exposure with vulnerable group weightings ($P_{\text{eff}} = P + (m_E-1)E + (m_C-1)C + (m_{Dis}-1)D_{is}$) benchmarked to regional capacity, 4-dimensional social vulnerability aggregation (social, economic, structural, access isolation), conversion to M3-06 `FactorInput` and M3-05 `NormalizedFactorResult`, and strict missing-data safety invariants. Formalized under project-approved Option 1.
 - Chunk M3-10 established permanent red zone demarcation engine (`app.core.risk.red_zone`) implementing Option 1 formalization: geophysical trigger (`active_subsidence == True` or compound `slope >= min_slope` & `landslides >= min_landslides`), M3-07 CRITICAL risk corroboration and SAFE/MODERATE + steep slope MONITOR designation, geodesic circular buffering for point villages via configured `hazard_buffer_m`, overlap dissolution with full provenance preservation, safety-critical missing data policy (never assumed safe), and strict governance invariants (`is_active = False`, `declared_by_officer_id = None`).
-- Automated tests verified: 327 backend tests passed in container; 29 frontend tests passed in Vitest.
+- Chunk M3-11 established dynamic red zone & threshold trigger engine (`app.core.risk.red_zone.dynamic_engine`) implementing real-time event-driven hazard demarcation (`rainfall_24h_mm`, `seismic_intensity_mmi`, `slope_deg`, `water_level_m_above_danger`, `debris_volume_cu_m`, compound triggers) strictly resolved from regional profiles with zero hardcoded constants, explicit 3-state evaluation (`NO_TRIGGER`, `TRIGGERED`, `INSUFFICIENT_DATA`), threshold-unavailable INSUFFICIENT_DATA safety semantics, geodesic circular buffering, overlap dissolution with provenance preservation, safety-critical missing data rejection, and governance invariants (`is_active = False`, analytical proposals only).
+- Automated tests verified: 365 backend tests passed in container (100% clean); 29 frontend tests passed in Vitest.
 
 ---
 
 ## Last Updated
 
-- **Timestamp:** 2026-09-06 00:40:00 IST
-- **Updated By:** M3 (Permanent Red Zone Demarcation Formalization & Commit — Chunk M3-10)
-- **Status Summary:** Chunk M3-10 COMMITTED (Commit: feat(risk): implement permanent red zone demarcation); Chunk M3-09 COMMITTED; Chunk M3-08 COMMITTED; Chunk M5-01 VERIFIED; 43 focused M3-10 tests passed; 327 total backend regression tests verified passing in container (100% clean); 29 frontend tests passed in Vitest. Next eligible M3 chunks: M3-11 and M3-12.
+- **Timestamp:** 2026-09-06 01:06:00 IST
+- **Updated By:** M3 (Dynamic Red Zones & Threshold Triggers — Chunk M3-11)
+- **Status Summary:** Chunk M3-11 COMMITTED following independent review approval; Chunk M3-10 COMMITTED; Chunk M3-09 COMMITTED; Chunk M3-08 COMMITTED; Chunk M5-01 VERIFIED; 38 focused M3-11 tests passed; 43 M3-10 regression tests passed; 365 total backend regression tests verified passing in container (100% clean); 29 frontend tests passed in Vitest. Next eligible M3 chunk: M3-12 (Relocation Priority Scoring).
+
 
