@@ -149,7 +149,7 @@ No chunk may transition to `IN_PROGRESS` until all its listed prerequisite depen
 | **M3-05** | Risk/GIS | Risk Normalization Engine | M3 | M3-04 | **COMMITTED** |
 | **M3-06** | Risk/GIS | Multi-Hazard Risk Computation Engine | M3 | M3-05 | **COMMITTED** |
 | **M3-07** | Risk/GIS | Risk Classification & Grading | M3 | M3-06 | **COMMITTED** |
-| **M3-08** | Risk/GIS | Risk Explainability & Factor Contribution | M3 | M3-07 | **AWAITING_REVIEW** |
+| **M3-08** | Risk/GIS | Risk Explainability & Factor Contribution | M3 | M3-07 | **COMMITTED** |
 | **M3-09** | Risk/GIS | Vulnerability & Exposure Scoring Engine | M3 | M3-06 | **BLOCKED** |
 | **M3-10** | Risk/GIS | Permanent Red Zones Demarcation | M3 | M3-07 | **BLOCKED** |
 | **M3-11** | Risk/GIS | Dynamic Red Zones & Threshold Triggers | M3 | M3-10 | **BLOCKED** |
@@ -187,9 +187,9 @@ No chunk may transition to `IN_PROGRESS` until all its listed prerequisite depen
 
 ## Current Work
 
-- **Active Chunk:** M3-08 (Risk Explainability & Factor Contribution) — `AWAITING_REVIEW`
+- **Active Chunk:** None
 - **Next Eligible Chunks:** M3-09 (Vulnerability & Exposure Scoring Engine); M5-02 (Authentication UI & Session Handling — once M5-01 committed); M5-03 (API Client & State Management Setup — once M5-01 committed)
-- **Status:** Chunk M3-08 implemented and in `AWAITING_REVIEW` status; 28 focused tests passed; 262 total backend regression tests verified passing in container. Chunk M4-03 COMMITTED. Chunk M4-04 remains BLOCKED awaiting prerequisite M3-12 (which depends on M3-08 and M3-09). Chunk M5-01 VERIFIED by independent review (29/29 frontend tests passed, Next.js build passed, 262/262 backend tests passed with zero regression); ready to commit.
+- **Status:** Chunk M3-08 COMMITTED (Commit `80a34d4`); 28 focused tests passed; 262 total backend regression tests verified passing in container. Chunk M4-03 COMMITTED. Note: Chunk M4-04 remains BLOCKED awaiting prerequisite M3-12 (which depends on M3-08 and M3-09). Chunk M5-01 VERIFIED by independent review (29/29 frontend tests passed, Next.js build passed, 262/262 backend tests passed with zero regression); ready to commit.
 
 ---
 
@@ -216,6 +216,7 @@ Chunks M3-08 through DOC-01 (except committed M3-01 through M3-07, M4-01 through
 - M3-05: Risk Normalization Engine — COMMITTED (Commit: `feat(m3): add risk normalization engine`).
 - M3-06: Multi-Hazard Risk Computation Engine — COMMITTED (Commit: `feat(m3): add multi-hazard risk computation engine`).
 - M3-07: Risk Classification & Grading — COMMITTED (Commit: `feat(m3): add risk classification and grading`).
+- M3-08: Risk Explainability & Factor Contribution — COMMITTED (Commit: `80a34d4`).
 - M4-01: Candidate Relocation Sites Backend — COMMITTED (Commit: `5c100603b77e45a47a8c6420f405819166e58609`).
 - M4-02: Multi-Criteria Site Suitability Engine — COMMITTED (Commit: `feat(m4): add site suitability engine`).
 - M4-03: Carrying Capacity & Infrastructure Sizing — COMMITTED (Commit: `3c0d37a7b8e19cbfcf16f0bcf82c813587b1c3e3`).
@@ -703,7 +704,8 @@ Chunks M3-08 through DOC-01 (except committed M3-01 through M3-07, M4-01 through
 
 ## Chunk M3-08 Implementation Record
 
-- **Status:** `AWAITING_REVIEW`
+- **Status:** `COMMITTED`
+- **Commit:** `80a34d4` (`feat(risk): add deterministic risk explainability`)
 - **Scope:** Risk Explainability & Factor Contribution
 - **Scope Discipline:** Strictly limited to auditable decomposition and transparent explanation of an already-computed multi-hazard composite risk result ($0.30H + 0.20F + 0.15R + 0.15S + 0.10D + 0.10V$) and its integrated M3-07 risk classification. Zero risk formula alterations, zero secondary weight configurations, zero Red Zone demarcation (M3-10 / M3-11), zero relocation priority scoring (M3-12), zero demographic vulnerability scoring (M3-09), zero site suitability/routing (M4), zero live external APIs, zero database migrations, zero LLMs for risk computation or narrative generation.
 - **Factor Decomposition & Semantics:**
@@ -1025,6 +1027,6 @@ Chunks M3-08 through DOC-01 (except committed M3-01 through M3-07, M4-01 through
 
 ## Last Updated
 
-- **Timestamp:** 2026-09-05 22:48:00 IST
-- **Updated By:** M5 (Frontend Foundation & Design System Verification)
-- **Status Summary:** Chunk M5-01 independently reviewed and VERIFIED; 29 frontend tests passed; Next.js build passed; 262 backend tests passed with zero regression; ready to commit and push.
+- **Timestamp:** 2026-09-05 23:00:00 IST
+- **Updated By:** M3 (Risk Explainability & Factor Contribution Status Bookkeeping)
+- **Status Summary:** Chunk M3-08 COMMITTED (Commit 80a34d4); Chunk M5-01 VERIFIED; 28 focused M3-08 tests passed; 262 backend tests passed in container; 29 frontend tests passed in Vitest. Chunk M3-09 is next eligible M3 chunk; M5-02/M5-03 eligible once M5-01 committed.
