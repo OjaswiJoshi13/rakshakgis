@@ -156,7 +156,7 @@ No chunk may transition to `IN_PROGRESS` until all its listed prerequisite depen
 | **M3-12** | Risk/GIS | Relocation Priority Scoring Backend | M3 | M3-08, M3-09 | **BLOCKED** |
 | **M3-13** | Risk/GIS | Data Source Freshness & Telemetry Backend | M3 | M3-03 | **BLOCKED** |
 | **M4-01** | Relocation | Candidate Relocation Sites Backend | M4 | M2-03 | **COMMITTED** |
-| **M4-02** | Relocation | Multi-Criteria Site Suitability Engine | M4 | M4-01, M3-06 | **BLOCKED** |
+| **M4-02** | Relocation | Multi-Criteria Site Suitability Engine | M4 | M4-01, M3-06 | **COMMITTED** |
 | **M4-03** | Relocation | Carrying Capacity & Infrastructure Sizing | M4 | M4-02 | **BLOCKED** |
 | **M4-04** | Relocation | Relocation Matching & Assignment Engine | M4 | M3-12, M4-03 | **BLOCKED** |
 | **M4-05** | Relocation | Evacuation & Access Routing Engine | M4 | M4-04 | **BLOCKED** |
@@ -188,14 +188,14 @@ No chunk may transition to `IN_PROGRESS` until all its listed prerequisite depen
 ## Current Work
 
 - **Active Chunk:** None
-- **Next Eligible Chunks:** M3-08 (Risk Explainability & Factor Contribution), M3-09 (Vulnerability & Exposure Scoring Engine), M4-02 (Multi-Criteria Site Suitability Engine)
-- **Status:** Chunk M4-01 independently reviewed and COMMITTED (Commit: `5c100603b77e45a47a8c6420f405819166e58609`); Chunk M4-02 is now ELIGIBLE because M4-01 is COMMITTED and M3-06 is already COMMITTED; Chunks M3-08 and M3-09 are also eligible independently.
+- **Next Eligible Chunks:** M4-03 (Carrying Capacity & Infrastructure Sizing, now eligible with M4-02 COMMITTED), M3-08 (Risk Explainability & Factor Contribution), M3-09 (Vulnerability & Exposure Scoring Engine)
+- **Status:** Chunk M4-02 COMMITTED; 20 focused tests passed; 216 total backend regression tests verified passing in container.
 
 ---
 
 ## Blocked Work
 
-Chunks M3-08 through DOC-01 (except unblocked M3-01, M3-02, M3-03, M3-04, M3-05, M3-06, M3-07, and M4-01) remain in `BLOCKED` status awaiting completion, independent verification, and commit of their respective prerequisites.
+Chunks M3-08 through DOC-01 (except unblocked M3-01, M3-02, M3-03, M3-04, M3-05, M3-06, M3-07, M4-01, and now eligible M4-03) remain in `BLOCKED` status awaiting completion, independent verification, and commit of their respective prerequisites. Note: M4-03 has NOT started and is NOT completed.
 
 ---
 
@@ -217,6 +217,7 @@ Chunks M3-08 through DOC-01 (except unblocked M3-01, M3-02, M3-03, M3-04, M3-05,
 - M3-06: Multi-Hazard Risk Computation Engine — COMMITTED (Commit: `feat(m3): add multi-hazard risk computation engine`).
 - M3-07: Risk Classification & Grading — COMMITTED (Commit: `feat(m3): add risk classification and grading`).
 - M4-01: Candidate Relocation Sites Backend — COMMITTED (Commit: `5c100603b77e45a47a8c6420f405819166e58609`).
+- M4-02: Multi-Criteria Site Suitability Engine — COMMITTED (Commit: `feat(m4): add site suitability engine`).
 
 ---
 
@@ -699,6 +700,84 @@ Chunks M3-08 through DOC-01 (except unblocked M3-01, M3-02, M3-03, M3-04, M3-05,
 
 ---
 
+## Chunk M4-02 Implementation Record
+
+- **Status:** `COMMITTED`
+- **Scope:** Multi-Criteria Site Suitability Engine
+- **Scope Discipline:** Implements deterministic multi-criteria suitability evaluation across 9 authoritative criteria preceded by strict hard safety and capacity constraint gates. Zero relocation matching or assignment (M4-04), zero evacuation routing (M4-05), zero scenario simulator (M4-06), zero officer approval sign-off workflow (M6-08), zero LLMs for numerical scoring.
+- **Criteria & Authoritative Weights (Strictly Sum to 1.00 / 100%):**
+  1. Hazard Safety: 30% (`0.30`)
+  2. Capacity: 20% (`0.20`)
+  3. Road Access: 10% (`0.10`)
+  4. Water Availability: 10% (`0.10`)
+  5. Healthcare Access: 10% (`0.10`)
+  6. School Access: 5% (`0.05`)
+  7. Emergency Services: 5% (`0.05`)
+  8. Livelihood Access: 5% (`0.05`)
+  9. Expansion Potential: 5% (`0.05`)
+- **Hard Constraints & Safety Invariants:**
+  - **Slope Safety:** Evaluates `terrain_slope_deg <= max_safe_slope_deg` (15.0° default from Himalayan profile). Missing slope strictly fails.
+  - **Hazard Buffer Distance:** Evaluates `hazard_buffer_distance_m >= min_hazard_buffer_m` (500.0m mandatory exclusion buffer).
+  - **Known Usable Capacity:** Evaluates `available_households > 0` and `max_households > 0`. Missing, unknown, or zero capacity strictly fails (never treated as unlimited).
+  - **Water Availability Criterion:** Water supply is strictly evaluated under the 10% weighted criterion (normalized against humanitarian baseline of 70 LPD/capita) rather than as an unconfigured hard disqualification gate.
+  - **Strict Pre-Scoring Override Invariant:** Hard constraints are evaluated *before* weighted scoring. Any failure strictly marks `is_eligible=False` and `decision=INELIGIBLE`. Weighted scores are calculated for explainability and audit trail only, and can **never** override a hard constraint failure.
+- **Categorical Decisions & Classification Rules:**
+  - `SUITABLE`: Passes all hard constraints, overall score $\ge 65.0$, and capacity $\ge 20$ households.
+  - `CONSTRAINED`: Passes hard constraints, but either score is in $[40.0, 65.0)$ or capacity $< 20$ households (community transfer bottleneck).
+  - `UNSUITABLE`: Passes hard constraints, but overall score $< 40.0$.
+  - `INELIGIBLE`: Failed one or more mandatory hard constraints.
+- **Configuration Approach:**
+  - `SuitabilityWeightsConfig`: Pydantic model with `@model_validator` enforcing strict sum-to-1.0 invariant within tolerance ($10^{-5}$).
+  - `SuitabilityThresholdsConfig`: Configurable domain thresholds with `from_profile(profile: RegionProfile)` factory to source regional defaults (e.g. `HIMALAYAN_PILOT_PROFILE`).
+- **Suitability Modules (`app.core.relocation.suitability`):**
+  - Exception Hierarchy (`errors.py`): `SiteSuitabilityError`, `InvalidSiteDataError`, `MissingCriticalAttributeError`, `SuitabilityConfigError`, `HardConstraintError`.
+  - Typed Contracts (`contracts.py`): `CriterionType`, `SuitabilityDecision`, `HardConstraintType`, `ConstraintEvaluation`, `CriterionScoreResult`, `SuitabilityWeightsConfig`, `SuitabilityThresholdsConfig`, `SiteSuitabilityInput` (with `from_candidate_site_model` and `from_synthetic_feature` factories), and `SiteSuitabilityResult` explainability envelope.
+  - Hard Constraints Evaluator (`constraints.py`): `HardConstraintEvaluator` implementing pre-scoring safety and capacity checks.
+  - Deterministic Scorer (`scoring.py`): Normalized 0.0–100.0 scoring functions for each of the 9 criteria with input validation against NaN/Inf.
+  - Suitability Coordinator (`engine.py`): `SiteSuitabilityEngine` coordinating hard constraint gates, multi-criteria scoring, weighted aggregation, decision grading, and human-readable audit reasons.
+  - Public Package Exports (`__init__.py`): Cleanly exported under `app.core.relocation.suitability`.
+  - Architectural Documentation (`README.md`): Architectural specifications, weights, formulas, and explainability breakdown.
+- **API Endpoints Added (`/api/v1/sites`):**
+  - `POST /api/v1/sites/evaluate`: Direct candidate site payload evaluation.
+  - `POST /api/v1/sites/{id}/evaluate`: Evaluate database candidate site by ID, with optional `persist_score` update.
+  - `GET /api/v1/sites/{id}/suitability`: Retrieve suitability evaluation for database site by ID.
+- **Files Created:**
+  - `backend/app/core/relocation/__init__.py`
+  - `backend/app/core/relocation/suitability/__init__.py`
+  - `backend/app/core/relocation/suitability/contracts.py`
+  - `backend/app/core/relocation/suitability/errors.py`
+  - `backend/app/core/relocation/suitability/constraints.py`
+  - `backend/app/core/relocation/suitability/scoring.py`
+  - `backend/app/core/relocation/suitability/engine.py`
+  - `backend/app/core/relocation/suitability/README.md`
+  - `backend/tests/test_site_suitability.py`
+- **Files Modified:**
+  - `backend/app/schemas/sites.py` (Added `SiteEvaluationRequest`, re-exported contracts)
+  - `backend/app/api/v1/sites.py` (Added suitability evaluation endpoints)
+  - `PROJECT_STATE.md` (Updated status to `AWAITING_REVIEW` and added implementation record)
+- **Files Removed:** None.
+- **Automated Test Results:**
+  - M4-02 suitability suite command: `docker exec rakshakgis-backend pytest tests/test_site_suitability.py -v`
+  - Result: **20 passed, 0 failed, 2 warnings in 2.98s**
+  - M4-01 sites suite regression command: `docker exec rakshakgis-backend pytest tests/test_sites.py -v`
+  - Result: **12 passed, 0 failed, 3 warnings in 2.35s**
+  - Full backend regression command: `docker exec rakshakgis-backend pytest tests -v`
+  - Result: **216 passed, 0 failed, 4 warnings in 19.86s**
+- **M4-02 Implementation Review Corrections:**
+  - **Correction 1 (Silent Region-Profile Fallback Removed):** Removed broad `except Exception:` fallback in `/api/v1/sites` suitability endpoints (`/evaluate`, `/{id}/evaluate`, `/{id}/suitability`) that previously substituted the default `SiteSuitabilityEngine()`. Requesting an invalid or nonexistent `region_profile_id` now raises `UnknownRegionProfileError`, returning a standard HTTP 404 response with structured error code `"UNKNOWN_REGION_PROFILE"` and correlation ID.
+  - **Correction 2 (Water Hard Constraint Removed):** Inspected existing `RegionProfile` and site rules. Water availability is an engineering baseline (`water_supply_lpd_per_capita = 70.0`) used for infrastructure capacity sizing in M4-03, not an authoritative hard exclusion gate in the M4-02 suitability specification. Removed `WATER_MINIMUM` from the mandatory hard-constraint gate (`Slope Safety`, `Hazard Buffer`, and `Usable Capacity` remain the hard exclusion gates). Kept Water Availability strictly as the 10% weighted criterion, ensuring low water supply proportionately penalizes the raw water score without bypassing authoritative safety gates or artificially disqualifying viable sites.
+- **Explicitly Documented MVP Assumptions:**
+  - Regional threshold defaults are sourced from Himalayan Pilot Profile (`SiteCapacityAssumptions`): max safe slope 15.0°, hazard exclusion buffer 500.0m, water supply standard 70.0 LPD/capita.
+  - Minimum viable community relocation capacity is assumed at 20 households; sites passing scoring with < 20 households are classified as `CONSTRAINED`.
+  - Non-perennial water sources and seasonal road access apply deterministic discount multipliers (0.75 and 0.70).
+- **Known Limitations:**
+  - Relocation carrying capacity sizing and infrastructure deficit calculations are deferred to Chunk M4-03.
+  - Multi-village to candidate site matching and assignment optimization are deferred to Chunk M4-04.
+  - Evacuation and access network routing engine are deferred to Chunk M4-05.
+  - Dynamic scenario simulation is deferred to Chunk M4-06.
+
+---
+
 ## Known Issues
 
 1. **Untracked Host Virtual Environment:** `backend/venv/` exists locally on Windows host and is properly ignored by `.gitignore`. The Docker service isolates this via an anonymous volume (`/app/venv`).
@@ -719,6 +798,7 @@ Chunks M3-08 through DOC-01 (except unblocked M3-01, M3-02, M3-03, M3-04, M3-05,
 - Chunk M2-04 established common API schemas, standardized error responses, exception hierarchy, correlation ID middleware (`X-Request-ID`), and centralized error handlers.
 - Chunk M2-05 established password hashing with bcrypt, JWT token operations with pyjwt, current-user authentication dependency, RBAC authorization (`require_roles`), and auth API endpoints (`/login`, `/me`).
 - Chunk M4-01 established candidate relocation sites backend API (`/api/v1/sites`), Pydantic GeoJSON Point/Polygon schemas with coordinate bounds and closed-ring validation, pagination and domain filters, RBAC mutation enforcement (`ADMIN`, `DISTRICT_OFFICER`), and relational detail loading.
+- Chunk M4-02 established multi-criteria site suitability engine (`app.core.relocation.suitability`) evaluating 9 criteria (30/20/10/10/10/5/5/5/5), pre-scoring hard constraint gates (slope, buffer, capacity), weighted water availability scoring (10%), structured explainability breakdown, and API endpoints (`/api/v1/sites/evaluate`, `/api/v1/sites/{id}/evaluate`, `/api/v1/sites/{id}/suitability`) with strict region profile validation.
 - Chunk M3-01 established typed, immutable regional configuration system (`app.core.profiles`) with deterministic validation, registry resolver, Himalayan pilot profile, and future Riverine/Coastal templates.
 - Chunk M3-02 established deterministic synthetic Himalayan pilot dataset (40 villages, 12 candidate relocation sites, 30 hazard events, seed 26191) with GeoJSON fixtures and Pydantic loader schemas.
 - Chunk M3-03 established provider-adapter abstraction layer (`app.data.providers`) with typed contracts, exception hierarchy, registry, and deterministic mock adapters consuming M3-02 fixtures.
@@ -726,12 +806,12 @@ Chunks M3-08 through DOC-01 (except unblocked M3-01, M3-02, M3-03, M3-04, M3-05,
 - Chunk M3-05 established risk normalization engine (`app.core.risk.normalization`) transforming heterogeneous hazard observations to comparable 0.0 - 100.0 factors with M3-01 profile thresholds, clamping tracking, explainability metadata, and safety-critical missing/unknown handling.
 - Chunk M3-06 established multi-hazard risk computation engine (`app.core.risk.computation`) implementing $Risk = 0.30H + 0.20F + 0.15R + 0.15S + 0.10D + 0.10V$, weighted explainability breakdown, strict $[0.0, 100.0]$ bounds, and safe missing-factor handling.
 - Chunk M3-07 established risk classification and grading engine (`app.core.risk.classification`) evaluating authoritative risk bands (SAFE, MODERATE, HIGH, VERY_HIGH, CRITICAL) with explicit boundary transitions, explainability metadata, and strict rejection of invalid scores.
-- Automated tests verified: 196 passed in container (Python 3.11).
+- Automated tests verified: 216 passed in container (Python 3.11).
 
 ---
 
 ## Last Updated
 
-- **Timestamp:** 2026-09-05 02:22:00 IST
-- **Updated By:** M4 (Bookkeeping Correction)
-- **Status Summary:** Chunk M4-01 independently reviewed and COMMITTED (Commit: `5c100603b77e45a47a8c6420f405819166e58609`); Chunk M4-02 is now eligible; Chunks M3-08 and M3-09 are eligible independently.
+- **Timestamp:** 2026-09-05 15:40:00 IST
+- **Updated By:** M4 (Site Suitability Engine Implementation & Commit)
+- **Status Summary:** Chunk M4-02 COMMITTED; Chunk M4-03 is now eligible to start; Chunks M3-08 and M3-09 remain eligible independently. Note: M4-03 has NOT started and is NOT completed.

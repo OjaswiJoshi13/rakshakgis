@@ -251,3 +251,20 @@ class CandidateSiteUpdate(BaseModel):
                 f"Invalid site status '{v}'. Allowed statuses are: {', '.join(sorted(ALLOWED_STATUSES))}"
             )
         return val
+
+
+class SiteEvaluationRequest(BaseModel):
+    """Optional configuration request payload for site evaluation."""
+
+    persist_score: bool = Field(
+        default=False,
+        description="If True, updates candidate_sites.suitability_score in the database with the result.",
+    )
+    region_profile_id: Optional[str] = Field(
+        default="himalayan_pilot",
+        description="Optional regional profile identifier (e.g. 'himalayan_pilot').",
+    )
+    overrides: Optional[dict] = Field(
+        default=None,
+        description="Optional attribute overrides for what-if evaluation.",
+    )

@@ -13,6 +13,12 @@ from app.api.deps import require_roles, UserRole
 from app.models.governance import User
 from app.models.geographic import District
 from app.models.relocation import CandidateSite
+from app.core.profiles.registry import get_profile
+from app.core.relocation.suitability import (
+    SiteSuitabilityEngine,
+    SiteSuitabilityInput,
+    SiteSuitabilityResult,
+)
 from app.schemas.common import (
     ResponseEnvelope,
     PaginatedResponse,
@@ -23,9 +29,11 @@ from app.schemas.sites import (
     CandidateSiteDetailRead,
     CandidateSiteCreate,
     CandidateSiteUpdate,
+    SiteEvaluationRequest,
 )
 
 sites_router = APIRouter()
+
 
 
 def _geojson_point_to_wkt(point_schema) -> WKTElement:
@@ -301,3 +309,112 @@ def delete_candidate_site(
         success=True,
         data={"id": id, "deleted": True},
     )
+
+
+def _resolve_suitability_engine(profile_id: Optional[str]) -> SiteSuitabilityEngine:
+    """Resolve SiteSuitabilityEngine configured for the specified profile without silent fallback."""
+    if not profile_id:
+        return SiteSuitabilityEngine()
+    profile = get_profile(profile_id)
+    return SiteSuitabilityEngine.from_region_profile(profile)
+
+
+@sites_router.post(
+    "/evaluate",
+    response_model=ResponseEnvelope[SiteSuitabilityResult],
+    summary="Evaluate candidate site suitability from payload",
+    description="Evaluate multi-criteria suitability and hard constraints for candidate site data provided in the request body.",
+)
+def evaluate_site_payload(
+    site_input: SiteSuitabilityInput,
+    region_profile_id: Optional[str] = Query(
+        "himalayan_pilot", description="Regional configuration profile ID"
+    ),
+):
+    """Evaluate candidate site suitability directly from payload attributes."""
+    engine = _resolve_suitability_engine(region_profile_id)
+    result = engine.evaluate(site_input)
+    return ResponseEnvelope(success=True, data=result)
+
+
+@sites_router.post(
+    "/{id}/evaluate",
+    response_model=ResponseEnvelope[SiteSuitabilityResult],
+    summary="Evaluate candidate relocation site suitability by ID",
+    description="Evaluate multi-criteria suitability and hard constraints for a candidate relocation site stored in the database.",
+)
+def evaluate_candidate_site(
+    id: int = Path(..., ge=1, description="Candidate site ID"),
+    eval_req: Optional[SiteEvaluationRequest] = None,
+    db: Session = Depends(get_db),
+):
+    """Evaluate stored candidate site suitability by ID."""
+    site = (
+        db.query(CandidateSite)
+        .options(
+            joinedload(CandidateSite.capacities),
+            joinedload(CandidateSite.infrastructures),
+        )
+        .filter(CandidateSite.id == id)
+        .first()
+    )
+
+    if not site:
+        raise NotFoundError(message=f"Candidate site with ID {id} was not found.")
+
+    site_input = SiteSuitabilityInput.from_candidate_site_model(site)
+
+    profile_id = (
+        eval_req.region_profile_id
+        if eval_req and eval_req.region_profile_id
+        else "himalayan_pilot"
+    )
+    engine = _resolve_suitability_engine(profile_id)
+
+    # Apply overrides if provided in request
+    if eval_req and eval_req.overrides:
+        for k, v in eval_req.overrides.items():
+            if hasattr(site_input, k):
+                setattr(site_input, k, v)
+
+    result = engine.evaluate(site_input)
+
+    # Persist score if requested
+    if eval_req and eval_req.persist_score:
+        site.suitability_score = result.overall_score
+        db.commit()
+
+    return ResponseEnvelope(success=True, data=result)
+
+
+@sites_router.get(
+    "/{id}/suitability",
+    response_model=ResponseEnvelope[SiteSuitabilityResult],
+    summary="Get candidate site suitability evaluation by ID",
+    description="Retrieve the multi-criteria suitability evaluation result for a candidate site by ID.",
+)
+def get_candidate_site_suitability(
+    id: int = Path(..., ge=1, description="Candidate site ID"),
+    region_profile_id: Optional[str] = Query(
+        "himalayan_pilot", description="Regional configuration profile ID"
+    ),
+    db: Session = Depends(get_db),
+):
+    """Compute and retrieve suitability result for candidate site by ID."""
+    site = (
+        db.query(CandidateSite)
+        .options(
+            joinedload(CandidateSite.capacities),
+            joinedload(CandidateSite.infrastructures),
+        )
+        .filter(CandidateSite.id == id)
+        .first()
+    )
+
+    if not site:
+        raise NotFoundError(message=f"Candidate site with ID {id} was not found.")
+
+    site_input = SiteSuitabilityInput.from_candidate_site_model(site)
+    engine = _resolve_suitability_engine(region_profile_id)
+    result = engine.evaluate(site_input)
+    return ResponseEnvelope(success=True, data=result)
