@@ -157,7 +157,7 @@ No chunk may transition to `IN_PROGRESS` until all its listed prerequisite depen
 | **M3-13** | Risk/GIS | Data Source Freshness & Telemetry Backend | M3 | M3-03 | **BLOCKED** |
 | **M4-01** | Relocation | Candidate Relocation Sites Backend | M4 | M2-03 | **COMMITTED** |
 | **M4-02** | Relocation | Multi-Criteria Site Suitability Engine | M4 | M4-01, M3-06 | **COMMITTED** |
-| **M4-03** | Relocation | Carrying Capacity & Infrastructure Sizing | M4 | M4-02 | **AWAITING_REVIEW** |
+| **M4-03** | Relocation | Carrying Capacity & Infrastructure Sizing | M4 | M4-02 | **COMMITTED** |
 | **M4-04** | Relocation | Relocation Matching & Assignment Engine | M4 | M3-12, M4-03 | **BLOCKED** |
 | **M4-05** | Relocation | Evacuation & Access Routing Engine | M4 | M4-04 | **BLOCKED** |
 | **M4-06** | Relocation | Scenario Simulator Integration Backend | M4 | M4-04, M3-11 | **BLOCKED** |
@@ -188,14 +188,14 @@ No chunk may transition to `IN_PROGRESS` until all its listed prerequisite depen
 ## Current Work
 
 - **Active Chunk:** None
-- **Next Eligible Chunks:** M4-04 (Relocation Matching & Assignment Engine, once M4-03 COMMITTED), M3-08 (Risk Explainability & Factor Contribution), M3-09 (Vulnerability & Exposure Scoring Engine)
-- **Status:** Chunk M4-03 implemented and AWAITING_REVIEW; 18 focused tests passed; 234 total backend regression tests verified passing in container. Note: M4-04 remains BLOCKED awaiting independent verification and commit of M4-03.
+- **Next Eligible Chunks:** M3-08 (Risk Explainability & Factor Contribution), M3-09 (Vulnerability & Exposure Scoring Engine)
+- **Status:** Chunk M4-03 COMMITTED; 18 focused tests passed; 234 total backend regression tests verified passing in container. Note: M4-04 remains BLOCKED awaiting completion and commit of prerequisite M3-12.
 
 ---
 
 ## Blocked Work
 
-Chunks M3-08 through DOC-01 (except unblocked M3-01, M3-02, M3-03, M3-04, M3-05, M3-06, M3-07, M4-01, and now eligible M4-03) remain in `BLOCKED` status awaiting completion, independent verification, and commit of their respective prerequisites. Note: M4-03 has NOT started and is NOT completed.
+Chunks M3-08 through DOC-01 (except committed M3-01 through M3-07, M4-01 through M4-03; and eligible M3-08, M3-09) remain in `BLOCKED` status awaiting completion, independent verification, and commit of their respective prerequisites. Note: M4-04 remains BLOCKED awaiting prerequisite M3-12.
 
 ---
 
@@ -218,6 +218,7 @@ Chunks M3-08 through DOC-01 (except unblocked M3-01, M3-02, M3-03, M3-04, M3-05,
 - M3-07: Risk Classification & Grading — COMMITTED (Commit: `feat(m3): add risk classification and grading`).
 - M4-01: Candidate Relocation Sites Backend — COMMITTED (Commit: `5c100603b77e45a47a8c6420f405819166e58609`).
 - M4-02: Multi-Criteria Site Suitability Engine — COMMITTED (Commit: `feat(m4): add site suitability engine`).
+- M4-03: Carrying Capacity & Infrastructure Sizing — COMMITTED (Commit: `3c0d37a7b8e19cbfcf16f0bcf82c813587b1c3e3`).
 
 ---
 
@@ -780,7 +781,8 @@ Chunks M3-08 through DOC-01 (except unblocked M3-01, M3-02, M3-03, M3-04, M3-05,
 
 ## Chunk M4-03 Implementation Record
 
-- **Status:** `AWAITING_REVIEW`
+- **Status:** `COMMITTED`
+- **Commit:** `3c0d37a7b8e19cbfcf16f0bcf82c813587b1c3e3`
 - **Scope:** Carrying Capacity & Infrastructure Sizing
 - **Scope Discipline:** Implements deterministic, explainable carrying capacity calculations and infrastructure sizing across 5 critical dimensions. Zero relocation matching or assignment (deferred to M4-04), zero evacuation routing (deferred to M4-05), zero scenario simulation (deferred to M4-06), zero officer approval workflow (deferred to M6-08), zero frontend code, zero LLMs for capacity computations.
 - **Authoritative Effective Capacity Rule:**
@@ -882,6 +884,6 @@ Chunks M3-08 through DOC-01 (except unblocked M3-01, M3-02, M3-03, M3-04, M3-05,
 
 ## Last Updated
 
-- **Timestamp:** 2026-09-05 16:00:00 IST
-- **Updated By:** M4 (Carrying Capacity & Infrastructure Sizing Implementation)
-- **Status Summary:** Chunk M4-03 implemented and AWAITING_REVIEW; Chunk M4-04 becomes eligible once M4-03 is independently reviewed and COMMITTED; Chunks M3-08 and M3-09 remain eligible independently. Note: M4-04 has NOT started and is NOT completed.
+- **Timestamp:** 2026-09-05 16:38:00 IST
+- **Updated By:** M4 (Carrying Capacity & Infrastructure Sizing Status Bookkeeping)
+- **Status Summary:** Chunk M4-03 COMMITTED; Chunk M4-04 remains BLOCKED awaiting prerequisite M3-12; Chunks M3-08 and M3-09 remain eligible independently.
