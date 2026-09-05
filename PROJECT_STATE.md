@@ -151,7 +151,7 @@ No chunk may transition to `IN_PROGRESS` until all its listed prerequisite depen
 | **M3-07** | Risk/GIS | Risk Classification & Grading | M3 | M3-06 | **COMMITTED** |
 | **M3-08** | Risk/GIS | Risk Explainability & Factor Contribution | M3 | M3-07 | **COMMITTED** |
 | **M3-09** | Risk/GIS | Vulnerability & Exposure Scoring Engine | M3 | M3-06 | **COMMITTED** |
-| **M3-10** | Risk/GIS | Permanent Red Zones Demarcation | M3 | M3-07 | **BLOCKED** |
+| **M3-10** | Risk/GIS | Permanent Red Zones Demarcation | M3 | M3-07 | **COMMITTED** |
 | **M3-11** | Risk/GIS | Dynamic Red Zones & Threshold Triggers | M3 | M3-10 | **BLOCKED** |
 | **M3-12** | Risk/GIS | Relocation Priority Scoring Backend | M3 | M3-08, M3-09 | **BLOCKED** |
 | **M3-13** | Risk/GIS | Data Source Freshness & Telemetry Backend | M3 | M3-03 | **BLOCKED** |
@@ -187,9 +187,10 @@ No chunk may transition to `IN_PROGRESS` until all its listed prerequisite depen
 
 ## Current Work
 
-- **Active Chunk:** None (Chunk M3-09 COMMITTED)
-- **Next Eligible Chunks:** M3-10 (Permanent Red Zones Demarcation — prerequisite M3-07 committed); M3-12 (Relocation Priority Scoring Backend — prerequisites M3-08 and M3-09 committed); M5-02 (Authentication UI & Session Handling — once M5-01 committed); M5-03 (API Client & State Management Setup — once M5-01 committed)
-- **Status:** Chunk M3-09 COMMITTED; Chunk M3-08 COMMITTED (Commit `80a34d4`); Chunk M4-03 COMMITTED; Chunk M5-01 VERIFIED by independent review (29/29 frontend tests passed, Next.js build passed); ready to commit. 22 focused M3-09 tests passed; 284 total backend regression tests verified passing in container. Note: Chunk M4-04 remains BLOCKED awaiting prerequisite M3-12.
+- **Active Chunk:** None (Chunk M3-10 completed and COMMITTED)
+- **Next Eligible Chunks:** Chunk M3-11: Dynamic Red Zones & Threshold Triggers (prerequisite M3-10 committed); Chunk M3-12: Relocation Priority Scoring Backend (prerequisites M3-08 and M3-09 committed); Chunk M5-02: Authentication UI & Session Handling (once M5-01 committed); Chunk M5-03: API Client & State Management Setup (once M5-01 committed)
+- **Status:** Chunk M3-10 COMMITTED. 43 focused M3-10 unit and regression tests passing; 161 related risk engine tests passing; 327 full backend tests passing (100% clean regression). Prerequisite dependencies M3-07 and M3-09 verified COMMITTED.
+
 
 ---
 
@@ -1061,6 +1062,92 @@ Chunks M3-08 through DOC-01 (except committed M3-01 through M3-07, M4-01 through
 
 ---
 
+## Chunk M3-10 Implementation Record
+
+- **Status:** `COMMITTED`
+- **Summary:**
+  - Implemented and formalized the Permanent Red Zone Demarcation Engine for Member 3 (Risk / GIS / Data) per project lead approval (**Option 1 Formalization**).
+  - Evaluates settlement/location-level geophysical observations and multi-hazard risk indicators to demarcate **analytical candidate / proposed** Permanent Red Zones without replacing or recomputing the M3-06 composite risk engine.
+  - **Formalized Geophysical Triggers (Option 1):**
+    ```text
+    active_subsidence == True
+    OR
+    (
+        slope_deg >= regional_profile.min_slope_deg
+        AND
+        historical_landslide_count >= regional_profile.min_historical_landslides
+    )
+    ```
+    - Loaded dynamically from `RegionProfile.red_zone_thresholds.permanent_criteria`.
+    - Profile criteria: Himalayan Pilot (`slope >= 35.0°`, `historical_landslides >= 1`), Riverine Template (`slope >= 15.0°`, `historical_landslides >= 0`), Coastal Template (`slope >= 10.0°`, `historical_landslides >= 0`).
+  - **Relationship to Upstream M3-07 Composite Risk Classification:**
+    - Upstream `CRITICAL` risk ($Risk \ge 85.0$) corroborates candidate permanent red zones.
+    - `SAFE` or `MODERATE` combined with steep slope **without active subsidence** is explicitly designated as `MONITOR` status rather than a proposed permanent red zone.
+    - Confirmed active subsidence triggers candidate status regardless of composite risk score due to immediate physical ground instability and fissure hazard.
+  - **Spatial Representation & Geometry Normalization:**
+    - Output geometries strictly normalized to valid Shapely `MultiPolygon` in **EPSG:4326 (SRID 4326)**, matching the `RedZone.geometry` database column type.
+    - Polygonal inputs (`Polygon`, `MultiPolygon`, GeoJSON dict) are normalized directly and topology-repaired via `shapely.make_valid`.
+    - Point-based village locations are converted into spatial perimeters using a **geodesic circular buffer** projected through metric azimuthal equidistant projection (`pyproj.CRS("+proj=aeqd ...")`) based on the profile's configured `hazard_buffer_m` (500.0 m in Himalayan pilot). Arbitrary degree-based buffers are strictly forbidden.
+    - Ellipsoidal geodesic area is computed in square kilometers using WGS84 ellipsoid parameters (`pyproj.Geod(ellps="WGS84")`).
+  - **Overlapping Zones & Dissolution:**
+    - Continuous overlapping candidate perimeters are dissolved using graph-based spatial intersection and Shapely `unary_union`.
+    - Dissolved candidates retain full auditability and provenance without loss: contributing village IDs (`contributing_village_ids`), individual trigger audits (`trigger_audits`), and source provenance records (`source_village_provenance`).
+  - **Safety-Critical Missing Data Safety Rule:**
+    - Missing or unavailable required geophysical indicators (`slope_deg`, `historical_landslide_count`, or `active_subsidence`) are **never defaulted to safe or 0**.
+    - Strict return of `RedZoneStatus.INSUFFICIENT_DATA` with `is_candidate = False`, `geometry = None`, and explicit audit enumeration of `missing_indicators`.
+    - Input domain validation strictly rejects `NaN`, $\pm\infty$, negative slopes, slopes $> 90^\circ$, or negative landslide counts (`InvalidGeophysicalDataError`).
+  - **Governance Invariants:**
+    - Output represents `PROPOSED` / candidate zones only.
+    - Candidates strictly enforce `is_active = False`, `declared_by_officer_id = None`, and `declared_at = None`. Pydantic validators strictly raise errors if an algorithmic output attempts to set these officer-declaration fields.
+    - Statutory legal declaration belongs exclusively to the downstream officer review workflow (Chunk M6-08).
+  - **Review Finding Correction (DangerLevel Invariant & Dissolve Fallback Removal):**
+    - Corrected unapproved trigger-based `DangerLevel` assignments (`landslide-only -> CRITICAL`, `subsidence -> UNINHABITABLE`, `MONITOR -> VERY_HIGH`).
+    - Removed unapproved `or DangerLevel.UNINHABITABLE` fallback from `dissolve_overlapping_candidates` in `geometry.py`.
+    - Dissolve strictly adheres to resolution order: 1) explicit caller `default_danger_level`, 2) constituent proposed candidate `danger_level`, 3) raise explicit `RedZoneConfigError` if neither is provided.
+    - Engine strictly assigns profile-configured `default_danger_level` (from `profile.red_zone_thresholds.permanent_criteria.default_danger_level`) for `PROPOSED` candidates, and `danger_level = None` for non-candidate observations (`MONITOR`, `INSUFFICIENT_DATA`, `NOT_DEMARCATED`).
+- **Files Created:**
+  - `backend/app/core/risk/red_zone/__init__.py` (Package exports)
+  - `backend/app/core/risk/red_zone/contracts.py` (Data contracts, schemas, enums, Pydantic validators)
+  - `backend/app/core/risk/red_zone/errors.py` (Domain exception hierarchy)
+  - `backend/app/core/risk/red_zone/geometry.py` (GIS geodesic buffering, MultiPolygon normalization, dissolve engine)
+  - `backend/app/core/risk/red_zone/engine.py` (PermanentRedZoneEngine core candidate demarcation coordinator)
+  - `backend/app/core/risk/red_zone/README.md` (Technical documentation, Option 1 rules, governance boundaries)
+  - `backend/tests/test_permanent_red_zones.py` (43 unit and regression tests covering all 15 specification categories and danger-level invariants)
+- **Files Modified:**
+  - `backend/app/core/risk/__init__.py` (Re-exported M3-10 red zone engine and contracts)
+  - `PROJECT_STATE.md` (Updated registry status to AWAITING_REVIEW, recorded implementation details and test metrics)
+- **Files Removed:** None
+- **Commands Executed & Results:**
+  - `wsl -e docker exec rakshakgis-backend pytest tests/test_permanent_red_zones.py -v` -> Exited 0, 43 passed in 1.80s (100%)
+  - `wsl -e docker exec rakshakgis-backend pytest tests/test_risk_normalization.py tests/test_risk_computation.py tests/test_risk_classification.py tests/test_risk_explainability.py tests/test_vulnerability_scoring.py tests/test_profiles.py tests/test_permanent_red_zones.py -v` -> Exited 0, 161 passed in 2.69s (100% risk subsystem pass)
+  - `wsl -e docker exec rakshakgis-backend pytest tests -v` -> Exited 0, 327 passed, 4 warnings in 9.09s (100% full backend regression pass)
+- **Test Coverage Mapping (All 15 Required Categories + Invariants):**
+  1. Active subsidence triggers candidate: `test_active_subsidence_triggers_candidate`
+  2. Slope + historical landslide thresholds trigger candidate: `test_slope_and_historical_landslides_trigger_candidate`, `test_compound_danger_when_both_triggers_active`
+  3. Values exactly at thresholds: `test_values_exactly_at_thresholds_trigger_candidate`
+  4. Values below thresholds do not trigger: `test_values_below_thresholds_do_not_trigger`
+  5. CRITICAL risk corroborates candidate: `test_critical_risk_corroborates_candidate`, `test_critical_risk_with_subsidence`
+  6. SAFE/MODERATE + steep slope without subsidence becomes MONITOR: `test_safe_or_moderate_with_steep_slope_becomes_monitor`, `test_safe_or_moderate_with_active_subsidence_still_triggers_candidate`
+  7. Missing slope yields INSUFFICIENT_DATA: `test_missing_slope_yields_insufficient_data`, `test_strict_mode_raises_on_missing_slope`
+  8. Missing landslide count yields INSUFFICIENT_DATA: `test_missing_landslide_count_yields_insufficient_data`
+  9. Missing subsidence not converted to false/safe: `test_missing_subsidence_yields_insufficient_data`
+  10. Point input produces valid MultiPolygon via configured 500m buffer: `test_point_input_produces_valid_multipolygon`, `test_create_geodesic_buffer_directly`
+  11. Polygon/MultiPolygon normalized correctly: `test_polygon_input_normalized_to_multipolygon`, `test_normalize_to_multipolygon_handles_geojson_dict`
+  12. Overlapping candidates dissolve without losing provenance: `test_overlapping_candidates_dissolve_preserving_provenance`, `test_non_overlapping_candidates_remain_separate`
+  13. Output remains EPSG:4326 / SRID 4326: `test_geometry_srid_is_4326`
+  14. Candidate output enforces governance invariants: `test_governance_invariants_candidate_not_officer_declared`, `test_governance_validation_rejects_active_flag`, `test_governance_validation_rejects_officer_declaration`
+  15. Deterministic repeated inputs produce identical result: `test_strict_determinism_across_repeated_evaluations`
+  16. Multi-region profile threshold tests: `test_riverine_template_thresholds`, `test_coastal_template_thresholds`
+  17. Input validation & error cases: `test_invalid_negative_slope`, `test_invalid_slope_exceeding_90`, `test_invalid_negative_landslides`, `test_invalid_nan_slope`, `test_invalid_buffer_distance_raises`, `test_invalid_latitude_for_geodesic_buffer`
+  18. DangerLevel contract and configuration invariants: `test_no_unapproved_danger_level_mappings_across_triggers`, `test_danger_level_strictly_respects_custom_configured_profile`, `test_monitor_status_has_no_danger_level_assigned`, `test_dissolved_candidates_preserve_configured_danger_level_without_trigger_selection`, `test_dissolve_rejects_missing_danger_level_when_neither_source_available`, `test_dissolve_single_candidate_rejects_missing_danger_level_when_neither_source_available`, `test_dissolve_adheres_to_strict_resolution_order`
+- **Scope Boundaries & Invariants Preserved:**
+  - Status marked `AWAITING_REVIEW` (not marked VERIFIED or COMMITTED).
+  - Dynamic Red Zones (M3-11) and Relocation Priority (M3-12) left completely untouched.
+  - Officer legal declaration workflow remains in M6-08.
+  - Zero LLM usage; 100% deterministic algorithms.
+
+---
+
 ## Known Issues
 
 1. **Untracked Host Virtual Environment:** `backend/venv/` exists locally on Windows host and is properly ignored by `.gitignore`. The Docker service isolates this via an anonymous volume (`/app/venv`).
@@ -1093,12 +1180,14 @@ Chunks M3-08 through DOC-01 (except committed M3-01 through M3-07, M4-01 through
 - Chunk M3-08 established risk explainability & factor contribution engine (`app.core.risk.explainability`) evaluating 6-factor decompositions ($w_i \times v_i$), percentage shares, deterministic contribution rankings, primary risk driver identification, M3-07 classification integration, and human-readable audit narratives with strict missing-data safety invariants.
 - Chunk M5-01 established frontend application foundation (Next.js 14 App Router, React 18, TypeScript, Tailwind CSS), design system tokens aligning with backend Risk Bands and Relocation Priority Cutoffs, WCAG 2.1 AA accessible UI primitives (Button, Badge, RiskBadge, RelocationBadge, Card, MetricCard, Alert, StatusIndicator), command center operational layout shell (CommandHeader, Sidebar, StatusBar, AppLayout), and automated test suite (29 Vitest tests passing, 0 lint errors, production build verified).
 - Chunk M3-09 established vulnerability & exposure scoring engine (`app.core.risk.vulnerability`) implementing demographic exposure with vulnerable group weightings ($P_{\text{eff}} = P + (m_E-1)E + (m_C-1)C + (m_{Dis}-1)D_{is}$) benchmarked to regional capacity, 4-dimensional social vulnerability aggregation (social, economic, structural, access isolation), conversion to M3-06 `FactorInput` and M3-05 `NormalizedFactorResult`, and strict missing-data safety invariants. Formalized under project-approved Option 1.
-- Automated tests verified: 284 backend tests passed in container; 29 frontend tests passed in Vitest.
+- Chunk M3-10 established permanent red zone demarcation engine (`app.core.risk.red_zone`) implementing Option 1 formalization: geophysical trigger (`active_subsidence == True` or compound `slope >= min_slope` & `landslides >= min_landslides`), M3-07 CRITICAL risk corroboration and SAFE/MODERATE + steep slope MONITOR designation, geodesic circular buffering for point villages via configured `hazard_buffer_m`, overlap dissolution with full provenance preservation, safety-critical missing data policy (never assumed safe), and strict governance invariants (`is_active = False`, `declared_by_officer_id = None`).
+- Automated tests verified: 327 backend tests passed in container; 29 frontend tests passed in Vitest.
 
 ---
 
 ## Last Updated
 
-- **Timestamp:** 2026-09-05 23:50:00 IST
-- **Updated By:** M3 (Vulnerability & Exposure Scoring Engine Formalization & Commit)
-- **Status Summary:** Chunk M3-09 COMMITTED (Commit: feat(risk): formalize demographic and social vulnerability scoring); Chunk M3-08 COMMITTED; Chunk M5-01 VERIFIED; 22 focused M3-09 tests passed; 284 backend tests passed in container (zero regression); 29 frontend tests passed in Vitest. Next eligible M3 chunks: M3-10 and M3-12.
+- **Timestamp:** 2026-09-06 00:40:00 IST
+- **Updated By:** M3 (Permanent Red Zone Demarcation Formalization & Commit — Chunk M3-10)
+- **Status Summary:** Chunk M3-10 COMMITTED (Commit: feat(risk): implement permanent red zone demarcation); Chunk M3-09 COMMITTED; Chunk M3-08 COMMITTED; Chunk M5-01 VERIFIED; 43 focused M3-10 tests passed; 327 total backend regression tests verified passing in container (100% clean); 29 frontend tests passed in Vitest. Next eligible M3 chunks: M3-11 and M3-12.
+

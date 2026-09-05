@@ -72,6 +72,25 @@ from app.core.risk.vulnerability import (
     VulnerabilityInput,
     VulnerabilityScoringError,
 )
+from app.core.risk.red_zone import (
+    DangerLevel,
+    GeophysicalObservationInput,
+    InsufficientGeophysicalDataError,
+    InvalidGeophysicalDataError,
+    PermanentRedZoneCandidate,
+    PermanentRedZoneEngine,
+    PermanentRedZoneExplainability,
+    RedZoneConfigError,
+    RedZoneError,
+    RedZoneStatus,
+    RedZoneType,
+    SpatialGeometryError,
+    TriggerAudit,
+    calculate_geodesic_area_sq_km,
+    create_geodesic_buffer,
+    dissolve_overlapping_candidates,
+    normalize_to_multipolygon,
+)
 
 
 __all__ = [
@@ -141,5 +160,24 @@ __all__ = [
     "VulnerabilityExposureEngine",
     "VulnerabilityInput",
     "VulnerabilityScoringError",
+    # M3-10 Permanent Red Zone Demarcation
+    "PermanentRedZoneEngine",
+    "RedZoneStatus",
+    "RedZoneType",
+    "DangerLevel",
+    "GeophysicalObservationInput",
+    "TriggerAudit",
+    "PermanentRedZoneExplainability",
+    "PermanentRedZoneCandidate",
+    "create_geodesic_buffer",
+    "normalize_to_multipolygon",
+    "calculate_geodesic_area_sq_km",
+    "dissolve_overlapping_candidates",
+    "RedZoneError",
+    "InvalidGeophysicalDataError",
+    "InsufficientGeophysicalDataError",
+    "SpatialGeometryError",
+    "RedZoneConfigError",
 ]
+
 
