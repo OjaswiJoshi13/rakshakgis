@@ -159,7 +159,7 @@ No chunk may transition to `IN_PROGRESS` until all its listed prerequisite depen
 | **M4-02** | Relocation | Multi-Criteria Site Suitability Engine | M4 | M4-01, M3-06 | **COMMITTED** |
 | **M4-03** | Relocation | Carrying Capacity & Infrastructure Sizing | M4 | M4-02 | **COMMITTED** |
 | **M4-04** | Relocation | Relocation Matching & Assignment Engine | M4 | M3-12, M4-03 | **COMMITTED** |
-| **M4-05** | Relocation | Evacuation & Access Routing Engine | M4 | M4-04 | **BLOCKED** |
+| **M4-05** | Relocation | Evacuation & Access Routing Engine | M4 | M4-04 | **AWAITING_REVIEW** |
 | **M4-06** | Relocation | Scenario Simulator Integration Backend | M4 | M4-04, M3-11 | **BLOCKED** |
 | **M5-01** | Frontend | Frontend Foundation & Design System | M5 | M1-01 | **VERIFIED** |
 | **M5-02** | Frontend | Authentication UI & Session Handling | M5 | M5-01, M2-05 | **BLOCKED** |
@@ -187,15 +187,15 @@ No chunk may transition to `IN_PROGRESS` until all its listed prerequisite depen
 
 ## Current Work
 
-- **Active Chunk:** None (Chunk M4-04 committed)
-- **Next Eligible Chunks:** Chunk M4-05: Evacuation & Access Routing Engine (eligible; M4-04 committed); Chunk M5-02: Authentication UI & Session Handling (once M5-01 committed); Chunk M5-03: API Client & State Management Setup (once M5-01 committed); Chunk M6-06: Data Sources & Freshness Monitoring UI (once M6-01 committed; M3-13 committed)
-- **Status:** Chunk M4-04 COMMITTED (Commit: `b4e984ebc6a567e149881079d36c2580525ab72f`). 28 focused M4-04 unit and API tests passing; 50 M4 regression tests passing; 459 full backend regression tests passing (100% clean).
+- **Active Chunk:** Chunk M4-05: Evacuation & Access Routing Engine (Status: AWAITING_REVIEW)
+- **Next Eligible Chunks:** Chunk M4-06: Scenario Simulator Integration Backend (once M4-05 committed); Chunk M5-02: Authentication UI & Session Handling (once M5-01 committed); Chunk M5-03: API Client & State Management Setup (once M5-01 committed); Chunk M6-06: Data Sources & Freshness Monitoring UI (once M6-01 committed; M3-13 committed)
+- **Status:** Chunk M4-05 IMPLEMENTED / AWAITING_REVIEW. 35 focused M4-05 unit and API tests passing; 78 M4 regression tests passing; 494 full backend regression tests passing (100% clean).
 
 ---
 
 ## Blocked Work
 
-Chunks M4-05 through DOC-01 (except committed M3-01 through M3-13, M4-01 through M4-04, and M5-01 which is VERIFIED) remain in `BLOCKED` status awaiting completion, independent verification, and commit of their respective prerequisites.
+Chunk M4-05 is IMPLEMENTED and AWAITING_REVIEW. Chunks M4-06 through DOC-01 (except committed M3-01 through M3-13, M4-01 through M4-04, and M5-01 which is VERIFIED) remain in `BLOCKED` status awaiting completion, independent verification, and commit of their respective prerequisites.
 
 ---
 
@@ -1333,6 +1333,42 @@ Chunks M4-05 through DOC-01 (except committed M3-01 through M3-13, M4-01 through
 
 ---
 
+## Chunk M4-05 Implementation Record
+
+- **Status:** `AWAITING_REVIEW`
+- **Scope:** Evacuation & Access Routing Engine (decision-support routing subsystem between village origins and assigned candidate relocation sites)
+- **Files Created:**
+  - `backend/app/core/relocation/routing/__init__.py` (Subpackage exports: `EvacuationRoutingEngine`, `HazardAwareRouteEvaluator`, `BaseRoadNetworkProvider`, `SyntheticHimalayanRoadProvider`, `RoadNetwork`, contracts, errors)
+  - `backend/app/core/relocation/routing/contracts.py` (Domain models: `RouteStatus`, `SegmentHazardStatus`, `RouteType`, `HazardExposureDetail`, `RouteSegment`, `RouteExplainability`, `RouteResult`, `EvacuationRoutingResult`, `RouteQuery`)
+  - `backend/app/core/relocation/routing/errors.py` (Exception hierarchy: `RoutingError`, `InvalidRouteInputError`, `InsufficientRoutingDataError`, `NoFeasibleRouteError`, `RouteBlockedError`)
+  - `backend/app/core/relocation/routing/network.py` (Spatial network graph: `RoadNode`, `RoadSegmentEdge`, `RoadNetwork` with deterministic adjacency and Haversine snapping, `BaseRoadNetworkProvider`, `SyntheticHimalayanRoadProvider` featuring Valley Highway NH-7 corridor and Upper Ridge Bypass)
+  - `backend/app/core/relocation/routing/hazards.py` (`HazardAwareRouteEvaluator`: dynamic buffer proximity, severity-based penalty multipliers, hard cut-off blockage detection for critical highway obstructions, and missing-hazard data safety tracking)
+  - `backend/app/core/relocation/routing/engine.py` (`EvacuationRoutingEngine`: deterministic Dijkstra shortest-path with exact tuple tie-breaking `(round(cost, 6), hop_count, str(node_id))`, hard blocked segment omission, edge-penalty diversion for distinct alternative route discovery, continuous LineString coordinate assembly, and comprehensive explainability generation)
+  - `backend/app/core/relocation/routing/README.md` (Subsystem documentation: architecture, cost formulations, hazard penalties, tie-breaking, missing data policy, explainability contract, demo data, and future OSM/routing provider replacement)
+  - `backend/app/schemas/routing.py` (Pydantic schemas: `GeoJSONLineString`, `RouteGenerateRequest`, `RouteCreate`, `RouteRead`)
+  - `backend/app/api/v1/routing.py` (FastAPI router: `POST /generate` pure calculation with zero DB mutation, `POST /` explicit persistence for `ADMIN`/`DISTRICT_OFFICER`, `GET /` list with filtering & pagination, `GET /{id}` retrieval)
+  - `backend/tests/test_m4_05_routing.py` (35 automated tests covering validation, basic routing, hazard avoidance, missing data invariants, alternative routes, M4-04 integration, 50-run determinism, and API endpoints)
+- **Files Modified:**
+  - `backend/app/api/routes.py` (Registered `routing_router` under `/routes` prefix)
+  - `PROJECT_STATE.md` (Updated Chunk M4-05 status to `AWAITING_REVIEW`, added Implementation Record, and refreshed test metrics)
+- **Files Removed:** None
+- **Database / Migration Changes:** None (Reused existing `routes` table created in initial migration M2-03)
+- **Commands Executed & Results:**
+  - `docker exec rakshakgis-backend pytest tests/test_m4_05_routing.py -v` -> Exited 0, 35 passed, 3 warnings in 4.49s (100%)
+  - `docker exec rakshakgis-backend pytest tests/test_m4_04_matching.py tests/test_m4_03_capacity.py tests/test_site_suitability.py tests/test_sites.py -v` -> Exited 0, 78 passed, 3 warnings in 7.27s (100% M4 regression pass)
+  - `docker exec rakshakgis-backend pytest tests -v` -> Exited 0, 494 passed, 5 warnings in 46.17s (100% full backend regression pass)
+  - `git diff --check` -> Exited 0 (Clean)
+- **Scope Boundaries & Invariants Preserved:**
+  - Decision-support tool only; not an autonomous evacuation dispatcher or statutory evacuation order.
+  - Hard safety constraint: strictly omit `BLOCKED` hazard road segments from the primary safe route.
+  - Dynamic hazard penalties for caution/hazardous segments (`PENALIZED`).
+  - Strict missing-data safety: "Unknown is NOT safe" (missing network -> `INSUFFICIENT_DATA`, missing speed -> `estimated_time_minutes = None`, missing hazard data tracked in explainability uncertainty notes).
+  - Deterministic tie-breaking: `(round(cost, 6), segment_count, str(node_id))` across graph traversal.
+  - Alternative route generation via deterministic edge-penalty diversion; report `NO_FEASIBLE_ALTERNATIVE` if only a single physical corridor exists or alternatives are blocked.
+  - Pure calculation vs persistence boundary: `POST /api/v1/routes/generate` never mutates the database.
+
+---
+
 ## Known Issues
 
 1. **Untracked Host Virtual Environment:** `backend/venv/` exists locally on Windows host and is properly ignored by `.gitignore`. The Docker service isolates this via an anonymous volume (`/app/venv`).
@@ -1370,14 +1406,13 @@ Chunks M4-05 through DOC-01 (except committed M3-01 through M3-13, M4-01 through
 - Chunk M3-12 established relocation priority scoring engine (`app.core.risk.relocation_priority.engine`) implementing 5-factor priority formula $0.40R + 0.25E + 0.20V + 0.10H + 0.05A$ normalized to $[0.0, 100.0]$, profile-driven weights and band cutoffs (IMMEDIATE, SHORT-TERM, MEDIUM-TERM, MONITOR), full explainability factor breakdown with percentage contributions, upstream result envelope consumption (`CompositeRiskResult`, `DemographicExposureResult`, `SocialVulnerabilityResult`), strict missing data safety semantics (`INSUFFICIENT_DATA`), and strict governance invariants (`is_automatic_evacuation = False`, analytical proposal only).
 - Chunk M3-13 established data source freshness & telemetry backend (`app.core.telemetry`) providing deterministic 5-state freshness evaluation (`FRESH`, `STALE`, `UNAVAILABLE`, `CLOCK_SKEW`, `UNKNOWN`), category-specific default freshness thresholds (Rainfall 1h, Flood 1h, Landslide 24h, Sensors 1h, Population 7d, Fallback 24h) and custom overrides, provider health integration with M3-03 `BaseDataProvider` and `ProviderRegistry`, automatic synchronization to PostgreSQL `DataSource` and `DataIngestionRun` tables, secret scrubbing from diagnostic logs, and REST API endpoints under `/api/v1/telemetry`.
 - Chunk M4-04 established relocation matching & assignment engine (`app.core.relocation.matching`) implementing deterministic greedy village-to-site matching with descending priority processing, dynamic carrying capacity reservation across sequential assignments, M4-02 hard safety constraint gating, M4-03 weakest-link capacity enforcement, distance/suitability ranking, rejection audits, and REST API endpoints under `/api/v1/relocation` (`POST /match`, `POST /assignments`, `POST /assignments/batch`, `GET /assignments`, `GET /assignments/{id}`).
-- Automated tests verified: 459 backend tests passed in container (100% clean); 29 frontend tests passed in Vitest.
+- Chunk M4-05 established evacuation & access routing engine (`app.core.relocation.routing`) implementing deterministic Dijkstra routing with exact tuple tie-breaking, hard safety blockage omission for cut-off road corridors, dynamic hazard proximity penalties, continuous LineString coordinate assembly, edge-penalty diversion for distinct alternative route discovery, explainability synthesis, and REST API endpoints under `/api/v1/routes` (`POST /generate` pure evaluation with zero DB mutations, `POST /` explicit persistence, `GET /` filtering & pagination, `GET /{id}`).
+- Automated tests verified: 494 backend tests passed in container (100% clean); 29 frontend tests passed in Vitest.
 
 ---
 
 ## Last Updated
 
-- **Timestamp:** 2026-09-06 02:25:00 IST
-- **Updated By:** M4 (Relocation Matching & Assignment Engine — Chunk M4-04 State Update)
-- **Status Summary:** Chunk M4-04 COMMITTED; Chunk M4-03 COMMITTED; Chunk M4-02 COMMITTED; Chunk M4-01 COMMITTED; Chunk M3-13 COMMITTED; Chunk M3-12 COMMITTED; Chunk M3-11 COMMITTED; Chunk M3-10 COMMITTED; Chunk M3-09 COMMITTED; Chunk M3-08 COMMITTED; Chunk M5-01 VERIFIED; 28 focused M4-04 tests passed; 459 total backend regression tests verified passing in container (100% clean); 29 frontend tests passed in Vitest. Next eligible chunks: M4-05 (Relocation Routing), M5-02, M5-03, M6-06.
-
-
+- **Timestamp:** 2026-09-06 02:45:00 IST
+- **Updated By:** M4 (Evacuation & Access Routing Engine — Chunk M4-05 Implementation Pass)
+- **Status Summary:** Chunk M4-05 IMPLEMENTED / AWAITING_REVIEW; Chunk M4-04 COMMITTED; Chunk M4-03 COMMITTED; Chunk M4-02 COMMITTED; Chunk M4-01 COMMITTED; Chunk M3-13 COMMITTED; Chunk M3-12 COMMITTED; Chunk M3-11 COMMITTED; Chunk M3-10 COMMITTED; Chunk M3-09 COMMITTED; Chunk M3-08 COMMITTED; Chunk M5-01 VERIFIED; 35 focused M4-05 tests passed; 78 M4 regression tests passed; 494 total backend regression tests verified passing in container (100% clean); 29 frontend tests passed in Vitest. Next eligible chunk: M4-06 (Scenario Simulator) pending M4-05 review and commit.
