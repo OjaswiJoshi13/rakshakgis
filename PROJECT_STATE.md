@@ -150,7 +150,7 @@ No chunk may transition to `IN_PROGRESS` until all its listed prerequisite depen
 | **M3-06** | Risk/GIS | Multi-Hazard Risk Computation Engine | M3 | M3-05 | **COMMITTED** |
 | **M3-07** | Risk/GIS | Risk Classification & Grading | M3 | M3-06 | **COMMITTED** |
 | **M3-08** | Risk/GIS | Risk Explainability & Factor Contribution | M3 | M3-07 | **COMMITTED** |
-| **M3-09** | Risk/GIS | Vulnerability & Exposure Scoring Engine | M3 | M3-06 | **BLOCKED** |
+| **M3-09** | Risk/GIS | Vulnerability & Exposure Scoring Engine | M3 | M3-06 | **COMMITTED** |
 | **M3-10** | Risk/GIS | Permanent Red Zones Demarcation | M3 | M3-07 | **BLOCKED** |
 | **M3-11** | Risk/GIS | Dynamic Red Zones & Threshold Triggers | M3 | M3-10 | **BLOCKED** |
 | **M3-12** | Risk/GIS | Relocation Priority Scoring Backend | M3 | M3-08, M3-09 | **BLOCKED** |
@@ -187,9 +187,9 @@ No chunk may transition to `IN_PROGRESS` until all its listed prerequisite depen
 
 ## Current Work
 
-- **Active Chunk:** None
-- **Next Eligible Chunks:** M3-09 (Vulnerability & Exposure Scoring Engine); M5-02 (Authentication UI & Session Handling — once M5-01 committed); M5-03 (API Client & State Management Setup — once M5-01 committed)
-- **Status:** Chunk M3-08 COMMITTED (Commit `80a34d4`); 28 focused tests passed; 262 total backend regression tests verified passing in container. Chunk M4-03 COMMITTED. Note: Chunk M4-04 remains BLOCKED awaiting prerequisite M3-12 (which depends on M3-08 and M3-09). Chunk M5-01 VERIFIED by independent review (29/29 frontend tests passed, Next.js build passed, 262/262 backend tests passed with zero regression); ready to commit.
+- **Active Chunk:** None (Chunk M3-09 COMMITTED)
+- **Next Eligible Chunks:** M3-10 (Permanent Red Zones Demarcation — prerequisite M3-07 committed); M3-12 (Relocation Priority Scoring Backend — prerequisites M3-08 and M3-09 committed); M5-02 (Authentication UI & Session Handling — once M5-01 committed); M5-03 (API Client & State Management Setup — once M5-01 committed)
+- **Status:** Chunk M3-09 COMMITTED; Chunk M3-08 COMMITTED (Commit `80a34d4`); Chunk M4-03 COMMITTED; Chunk M5-01 VERIFIED by independent review (29/29 frontend tests passed, Next.js build passed); ready to commit. 22 focused M3-09 tests passed; 284 total backend regression tests verified passing in container. Note: Chunk M4-04 remains BLOCKED awaiting prerequisite M3-12.
 
 ---
 
@@ -217,6 +217,7 @@ Chunks M3-08 through DOC-01 (except committed M3-01 through M3-07, M4-01 through
 - M3-06: Multi-Hazard Risk Computation Engine — COMMITTED (Commit: `feat(m3): add multi-hazard risk computation engine`).
 - M3-07: Risk Classification & Grading — COMMITTED (Commit: `feat(m3): add risk classification and grading`).
 - M3-08: Risk Explainability & Factor Contribution — COMMITTED (Commit: `80a34d4`).
+- M3-09: Vulnerability & Exposure Scoring Engine — COMMITTED (Commit: `feat(risk): formalize demographic and social vulnerability scoring`).
 - M4-01: Candidate Relocation Sites Backend — COMMITTED (Commit: `5c100603b77e45a47a8c6420f405819166e58609`).
 - M4-02: Multi-Criteria Site Suitability Engine — COMMITTED (Commit: `feat(m4): add site suitability engine`).
 - M4-03: Carrying Capacity & Infrastructure Sizing — COMMITTED (Commit: `3c0d37a7b8e19cbfcf16f0bcf82c813587b1c3e3`).
@@ -990,6 +991,76 @@ Chunks M3-08 through DOC-01 (except committed M3-01 through M3-07, M4-01 through
 
 ---
 
+## Chunk M3-09 Implementation Record
+
+- **Status:** `COMMITTED`
+- **Commit:** `feat(risk): formalize demographic and social vulnerability scoring`
+- **Scope:** Vulnerability & Exposure Scoring Engine
+- **Lifecycle:** IMPLEMENTED -> VERIFIED -> COMMITTED
+- **Summary:**
+  - Implemented and formalized the Vulnerability & Exposure Scoring Engine for Member 3 (Risk / GIS / Data) per project lead approval (**Option 1 — Accept with Formalization**).
+  - Produces normalized $[0.0, 100.0]$ factor scores for Factor $D$ (Demographic Exposure, mapped to `RiskFactorType.INFRASTRUCTURE_VULNERABILITY`, symbol `"D"`, weight 0.10) and Factor $V$ (Social Vulnerability, `RiskFactorType.SOCIAL_VULNERABILITY`, symbol `"V"`, weight 0.10).
+  - **Factor $D$ — Demographic Exposure Formalized:**
+    ```text
+    P_eff = P + (m_E - 1)E + (m_C - 1)C + (m_Dis - 1)D_is
+
+    Score_D = min(100.0, ((P_eff - P_min) / (P_benchmark - P_min)) * 100.0)
+    ```
+    - $P_{\min} = 0.0$
+    - Himalayan profile multipliers: elderly $m_E = 1.25$, children $m_C = 1.20$, disabled $m_{\text{Dis}} = 1.50$, loaded dynamically from `RegionProfile.vulnerability_parameters.demographic_factors`.
+    - Population benchmark parameter $P_{\text{benchmark}}$ is a configurable parameter via `DemographicExposureConfig(benchmark_population=...)`, with default $P_{\text{benchmark}} = 1000.0$ for the Himalayan pilot.
+    - Zero-population safety rule: zero population strictly produces $D = 0.0$ (`Score_D = 0.0`) without division-by-zero.
+    - Output is strictly bounded to $[0.0, 100.0]$ with explicit clamping metadata.
+    - Contract Naming: Factor D retains `RiskFactorType.INFRASTRUCTURE_VULNERABILITY` (symbol `"D"`, weight 0.10) per explicit project lead decision to preserve full backwards compatibility with committed M3-06 MultiHazardRiskEngine and M3-08 Explainability contracts.
+  - **Factor $V$ — Social Vulnerability Formalized:**
+    ```text
+    Score_V = (w_soc * I_soc + w_econ * I_econ + w_struct * I_struct + w_road * (1 - C_road)) * 100
+    ```
+    - Uses four committed indices from `VulnerabilityProfile`: social vulnerability ($I_{\text{soc}}$), economic vulnerability ($I_{\text{econ}}$), structural fragility ($I_{\text{struct}}$), and road connectivity ($C_{\text{road}}$).
+    - Road vulnerability is formally defined as access isolation: $1.0 - C_{\text{road}}$.
+    - Component weights loaded from active regional profile, with Himalayan pilot default $0.25$ each ($w_{\text{soc}}=0.25, w_{\text{econ}}=0.25, w_{\text{struct}}=0.25, w_{\text{road}}=0.25$), summing strictly to 1.0 within numerical tolerance ($10^{-4}$).
+    - Output is strictly bounded to $[0.0, 100.0]$.
+    - Indicator scope: strictly uses committed indicators; no BPL, literacy, marginal-worker, or agricultural-dependence indicators are used.
+  - **Safety-Critical Missing Data & Determinism Policy:**
+    - Missing/unavailable required demographic or vulnerability data strictly remains unavailable (`ScoringStatus.UNAVAILABLE` or `ScoringStatus.INSUFFICIENT_DATA` with `normalized_value=None`, `is_available=False`); never defaults or coerced to zero risk.
+    - Deterministic execution guaranteed; identical inputs yield identical floating-point scores.
+- **Files Created:**
+  - `backend/app/core/risk/vulnerability/__init__.py` (Package exports)
+  - `backend/app/core/risk/vulnerability/contracts.py` (Domain models, configs, inputs, results, invariants)
+  - `backend/app/core/risk/vulnerability/errors.py` (Domain exception hierarchy)
+  - `backend/app/core/risk/vulnerability/engine.py` (Core scoring coordinator and algorithms)
+  - `backend/app/core/risk/vulnerability/README.md` (Technical documentation, math formulas, invariants)
+  - `backend/tests/test_vulnerability_scoring.py` (22 automated unit & integration tests)
+- **Files Modified:**
+  - `backend/app/core/risk/__init__.py` (Re-exported vulnerability engine symbols)
+  - `PROJECT_STATE.md` (Recorded Option 1 formalization, updated test counts and current work)
+- **Files Removed:** None
+- **Commands Executed & Results:**
+  - `wsl -e docker exec rakshakgis-backend pytest tests/test_vulnerability_scoring.py -v` -> Exited 0, 22 passed, 2 warnings in 1.07s (100%)
+  - `wsl -e docker exec rakshakgis-backend pytest tests/test_risk_normalization.py tests/test_risk_computation.py tests/test_risk_classification.py tests/test_risk_explainability.py tests/test_vulnerability_scoring.py -v` -> Exited 0, 95 passed, 2 warnings in 2.12s (100%)
+  - `wsl -e docker exec rakshakgis-backend pytest tests -v` -> Exited 0, 284 passed, 4 warnings in 8.08s (100% full backend regression pass)
+- **Test Coverage Mapping:**
+  - D calculation: `test_demographic_exposure_valid_standard`, `test_demographic_exposure_no_vulnerable_groups`
+  - Configurable D benchmark: `test_configurable_demographic_benchmark`
+  - D bounds: `test_demographic_exposure_maximum_clamping`
+  - Zero population: `test_demographic_exposure_zero_population`
+  - V weighted calculation: `test_social_vulnerability_valid_standard`, `test_regional_profile_customization`
+  - Road inversion: `test_road_connectivity_inversion_explicit`, `test_social_vulnerability_valid_standard`
+  - Missing-data safety: `test_demographic_exposure_missing_and_unavailable`, `test_social_vulnerability_missing_and_insufficient`, `test_missing_data_safety_chain_to_m3_06`
+  - M3-06 compatibility: `test_m3_06_d_contract_naming_preserved`, `test_integration_with_m3_06_risk_engine`
+  - Deterministic behavior: `test_deterministic_reproducibility`
+- **Scope Boundaries & Invariants Preserved:**
+  - Status marked `COMMITTED`.
+  - M3-10, M3-11, M3-12, M4 relocation, and frontend untouched.
+  - Missing/unavailable data never coerced to zero.
+  - Core numerical engine decoupled from LLMs and external network calls.
+- **Dependencies & Downstream Readiness:**
+  - Chunk M3-09 COMMITTED.
+  - Prerequisite for M3-12 (Relocation Priority Scoring Backend) is now satisfied alongside committed M3-08.
+  - Downstream chunks M3-10, M3-11, M3-12, M4, M5, M6 remain in their appropriate unstarted/blocked states.
+
+---
+
 ## Known Issues
 
 1. **Untracked Host Virtual Environment:** `backend/venv/` exists locally on Windows host and is properly ignored by `.gitignore`. The Docker service isolates this via an anonymous volume (`/app/venv`).
@@ -1021,12 +1092,13 @@ Chunks M3-08 through DOC-01 (except committed M3-01 through M3-07, M4-01 through
 - Chunk M3-07 established risk classification and grading engine (`app.core.risk.classification`) evaluating authoritative risk bands (SAFE, MODERATE, HIGH, VERY_HIGH, CRITICAL) with explicit boundary transitions, explainability metadata, and strict rejection of invalid scores.
 - Chunk M3-08 established risk explainability & factor contribution engine (`app.core.risk.explainability`) evaluating 6-factor decompositions ($w_i \times v_i$), percentage shares, deterministic contribution rankings, primary risk driver identification, M3-07 classification integration, and human-readable audit narratives with strict missing-data safety invariants.
 - Chunk M5-01 established frontend application foundation (Next.js 14 App Router, React 18, TypeScript, Tailwind CSS), design system tokens aligning with backend Risk Bands and Relocation Priority Cutoffs, WCAG 2.1 AA accessible UI primitives (Button, Badge, RiskBadge, RelocationBadge, Card, MetricCard, Alert, StatusIndicator), command center operational layout shell (CommandHeader, Sidebar, StatusBar, AppLayout), and automated test suite (29 Vitest tests passing, 0 lint errors, production build verified).
-- Automated tests verified: 262 backend tests passed in container; 29 frontend tests passed in Vitest.
+- Chunk M3-09 established vulnerability & exposure scoring engine (`app.core.risk.vulnerability`) implementing demographic exposure with vulnerable group weightings ($P_{\text{eff}} = P + (m_E-1)E + (m_C-1)C + (m_{Dis}-1)D_{is}$) benchmarked to regional capacity, 4-dimensional social vulnerability aggregation (social, economic, structural, access isolation), conversion to M3-06 `FactorInput` and M3-05 `NormalizedFactorResult`, and strict missing-data safety invariants. Formalized under project-approved Option 1.
+- Automated tests verified: 284 backend tests passed in container; 29 frontend tests passed in Vitest.
 
 ---
 
 ## Last Updated
 
-- **Timestamp:** 2026-09-05 23:00:00 IST
-- **Updated By:** M3 (Risk Explainability & Factor Contribution Status Bookkeeping)
-- **Status Summary:** Chunk M3-08 COMMITTED (Commit 80a34d4); Chunk M5-01 VERIFIED; 28 focused M3-08 tests passed; 262 backend tests passed in container; 29 frontend tests passed in Vitest. Chunk M3-09 is next eligible M3 chunk; M5-02/M5-03 eligible once M5-01 committed.
+- **Timestamp:** 2026-09-05 23:50:00 IST
+- **Updated By:** M3 (Vulnerability & Exposure Scoring Engine Formalization & Commit)
+- **Status Summary:** Chunk M3-09 COMMITTED (Commit: feat(risk): formalize demographic and social vulnerability scoring); Chunk M3-08 COMMITTED; Chunk M5-01 VERIFIED; 22 focused M3-09 tests passed; 284 backend tests passed in container (zero regression); 29 frontend tests passed in Vitest. Next eligible M3 chunks: M3-10 and M3-12.

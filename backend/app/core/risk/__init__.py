@@ -54,6 +54,25 @@ from app.core.risk.explainability import (
     RiskExplainabilityError,
     UncomputableExplanationError,
 )
+from app.core.risk.vulnerability import (
+    DemographicExposureConfig,
+    DemographicExposureExplainability,
+    DemographicExposureResult,
+    DemographicInput,
+    InsufficientVulnerabilityDataError,
+    InvalidDemographicDataError,
+    InvalidVulnerabilityDataError,
+    ScoringStatus,
+    SocialVulnerabilityConfig,
+    SocialVulnerabilityExplainability,
+    SocialVulnerabilityResult,
+    VillageExposureVulnerabilityResult,
+    VulnerabilityConfigError,
+    VulnerabilityExposureEngine,
+    VulnerabilityInput,
+    VulnerabilityScoringError,
+)
+
 
 __all__ = [
     # M3-05 Normalization
@@ -105,4 +124,22 @@ __all__ = [
     "RiskExplainabilityEngine",
     "RiskExplainabilityError",
     "UncomputableExplanationError",
+    # M3-09 Vulnerability & Exposure
+    "DemographicExposureConfig",
+    "DemographicExposureExplainability",
+    "DemographicExposureResult",
+    "DemographicInput",
+    "InsufficientVulnerabilityDataError",
+    "InvalidDemographicDataError",
+    "InvalidVulnerabilityDataError",
+    "ScoringStatus",
+    "SocialVulnerabilityConfig",
+    "SocialVulnerabilityExplainability",
+    "SocialVulnerabilityResult",
+    "VillageExposureVulnerabilityResult",
+    "VulnerabilityConfigError",
+    "VulnerabilityExposureEngine",
+    "VulnerabilityInput",
+    "VulnerabilityScoringError",
 ]
+
