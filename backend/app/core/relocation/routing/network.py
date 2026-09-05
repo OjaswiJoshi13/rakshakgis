@@ -355,3 +355,8 @@ class SyntheticHimalayanRoadProvider(BaseRoadNetworkProvider):
         )
 
         return net
+
+
+def get_default_road_network_provider() -> BaseRoadNetworkProvider:
+    """Return default registered road network provider for routing."""
+    return SyntheticHimalayanRoadProvider()

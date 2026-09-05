@@ -132,6 +132,7 @@ HIMALAYAN_PILOT_PROFILE = RegionProfile(
         min_seismic_intensity_mmi=3.0,
         max_seismic_intensity_mmi=9.0,
         max_road_blockage_percentage=100.0,
+        flood_prone_corridor_segments=["SEG-VALLEY-02"],
     ),
     uncertainty_notes=UncertaintyNotes(
         provisional_parameters=[

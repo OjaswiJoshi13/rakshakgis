@@ -305,6 +305,10 @@ class ScenarioBounds(ProfileBaseModel):
     min_seismic_intensity_mmi: float = Field(default=1.0, ge=1.0, le=12.0)
     max_seismic_intensity_mmi: float = Field(default=10.0, ge=1.0, le=12.0)
     max_road_blockage_percentage: float = Field(default=100.0, ge=0.0, le=100.0)
+    flood_prone_corridor_segments: List[str] = Field(
+        default_factory=list,
+        description="Region-specific road segment IDs vulnerable to flash flooding or valley inundation.",
+    )
 
 
 class UncertaintyNotes(ProfileBaseModel):

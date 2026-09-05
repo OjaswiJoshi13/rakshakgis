@@ -5,6 +5,7 @@ from fastapi import APIRouter
 from app.api.v1.auth import auth_router
 from app.api.v1.relocation import relocation_router
 from app.api.v1.routing import routing_router
+from app.api.v1.scenarios import scenarios_router
 from app.api.v1.sites import sites_router
 from app.api.v1.telemetry import telemetry_router
 from app.core.config import get_settings
@@ -24,6 +25,9 @@ api_router.include_router(relocation_router, prefix="/relocation", tags=["Reloca
 
 # Evacuation & Access Routing endpoints
 api_router.include_router(routing_router, prefix="/routes", tags=["Evacuation & Access Routing"])
+
+# Scenario Simulator endpoints
+api_router.include_router(scenarios_router, prefix="/scenarios", tags=["Scenario Simulator"])
 
 # Data Source Freshness & Telemetry endpoints
 api_router.include_router(telemetry_router, prefix="/telemetry", tags=["Data Source Telemetry"])

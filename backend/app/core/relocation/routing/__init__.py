@@ -30,6 +30,7 @@ from app.core.relocation.routing.network import (
     RoadNode,
     RoadSegmentEdge,
     SyntheticHimalayanRoadProvider,
+    get_default_road_network_provider,
     haversine_distance_km,
 )
 
@@ -37,6 +38,7 @@ __all__ = [
     "EvacuationRoutingEngine",
     "BaseRoadNetworkProvider",
     "SyntheticHimalayanRoadProvider",
+    "get_default_road_network_provider",
     "HazardAwareRouteEvaluator",
     "haversine_distance_km",
     "distance_point_to_linestring_m",

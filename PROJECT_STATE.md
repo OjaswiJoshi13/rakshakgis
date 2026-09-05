@@ -160,7 +160,7 @@ No chunk may transition to `IN_PROGRESS` until all its listed prerequisite depen
 | **M4-03** | Relocation | Carrying Capacity & Infrastructure Sizing | M4 | M4-02 | **COMMITTED** |
 | **M4-04** | Relocation | Relocation Matching & Assignment Engine | M4 | M3-12, M4-03 | **COMMITTED** |
 | **M4-05** | Relocation | Evacuation & Access Routing Engine | M4 | M4-04 | **COMMITTED** |
-| **M4-06** | Relocation | Scenario Simulator Integration Backend | M4 | M4-04, M3-11 | **BLOCKED** |
+| **M4-06** | Relocation | Scenario Simulator Integration Backend | M4 | M4-04, M3-11 | **COMMITTED** |
 | **M5-01** | Frontend | Frontend Foundation & Design System | M5 | M1-01 | **VERIFIED** |
 | **M5-02** | Frontend | Authentication UI & Session Handling | M5 | M5-01, M2-05 | **BLOCKED** |
 | **M5-03** | Frontend | API Client & State Management Setup | M5 | M5-01, M2-04 | **BLOCKED** |
@@ -187,15 +187,15 @@ No chunk may transition to `IN_PROGRESS` until all its listed prerequisite depen
 
 ## Current Work
 
-- **Active Chunk:** None (Chunk M4-05 committed)
-- **Next Eligible Chunks:** Chunk M4-06: Scenario Simulator Integration Backend (eligible; M4-04 and M4-05 committed, M3-11 committed); Chunk M5-02: Authentication UI & Session Handling (once M5-01 committed); Chunk M5-03: API Client & State Management Setup (once M5-01 committed); Chunk M6-06: Data Sources & Freshness Monitoring UI (once M6-01 committed; M3-13 committed)
-- **Status:** Chunk M4-05 COMMITTED (Commit: `93e62e6392e0903aefc034a9cd13d4ad18e0c1ec`). 35 focused M4-05 unit and API tests passing; 78 M4 regression tests passing; 494 full backend regression tests passing (100% clean).
+- **Active Chunk:** None (Chunk M4-06 committed; Milestone 4 complete)
+- **Next Eligible Chunks:** Chunk M5-02: Authentication UI & Session Handling (once M5-01 committed); Chunk M5-03: API Client & State Management Setup (once M5-01 committed); Chunk M6-01: Operations UI Shell & Navigation (once M5-01 committed); Chunk M6-04: Scenario Simulator UI (once M6-01 committed)
+- **Status:** Chunk M4-06 COMMITTED (Commit: `feat(m4): integrate scenario simulator pipeline`). 31 focused M4-06 unit, integration, and API tests passing (covering all 48 test cases); 113 M4 regression tests passing; 525 full backend regression tests passing (100% clean). `git diff --check` clean.
 
 ---
 
 ## Blocked Work
 
-Chunks M4-06 through DOC-01 (except committed M3-01 through M3-13, M4-01 through M4-05, and M5-01 which is VERIFIED) remain in `BLOCKED` status awaiting completion, independent verification, and commit of their respective prerequisites.
+Chunks M5-02 through DOC-01 (except committed M3-01 through M3-13, M4-01 through M4-06, and M5-01 which is VERIFIED) remain in `BLOCKED` status awaiting completion, independent verification, and commit of their respective prerequisites.
 
 ---
 
@@ -227,6 +227,7 @@ Chunks M4-06 through DOC-01 (except committed M3-01 through M3-13, M4-01 through
 - M4-03: Carrying Capacity & Infrastructure Sizing — COMMITTED (Commit: `3c0d37a7b8e19cbfcf16f0bcf82c813587b1c3e3`).
 - M4-04: Relocation Matching & Assignment Engine — COMMITTED (Commit: `b4e984ebc6a567e149881079d36c2580525ab72f`).
 - M4-05: Evacuation & Access Routing Engine — COMMITTED (Commit: `93e62e6392e0903aefc034a9cd13d4ad18e0c1ec` — `feat(m4): implement evacuation and access routing`).
+- M4-06: Scenario Simulator Integration Backend — COMMITTED (Commit: `feat(m4): integrate scenario simulator pipeline`).
 
 ---
 
@@ -1370,6 +1371,44 @@ Chunks M4-06 through DOC-01 (except committed M3-01 through M3-13, M4-01 through
 
 ---
 
+## Chunk M4-06 Implementation Record
+
+- **Status:** `COMMITTED` (Commit: `feat(m4): integrate scenario simulator pipeline`)
+- **Scope:** Scenario Simulator Integration Backend (orchestrates 7 existing domain engines into a deterministic what-if simulation pipeline with baseline isolation, explicit input modifications, before-vs-after comparisons, explainability, and analytical decision-support provenance)
+- **Files Created:**
+  - `backend/app/core/scenarios/__init__.py` (Subpackage re-exports: `ScenarioSimulatorEngine`, `ScenarioComparator`, contracts, errors, definitions, inputs)
+  - `backend/app/core/scenarios/contracts.py` (Domain models: `ScenarioType`, `ScenarioRunStatus`, `ScenarioParameters`, `VillageSimulationInput`, `SiteSimulationInput`, stage results for all 7 engines, `ScenarioComparison`, `ScenarioSimulationOutput`)
+  - `backend/app/core/scenarios/errors.py` (Exception hierarchy: `ScenarioError`, `InvalidScenarioParameterError`, `UnknownScenarioTypeError`, `ScenarioExecutionError`, `InsufficientScenarioDataError`)
+  - `backend/app/core/scenarios/definitions.py` (Canonical scenario definitions and default parameter registry: `NORMAL`, `EXTREME_RAINFALL` with 1.40x multiplier, `FLASH_FLOOD` with +35 flood exposure and region-agnostic parameters, `CAPACITY_CRISIS` with 50% capacity reduction)
+  - `backend/app/core/scenarios/inputs.py` (Isolated in-memory input modification functions: `apply_scenario_modifications` deep copying objects with zero baseline mutation)
+  - `backend/app/core/scenarios/comparison.py` (`ScenarioComparator`: exact numeric deltas for risk, red zones, relocation priority, carrying capacity, matching reallocations/unassigned, and routing diversions)
+  - `backend/app/core/scenarios/engine.py` (`ScenarioSimulatorEngine`: orchestrates all 7 domain engines across baseline and scenario pipelines, with stage failure trapping and provenance marking)
+  - `backend/app/core/scenarios/README.md` (Subsystem documentation: architecture, execution pipeline, canonical scenarios, input modifications, comparison semantics, provenance, zero duplicate logic, and determinism)
+  - `backend/app/schemas/scenarios.py` (Pydantic API schemas: `ScenarioDefinitionRead`, `ScenarioCreate`, `ScenarioRead`, `ScenarioRunRequest`, `ScenarioRunRecordRead`)
+  - `backend/app/api/v1/scenarios.py` (FastAPI router: `GET /` list scenarios, `POST /` create custom scenario for `ADMIN`/`DISTRICT_OFFICER`, `GET /{id}`, `POST /run` pure simulation with optional persistence, `GET /runs/{id}`)
+  - `backend/tests/test_m4_06_scenarios.py` (31 automated unit, integration, and API tests covering all 48 test cases including 20-run determinism, baseline isolation, real engine propagation, error handling, region-agnostic checks, and synthetic Himalayan pilot demonstration)
+- **Files Modified:**
+  - `backend/app/api/routes.py` (Registered `scenarios_router` under `/scenarios` prefix)
+  - `backend/app/core/profiles/models.py` (Added `flood_prone_corridor_segments` to `ScenarioBounds`)
+  - `backend/app/core/profiles/himalayan.py` (Configured `flood_prone_corridor_segments=["SEG-VALLEY-02"]` on `HIMALAYAN_PILOT_PROFILE`)
+  - `backend/app/core/relocation/routing/network.py` (Added `get_default_road_network_provider()`)
+  - `backend/app/core/relocation/routing/__init__.py` (Exported `get_default_road_network_provider`)
+  - `PROJECT_STATE.md` (Updated Chunk M4-06 status to `COMMITTED`, added Implementation Record, and refreshed test metrics)
+- **Files Removed:** None
+- **Database / Migration Changes:** None (Reused existing `scenarios` and `scenario_runs` tables created in initial migration M2-03)
+- **Commands Executed & Results:**
+  - `docker exec rakshakgis-backend pytest tests/test_m4_06_scenarios.py -v` -> Exited 0, 31 passed, 3 warnings in 7.96s (100%)
+  - `docker exec rakshakgis-backend pytest tests/test_m4_05_routing.py tests/test_m4_04_matching.py tests/test_m4_03_capacity.py tests/test_site_suitability.py tests/test_sites.py -v` -> Exited 0, 113 passed, 4 warnings in 7.25s (100% M4 regression pass)
+  - `docker exec rakshakgis-backend pytest tests -v` -> Exited 0, 525 passed, 6 warnings in 29.02s (100% full backend regression pass)
+  - `git diff --check` -> Exited 0 (Clean)
+- **Scope Boundaries & Invariants Preserved:**
+  - Zero duplicate numerical logic: orchestrates existing M3/M4 domain services (`MultiHazardRiskEngine`, `RiskClassificationEngine`, `DynamicRedZoneEngine`, `RelocationPriorityEngine`, `SiteSuitabilityEngine`, `CarryingCapacityEngine`, `RelocationMatchingEngine`, `EvacuationRoutingEngine`).
+  - Strict baseline isolation: in-memory deep copy of simulation inputs; zero silent mutation of database records (`villages`, `candidate_sites`, `relocation_assignments`, `routes`).
+  - Deterministic evaluation: zero random numbers, zero runtime clock inputs in formulas; verified by 20 repeated runs across core scenarios.
+  - Decision-support boundary: simulation outputs tagged with `SIMULATION` provenance and explicit governance notice; not official government forecasts or evacuation orders.
+
+---
+
 ## Known Issues
 
 1. **Untracked Host Virtual Environment:** `backend/venv/` exists locally on Windows host and is properly ignored by `.gitignore`. The Docker service isolates this via an anonymous volume (`/app/venv`).
@@ -1408,12 +1447,13 @@ Chunks M4-06 through DOC-01 (except committed M3-01 through M3-13, M4-01 through
 - Chunk M3-13 established data source freshness & telemetry backend (`app.core.telemetry`) providing deterministic 5-state freshness evaluation (`FRESH`, `STALE`, `UNAVAILABLE`, `CLOCK_SKEW`, `UNKNOWN`), category-specific default freshness thresholds (Rainfall 1h, Flood 1h, Landslide 24h, Sensors 1h, Population 7d, Fallback 24h) and custom overrides, provider health integration with M3-03 `BaseDataProvider` and `ProviderRegistry`, automatic synchronization to PostgreSQL `DataSource` and `DataIngestionRun` tables, secret scrubbing from diagnostic logs, and REST API endpoints under `/api/v1/telemetry`.
 - Chunk M4-04 established relocation matching & assignment engine (`app.core.relocation.matching`) implementing deterministic greedy village-to-site matching with descending priority processing, dynamic carrying capacity reservation across sequential assignments, M4-02 hard safety constraint gating, M4-03 weakest-link capacity enforcement, distance/suitability ranking, rejection audits, and REST API endpoints under `/api/v1/relocation` (`POST /match`, `POST /assignments`, `POST /assignments/batch`, `GET /assignments`, `GET /assignments/{id}`).
 - Chunk M4-05 established evacuation & access routing engine (`app.core.relocation.routing`) implementing deterministic Dijkstra routing with exact tuple tie-breaking, hard safety blockage omission for cut-off road corridors, dynamic hazard proximity penalties, continuous LineString coordinate assembly, edge-penalty diversion for distinct alternative route discovery, explainability synthesis, and REST API endpoints under `/api/v1/routes` (`POST /generate` pure evaluation with zero DB mutations, `POST /` explicit persistence, `GET /` filtering & pagination, `GET /{id}`).
-- Automated tests verified: 494 backend tests passed in container (100% clean); 29 frontend tests passed in Vitest.
+- Chunk M4-06 established scenario simulator integration backend (`app.core.scenarios`) orchestrating the 7 backend engines into an isolated what-if simulation pipeline supporting NORMAL, EXTREME_RAINFALL, FLASH_FLOOD, and CAPACITY_CRISIS with before-vs-after deltas, REST API endpoints under `/api/v1/scenarios` (`GET /`, `POST /`, `GET /{id}`, `POST /run`, `GET /runs/{id}`), and zero baseline mutation.
+- Automated tests verified: 525 backend tests passed in container (100% clean); 29 frontend tests passed in Vitest.
 
 ---
 
 ## Last Updated
 
-- **Timestamp:** 2026-09-06 02:48:00 IST
-- **Updated By:** M4 (Evacuation & Access Routing Engine — Chunk M4-05 Committed State Update)
-- **Status Summary:** Chunk M4-05 COMMITTED (Commit: `93e62e6`); Chunk M4-04 COMMITTED; Chunk M4-03 COMMITTED; Chunk M4-02 COMMITTED; Chunk M4-01 COMMITTED; Chunk M3-13 COMMITTED; Chunk M3-12 COMMITTED; Chunk M3-11 COMMITTED; Chunk M3-10 COMMITTED; Chunk M3-09 COMMITTED; Chunk M3-08 COMMITTED; Chunk M5-01 VERIFIED; 35 focused M4-05 tests passed; 78 M4 regression tests passed; 494 total backend regression tests verified passing in container (100% clean); 29 frontend tests passed in Vitest. Next eligible chunks: M4-06 (Scenario Simulator), M5-02, M5-03, M6-06.
+- **Timestamp:** 2026-09-06 03:45:00 IST
+- **Updated By:** M4 (Scenario Simulator Integration Backend — Chunk M4-06 Committed)
+- **Status Summary:** Chunk M4-06 COMMITTED; Chunk M4-05 COMMITTED; Chunk M4-04 COMMITTED; Chunk M4-03 COMMITTED; Chunk M4-02 COMMITTED; Chunk M4-01 COMMITTED; Chunk M3-13 COMMITTED; Chunk M3-12 COMMITTED; Chunk M3-11 COMMITTED; Chunk M3-10 COMMITTED; Chunk M3-09 COMMITTED; Chunk M3-08 COMMITTED; Chunk M5-01 VERIFIED; 31 focused M4-06 tests passed (48 test cases); 113 M4 regression tests passed; 525 total backend regression tests verified passing in container (100% clean); 29 frontend tests passed in Vitest. Next eligible chunks: M5-02, M5-03, M6-01, M6-04.
