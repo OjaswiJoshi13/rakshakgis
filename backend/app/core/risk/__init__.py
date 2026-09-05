@@ -43,6 +43,18 @@ from app.core.risk.normalization import (
     piecewise_threshold_normalize,
 )
 
+from app.core.risk.explainability import (
+    FACTOR_METADATA,
+    CompositeRiskExplanation,
+    FactorContributionDetail,
+    FactorRanking,
+    IncompatibleClassificationError,
+    RiskClassificationSummary,
+    RiskExplainabilityEngine,
+    RiskExplainabilityError,
+    UncomputableExplanationError,
+)
+
 __all__ = [
     # M3-05 Normalization
     "CategoricalSeverityPolicy",
@@ -83,4 +95,14 @@ __all__ = [
     "RiskClassificationExplainability",
     "RiskClassificationResult",
     "RiskScoreBandsConfig",
+    # M3-08 Explainability
+    "FACTOR_METADATA",
+    "CompositeRiskExplanation",
+    "FactorContributionDetail",
+    "FactorRanking",
+    "IncompatibleClassificationError",
+    "RiskClassificationSummary",
+    "RiskExplainabilityEngine",
+    "RiskExplainabilityError",
+    "UncomputableExplanationError",
 ]

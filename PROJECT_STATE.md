@@ -149,7 +149,7 @@ No chunk may transition to `IN_PROGRESS` until all its listed prerequisite depen
 | **M3-05** | Risk/GIS | Risk Normalization Engine | M3 | M3-04 | **COMMITTED** |
 | **M3-06** | Risk/GIS | Multi-Hazard Risk Computation Engine | M3 | M3-05 | **COMMITTED** |
 | **M3-07** | Risk/GIS | Risk Classification & Grading | M3 | M3-06 | **COMMITTED** |
-| **M3-08** | Risk/GIS | Risk Explainability & Factor Contribution | M3 | M3-07 | **BLOCKED** |
+| **M3-08** | Risk/GIS | Risk Explainability & Factor Contribution | M3 | M3-07 | **AWAITING_REVIEW** |
 | **M3-09** | Risk/GIS | Vulnerability & Exposure Scoring Engine | M3 | M3-06 | **BLOCKED** |
 | **M3-10** | Risk/GIS | Permanent Red Zones Demarcation | M3 | M3-07 | **BLOCKED** |
 | **M3-11** | Risk/GIS | Dynamic Red Zones & Threshold Triggers | M3 | M3-10 | **BLOCKED** |
@@ -187,9 +187,9 @@ No chunk may transition to `IN_PROGRESS` until all its listed prerequisite depen
 
 ## Current Work
 
-- **Active Chunk:** None
-- **Next Eligible Chunks:** M3-08 (Risk Explainability & Factor Contribution), M3-09 (Vulnerability & Exposure Scoring Engine)
-- **Status:** Chunk M4-03 COMMITTED; 18 focused tests passed; 234 total backend regression tests verified passing in container. Note: M4-04 remains BLOCKED awaiting completion and commit of prerequisite M3-12.
+- **Active Chunk:** M3-08 (Risk Explainability & Factor Contribution) — `AWAITING_REVIEW`
+- **Next Eligible Chunks:** M3-09 (Vulnerability & Exposure Scoring Engine)
+- **Status:** Chunk M3-08 implemented and in `AWAITING_REVIEW` status; 28 focused tests passed; 262 total backend regression tests verified passing in container. Chunk M4-03 COMMITTED. Chunk M4-04 remains BLOCKED awaiting prerequisite M3-12 (which depends on M3-08 and M3-09).
 
 ---
 
@@ -701,6 +701,60 @@ Chunks M3-08 through DOC-01 (except committed M3-01 through M3-07, M4-01 through
 
 ---
 
+## Chunk M3-08 Implementation Record
+
+- **Status:** `AWAITING_REVIEW`
+- **Scope:** Risk Explainability & Factor Contribution
+- **Scope Discipline:** Strictly limited to auditable decomposition and transparent explanation of an already-computed multi-hazard composite risk result ($0.30H + 0.20F + 0.15R + 0.15S + 0.10D + 0.10V$) and its integrated M3-07 risk classification. Zero risk formula alterations, zero secondary weight configurations, zero Red Zone demarcation (M3-10 / M3-11), zero relocation priority scoring (M3-12), zero demographic vulnerability scoring (M3-09), zero site suitability/routing (M4), zero live external APIs, zero database migrations, zero LLMs for risk computation or narrative generation.
+- **Factor Decomposition & Semantics:**
+  - **Six Authoritative Factors:** Hazard Severity ($H$, 0.30), Flood Exposure ($F$, 0.20), Rainfall Intensity ($R$, 0.15), Slope / Landslide Susceptibility ($S$, 0.15), Infrastructure Vulnerability ($D$, 0.10), Social Vulnerability ($V$, 0.10).
+  - **Individual Contributions:** $c_i = w_i \times v_i$ where $v_i \in [0.0, 100.0]$. Sum of contributions matches composite score within numerical tolerance ($10^{-4}$).
+  - **Contribution Percentage:** Proportional share $p_i = (c_i / \text{Risk}) \times 100\%$ for non-zero scores, summing to 100.0%.
+  - **Ranked Contributions & Dominant Driver:** Deterministic descending contribution ranking with canonical tie-breaking ($H \to F \to R \to S \to D \to V$). Identifies primary hazard/vulnerability driver.
+- **Safety-Critical Missing Data Policy:**
+  - `INSUFFICIENT_FACTORS` status from M3-06 strictly yields `is_computable=False`, `score=None`, `ranked_contributions=[]`, `dominant_factor=None`, and `classification=None`.
+  - Missing factors are explicitly enumerated in `missing_factors`.
+  - Narrative explanation highlights disaster safety protocol: unmonitored or unavailable factors are **never** coerced to zero risk.
+  - `INVALID_INPUT` (NaN, Inf, out of bounds) strictly yields `is_computable=False`, `score=None`, with explicit rejection audit trail.
+- **M3-07 Risk Classification Integration:**
+  - Accepts pre-computed `RiskClassificationResult` envelopes, validating mathematical consistency ($|\text{classification.score} - \text{composite.score}| < 10^{-4}$) and village ID alignment.
+  - Automatically runs `RiskClassificationEngine` when unclassified `CompositeRiskResult` is passed and classification is requested.
+  - Supports unclassified explanation (`classification=None`) when classification is omitted.
+  - Never recalculates risk bands or duplicates cutoff thresholds.
+- **Deterministic Narrative & Provenance:**
+  - Generates template-driven human-readable explanations synthesizing overall risk score, risk band, primary driver, full factor breakdown, and applied formula.
+  - Preserves regional configuration provenance (`RegionProfileRegistry`, `himalayan_pilot`).
+- **Explainability Modules (`app.core.risk.explainability`):**
+  - Exception Hierarchy (`errors.py`): `RiskExplainabilityError`, `UncomputableExplanationError`, `IncompatibleClassificationError`.
+  - Typed Contracts (`contracts.py`): `FACTOR_METADATA`, `FactorContributionDetail`, `FactorRanking`, `RiskClassificationSummary`, `CompositeRiskExplanation`.
+  - Explainability Engine (`engine.py`): `RiskExplainabilityEngine` coordinating decomposition, ranking, classification integration, narrative synthesis, and convenience `explain_computation()` pipeline.
+  - Package Exports (`__init__.py`): Re-exported under `app.core.risk` and `app.core.risk.explainability`.
+  - Technical Documentation (`README.md`): Architecture, formulas, factor semantics, missing data policy, classification integration, and boundary definitions.
+- **Files Created:**
+  - `backend/app/core/risk/explainability/__init__.py`
+  - `backend/app/core/risk/explainability/contracts.py`
+  - `backend/app/core/risk/explainability/engine.py`
+  - `backend/app/core/risk/explainability/errors.py`
+  - `backend/app/core/risk/explainability/README.md`
+  - `backend/tests/test_risk_explainability.py` (28 automated unit tests covering all mathematical boundaries, missing value safety, ranking, classification integration, determinism, provenance, and scope boundaries)
+- **Files Modified:**
+  - `backend/app/core/risk/__init__.py` (Re-exported M3-08 explainability classes)
+  - `PROJECT_STATE.md` (Updated M3-08 status to `AWAITING_REVIEW`, added implementation record, updated integration notes)
+- **Files Removed:** None.
+- **Automated Test Results:**
+  - Explainability suite command: `wsl -e docker exec rakshakgis-backend pytest tests/test_risk_explainability.py -v`
+  - Result: **28 passed, 0 failed, 2 warnings in 1.19s**
+  - Computation & Classification regression: `wsl -e docker exec rakshakgis-backend pytest tests/test_risk_computation.py tests/test_risk_classification.py -v`
+  - Result: **42 passed, 0 failed, 2 warnings in 1.37s**
+  - Full backend regression command: `wsl -e docker exec rakshakgis-backend pytest tests -v`
+  - Result: **262 passed, 0 failed, 4 warnings in 8.08s**
+- **Known Issues or Ambiguities / Limitations:**
+  - Demographic exposure and social vulnerability scoring engine is deferred to Chunk M3-09.
+  - Permanent and dynamic Red Zone demarcation is deferred to Chunks M3-10 and M3-11.
+  - Relocation priority scoring backend is deferred to Chunk M3-12 (requires M3-08 and M3-09).
+
+---
+
 ## Chunk M4-02 Implementation Record
 
 - **Status:** `COMMITTED`
@@ -878,12 +932,13 @@ Chunks M3-08 through DOC-01 (except committed M3-01 through M3-07, M4-01 through
 - Chunk M3-05 established risk normalization engine (`app.core.risk.normalization`) transforming heterogeneous hazard observations to comparable 0.0 - 100.0 factors with M3-01 profile thresholds, clamping tracking, explainability metadata, and safety-critical missing/unknown handling.
 - Chunk M3-06 established multi-hazard risk computation engine (`app.core.risk.computation`) implementing $Risk = 0.30H + 0.20F + 0.15R + 0.15S + 0.10D + 0.10V$, weighted explainability breakdown, strict $[0.0, 100.0]$ bounds, and safe missing-factor handling.
 - Chunk M3-07 established risk classification and grading engine (`app.core.risk.classification`) evaluating authoritative risk bands (SAFE, MODERATE, HIGH, VERY_HIGH, CRITICAL) with explicit boundary transitions, explainability metadata, and strict rejection of invalid scores.
-- Automated tests verified: 234 passed in container (Python 3.11).
+- Chunk M3-08 established risk explainability & factor contribution engine (`app.core.risk.explainability`) evaluating 6-factor decompositions ($w_i \times v_i$), percentage shares, deterministic contribution rankings, primary risk driver identification, M3-07 classification integration, and human-readable audit narratives with strict missing-data safety invariants.
+- Automated tests verified: 262 passed in container (Python 3.11).
 
 ---
 
 ## Last Updated
 
-- **Timestamp:** 2026-09-05 16:38:00 IST
-- **Updated By:** M4 (Carrying Capacity & Infrastructure Sizing Status Bookkeeping)
-- **Status Summary:** Chunk M4-03 COMMITTED; Chunk M4-04 remains BLOCKED awaiting prerequisite M3-12; Chunks M3-08 and M3-09 remain eligible independently.
+- **Timestamp:** 2026-09-05 17:18:00 IST
+- **Updated By:** M3 (Risk Explainability & Factor Contribution Implementation)
+- **Status Summary:** Chunk M3-08 IMPLEMENTED and in AWAITING_REVIEW status; 28 focused tests passed; 262 total backend regression tests verified passing in container.
