@@ -158,7 +158,7 @@ No chunk may transition to `IN_PROGRESS` until all its listed prerequisite depen
 | **M4-01** | Relocation | Candidate Relocation Sites Backend | M4 | M2-03 | **COMMITTED** |
 | **M4-02** | Relocation | Multi-Criteria Site Suitability Engine | M4 | M4-01, M3-06 | **COMMITTED** |
 | **M4-03** | Relocation | Carrying Capacity & Infrastructure Sizing | M4 | M4-02 | **COMMITTED** |
-| **M4-04** | Relocation | Relocation Matching & Assignment Engine | M4 | M3-12, M4-03 | **BLOCKED** |
+| **M4-04** | Relocation | Relocation Matching & Assignment Engine | M4 | M3-12, M4-03 | **AWAITING_REVIEW** |
 | **M4-05** | Relocation | Evacuation & Access Routing Engine | M4 | M4-04 | **BLOCKED** |
 | **M4-06** | Relocation | Scenario Simulator Integration Backend | M4 | M4-04, M3-11 | **BLOCKED** |
 | **M5-01** | Frontend | Frontend Foundation & Design System | M5 | M1-01 | **VERIFIED** |
@@ -187,16 +187,15 @@ No chunk may transition to `IN_PROGRESS` until all its listed prerequisite depen
 
 ## Current Work
 
-- **Active Chunk:** None (Chunk M3-13 COMMITTED)
-- **Next Eligible Chunks:** Chunk M4-04: Relocation Matching & Assignment Engine (prerequisites M3-12 and M4-03 committed); Chunk M5-02: Authentication UI & Session Handling (once M5-01 committed); Chunk M5-03: API Client & State Management Setup (once M5-01 committed); Chunk M6-06: Data Sources & Freshness Monitoring UI (once M6-01 committed; M3-13 committed)
-- **Status:** Chunk M3-13 COMMITTED following independent review verification. 19 focused M3-13 unit and API tests passing; 431 full backend regression tests passing (100% clean). Prerequisite M3-03 verified COMMITTED.
-
+- **Active Chunk:** Chunk M4-04: Relocation Matching & Assignment Engine (Status: `AWAITING_REVIEW`)
+- **Next Eligible Chunks:** Chunk M4-05: Evacuation & Access Routing Engine (once M4-04 committed); Chunk M5-02: Authentication UI & Session Handling (once M5-01 committed); Chunk M5-03: API Client & State Management Setup (once M5-01 committed); Chunk M6-06: Data Sources & Freshness Monitoring UI (once M6-01 committed; M3-13 committed)
+- **Status:** Chunk M4-04 IMPLEMENTED and AWAITING_REVIEW following correction pass. 28 focused M4-04 unit and API tests passing; 50 M4 regression tests passing; 459 full backend regression tests passing (100% clean).
 
 ---
 
 ## Blocked Work
 
-Chunks M4-04 through DOC-01 (except committed M3-01 through M3-13, M4-01 through M4-03) remain in `BLOCKED` status awaiting completion, independent verification, and commit of their respective prerequisites. Note: M4-04 remains BLOCKED awaiting prerequisite M3-12 review sign-off.
+Chunks M4-05 through DOC-01 (except committed M3-01 through M3-13, M4-01 through M4-03, and M4-04 which is AWAITING_REVIEW) remain in `BLOCKED` status awaiting completion, independent verification, and commit of their respective prerequisites. Note: M4-05 remains BLOCKED awaiting M4-04 review and commit.
 
 ---
 
@@ -1297,6 +1296,42 @@ Chunks M4-04 through DOC-01 (except committed M3-01 through M3-13, M4-01 through
 
 ---
 
+## Chunk M4-04 Implementation Record
+
+- **Status:** `AWAITING_REVIEW` (Correction Pass Completed)
+- **Files Created:**
+  - `backend/app/core/relocation/matching/__init__.py` (Subpackage re-exports: `RelocationMatchingEngine`, contracts, error hierarchy, ranking utilities)
+  - `backend/app/core/relocation/matching/contracts.py` (Domain models: `AssignmentStatus`, `RejectionReasonCode` formalizing `LOW_SUITABILITY` for sites passing hard constraints but with overall score $< 40.0$, `SITE_UNAVAILABLE`, `MatchingAlgorithmType`, `VillageDemandInput`, `MatchingSiteCandidate`, `CandidateEvaluationAudit`, `VillageAssignmentResult`, `RelocationMatchingResult`)
+  - `backend/app/core/relocation/matching/errors.py` (Exception hierarchy: `RelocationMatchingError`, `InvalidMatchingInputError`, `MatchingConfigurationError`, `SiteCapacityExhaustedError`)
+  - `backend/app/core/relocation/matching/ranking.py` (Deterministic scoring: Haversine great-circle distance $R = 6371.009\text{ km}$, exact linear proximity $\max(0.0, 100.0 - 2.0 \cdot d_{\text{km}})$ clamped to $[0, 100]$, exact rank score $0.70 \cdot \text{suitability} + 0.30 \cdot \text{proximity}$ with missing-coordinate fallback $\text{rank\_score} = \text{suitability}$, exact deterministic tie-break tuple $(-\text{rank\_score}, -\text{suitability\_score}, \text{distance\_km}, \text{str}(\text{site\_id}))$)
+  - `backend/app/core/relocation/matching/engine.py` (Deterministic greedy matching engine implementing 6-step flow: priority ordering, demand validation, M4-02 & M4-03 constraint filtering, ranking, capacity reservation, unassigned fallback)
+  - `backend/app/core/relocation/matching/README.md` (Operational architecture, exact ranking formula, Haversine distance, pure evaluation vs persistence separation, explainability, rejection taxonomy, future OR-Tools boundary)
+  - `backend/app/schemas/relocation.py` (Pydantic API schemas: `RelocationMatchingRequest`, `RelocationAssignmentCreate`, `RelocationAssignmentBatchCreate`, `RelocationAssignmentRead`)
+  - `backend/app/api/v1/relocation.py` (FastAPI router: `POST /match` pure evaluation with zero DB mutations, `POST /assignments` & `/batch` persistence, `GET /assignments` with authentication via `get_current_user`, filtering, deterministic ordering by `(assigned_at.desc(), id.asc())`, and pagination, `GET /assignments/{id}`)
+  - `backend/tests/test_m4_04_matching.py` (28 automated unit and API integration tests covering all 27 requirements including 50-run repeated determinism, pure evaluation zero-mutation verification, exact linear proximity, exact tie-breaking, micro rank score floating point precision, positive capacity below 20 safety validation, and GET filtering/pagination)
+- **Files Modified:**
+  - `backend/app/api/routes.py` (Registered `relocation_router` under `/relocation` prefix)
+  - `PROJECT_STATE.md` (Maintained status as AWAITING_REVIEW, documented correction pass details, and updated test metrics)
+- **Files Removed:** None
+- **Database / Migration Changes:** None (Reused existing `relocation_assignments` table created in initial migration M2-03)
+- **Commands Executed & Results:**
+  - `docker exec rakshakgis-backend pytest tests/test_m4_04_matching.py -v` -> Exited 0, 28 passed, 2 warnings in 1.79s (100%)
+  - `docker exec rakshakgis-backend pytest tests/test_m4_03_capacity.py tests/test_site_suitability.py tests/test_sites.py -v` -> Exited 0, 50 passed, 3 warnings in 6.34s (100%)
+  - `docker exec rakshakgis-backend pytest tests -v` -> Exited 0, 459 passed, 4 warnings in 26.97s (100% full backend regression pass)
+  - `git diff --check` -> Exited 0 (Clean)
+- **Scope Boundaries & Invariants Preserved:**
+  - Deterministic greedy algorithm: no OR-Tools, ILP, ML, LLMs, or randomized assignment.
+  - Strict descending priority ordering of villages with deterministic tie-breaking (village ID).
+  - Validation of non-negative, finite household demand; zero silent invention.
+  - Strict integration with M4-02 site suitability hard safety constraints and M4-03 carrying capacity weakest-link model.
+  - Critical capacity dimensions missing or unknown are never treated as unlimited; rejected with `UNKNOWN_CAPACITY`.
+  - Dynamic capacity reservation tracked across allocations without negative remainder or unintended DB mutations.
+  - Clear separation between matching recommendation calculation (`POST /api/v1/relocation/match`) and assignment persistence (`POST /api/v1/relocation/assignments`).
+  - Explainability contract populated for all evaluated sites per village including rejection reason codes and capacity margins.
+  - Evacuation routing (M4-05) and scenario simulation (M4-06) left completely untouched.
+
+---
+
 ## Known Issues
 
 1. **Untracked Host Virtual Environment:** `backend/venv/` exists locally on Windows host and is properly ignored by `.gitignore`. The Docker service isolates this via an anonymous volume (`/app/venv`).
@@ -1333,14 +1368,15 @@ Chunks M4-04 through DOC-01 (except committed M3-01 through M3-13, M4-01 through
 - Chunk M3-11 established dynamic red zone & threshold trigger engine (`app.core.risk.red_zone.dynamic_engine`) implementing real-time event-driven hazard demarcation (`rainfall_24h_mm`, `seismic_intensity_mmi`, `slope_deg`, `water_level_m_above_danger`, `debris_volume_cu_m`, compound triggers) strictly resolved from regional profiles with zero hardcoded constants, explicit 3-state evaluation (`NO_TRIGGER`, `TRIGGERED`, `INSUFFICIENT_DATA`), threshold-unavailable INSUFFICIENT_DATA safety semantics, geodesic circular buffering, overlap dissolution with provenance preservation, safety-critical missing data rejection, and governance invariants (`is_active = False`, analytical proposals only).
 - Chunk M3-12 established relocation priority scoring engine (`app.core.risk.relocation_priority.engine`) implementing 5-factor priority formula $0.40R + 0.25E + 0.20V + 0.10H + 0.05A$ normalized to $[0.0, 100.0]$, profile-driven weights and band cutoffs (IMMEDIATE, SHORT-TERM, MEDIUM-TERM, MONITOR), full explainability factor breakdown with percentage contributions, upstream result envelope consumption (`CompositeRiskResult`, `DemographicExposureResult`, `SocialVulnerabilityResult`), strict missing data safety semantics (`INSUFFICIENT_DATA`), and strict governance invariants (`is_automatic_evacuation = False`, analytical proposal only).
 - Chunk M3-13 established data source freshness & telemetry backend (`app.core.telemetry`) providing deterministic 5-state freshness evaluation (`FRESH`, `STALE`, `UNAVAILABLE`, `CLOCK_SKEW`, `UNKNOWN`), category-specific default freshness thresholds (Rainfall 1h, Flood 1h, Landslide 24h, Sensors 1h, Population 7d, Fallback 24h) and custom overrides, provider health integration with M3-03 `BaseDataProvider` and `ProviderRegistry`, automatic synchronization to PostgreSQL `DataSource` and `DataIngestionRun` tables, secret scrubbing from diagnostic logs, and REST API endpoints under `/api/v1/telemetry`.
-- Automated tests verified: 431 backend tests passed in container (100% clean); 29 frontend tests passed in Vitest.
+- Chunk M4-04 established relocation matching & assignment engine (`app.core.relocation.matching`) implementing deterministic greedy village-to-site matching with descending priority processing, dynamic carrying capacity reservation across sequential assignments, M4-02 hard safety constraint gating, M4-03 weakest-link capacity enforcement, distance/suitability ranking, rejection audits, and REST API endpoints under `/api/v1/relocation` (`POST /match`, `POST /assignments`, `POST /assignments/batch`, `GET /assignments`, `GET /assignments/{id}`).
+- Automated tests verified: 459 backend tests passed in container (100% clean); 29 frontend tests passed in Vitest.
 
 ---
 
 ## Last Updated
 
-- **Timestamp:** 2026-09-06 01:45:00 IST
-- **Updated By:** M3 (Data Source Freshness & Telemetry Backend — Chunk M3-13)
-- **Status Summary:** Chunk M3-13 COMMITTED; Chunk M3-12 COMMITTED; Chunk M3-11 COMMITTED; Chunk M3-10 COMMITTED; Chunk M3-09 COMMITTED; Chunk M3-08 COMMITTED; Chunk M5-01 VERIFIED; 19 focused M3-13 tests passed; 431 total backend regression tests verified passing in container (100% clean); 29 frontend tests passed in Vitest. Next eligible chunks: M4-04 (Relocation Matching), M5-02, M5-03, M6-06.
+- **Timestamp:** 2026-09-06 02:22:00 IST
+- **Updated By:** M4 (Relocation Matching & Assignment Engine — Chunk M4-04 Correction Pass)
+- **Status Summary:** Chunk M4-04 AWAITING_REVIEW; Chunk M4-03 COMMITTED; Chunk M4-02 COMMITTED; Chunk M4-01 COMMITTED; Chunk M3-13 COMMITTED; Chunk M3-12 COMMITTED; Chunk M3-11 COMMITTED; Chunk M3-10 COMMITTED; Chunk M3-09 COMMITTED; Chunk M3-08 COMMITTED; Chunk M5-01 VERIFIED; 28 focused M4-04 tests passed; 459 total backend regression tests verified passing in container (100% clean); 29 frontend tests passed in Vitest. Next eligible chunk: M4-05 (once M4-04 is verified and committed).
 
 
