@@ -91,6 +91,22 @@ from app.core.risk.red_zone import (
     dissolve_overlapping_candidates,
     normalize_to_multipolygon,
 )
+from app.core.risk.relocation_priority import (
+    InsufficientPriorityDataError,
+    InvalidPriorityDataError,
+    PriorityConfigError,
+    PriorityFactorDetail,
+    PriorityFactorType,
+    PriorityScoreBandsConfig,
+    RelocationPriorityBand,
+    RelocationPriorityEngine,
+    RelocationPriorityError,
+    RelocationPriorityExplainability,
+    RelocationPriorityInput,
+    RelocationPriorityResult,
+    RelocationPriorityStatus,
+    RelocationPriorityWeightsConfig,
+)
 
 
 __all__ = [
@@ -178,6 +194,21 @@ __all__ = [
     "InsufficientGeophysicalDataError",
     "SpatialGeometryError",
     "RedZoneConfigError",
+    # M3-12 Relocation Priority Scoring
+    "RelocationPriorityEngine",
+    "RelocationPriorityStatus",
+    "PriorityFactorType",
+    "RelocationPriorityBand",
+    "RelocationPriorityWeightsConfig",
+    "PriorityScoreBandsConfig",
+    "RelocationPriorityInput",
+    "PriorityFactorDetail",
+    "RelocationPriorityExplainability",
+    "RelocationPriorityResult",
+    "RelocationPriorityError",
+    "InvalidPriorityDataError",
+    "InsufficientPriorityDataError",
+    "PriorityConfigError",
 ]
 
 

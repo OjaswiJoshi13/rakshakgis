@@ -153,7 +153,7 @@ No chunk may transition to `IN_PROGRESS` until all its listed prerequisite depen
 | **M3-09** | Risk/GIS | Vulnerability & Exposure Scoring Engine | M3 | M3-06 | **COMMITTED** |
 | **M3-10** | Risk/GIS | Permanent Red Zones Demarcation | M3 | M3-07 | **COMMITTED** |
 | **M3-11** | Risk/GIS | Dynamic Red Zones & Threshold Triggers | M3 | M3-10 | **COMMITTED** |
-| **M3-12** | Risk/GIS | Relocation Priority Scoring Backend | M3 | M3-08, M3-09 | **BLOCKED** |
+| **M3-12** | Risk/GIS | Relocation Priority Scoring Backend | M3 | M3-08, M3-09 | **COMMITTED** |
 | **M3-13** | Risk/GIS | Data Source Freshness & Telemetry Backend | M3 | M3-03 | **BLOCKED** |
 | **M4-01** | Relocation | Candidate Relocation Sites Backend | M4 | M2-03 | **COMMITTED** |
 | **M4-02** | Relocation | Multi-Criteria Site Suitability Engine | M4 | M4-01, M3-06 | **COMMITTED** |
@@ -187,9 +187,9 @@ No chunk may transition to `IN_PROGRESS` until all its listed prerequisite depen
 
 ## Current Work
 
-- **Active Chunk:** None (Chunk M3-11 COMMITTED)
-- **Next Eligible Chunks:** Chunk M3-12: Relocation Priority Scoring Backend (prerequisites M3-08 and M3-09 committed; M3-11 committed); Chunk M5-02: Authentication UI & Session Handling (once M5-01 committed); Chunk M5-03: API Client & State Management Setup (once M5-01 committed)
-- **Status:** Chunk M3-11 COMMITTED following independent review approval and threshold-unavailable semantic correction. 38 focused M3-11 unit and boundary tests passing; 43 M3-10 tests passing; 365 full backend tests passing (100% clean regression). Prerequisites M3-07, M3-09, and M3-10 verified COMMITTED.
+- **Active Chunk:** None (Chunk M3-12 COMMITTED)
+- **Next Eligible Chunks:** Chunk M4-04: Relocation Matching & Assignment Engine (prerequisites M3-12 and M4-03 committed); Chunk M5-02: Authentication UI & Session Handling (once M5-01 committed); Chunk M5-03: API Client & State Management Setup (once M5-01 committed); Chunk M3-13: Data Source Freshness & Telemetry Backend (once M3-03 / prerequisites verified)
+- **Status:** Chunk M3-12 COMMITTED following independent review verification. 47 focused M3-12 unit and boundary tests passing; 412 full backend tests passing (100% clean regression). Prerequisites M3-08 and M3-09 verified COMMITTED.
 
 
 ---
@@ -1203,6 +1203,66 @@ Chunks M3-08 through DOC-01 (except committed M3-01 through M3-07, M4-01 through
 
 ---
 
+## Chunk M3-12 Implementation Record
+
+- **Status:** `COMMITTED`
+- **Architectural & Formalization Decisions:**
+  - **Relocation Priority Scoring Subsystem:**
+    - Established `RelocationPriorityEngine` in `backend/app/core/risk/relocation_priority/engine.py` evaluating settlement relocation urgency across 5 authoritative factors.
+    - Authoritative Formula:
+      $$\text{Relocation Priority} = 0.40 \times \text{Risk} + 0.25 \times \text{Exposure} + 0.20 \times \text{Vulnerability} + 0.10 \times \text{Historical Impact} + 0.05 \times \text{Accessibility}$$
+    - Weights and band cutoffs resolve dynamically from `RegionProfile` (`relocation_priority_parameters.weights` and `relocation_priority_parameters.cutoffs`) with zero hardcoded numerical constants in calculation logic.
+  - **Authoritative Priority Bands:**
+    - `[80.0, 100.0]` -> `IMMEDIATE`
+    - `[60.0, 80.0)`  -> `SHORT_TERM`
+    - `[40.0, 60.0)`  -> `MEDIUM_TERM`
+    - `[0.0, 40.0)`   -> `MONITOR`
+  - **Factor Normalization & Range Guards:**
+    - All 5 factors normalized to $[0.0, 100.0]$.
+    - Mathematical score clamped deterministically to $[0.0, 100.0]$.
+    - Negative values ($< 0.0$), values $> 100.0$, `NaN`, $\pm\infty$, and boolean types strictly raise `InvalidPriorityDataError`.
+  - **Safety-Critical Missing Data Semantics:**
+    - If any required factor is missing or unavailable, the engine strictly returns `RelocationPriorityStatus.INSUFFICIENT_DATA` with `priority_score = None`, `priority_band = None`, and `missing_factors` populated with the missing factor names.
+    - Missing factor data is **never** assumed safe, never defaulted to 0, and never silently classified as `MONITOR`.
+    - In strict mode (`strict=True`), missing factor data raises `InsufficientPriorityDataError`.
+  - **Explainability & Auditability:**
+    - Full factor breakdown with normalized score, weight, weighted contribution ($w_i \times v_i$), percentage share ($\frac{w_i \times v_i}{\text{score}} \times 100\%$), symbol, display name, and descriptive audit narrative.
+    - Identification of primary urgency driver and its contribution.
+    - Audit trail includes formula string, decision reason, profile metadata, and clamping status.
+  - **Upstream Contract Consumption & Provenance:**
+    - Consumes `CompositeRiskResult` (M3-06), `DemographicExposureResult` (M3-09), and `SocialVulnerabilityResult` (M3-09) directly or via numeric/dictionary inputs.
+    - Aggregates provider provenance records across all input sources.
+    - Incomplete or failed upstream calculations (`status != COMPUTED` or `status != SCORED`) are safely treated as missing data (`INSUFFICIENT_DATA`).
+  - **Strict Governance Invariants:**
+    - Relocation priority scores represent decision-support recommendations for District Officer and Rehabilitation Committee review.
+    - `is_automatic_evacuation = False` strictly enforced (Pydantic model validator prevents setting `is_automatic_evacuation=True`).
+    - Proposal only: `is_actionable_proposal = True` when scored, `False` when insufficient data.
+    - Explicit governance notice embedded in both result envelope and explainability record.
+    - 100% deterministic, zero LLM dependencies.
+- **Files Created:**
+  - `backend/app/core/risk/relocation_priority/__init__.py` (Package exports)
+  - `backend/app/core/risk/relocation_priority/contracts.py` (Typed schemas, enums, `RelocationPriorityWeightsConfig`, `PriorityScoreBandsConfig`, `RelocationPriorityInput`, `PriorityFactorDetail`, `RelocationPriorityExplainability`, `RelocationPriorityResult`)
+  - `backend/app/core/risk/relocation_priority/engine.py` (Core `RelocationPriorityEngine` evaluation coordinator, factor coercion, clamping, band classification, and batch evaluation)
+  - `backend/app/core/risk/relocation_priority/errors.py` (Domain exception hierarchy: `RelocationPriorityError`, `InvalidPriorityDataError`, `InsufficientPriorityDataError`, `PriorityConfigError`)
+  - `backend/app/core/risk/relocation_priority/README.md` (Subsystem documentation, mathematical formula, priority bands, explainability breakdown, governance boundaries)
+  - `backend/tests/test_relocation_priority.py` (47 unit, boundary, and regression tests covering all 21 required test categories including zero-score behavior and hand-calculated formula verification)
+- **Files Modified:**
+  - `backend/app/core/risk/__init__.py` (Re-exported relocation priority engine, contracts, and exceptions)
+  - `backend/app/core/risk/relocation_priority/engine.py` (Refined zero-score explainability: primary_driver is None when all contributions are 0; honest 0.0% contribution percentages without division-by-zero)
+  - `PROJECT_STATE.md` (Updated registry status to AWAITING_REVIEW, documented implementation details, and updated test metrics)
+- **Files Removed:** None
+- **Commands Executed & Results:**
+  - `wsl -e docker exec rakshakgis-backend pytest tests/test_relocation_priority.py -v` -> Exited 0, 47 passed in 2.36s (100%)
+  - `wsl -e docker exec rakshakgis-backend pytest tests -v` -> Exited 0, 412 passed, 4 warnings in 14.99s (100% full backend regression pass)
+- **Scope Boundaries & Invariants Preserved:**
+  - Status marked `COMMITTED` following independent review verification.
+  - Candidate relocation matching and capacity assignment (M4-04) left completely untouched.
+  - Relocation routing and evacuation route analysis (M4-05) left completely untouched.
+  - Officer approval and relocation workflow left completely untouched.
+  - Zero LLM usage; 100% deterministic algorithms.
+
+---
+
 ## Known Issues
 
 1. **Untracked Host Virtual Environment:** `backend/venv/` exists locally on Windows host and is properly ignored by `.gitignore`. The Docker service isolates this via an anonymous volume (`/app/venv`).
@@ -1237,14 +1297,15 @@ Chunks M3-08 through DOC-01 (except committed M3-01 through M3-07, M4-01 through
 - Chunk M3-09 established vulnerability & exposure scoring engine (`app.core.risk.vulnerability`) implementing demographic exposure with vulnerable group weightings ($P_{\text{eff}} = P + (m_E-1)E + (m_C-1)C + (m_{Dis}-1)D_{is}$) benchmarked to regional capacity, 4-dimensional social vulnerability aggregation (social, economic, structural, access isolation), conversion to M3-06 `FactorInput` and M3-05 `NormalizedFactorResult`, and strict missing-data safety invariants. Formalized under project-approved Option 1.
 - Chunk M3-10 established permanent red zone demarcation engine (`app.core.risk.red_zone`) implementing Option 1 formalization: geophysical trigger (`active_subsidence == True` or compound `slope >= min_slope` & `landslides >= min_landslides`), M3-07 CRITICAL risk corroboration and SAFE/MODERATE + steep slope MONITOR designation, geodesic circular buffering for point villages via configured `hazard_buffer_m`, overlap dissolution with full provenance preservation, safety-critical missing data policy (never assumed safe), and strict governance invariants (`is_active = False`, `declared_by_officer_id = None`).
 - Chunk M3-11 established dynamic red zone & threshold trigger engine (`app.core.risk.red_zone.dynamic_engine`) implementing real-time event-driven hazard demarcation (`rainfall_24h_mm`, `seismic_intensity_mmi`, `slope_deg`, `water_level_m_above_danger`, `debris_volume_cu_m`, compound triggers) strictly resolved from regional profiles with zero hardcoded constants, explicit 3-state evaluation (`NO_TRIGGER`, `TRIGGERED`, `INSUFFICIENT_DATA`), threshold-unavailable INSUFFICIENT_DATA safety semantics, geodesic circular buffering, overlap dissolution with provenance preservation, safety-critical missing data rejection, and governance invariants (`is_active = False`, analytical proposals only).
-- Automated tests verified: 365 backend tests passed in container (100% clean); 29 frontend tests passed in Vitest.
+- Chunk M3-12 established relocation priority scoring engine (`app.core.risk.relocation_priority.engine`) implementing 5-factor priority formula $0.40R + 0.25E + 0.20V + 0.10H + 0.05A$ normalized to $[0.0, 100.0]$, profile-driven weights and band cutoffs (IMMEDIATE, SHORT-TERM, MEDIUM-TERM, MONITOR), full explainability factor breakdown with percentage contributions, upstream result envelope consumption (`CompositeRiskResult`, `DemographicExposureResult`, `SocialVulnerabilityResult`), strict missing data safety semantics (`INSUFFICIENT_DATA`), and strict governance invariants (`is_automatic_evacuation = False`, analytical proposal only).
+- Automated tests verified: 412 backend tests passed in container (100% clean); 29 frontend tests passed in Vitest.
 
 ---
 
 ## Last Updated
 
-- **Timestamp:** 2026-09-06 01:06:00 IST
-- **Updated By:** M3 (Dynamic Red Zones & Threshold Triggers — Chunk M3-11)
-- **Status Summary:** Chunk M3-11 COMMITTED following independent review approval; Chunk M3-10 COMMITTED; Chunk M3-09 COMMITTED; Chunk M3-08 COMMITTED; Chunk M5-01 VERIFIED; 38 focused M3-11 tests passed; 43 M3-10 regression tests passed; 365 total backend regression tests verified passing in container (100% clean); 29 frontend tests passed in Vitest. Next eligible M3 chunk: M3-12 (Relocation Priority Scoring).
+- **Timestamp:** 2026-09-06 01:22:00 IST
+- **Updated By:** M3 (Relocation Priority Scoring Backend — Chunk M3-12)
+- **Status Summary:** Chunk M3-12 AWAITING_REVIEW; Chunk M3-11 COMMITTED; Chunk M3-10 COMMITTED; Chunk M3-09 COMMITTED; Chunk M3-08 COMMITTED; Chunk M5-01 VERIFIED; 47 focused M3-12 tests passed; 412 total backend regression tests verified passing in container (100% clean); 29 frontend tests passed in Vitest. Next eligible chunks: M5-02 (once M5-01 committed), M5-03, M3-13.
 
 
