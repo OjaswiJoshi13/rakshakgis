@@ -154,7 +154,7 @@ No chunk may transition to `IN_PROGRESS` until all its listed prerequisite depen
 | **M3-10** | Risk/GIS | Permanent Red Zones Demarcation | M3 | M3-07 | **COMMITTED** |
 | **M3-11** | Risk/GIS | Dynamic Red Zones & Threshold Triggers | M3 | M3-10 | **COMMITTED** |
 | **M3-12** | Risk/GIS | Relocation Priority Scoring Backend | M3 | M3-08, M3-09 | **COMMITTED** |
-| **M3-13** | Risk/GIS | Data Source Freshness & Telemetry Backend | M3 | M3-03 | **BLOCKED** |
+| **M3-13** | Risk/GIS | Data Source Freshness & Telemetry Backend | M3 | M3-03 | **COMMITTED** |
 | **M4-01** | Relocation | Candidate Relocation Sites Backend | M4 | M2-03 | **COMMITTED** |
 | **M4-02** | Relocation | Multi-Criteria Site Suitability Engine | M4 | M4-01, M3-06 | **COMMITTED** |
 | **M4-03** | Relocation | Carrying Capacity & Infrastructure Sizing | M4 | M4-02 | **COMMITTED** |
@@ -187,16 +187,16 @@ No chunk may transition to `IN_PROGRESS` until all its listed prerequisite depen
 
 ## Current Work
 
-- **Active Chunk:** None (Chunk M3-12 COMMITTED)
-- **Next Eligible Chunks:** Chunk M4-04: Relocation Matching & Assignment Engine (prerequisites M3-12 and M4-03 committed); Chunk M5-02: Authentication UI & Session Handling (once M5-01 committed); Chunk M5-03: API Client & State Management Setup (once M5-01 committed); Chunk M3-13: Data Source Freshness & Telemetry Backend (once M3-03 / prerequisites verified)
-- **Status:** Chunk M3-12 COMMITTED following independent review verification. 47 focused M3-12 unit and boundary tests passing; 412 full backend tests passing (100% clean regression). Prerequisites M3-08 and M3-09 verified COMMITTED.
+- **Active Chunk:** None (Chunk M3-13 COMMITTED)
+- **Next Eligible Chunks:** Chunk M4-04: Relocation Matching & Assignment Engine (prerequisites M3-12 and M4-03 committed); Chunk M5-02: Authentication UI & Session Handling (once M5-01 committed); Chunk M5-03: API Client & State Management Setup (once M5-01 committed); Chunk M6-06: Data Sources & Freshness Monitoring UI (once M6-01 committed; M3-13 committed)
+- **Status:** Chunk M3-13 COMMITTED following independent review verification. 19 focused M3-13 unit and API tests passing; 431 full backend regression tests passing (100% clean). Prerequisite M3-03 verified COMMITTED.
 
 
 ---
 
 ## Blocked Work
 
-Chunks M3-08 through DOC-01 (except committed M3-01 through M3-07, M4-01 through M4-03; and eligible M3-08, M3-09) remain in `BLOCKED` status awaiting completion, independent verification, and commit of their respective prerequisites. Note: M4-04 remains BLOCKED awaiting prerequisite M3-12.
+Chunks M4-04 through DOC-01 (except committed M3-01 through M3-13, M4-01 through M4-03) remain in `BLOCKED` status awaiting completion, independent verification, and commit of their respective prerequisites. Note: M4-04 remains BLOCKED awaiting prerequisite M3-12 review sign-off.
 
 ---
 
@@ -219,6 +219,10 @@ Chunks M3-08 through DOC-01 (except committed M3-01 through M3-07, M4-01 through
 - M3-07: Risk Classification & Grading — COMMITTED (Commit: `feat(m3): add risk classification and grading`).
 - M3-08: Risk Explainability & Factor Contribution — COMMITTED (Commit: `80a34d4`).
 - M3-09: Vulnerability & Exposure Scoring Engine — COMMITTED (Commit: `feat(risk): formalize demographic and social vulnerability scoring`).
+- M3-10: Permanent Red Zones Demarcation — COMMITTED (Commit: `feat(risk): implement permanent red zone demarcation`).
+- M3-11: Dynamic Red Zones & Threshold Triggers — COMMITTED (Commit: `feat(risk): implement dynamic red zone threshold triggers`).
+- M3-12: Relocation Priority Scoring Backend — COMMITTED (Commit: `feat(risk): implement relocation priority scoring`).
+- M3-13: Data Source Freshness & Telemetry Backend — COMMITTED (Commit: `a14d46b` — `feat(telemetry): implement data source freshness telemetry`).
 - M4-01: Candidate Relocation Sites Backend — COMMITTED (Commit: `5c100603b77e45a47a8c6420f405819166e58609`).
 - M4-02: Multi-Criteria Site Suitability Engine — COMMITTED (Commit: `feat(m4): add site suitability engine`).
 - M4-03: Carrying Capacity & Infrastructure Sizing — COMMITTED (Commit: `3c0d37a7b8e19cbfcf16f0bcf82c813587b1c3e3`).
@@ -1263,6 +1267,36 @@ Chunks M3-08 through DOC-01 (except committed M3-01 through M3-07, M4-01 through
 
 ---
 
+## Chunk M3-13 Implementation Record
+
+- **Status:** `COMMITTED` (Commit: `a14d46b`)
+- **Files Created:**
+  - `backend/app/core/telemetry/__init__.py` (Subpackage re-exports for telemetry and freshness subsystem)
+  - `backend/app/core/telemetry/contracts.py` (Contracts: FreshnessStatus, FreshnessThresholds, FreshnessEvaluation, SourceTelemetrySummary, IngestionRunSummary, TelemetryOverview)
+  - `backend/app/core/telemetry/errors.py` (TelemetryError, DataSourceNotFoundError, InvalidTimestampError, TelemetryConfigError)
+  - `backend/app/core/telemetry/evaluator.py` (Deterministic freshness evaluation engine: clock-skew guards, negative age clamping, provider availability gates, category thresholds)
+  - `backend/app/core/telemetry/service.py` (TelemetryService: provider registry auto-sync, database DataSource and DataIngestionRun management, secret sanitization, health probes)
+  - `backend/app/core/telemetry/README.md` (Operational architecture, freshness invariants, state machine, and configuration documentation)
+  - `backend/app/schemas/telemetry.py` (Pydantic API models: FreshnessEvaluationRead, DataSourceTelemetryRead, DataSourceDetailRead, DataIngestionRunRead, TelemetryOverviewRead)
+  - `backend/app/api/v1/telemetry.py` (FastAPI router: GET /overview, GET /sources, GET /sources/{id}, GET /sources/{id}/runs, POST /sources/{id}/probe)
+  - `backend/tests/test_telemetry.py` (19 automated unit and API integration tests covering all 16 prompt requirements)
+- **Files Modified:**
+  - `backend/app/api/routes.py` (Registered telemetry_router under /telemetry prefix)
+  - `PROJECT_STATE.md` (Updated registry status to COMMITTED, documented implementation details, and updated test metrics)
+- **Files Removed:** None
+- **Database / Migration Changes:** None (Reused existing `data_sources` and `data_ingestion_runs` tables created in initial migration)
+- **Commands Executed & Results:**
+  - `wsl -e docker exec rakshakgis-backend pytest tests/test_telemetry.py -v` -> Exited 0, 19 passed, 2 warnings in 1.40s (100%)
+  - `wsl -e docker exec rakshakgis-backend pytest tests -v` -> Exited 0, 431 passed, 4 warnings in 17.07s (100% full backend regression pass)
+- **Scope Boundaries & Invariants Preserved:**
+  - Telemetry layer strictly decoupled from numerical risk engines, Red Zone demarcation, and relocation algorithms.
+  - Zero secrets or credentials leaked in logs or API responses (sanitization patterns scrub Bearer tokens, passwords, API keys).
+  - Conservative freshness rules: missing timestamps -> UNKNOWN (never fresh); future timestamps beyond 60s tolerance -> CLOCK_SKEW; unavailable providers -> UNAVAILABLE; failed ingestion -> not fresh.
+  - Synthetic/demo provenance explicitly maintained (`is_synthetic = True`, disclaimer preserved).
+  - Zero LLMs, zero random heuristics.
+
+---
+
 ## Known Issues
 
 1. **Untracked Host Virtual Environment:** `backend/venv/` exists locally on Windows host and is properly ignored by `.gitignore`. The Docker service isolates this via an anonymous volume (`/app/venv`).
@@ -1298,14 +1332,15 @@ Chunks M3-08 through DOC-01 (except committed M3-01 through M3-07, M4-01 through
 - Chunk M3-10 established permanent red zone demarcation engine (`app.core.risk.red_zone`) implementing Option 1 formalization: geophysical trigger (`active_subsidence == True` or compound `slope >= min_slope` & `landslides >= min_landslides`), M3-07 CRITICAL risk corroboration and SAFE/MODERATE + steep slope MONITOR designation, geodesic circular buffering for point villages via configured `hazard_buffer_m`, overlap dissolution with full provenance preservation, safety-critical missing data policy (never assumed safe), and strict governance invariants (`is_active = False`, `declared_by_officer_id = None`).
 - Chunk M3-11 established dynamic red zone & threshold trigger engine (`app.core.risk.red_zone.dynamic_engine`) implementing real-time event-driven hazard demarcation (`rainfall_24h_mm`, `seismic_intensity_mmi`, `slope_deg`, `water_level_m_above_danger`, `debris_volume_cu_m`, compound triggers) strictly resolved from regional profiles with zero hardcoded constants, explicit 3-state evaluation (`NO_TRIGGER`, `TRIGGERED`, `INSUFFICIENT_DATA`), threshold-unavailable INSUFFICIENT_DATA safety semantics, geodesic circular buffering, overlap dissolution with provenance preservation, safety-critical missing data rejection, and governance invariants (`is_active = False`, analytical proposals only).
 - Chunk M3-12 established relocation priority scoring engine (`app.core.risk.relocation_priority.engine`) implementing 5-factor priority formula $0.40R + 0.25E + 0.20V + 0.10H + 0.05A$ normalized to $[0.0, 100.0]$, profile-driven weights and band cutoffs (IMMEDIATE, SHORT-TERM, MEDIUM-TERM, MONITOR), full explainability factor breakdown with percentage contributions, upstream result envelope consumption (`CompositeRiskResult`, `DemographicExposureResult`, `SocialVulnerabilityResult`), strict missing data safety semantics (`INSUFFICIENT_DATA`), and strict governance invariants (`is_automatic_evacuation = False`, analytical proposal only).
-- Automated tests verified: 412 backend tests passed in container (100% clean); 29 frontend tests passed in Vitest.
+- Chunk M3-13 established data source freshness & telemetry backend (`app.core.telemetry`) providing deterministic 5-state freshness evaluation (`FRESH`, `STALE`, `UNAVAILABLE`, `CLOCK_SKEW`, `UNKNOWN`), category-specific default freshness thresholds (Rainfall 1h, Flood 1h, Landslide 24h, Sensors 1h, Population 7d, Fallback 24h) and custom overrides, provider health integration with M3-03 `BaseDataProvider` and `ProviderRegistry`, automatic synchronization to PostgreSQL `DataSource` and `DataIngestionRun` tables, secret scrubbing from diagnostic logs, and REST API endpoints under `/api/v1/telemetry`.
+- Automated tests verified: 431 backend tests passed in container (100% clean); 29 frontend tests passed in Vitest.
 
 ---
 
 ## Last Updated
 
-- **Timestamp:** 2026-09-06 01:22:00 IST
-- **Updated By:** M3 (Relocation Priority Scoring Backend — Chunk M3-12)
-- **Status Summary:** Chunk M3-12 AWAITING_REVIEW; Chunk M3-11 COMMITTED; Chunk M3-10 COMMITTED; Chunk M3-09 COMMITTED; Chunk M3-08 COMMITTED; Chunk M5-01 VERIFIED; 47 focused M3-12 tests passed; 412 total backend regression tests verified passing in container (100% clean); 29 frontend tests passed in Vitest. Next eligible chunks: M5-02 (once M5-01 committed), M5-03, M3-13.
+- **Timestamp:** 2026-09-06 01:45:00 IST
+- **Updated By:** M3 (Data Source Freshness & Telemetry Backend — Chunk M3-13)
+- **Status Summary:** Chunk M3-13 COMMITTED; Chunk M3-12 COMMITTED; Chunk M3-11 COMMITTED; Chunk M3-10 COMMITTED; Chunk M3-09 COMMITTED; Chunk M3-08 COMMITTED; Chunk M5-01 VERIFIED; 19 focused M3-13 tests passed; 431 total backend regression tests verified passing in container (100% clean); 29 frontend tests passed in Vitest. Next eligible chunks: M4-04 (Relocation Matching), M5-02, M5-03, M6-06.
 
 
