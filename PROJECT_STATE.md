@@ -159,7 +159,7 @@ No chunk may transition to `IN_PROGRESS` until all its listed prerequisite depen
 | **M4-02** | Relocation | Multi-Criteria Site Suitability Engine | M4 | M4-01, M3-06 | **COMMITTED** |
 | **M4-03** | Relocation | Carrying Capacity & Infrastructure Sizing | M4 | M4-02 | **COMMITTED** |
 | **M4-04** | Relocation | Relocation Matching & Assignment Engine | M4 | M3-12, M4-03 | **COMMITTED** |
-| **M4-05** | Relocation | Evacuation & Access Routing Engine | M4 | M4-04 | **AWAITING_REVIEW** |
+| **M4-05** | Relocation | Evacuation & Access Routing Engine | M4 | M4-04 | **COMMITTED** |
 | **M4-06** | Relocation | Scenario Simulator Integration Backend | M4 | M4-04, M3-11 | **BLOCKED** |
 | **M5-01** | Frontend | Frontend Foundation & Design System | M5 | M1-01 | **VERIFIED** |
 | **M5-02** | Frontend | Authentication UI & Session Handling | M5 | M5-01, M2-05 | **BLOCKED** |
@@ -187,15 +187,15 @@ No chunk may transition to `IN_PROGRESS` until all its listed prerequisite depen
 
 ## Current Work
 
-- **Active Chunk:** Chunk M4-05: Evacuation & Access Routing Engine (Status: AWAITING_REVIEW)
-- **Next Eligible Chunks:** Chunk M4-06: Scenario Simulator Integration Backend (once M4-05 committed); Chunk M5-02: Authentication UI & Session Handling (once M5-01 committed); Chunk M5-03: API Client & State Management Setup (once M5-01 committed); Chunk M6-06: Data Sources & Freshness Monitoring UI (once M6-01 committed; M3-13 committed)
-- **Status:** Chunk M4-05 IMPLEMENTED / AWAITING_REVIEW. 35 focused M4-05 unit and API tests passing; 78 M4 regression tests passing; 494 full backend regression tests passing (100% clean).
+- **Active Chunk:** None (Chunk M4-05 committed)
+- **Next Eligible Chunks:** Chunk M4-06: Scenario Simulator Integration Backend (eligible; M4-04 and M4-05 committed, M3-11 committed); Chunk M5-02: Authentication UI & Session Handling (once M5-01 committed); Chunk M5-03: API Client & State Management Setup (once M5-01 committed); Chunk M6-06: Data Sources & Freshness Monitoring UI (once M6-01 committed; M3-13 committed)
+- **Status:** Chunk M4-05 COMMITTED (Commit: `93e62e6392e0903aefc034a9cd13d4ad18e0c1ec`). 35 focused M4-05 unit and API tests passing; 78 M4 regression tests passing; 494 full backend regression tests passing (100% clean).
 
 ---
 
 ## Blocked Work
 
-Chunk M4-05 is IMPLEMENTED and AWAITING_REVIEW. Chunks M4-06 through DOC-01 (except committed M3-01 through M3-13, M4-01 through M4-04, and M5-01 which is VERIFIED) remain in `BLOCKED` status awaiting completion, independent verification, and commit of their respective prerequisites.
+Chunks M4-06 through DOC-01 (except committed M3-01 through M3-13, M4-01 through M4-05, and M5-01 which is VERIFIED) remain in `BLOCKED` status awaiting completion, independent verification, and commit of their respective prerequisites.
 
 ---
 
@@ -226,6 +226,7 @@ Chunk M4-05 is IMPLEMENTED and AWAITING_REVIEW. Chunks M4-06 through DOC-01 (exc
 - M4-02: Multi-Criteria Site Suitability Engine — COMMITTED (Commit: `feat(m4): add site suitability engine`).
 - M4-03: Carrying Capacity & Infrastructure Sizing — COMMITTED (Commit: `3c0d37a7b8e19cbfcf16f0bcf82c813587b1c3e3`).
 - M4-04: Relocation Matching & Assignment Engine — COMMITTED (Commit: `b4e984ebc6a567e149881079d36c2580525ab72f`).
+- M4-05: Evacuation & Access Routing Engine — COMMITTED (Commit: `93e62e6392e0903aefc034a9cd13d4ad18e0c1ec` — `feat(m4): implement evacuation and access routing`).
 
 ---
 
@@ -1335,7 +1336,7 @@ Chunk M4-05 is IMPLEMENTED and AWAITING_REVIEW. Chunks M4-06 through DOC-01 (exc
 
 ## Chunk M4-05 Implementation Record
 
-- **Status:** `AWAITING_REVIEW`
+- **Status:** `COMMITTED` (Commit: `93e62e6392e0903aefc034a9cd13d4ad18e0c1ec`)
 - **Scope:** Evacuation & Access Routing Engine (decision-support routing subsystem between village origins and assigned candidate relocation sites)
 - **Files Created:**
   - `backend/app/core/relocation/routing/__init__.py` (Subpackage exports: `EvacuationRoutingEngine`, `HazardAwareRouteEvaluator`, `BaseRoadNetworkProvider`, `SyntheticHimalayanRoadProvider`, `RoadNetwork`, contracts, errors)
@@ -1413,6 +1414,6 @@ Chunk M4-05 is IMPLEMENTED and AWAITING_REVIEW. Chunks M4-06 through DOC-01 (exc
 
 ## Last Updated
 
-- **Timestamp:** 2026-09-06 02:45:00 IST
-- **Updated By:** M4 (Evacuation & Access Routing Engine — Chunk M4-05 Implementation Pass)
-- **Status Summary:** Chunk M4-05 IMPLEMENTED / AWAITING_REVIEW; Chunk M4-04 COMMITTED; Chunk M4-03 COMMITTED; Chunk M4-02 COMMITTED; Chunk M4-01 COMMITTED; Chunk M3-13 COMMITTED; Chunk M3-12 COMMITTED; Chunk M3-11 COMMITTED; Chunk M3-10 COMMITTED; Chunk M3-09 COMMITTED; Chunk M3-08 COMMITTED; Chunk M5-01 VERIFIED; 35 focused M4-05 tests passed; 78 M4 regression tests passed; 494 total backend regression tests verified passing in container (100% clean); 29 frontend tests passed in Vitest. Next eligible chunk: M4-06 (Scenario Simulator) pending M4-05 review and commit.
+- **Timestamp:** 2026-09-06 02:48:00 IST
+- **Updated By:** M4 (Evacuation & Access Routing Engine — Chunk M4-05 Committed State Update)
+- **Status Summary:** Chunk M4-05 COMMITTED (Commit: `93e62e6`); Chunk M4-04 COMMITTED; Chunk M4-03 COMMITTED; Chunk M4-02 COMMITTED; Chunk M4-01 COMMITTED; Chunk M3-13 COMMITTED; Chunk M3-12 COMMITTED; Chunk M3-11 COMMITTED; Chunk M3-10 COMMITTED; Chunk M3-09 COMMITTED; Chunk M3-08 COMMITTED; Chunk M5-01 VERIFIED; 35 focused M4-05 tests passed; 78 M4 regression tests passed; 494 total backend regression tests verified passing in container (100% clean); 29 frontend tests passed in Vitest. Next eligible chunks: M4-06 (Scenario Simulator), M5-02, M5-03, M6-06.
