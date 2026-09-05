@@ -1,0 +1,71 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  /* Default Command Center Dark Surface Variables */
+  --surface-0: #090d16;
+  --surface-1: #0f172a;
+  --surface-2: #1e293b;
+  --surface-3: #334155;
+  --surface-border: #1e293b;
+  --surface-border-subtle: #172033;
+  --surface-text: #f8fafc;
+  --surface-text-muted: #94a3b8;
+  --focus-ring: #0ea5e9;
+}
+
+/* Light mode overrides if needed */
+.light {
+  --surface-0: #f8fafc;
+  --surface-1: #ffffff;
+  --surface-2: #f1f5f9;
+  --surface-3: #e2e8f0;
+  --surface-border: #cbd5e1;
+  --surface-border-subtle: #e2e8f0;
+  --surface-text: #0f172a;
+  --surface-text-muted: #64748b;
+  --focus-ring: #0284c7;
+}
+
+body {
+  background-color: var(--surface-0);
+  color: var(--surface-text);
+  font-feature-settings: "cv02", "cv03", "cv04", "cv11";
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+  overflow-x: hidden;
+  margin: 0;
+  padding: 0;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+/* Operational Command Center Accessibility: Strict Focus Outlines */
+*:focus-visible {
+  outline: 2px solid var(--focus-ring);
+  outline-offset: 2px;
+}
+
+/* Dense Data & Coordinates: Tabular Monospace Utilities */
+.tabular-nums {
+  font-variant-numeric: tabular-nums;
+}
+
+/* Sleek Command-Center Scrollbars */
+::-webkit-scrollbar {
+  width: 6px;
+  height: 6px;
+}
+
+::-webkit-scrollbar-track {
+  background: var(--surface-0);
+}
+
+::-webkit-scrollbar-thumb {
+  background: #334155;
+  border-radius: 3px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: #475569;
+}

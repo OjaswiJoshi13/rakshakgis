@@ -24,6 +24,7 @@ node_modules/
 .next/
 .cache/
 dist-ssr/
+*.tsbuildinfo
 
 # Testing, Coverage, and Linting Caches
 .pytest_cache/
