@@ -268,3 +268,31 @@ class SiteEvaluationRequest(BaseModel):
         default=None,
         description="Optional attribute overrides for what-if evaluation.",
     )
+
+
+class SiteCapacityEvaluationRequest(BaseModel):
+    """Request payload for evaluating carrying capacity and infrastructure sizing."""
+
+    incoming_households: int = Field(
+        default=0,
+        ge=0,
+        description="Number of incoming households proposed for relocation.",
+    )
+    current_occupancy_households: Optional[int] = Field(
+        default=None,
+        ge=0,
+        description="Optional override for current site occupancy in households.",
+    )
+    household_size: Optional[float] = Field(
+        default=None,
+        gt=0.0,
+        description="Average persons per household for per-capita infrastructure conversions.",
+    )
+    region_profile_id: Optional[str] = Field(
+        default="himalayan_pilot",
+        description="Optional regional profile identifier (e.g. 'himalayan_pilot').",
+    )
+    overrides: Optional[dict] = Field(
+        default=None,
+        description="Optional capacity overrides (e.g. {'healthcare_capacity': 100, 'shelter_capacity': 80}).",
+    )

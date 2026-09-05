@@ -19,6 +19,11 @@ from app.core.relocation.suitability import (
     SiteSuitabilityInput,
     SiteSuitabilityResult,
 )
+from app.core.relocation.capacity import (
+    CarryingCapacityEngine,
+    SiteCapacityInput,
+    SiteCapacityResult,
+)
 from app.schemas.common import (
     ResponseEnvelope,
     PaginatedResponse,
@@ -30,6 +35,7 @@ from app.schemas.sites import (
     CandidateSiteCreate,
     CandidateSiteUpdate,
     SiteEvaluationRequest,
+    SiteCapacityEvaluationRequest,
 )
 
 sites_router = APIRouter()
@@ -337,6 +343,32 @@ def evaluate_site_payload(
     return ResponseEnvelope(success=True, data=result)
 
 
+def _resolve_capacity_engine(profile_id: Optional[str]) -> CarryingCapacityEngine:
+    """Resolve CarryingCapacityEngine configured for the specified profile without silent fallback."""
+    if not profile_id:
+        return CarryingCapacityEngine()
+    profile = get_profile(profile_id)
+    return CarryingCapacityEngine.from_region_profile(profile)
+
+
+@sites_router.post(
+    "/capacity/evaluate",
+    response_model=ResponseEnvelope[SiteCapacityResult],
+    summary="Evaluate candidate site carrying capacity from payload",
+    description="Evaluate carrying capacity, bottleneck limiting factors, and infrastructure sizing from input payload.",
+)
+def evaluate_site_capacity_payload(
+    capacity_input: SiteCapacityInput,
+    region_profile_id: Optional[str] = Query(
+        "himalayan_pilot", description="Regional configuration profile ID"
+    ),
+):
+    """Evaluate site carrying capacity directly from payload attributes."""
+    engine = _resolve_capacity_engine(region_profile_id)
+    result = engine.evaluate(capacity_input)
+    return ResponseEnvelope(success=True, data=result)
+
+
 @sites_router.post(
     "/{id}/evaluate",
     response_model=ResponseEnvelope[SiteSuitabilityResult],
@@ -417,4 +449,89 @@ def get_candidate_site_suitability(
     site_input = SiteSuitabilityInput.from_candidate_site_model(site)
     engine = _resolve_suitability_engine(region_profile_id)
     result = engine.evaluate(site_input)
+    return ResponseEnvelope(success=True, data=result)
+
+
+@sites_router.post(
+    "/{id}/capacity/evaluate",
+    response_model=ResponseEnvelope[SiteCapacityResult],
+    summary="Evaluate candidate relocation site carrying capacity by ID",
+    description="Evaluate carrying capacity, bottleneck limiting factors, and infrastructure sizing for a stored site by ID.",
+)
+def evaluate_candidate_site_capacity(
+    id: int = Path(..., ge=1, description="Candidate site ID"),
+    eval_req: Optional[SiteCapacityEvaluationRequest] = None,
+    db: Session = Depends(get_db),
+):
+    """Evaluate stored candidate site carrying capacity by ID with proposed demand."""
+    site = (
+        db.query(CandidateSite)
+        .options(
+            joinedload(CandidateSite.capacities),
+            joinedload(CandidateSite.infrastructures),
+        )
+        .filter(CandidateSite.id == id)
+        .first()
+    )
+
+    if not site:
+        raise NotFoundError(message=f"Candidate site with ID {id} was not found.")
+
+    incoming_hh = eval_req.incoming_households if eval_req else 0
+    overrides = eval_req.overrides if eval_req else None
+    capacity_input = SiteCapacityInput.from_candidate_site_model(
+        site, incoming_households=incoming_hh, overrides=overrides
+    )
+
+    if eval_req:
+        if eval_req.current_occupancy_households is not None:
+            capacity_input.current_occupancy_households = eval_req.current_occupancy_households
+        if eval_req.household_size is not None:
+            capacity_input.household_size = eval_req.household_size
+
+    profile_id = (
+        eval_req.region_profile_id
+        if eval_req and eval_req.region_profile_id
+        else "himalayan_pilot"
+    )
+    engine = _resolve_capacity_engine(profile_id)
+    result = engine.evaluate(capacity_input)
+    return ResponseEnvelope(success=True, data=result)
+
+
+@sites_router.get(
+    "/{id}/capacity",
+    response_model=ResponseEnvelope[SiteCapacityResult],
+    summary="Get candidate site carrying capacity evaluation by ID",
+    description="Retrieve carrying capacity, limiting factors, and infrastructure sizing for a candidate site by ID.",
+)
+def get_candidate_site_capacity(
+    id: int = Path(..., ge=1, description="Candidate site ID"),
+    incoming_households: int = Query(
+        0, ge=0, description="Proposed incoming household relocation demand"
+    ),
+    region_profile_id: Optional[str] = Query(
+        "himalayan_pilot", description="Regional configuration profile ID"
+    ),
+    db: Session = Depends(get_db),
+):
+    """Compute and retrieve carrying capacity result for candidate site by ID."""
+    site = (
+        db.query(CandidateSite)
+        .options(
+            joinedload(CandidateSite.capacities),
+            joinedload(CandidateSite.infrastructures),
+        )
+        .filter(CandidateSite.id == id)
+        .first()
+    )
+
+    if not site:
+        raise NotFoundError(message=f"Candidate site with ID {id} was not found.")
+
+    capacity_input = SiteCapacityInput.from_candidate_site_model(
+        site, incoming_households=incoming_households
+    )
+    engine = _resolve_capacity_engine(region_profile_id)
+    result = engine.evaluate(capacity_input)
     return ResponseEnvelope(success=True, data=result)

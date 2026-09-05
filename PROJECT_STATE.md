@@ -157,7 +157,7 @@ No chunk may transition to `IN_PROGRESS` until all its listed prerequisite depen
 | **M3-13** | Risk/GIS | Data Source Freshness & Telemetry Backend | M3 | M3-03 | **BLOCKED** |
 | **M4-01** | Relocation | Candidate Relocation Sites Backend | M4 | M2-03 | **COMMITTED** |
 | **M4-02** | Relocation | Multi-Criteria Site Suitability Engine | M4 | M4-01, M3-06 | **COMMITTED** |
-| **M4-03** | Relocation | Carrying Capacity & Infrastructure Sizing | M4 | M4-02 | **BLOCKED** |
+| **M4-03** | Relocation | Carrying Capacity & Infrastructure Sizing | M4 | M4-02 | **AWAITING_REVIEW** |
 | **M4-04** | Relocation | Relocation Matching & Assignment Engine | M4 | M3-12, M4-03 | **BLOCKED** |
 | **M4-05** | Relocation | Evacuation & Access Routing Engine | M4 | M4-04 | **BLOCKED** |
 | **M4-06** | Relocation | Scenario Simulator Integration Backend | M4 | M4-04, M3-11 | **BLOCKED** |
@@ -188,8 +188,8 @@ No chunk may transition to `IN_PROGRESS` until all its listed prerequisite depen
 ## Current Work
 
 - **Active Chunk:** None
-- **Next Eligible Chunks:** M4-03 (Carrying Capacity & Infrastructure Sizing, now eligible with M4-02 COMMITTED), M3-08 (Risk Explainability & Factor Contribution), M3-09 (Vulnerability & Exposure Scoring Engine)
-- **Status:** Chunk M4-02 COMMITTED; 20 focused tests passed; 216 total backend regression tests verified passing in container.
+- **Next Eligible Chunks:** M4-04 (Relocation Matching & Assignment Engine, once M4-03 COMMITTED), M3-08 (Risk Explainability & Factor Contribution), M3-09 (Vulnerability & Exposure Scoring Engine)
+- **Status:** Chunk M4-03 implemented and AWAITING_REVIEW; 18 focused tests passed; 234 total backend regression tests verified passing in container. Note: M4-04 remains BLOCKED awaiting independent verification and commit of M4-03.
 
 ---
 
@@ -778,6 +778,75 @@ Chunks M3-08 through DOC-01 (except unblocked M3-01, M3-02, M3-03, M3-04, M3-05,
 
 ---
 
+## Chunk M4-03 Implementation Record
+
+- **Status:** `AWAITING_REVIEW`
+- **Scope:** Carrying Capacity & Infrastructure Sizing
+- **Scope Discipline:** Implements deterministic, explainable carrying capacity calculations and infrastructure sizing across 5 critical dimensions. Zero relocation matching or assignment (deferred to M4-04), zero evacuation routing (deferred to M4-05), zero scenario simulation (deferred to M4-06), zero officer approval workflow (deferred to M6-08), zero frontend code, zero LLMs for capacity computations.
+- **Authoritative Effective Capacity Rule:**
+  $$\text{effective\_capacity} = \min(\text{housing\_capacity}, \text{water\_capacity}, \text{sanitation\_capacity}, \text{healthcare\_capacity}, \text{shelter\_capacity})$$
+  - Enforces weakest-link bottleneck principle in households.
+  - Strict rejection of averaging, summing, or allowing strong dimensions to compensate for deficit dimensions.
+- **Incoming and Available Capacity Formulations:**
+  $$\text{available\_capacity} = \text{effective\_capacity} - \text{current\_occupancy}$$
+  $$\text{capacity\_margin} = \text{available\_capacity} - \text{incoming\_households}$$
+  - **Negative Margin Preservation:** Deficits are strictly preserved as negative numbers (e.g. $-25$ households; never clamped to 0) to support explainability and downstream optimization (M4-04).
+  - **Feasibility:** Feasible if and only if $\text{effective\_capacity} > 0$, $\text{available\_capacity} > 0$, and $\text{capacity\_margin} \ge 0$, with no critical deficits.
+- **Deterministic Limiting Factor Identification:**
+  - Identifies which critical dimension(s) constrain effective capacity.
+  - In case of ties, all tied dimensions are reported deterministically (sorted alphabetically).
+- **Unknown Data Safety Invariant:**
+  - Missing, `None`, or unavailable critical capacity dimensions are **never** treated as unlimited.
+  - Any unknown critical dimension produces an indeterminate/infeasible result (`feasible=False`, `effective_capacity=None`, `limiting_factors=[]`, `unknown_dimensions=[...]`) with clear human-readable explanation.
+- **Infrastructure Sizing Across Critical Dimensions:**
+  - **Housing / Habitation:** Existing household capacity vs. incoming household demand; physical land area ($\text{sq.m}$) sized against `land_area_sq_m_per_household`.
+  - **Water Availability:** Existing household water capacity vs. incoming household demand; physical water sized against `water_supply_lpd_per_capita` (70.0 LPD/person baseline).
+  - **Sanitation Facilities:** Existing household sanitation vs. incoming household demand; toilet units sized against `households_per_sanitation_unit` (4.0 hh/unit).
+  - **Healthcare Access:** Existing healthcare coverage capacity vs. incoming household demand.
+  - **Emergency Shelter:** Existing emergency shelter capacity vs. incoming household demand.
+- **Validation Invariants:**
+  - Rejects negative capacity, negative occupancy, negative incoming households, NaN, and $\pm\infty$ with `InvalidCapacityDataError` (HTTP 422).
+- **Regional Configuration:**
+  - Region-agnostic design; default planning parameters sourced dynamically from `RegionProfile` (`SiteCapacityAssumptions`).
+  - Requesting an invalid `region_profile_id` raises `UnknownRegionProfileError` (HTTP 404 with error code `"UNKNOWN_REGION_PROFILE"`), with zero silent fallback.
+- **API Endpoints Added (`/api/v1/sites`):**
+  - `POST /api/v1/sites/capacity/evaluate`: Direct payload carrying capacity evaluation.
+  - `POST /api/v1/sites/{id}/capacity/evaluate`: Evaluate carrying capacity for database candidate site by ID with optional demand and overrides.
+  - `GET /api/v1/sites/{id}/capacity`: Retrieve carrying capacity evaluation for database site by ID.
+- **Files Created:**
+  - `backend/app/core/relocation/capacity/__init__.py`
+  - `backend/app/core/relocation/capacity/contracts.py`
+  - `backend/app/core/relocation/capacity/errors.py`
+  - `backend/app/core/relocation/capacity/sizing.py`
+  - `backend/app/core/relocation/capacity/engine.py`
+  - `backend/app/core/relocation/capacity/README.md`
+  - `backend/tests/test_m4_03_capacity.py`
+- **Files Modified:**
+  - `backend/app/schemas/sites.py` (Added `SiteCapacityEvaluationRequest`, re-exported contracts)
+  - `backend/app/api/v1/sites.py` (Added capacity endpoints and `_resolve_capacity_engine`)
+  - `PROJECT_STATE.md` (Updated status to `AWAITING_REVIEW` and added implementation record)
+- **Files Removed:** None.
+- **Automated Test Results:**
+  - M4-03 focused capacity suite command: `docker exec rakshakgis-backend pytest tests/test_m4_03_capacity.py -v`
+  - Result: **18 passed, 0 failed, 2 warnings in 1.78s**
+  - M4-02 suitability suite regression command: `docker exec rakshakgis-backend pytest tests/test_site_suitability.py -v`
+  - Result: **20 passed, 0 failed, 2 warnings in 2.66s**
+  - M4-01 sites suite regression command: `docker exec rakshakgis-backend pytest tests/test_sites.py -v`
+  - Result: **12 passed, 0 failed, 3 warnings in 1.50s**
+  - Full backend regression command: `docker exec rakshakgis-backend pytest tests -v`
+  - Result: **234 passed, 0 failed, 4 warnings in 17.88s**
+- **Explicitly Documented MVP Assumptions:**
+  - Regional planning assumptions are derived from Himalayan Pilot Profile: water requirement 70.0 LPD/capita, land area 120.0 sq.m/household.
+  - Default demographic conversion assumes 4.17 persons per household (derived from synthetic dataset ratio).
+  - Standard community sanitation assumes 4.0 households per toilet unit (matching SPHERE / synthetic dataset 4:1 ratio).
+  - Healthcare and emergency shelter capacities are required inputs for safe effective capacity determination; if unmeasured in initial site surveys, they are safely reported as unknown rather than assumed infinite.
+- **Known Limitations:**
+  - Relocation matching and multi-village to site assignment optimization are deferred to Chunk M4-04.
+  - Evacuation and access network routing engine are deferred to Chunk M4-05.
+  - Dynamic scenario simulation is deferred to Chunk M4-06.
+
+---
+
 ## Known Issues
 
 1. **Untracked Host Virtual Environment:** `backend/venv/` exists locally on Windows host and is properly ignored by `.gitignore`. The Docker service isolates this via an anonymous volume (`/app/venv`).
@@ -799,6 +868,7 @@ Chunks M3-08 through DOC-01 (except unblocked M3-01, M3-02, M3-03, M3-04, M3-05,
 - Chunk M2-05 established password hashing with bcrypt, JWT token operations with pyjwt, current-user authentication dependency, RBAC authorization (`require_roles`), and auth API endpoints (`/login`, `/me`).
 - Chunk M4-01 established candidate relocation sites backend API (`/api/v1/sites`), Pydantic GeoJSON Point/Polygon schemas with coordinate bounds and closed-ring validation, pagination and domain filters, RBAC mutation enforcement (`ADMIN`, `DISTRICT_OFFICER`), and relational detail loading.
 - Chunk M4-02 established multi-criteria site suitability engine (`app.core.relocation.suitability`) evaluating 9 criteria (30/20/10/10/10/5/5/5/5), pre-scoring hard constraint gates (slope, buffer, capacity), weighted water availability scoring (10%), structured explainability breakdown, and API endpoints (`/api/v1/sites/evaluate`, `/api/v1/sites/{id}/evaluate`, `/api/v1/sites/{id}/suitability`) with strict region profile validation.
+- Chunk M4-03 established carrying capacity & infrastructure sizing engine (`app.core.relocation.capacity`) implementing authoritative weakest-link formula $\min(\text{housing}, \text{water}, \text{sanitation}, \text{healthcare}, \text{shelter})$, negative margin preservation, deterministic limiting factor identification, unknown capacity safety invariants, and API endpoints (`/api/v1/sites/capacity/evaluate`, `/api/v1/sites/{id}/capacity/evaluate`, `/api/v1/sites/{id}/capacity`).
 - Chunk M3-01 established typed, immutable regional configuration system (`app.core.profiles`) with deterministic validation, registry resolver, Himalayan pilot profile, and future Riverine/Coastal templates.
 - Chunk M3-02 established deterministic synthetic Himalayan pilot dataset (40 villages, 12 candidate relocation sites, 30 hazard events, seed 26191) with GeoJSON fixtures and Pydantic loader schemas.
 - Chunk M3-03 established provider-adapter abstraction layer (`app.data.providers`) with typed contracts, exception hierarchy, registry, and deterministic mock adapters consuming M3-02 fixtures.
@@ -806,12 +876,12 @@ Chunks M3-08 through DOC-01 (except unblocked M3-01, M3-02, M3-03, M3-04, M3-05,
 - Chunk M3-05 established risk normalization engine (`app.core.risk.normalization`) transforming heterogeneous hazard observations to comparable 0.0 - 100.0 factors with M3-01 profile thresholds, clamping tracking, explainability metadata, and safety-critical missing/unknown handling.
 - Chunk M3-06 established multi-hazard risk computation engine (`app.core.risk.computation`) implementing $Risk = 0.30H + 0.20F + 0.15R + 0.15S + 0.10D + 0.10V$, weighted explainability breakdown, strict $[0.0, 100.0]$ bounds, and safe missing-factor handling.
 - Chunk M3-07 established risk classification and grading engine (`app.core.risk.classification`) evaluating authoritative risk bands (SAFE, MODERATE, HIGH, VERY_HIGH, CRITICAL) with explicit boundary transitions, explainability metadata, and strict rejection of invalid scores.
-- Automated tests verified: 216 passed in container (Python 3.11).
+- Automated tests verified: 234 passed in container (Python 3.11).
 
 ---
 
 ## Last Updated
 
-- **Timestamp:** 2026-09-05 15:40:00 IST
-- **Updated By:** M4 (Site Suitability Engine Implementation & Commit)
-- **Status Summary:** Chunk M4-02 COMMITTED; Chunk M4-03 is now eligible to start; Chunks M3-08 and M3-09 remain eligible independently. Note: M4-03 has NOT started and is NOT completed.
+- **Timestamp:** 2026-09-05 16:00:00 IST
+- **Updated By:** M4 (Carrying Capacity & Infrastructure Sizing Implementation)
+- **Status Summary:** Chunk M4-03 implemented and AWAITING_REVIEW; Chunk M4-04 becomes eligible once M4-03 is independently reviewed and COMMITTED; Chunks M3-08 and M3-09 remain eligible independently. Note: M4-04 has NOT started and is NOT completed.
