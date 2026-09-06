@@ -173,7 +173,7 @@ No chunk may transition to `IN_PROGRESS` until all its listed prerequisite depen
 | **M6-03** | Operations | Relocation Site Details & Infrastructure UI | M6 | M6-02 | **COMMITTED** |
 | **M6-04** | Operations | Scenario Simulator UI | M6 | M6-01, M4-06 | **COMMITTED** |
 | **M6-05** | Operations | Real-Time Alerts & Threshold Warnings UI | M6 | M6-01, M3-11 | **COMMITTED** |
-| **M6-06** | Operations | Data Sources & Freshness Monitoring UI | M6 | M6-01, M3-13 | **BLOCKED** |
+| **M6-06** | Operations | Data Sources & Freshness Monitoring UI | M6 | M6-01, M3-13 | **AWAITING_REVIEW** |
 | **M6-07** | Operations | Report Generation & Export UI | M6 | M6-02, M6-03 | **BLOCKED** |
 | **M6-08** | Operations | Officer Review & Action Sign-Off Workflow | M6 | M6-02, M6-04 | **BLOCKED** |
 | **M6-09** | Operations | Audit Log & Traceability UI | M6 | M6-08 | **BLOCKED** |
@@ -187,15 +187,15 @@ No chunk may transition to `IN_PROGRESS` until all its listed prerequisite depen
 
 ## Current Work
 
-- **Active Chunk:** Chunk M6-05: Real-Time Alerts & Threshold Warnings UI
-- **Status:** `COMMITTED` (Commit: `3aef3a9` — `feat(frontend): implement M6-05 alerts and threshold warnings`; independent verification passed; Focused M6-05 suite: 12/12 passed; Full frontend suite: 207/207 tests passed across 26 files; TypeScript: 0 errors; ESLint: 0 warnings, 0 errors; Production build: passed; M6-05 implementation was committed and pushed to origin/main)
-- **Next Eligible Chunks:** M5-07, M6-06, M6-07, M6-08.
+- **Active Chunk:** Chunk M6-06: Data Sources & Freshness Monitoring UI
+- **Status:** `AWAITING_REVIEW` (Implementation complete; Data Sources & Freshness Monitoring workflow implemented inside `/operations/sources` consuming M3-13 telemetry overview, sources, detail, and probe contracts; DataSourcesOperations.test.tsx passed 13/13 tests independently; Full Vitest suite: 27/27 test files passed, 220/220 tests passed; TypeScript: 0 errors; ESLint: 0 warnings, 0 errors; Production build: passed).
+- **Next Eligible Chunks:** M5-07, M6-07, M6-08.
 
 ---
 
 ## Blocked Work
 
-Chunks M5-07 through DOC-01 (except committed M3-01 through M3-13, M4-01 through M4-06, M5-01 through M5-06, M6-01, M6-02, M6-03, M6-04, and M6-05 which are COMMITTED) remain in `BLOCKED` status awaiting completion, independent verification, and commit of their respective prerequisites.
+Chunks M5-07 through DOC-01 (except committed M3-01 through M3-13, M4-01 through M4-06, M5-01 through M5-06, M6-01, M6-02, M6-03, M6-04, M6-05 which are COMMITTED, and M6-06 which is AWAITING_REVIEW) remain in `BLOCKED` status awaiting completion, independent verification, and commit of their respective prerequisites.
 
 ---
 
@@ -1850,8 +1850,42 @@ Chunks M5-07 through DOC-01 (except committed M3-01 through M3-13, M4-01 through
 
 ---
 
+### Chunk M6-06 Implementation Record: Data Sources & Freshness Monitoring UI
+
+- **Status:** `AWAITING_REVIEW` (Lifecycle: `PLANNED` → `IN_PROGRESS` → `IMPLEMENTED` → `AWAITING_REVIEW`)
+- **Owner:** M6 (Frontend Operations)
+- **Primary Deliverables:**
+  - `frontend/src/types/telemetry.ts`: Strongly typed domain models for `FreshnessStatus` (`fresh`, `stale`, `unavailable`, `clock_skew`, `unknown`), `ProviderHealth` (`healthy`, `degraded`, `unavailable`, `unknown`), `ProviderMode` (`live`, `mock`, `file`, `hybrid`), `SourceCategory` (`rainfall`, `flood`, `landslide`, `hazard_observation`, `population_exposure`, `other`), `FreshnessEvaluationRead`, `DataIngestionRunRead`, `DataSourceTelemetryRead`, `DataSourceDetailRead`, `TelemetryOverviewRead`, `CategoryFreshnessThresholdItem`, and `DataSourceFilterCriteria` strictly conforming to M3-13 telemetry contracts.
+  - `frontend/src/lib/api/telemetry.ts`: Typed API client service methods (`getTelemetryOverview`, `listDataSources`, `getDataSourceDetail`, `listDataSourceRuns`, `probeDataSource`) backed by `/api/v1/telemetry/*` endpoints with deterministic Himalayan Pilot baseline fallback datasets (`HIMALAYAN_PILOT_TELEMETRY_OVERVIEW`, `HIMALAYAN_PILOT_DATA_SOURCES`, `HIMALAYAN_PILOT_INGESTION_RUNS`) covering the 5 registered M3-03 adapters.
+  - `frontend/src/lib/api/index.ts`: Barrel export for telemetry services and models.
+  - `frontend/src/components/operations/sources/TelemetryOverviewCards.tsx`: 4 KPI summary cards (Registered Data Feeds, Adapter Health, Freshness Status, Demo Provenance).
+  - `frontend/src/components/operations/sources/SourceFilterBar.tsx`: Search and 4-tier filtering bar (Category, Provider Health, Freshness Status, Adapter Mode) with accessible label associations and reset filter trigger.
+  - `frontend/src/components/operations/sources/SourceTable.tsx`: Tabular telemetry browser presenting source name, category, health badges, freshness badges, age vs. threshold comparisons, ingestion sync totals, mode, and action buttons.
+  - `frontend/src/components/operations/sources/SourceDetailModal.tsx`: Comprehensive inspection dialog displaying deterministic freshness evaluations, configuration parameters, recent ingestion runs execution history with sanitized diagnostic logs, health probe trigger, and statutory Rule 8 / Rule 12 disclaimers.
+  - `frontend/src/components/operations/sources/ThresholdsReferenceCard.tsx`: Collapsible reference card detailing platform freshness thresholds (Rainfall 1h, Flood 1h, Landslide 24h, Sensors 1h, Population 7d, Clock Skew 60s).
+  - `frontend/src/components/operations/sources/index.ts`: Clean barrel export.
+  - `frontend/src/app/operations/sources/page.tsx`: Full operational page inside `OperationsSectionShell` with `useSearchParams` URL deep linking (`?sourceId=...`), action toolbar with "Refresh Diagnostics", probe execution feedback, and responsive layout.
+  - `frontend/src/components/operations/OperationsNav.tsx`: Integrated "Data Sources" (`/operations/sources`, `M6-06`) into operations navigation.
+  - `frontend/src/components/layout/Sidebar.tsx`: Integrated "Data Sources" (`/operations/sources`, `M6-06`) into main sidebar navigation.
+  - `frontend/src/app/operations/page.tsx`: Added "Data Sources & Freshness" module launch card to Operations Hub console.
+  - `frontend/src/__tests__/DataSourcesOperations.test.tsx`: Comprehensive Vitest test suite with 13 unit and integration tests covering workspace header, telemetry overview counts, collapsible freshness thresholds, data sources table listing, text search filtering, category filtering, health filtering, freshness filtering, empty states with reset, source detail modal inspection, health probe execution, and URL deep linking.
+- **Verification Results:**
+  - Full Vitest suite: 27/27 test files passed, 220/220 tests passed (100% clean).
+  - Vitest M6-06 unit suite: `DataSourcesOperations.test.tsx` passed 13/13 tests cleanly.
+  - TypeScript: 0 errors (`tsc --noEmit` passed).
+  - ESLint: 0 warnings, 0 errors (`next lint` passed).
+  - Production Build: passed (`next build` compiled cleanly; 17 static routes generated including `/operations/sources` at 13.1 kB).
+- **Scope & Invariants Audit:**
+  - Zero backend modifications (`backend/` git status completely clean).
+  - Purely additive frontend implementation inside M6 operations module.
+  - Zero client-side freshness math or invented rules: temporal freshness statuses (`fresh`, `stale`, etc.) and provider health states are computed exclusively by backend Chunk M3-13.
+  - Strict adherence to Rule 8: all mock providers labeled with synthetic provenance.
+  - Strict adherence to Rule 12: operational data and health diagnostics require formal officer verification before downstream operational enforcement.
+
+---
+
 ## Last Updated
 
-- **Timestamp:** 2026-09-06 18:50:00 IST
-- **Updated By:** M6 (Real-Time Alerts & Threshold Warnings UI — Chunk M6-05 COMMITTED)
-- **Status Summary:** Chunk M6-05 COMMITTED (Commit: `3aef3a9`); Chunk M6-04 COMMITTED (Commit: `37d385b`); Chunk M6-03 COMMITTED (Commit: `19a8ff8`); Chunk M6-02 COMMITTED (Commit: `a00c7e1`); Chunk M5-06 COMMITTED (Commit: `4d6f5ba`); Chunk M6-01 COMMITTED (Commit: `05f5991`); Chunk M5-05 COMMITTED (Commit: `54573bb`); Chunk M5-04 COMMITTED (Commit: `85ac1e8`); Chunk M5-03 COMMITTED (Commit: `f1637e4`); Chunk M5-02 COMMITTED; Chunk M5-01 COMMITTED; Chunk M4-06 COMMITTED; Chunk M4-05 COMMITTED; Chunk M4-04 COMMITTED; Chunk M4-03 COMMITTED; Chunk M4-02 COMMITTED; Chunk M4-01 COMMITTED; Chunk M3-13 COMMITTED; Chunk M3-12 COMMITTED; Chunk M3-11 COMMITTED; Chunk M3-10 COMMITTED; Chunk M3-09 COMMITTED; Chunk M3-08 COMMITTED; 207/207 frontend tests passing across 26 files; 525 total backend regression tests verified passing in container. Next eligible chunks: M5-07, M6-06, M6-07, M6-08.
+- **Timestamp:** 2026-09-06 19:05:00 IST
+- **Updated By:** M6 (Data Sources & Freshness Monitoring UI — Chunk M6-06 AWAITING_REVIEW)
+- **Status Summary:** Chunk M6-06 AWAITING_REVIEW; Chunk M6-05 COMMITTED (Commit: `3aef3a9`); Chunk M6-04 COMMITTED (Commit: `37d385b`); Chunk M6-03 COMMITTED (Commit: `19a8ff8`); Chunk M6-02 COMMITTED (Commit: `a00c7e1`); Chunk M5-06 COMMITTED (Commit: `4d6f5ba`); Chunk M6-01 COMMITTED (Commit: `05f5991`); Chunk M5-05 COMMITTED (Commit: `54573bb`); Chunk M5-04 COMMITTED (Commit: `85ac1e8`); Chunk M5-03 COMMITTED (Commit: `f1637e4`); Chunk M5-02 COMMITTED; Chunk M5-01 COMMITTED; Chunk M4-06 COMMITTED; Chunk M4-05 COMMITTED; Chunk M4-04 COMMITTED; Chunk M4-03 COMMITTED; Chunk M4-02 COMMITTED; Chunk M4-01 COMMITTED; Chunk M3-13 COMMITTED; Chunk M3-12 COMMITTED; Chunk M3-11 COMMITTED; Chunk M3-10 COMMITTED; Chunk M3-09 COMMITTED; Chunk M3-08 COMMITTED; 220/220 frontend tests passing across 27 files; 525 total backend regression tests verified passing in container. Next eligible chunks: M5-07, M6-07, M6-08.
