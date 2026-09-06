@@ -55,6 +55,11 @@ export const MapCanvas: React.FC<MapCanvasProps> = ({
   const [isStyleLoaded, setIsStyleLoaded] = useState<boolean>(false);
   const [mapError, setMapError] = useState<string | null>(null);
 
+  const onFeatureSelectRef = useRef(onFeatureSelect);
+  useEffect(() => {
+    onFeatureSelectRef.current = onFeatureSelect;
+  }, [onFeatureSelect]);
+
   // Initialize MapLibre GL instance
   useEffect(() => {
     if (!mapContainerRef.current) return;
@@ -170,7 +175,7 @@ export const MapCanvas: React.FC<MapCanvasProps> = ({
             const feat = e.features[0];
             const coordinates: [number, number] = [e.lngLat.lng, e.lngLat.lat];
 
-            onFeatureSelect?.({
+            onFeatureSelectRef.current?.({
               id: (feat.id ?? feat.properties?.id ?? "unknown") as string | number,
               layerId: layerConfig.id,
               layerCategory: layerConfig.category,
@@ -203,7 +208,7 @@ export const MapCanvas: React.FC<MapCanvasProps> = ({
         }
       }
     });
-  }, [isStyleLoaded, sourcesData, layers, layerVisibility, onFeatureSelect]);
+  }, [isStyleLoaded, sourcesData, layers, layerVisibility]);
 
   // Fit bounds when bounds prop changes or geometry updates
   useEffect(() => {

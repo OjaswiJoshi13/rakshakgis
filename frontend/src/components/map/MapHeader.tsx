@@ -8,6 +8,8 @@ import { Button } from "@/components/ui/Button";
 export interface MapHeaderProps {
   totalSites?: number;
   totalRoutes?: number;
+  totalRedZones?: number;
+  totalVillages?: number;
   isRefreshing?: boolean;
   onRefresh?: () => void;
   onResetView?: () => void;
@@ -17,6 +19,8 @@ export interface MapHeaderProps {
 export const MapHeader: React.FC<MapHeaderProps> = ({
   totalSites = 0,
   totalRoutes = 0,
+  totalRedZones = 0,
+  totalVillages = 0,
   isRefreshing = false,
   onRefresh,
   onResetView,
@@ -65,6 +69,8 @@ export const MapHeader: React.FC<MapHeaderProps> = ({
             <span className="w-2 h-2 rounded-full bg-sky-400" />
             <span>
               {totalSites} Havens &bull; {totalRoutes} Corridors
+              {totalRedZones > 0 ? ` • ${totalRedZones} Red Zones` : ""}
+              {totalVillages > 0 ? ` • ${totalVillages} Habitations` : ""}
             </span>
           </div>
 
