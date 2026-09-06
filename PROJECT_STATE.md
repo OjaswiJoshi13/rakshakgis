@@ -166,7 +166,7 @@ No chunk may transition to `IN_PROGRESS` until all its listed prerequisite depen
 | **M5-03** | Frontend | API Client & State Management Setup | M5 | M5-01, M2-04 | **COMMITTED** |
 | **M5-04** | Frontend | Executive Dashboard UI | M5 | M5-03 | **COMMITTED** |
 | **M5-05** | Frontend | MapLibre GIS Interactive Map Canvas | M5 | M5-03 | **COMMITTED** |
-| **M5-06** | Frontend | Village Vulnerability Analysis UI | M5 | M5-04, M5-05 | **VERIFIED** |
+| **M5-06** | Frontend | Village Vulnerability Analysis UI | M5 | M5-04, M5-05 | **COMMITTED** |
 | **M5-07** | Frontend | GIS API Integration & GeoJSON Layers | M5 | M5-05, M3-10 | **BLOCKED** |
 | **M6-01** | Operations | Operations UI Shell & Navigation | M6 | M5-01 | **COMMITTED** |
 | **M6-02** | Operations | Relocation Planner Workflow UI | M6 | M6-01, M4-04 | **BLOCKED** |
@@ -187,15 +187,15 @@ No chunk may transition to `IN_PROGRESS` until all its listed prerequisite depen
 
 ## Current Work
 
-- **Active Chunk:** Chunk M5-06: Village Vulnerability Detail / Habitation Analysis UI (Independent Adversarial Review Passed)
-- **Status:** `VERIFIED` (Lifecycle: `PLANNED` → `IN_PROGRESS` → `IMPLEMENTED` → `AWAITING_REVIEW` → `FAILED_REVIEW` → `IN_PROGRESS` → `IMPLEMENTED` → `AWAITING_REVIEW` → `VERIFIED`)
+- **Active Chunk:** None (Chunk M5-06 and Chunk M6-01 COMMITTED)
+- **Status:** Ready for next scheduled chunks
 - **Next Eligible Chunks:** M5-07, M6-02, M6-04, M6-05, M6-06.
 
 ---
 
 ## Blocked Work
 
-Chunks M5-07 through DOC-01 (except committed M3-01 through M3-13, M4-01 through M4-06, M5-01 through M5-05, and M6-01 which are COMMITTED, and M5-06 which is VERIFIED) remain in `BLOCKED` status awaiting completion, independent verification, and commit of their respective prerequisites.
+Chunks M5-07 through DOC-01 (except committed M3-01 through M3-13, M4-01 through M4-06, M5-01 through M5-06, and M6-01 which are COMMITTED) remain in `BLOCKED` status awaiting completion, independent verification, and commit of their respective prerequisites.
 
 ---
 
@@ -234,6 +234,7 @@ Chunks M5-07 through DOC-01 (except committed M3-01 through M3-13, M4-01 through
 - M5-04: Executive Dashboard UI — COMMITTED (Commit: `85ac1e8`).
 - M5-05: MapLibre GIS Interactive Map Canvas — COMMITTED (Commit: `54573bb` — `feat(frontend): add MapLibre GIS map canvas`).
 - M6-01: Operations UI Shell & Navigation — COMMITTED (Commit: `05f5991` — `feat(frontend): implement M6-01 operations shell`; independent verification passed; OperationsShell.test.tsx passed 5/5 independently).
+- M5-06: Village Vulnerability Analysis UI — COMMITTED (Commit: `4d6f5ba` — `feat(frontend): add village vulnerability analysis`; independent adversarial review passed; VillageAnalysis.test.tsx passed 22/22 independently).
 
 ---
 
@@ -1713,7 +1714,7 @@ Chunks M5-07 through DOC-01 (except committed M3-01 through M3-13, M4-01 through
 
 ### Chunk M5-06 Implementation & Correction Record: Village Vulnerability Detail / Habitation Analysis UI
 
-- **Status:** `VERIFIED` (Lifecycle: `PLANNED` → `IN_PROGRESS` → `IMPLEMENTED` → `AWAITING_REVIEW` → `FAILED_REVIEW` → `IN_PROGRESS` → `IMPLEMENTED` → `AWAITING_REVIEW` → `VERIFIED`)
+- **Status:** `COMMITTED` (Feature commit: `4d6f5ba`; Lifecycle: `PLANNED` → `IN_PROGRESS` → `IMPLEMENTED` → `AWAITING_REVIEW` → `FAILED_REVIEW` → `IN_PROGRESS` → `IMPLEMENTED` → `AWAITING_REVIEW` → `VERIFIED` → `COMMITTED`)
 - **Owner:** M5 (Frontend Core / GIS)
 - **Primary Deliverables:**
   - `frontend/src/types/villages.ts`: Strongly typed domain models for M3-06 6-factor risk breakdowns, M3-09 vulnerability metrics, M3-11 Red Zone evaluation results, M3-12 relocation urgency, M4-04 matching results, M4-05 evacuation routing paths, and safe normalization parsers `parseRiskBand` and `parseRelocationPriorityBand`.
@@ -1752,6 +1753,6 @@ Chunks M5-07 through DOC-01 (except committed M3-01 through M3-13, M4-01 through
 
 ## Last Updated
 
-- **Timestamp:** 2026-09-06 16:42:00 IST
-- **Updated By:** M5 (Village Vulnerability Detail / Habitation Analysis — Chunk M5-06 Verified)
-- **Status Summary:** Chunk M5-06 VERIFIED; Chunk M6-01 COMMITTED (Commit: `ba8021e`); Chunk M5-05 COMMITTED (Commit: `63d88cd`); Chunk M5-04 COMMITTED (Commit: `85ac1e8`); Chunk M5-03 COMMITTED (Commit: `f1637e4`); Chunk M5-02 COMMITTED; Chunk M5-01 COMMITTED; Chunk M4-06 COMMITTED; Chunk M4-05 COMMITTED; Chunk M4-04 COMMITTED; Chunk M4-03 COMMITTED; Chunk M4-02 COMMITTED; Chunk M4-01 COMMITTED; Chunk M3-13 COMMITTED; Chunk M3-12 COMMITTED; Chunk M3-11 COMMITTED; Chunk M3-10 COMMITTED; Chunk M3-09 COMMITTED; Chunk M3-08 COMMITTED; 171 frontend tests passed in Vitest (22 test suites); 525 total backend regression tests verified passing in container (100% clean). Next eligible chunks: M5-07, M6-02, M6-04, M6-05, M6-06.
+- **Timestamp:** 2026-09-06 16:45:00 IST
+- **Updated By:** M5 (Village Vulnerability Detail / Habitation Analysis — Chunk M5-06 COMMITTED)
+- **Status Summary:** Chunk M5-06 COMMITTED (Commit: `4d6f5ba`); Chunk M6-01 COMMITTED (Commit: `ba8021e`); Chunk M5-05 COMMITTED (Commit: `63d88cd`); Chunk M5-04 COMMITTED (Commit: `85ac1e8`); Chunk M5-03 COMMITTED (Commit: `f1637e4`); Chunk M5-02 COMMITTED; Chunk M5-01 COMMITTED; Chunk M4-06 COMMITTED; Chunk M4-05 COMMITTED; Chunk M4-04 COMMITTED; Chunk M4-03 COMMITTED; Chunk M4-02 COMMITTED; Chunk M4-01 COMMITTED; Chunk M3-13 COMMITTED; Chunk M3-12 COMMITTED; Chunk M3-11 COMMITTED; Chunk M3-10 COMMITTED; Chunk M3-09 COMMITTED; Chunk M3-08 COMMITTED; 171 frontend tests passed in Vitest (22 test suites); 525 total backend regression tests verified passing in container (100% clean). Next eligible chunks: M5-07, M6-02, M6-04, M6-05, M6-06.
