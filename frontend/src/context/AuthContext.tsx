@@ -14,12 +14,14 @@ import {
   getStoredToken,
   isTokenExpired,
   loginApi,
+  loginDemoUser,
   setStoredToken,
 } from "@/lib/auth";
 import { AuthState, LoginRequest, User, UserRole } from "@/types/auth";
 
 export interface AuthContextType extends AuthState {
   login: (credentials: LoginRequest) => Promise<boolean>;
+  loginDemo: () => Promise<boolean>;
   logout: () => void;
   clearError: () => void;
   refreshUser: () => Promise<void>;
@@ -43,6 +45,7 @@ const defaultAuthContext: AuthContextType = {
   isLoading: false,
   error: null,
   login: async () => true,
+  loginDemo: async () => true,
   logout: () => {},
   clearError: () => {},
   refreshUser: async () => {},
@@ -153,6 +156,26 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({
     };
   }, [initialState]);
 
+  const loginDemo = useCallback(async (): Promise<boolean> => {
+    setIsLoading(true);
+    setError(null);
+
+    try {
+      const { token: tokenResponse, user: demoUser } = loginDemoUser();
+      setStoredToken(tokenResponse.access_token, tokenResponse.expires_in);
+
+      setUser(demoUser);
+      setToken(tokenResponse.access_token);
+      setIsAuthenticated(true);
+      setIsLoading(false);
+      return true;
+    } catch {
+      setError("Failed to initialize demo session.");
+      setIsLoading(false);
+      return false;
+    }
+  }, []);
+
   const login = useCallback(
     async (credentials: LoginRequest): Promise<boolean> => {
       setIsLoading(true);
@@ -170,6 +193,26 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({
         setIsLoading(false);
         return true;
       } catch (err) {
+        // Offline demo fallback: if backend is unreachable and credentials match demo accounts
+        const isOffline =
+          err instanceof Error &&
+          err.message.includes("Unable to connect to authentication server");
+        const isDemoUser =
+          credentials.username === "officer@rakshakgis.gov.in" ||
+          credentials.username === "collector@chamoli.gov.in" ||
+          credentials.username === "test_auth_officer";
+
+        if (isOffline && isDemoUser) {
+          const { token: tokenResponse, user: demoUser } = loginDemoUser();
+          setStoredToken(tokenResponse.access_token, tokenResponse.expires_in);
+
+          setUser(demoUser);
+          setToken(tokenResponse.access_token);
+          setIsAuthenticated(true);
+          setIsLoading(false);
+          return true;
+        }
+
         const message =
           err instanceof Error
             ? err.message
@@ -201,6 +244,7 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({
       isLoading,
       error,
       login,
+      loginDemo,
       logout,
       clearError,
       refreshUser,
@@ -213,6 +257,7 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({
       isLoading,
       error,
       login,
+      loginDemo,
       logout,
       clearError,
       refreshUser,

@@ -9,6 +9,31 @@ import { AuthErrorResponse, LoginRequest, TokenResponse, User } from "@/types/au
 
 export const TOKEN_STORAGE_KEY = "rakshakgis_auth_token";
 export const EXPIRY_STORAGE_KEY = "rakshakgis_auth_token_expiry";
+export const DEMO_AUTH_TOKEN = "demo-authority-access-token";
+
+export const DEMO_USER: User = {
+  id: 1,
+  username: "district_collector_chamoli",
+  email: "collector@chamoli.gov.in",
+  full_name: "District Collector Chamoli",
+  role: "district_officer",
+  department: "District Administration (Chamoli)",
+  is_active: true,
+  created_at: "2026-09-01T00:00:00Z",
+  updated_at: "2026-09-01T00:00:00Z",
+};
+
+/**
+ * Returns a static demo session response for offline testing and evaluation.
+ */
+export function loginDemoUser(): { token: TokenResponse; user: User } {
+  const token: TokenResponse = {
+    access_token: DEMO_AUTH_TOKEN,
+    token_type: "bearer",
+    expires_in: 86400 * 7, // 7 days
+  };
+  return { token, user: DEMO_USER };
+}
 
 /**
  * Returns the configured backend API base URL.
@@ -175,6 +200,11 @@ export async function loginApi(credentials: LoginRequest): Promise<TokenResponse
  * Fetch current authenticated user profile against M2-05 GET /api/v1/auth/me.
  */
 export async function getMeApi(token: string): Promise<User> {
+  // Support offline demo mode without backend connectivity
+  if (token === DEMO_AUTH_TOKEN || token.startsWith("demo-")) {
+    return DEMO_USER;
+  }
+
   const baseUrl = getApiBaseUrl();
   const endpoint = `${baseUrl}/auth/me`;
 

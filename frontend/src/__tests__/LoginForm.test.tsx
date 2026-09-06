@@ -142,4 +142,29 @@ describe("LoginForm Component", () => {
       screen.queryByText("Invalid username or password.")
     ).not.toBeInTheDocument();
   });
+
+  it("authenticates via Demo District Officer button and triggers onSuccess", async () => {
+    const onSuccessMock = vi.fn();
+
+    render(
+      <AuthProvider initialState={{ isLoading: false, isAuthenticated: false }}>
+        <LoginForm onSuccess={onSuccessMock} />
+      </AuthProvider>
+    );
+
+    const demoButton = screen.getByRole("button", {
+      name: /Sign In as Demo District Officer/i,
+    });
+    expect(demoButton).toBeInTheDocument();
+
+    fireEvent.click(demoButton);
+
+    await waitFor(() => {
+      expect(onSuccessMock).toHaveBeenCalledTimes(1);
+    });
+
+    expect(window.localStorage.getItem(authService.TOKEN_STORAGE_KEY)).toBe(
+      authService.DEMO_AUTH_TOKEN
+    );
+  });
 });

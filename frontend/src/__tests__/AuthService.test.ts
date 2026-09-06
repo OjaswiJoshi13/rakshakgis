@@ -11,6 +11,8 @@ import {
   setStoredToken,
   TOKEN_STORAGE_KEY,
   EXPIRY_STORAGE_KEY,
+  DEMO_AUTH_TOKEN,
+  loginDemoUser,
 } from "@/lib/auth";
 
 describe("AuthService and Token Storage", () => {
@@ -199,6 +201,19 @@ describe("AuthService and Token Storage", () => {
       await expect(getMeApi("expired-token")).rejects.toThrow(
         "Authentication token has expired."
       );
+    });
+
+    it("returns DEMO_USER directly without fetch when using demo token", async () => {
+      const fetchSpy = vi.spyOn(global, "fetch");
+      const user = await getMeApi(DEMO_AUTH_TOKEN);
+
+      expect(user.role).toBe("district_officer");
+      expect(user.email).toBe("collector@chamoli.gov.in");
+      expect(fetchSpy).not.toHaveBeenCalled();
+
+      const { token, user: demoProfile } = loginDemoUser();
+      expect(token.access_token).toBe(DEMO_AUTH_TOKEN);
+      expect(demoProfile.role).toBe("district_officer");
     });
   });
 });

@@ -25,6 +25,7 @@ const TestConsumer: React.FC = () => {
     isLoading,
     error,
     login,
+    loginDemo,
     logout,
     hasRole,
     clearError,
@@ -54,6 +55,7 @@ const TestConsumer: React.FC = () => {
       >
         Trigger Login
       </button>
+      <button onClick={() => loginDemo()}>Trigger Demo Login</button>
       <button onClick={logout}>Trigger Logout</button>
       <button onClick={clearError}>Trigger Clear Error</button>
     </div>
@@ -216,5 +218,28 @@ describe("AuthContext and Session Lifecycle", () => {
     expect(screen.getByTestId("auth-state").textContent).toBe("unauthenticated");
     expect(screen.getByTestId("user-name").textContent).toBe("none");
     expect(authService.getStoredToken()).toBeNull();
+  });
+
+  it("authenticates successfully via loginDemo and persists demo token", async () => {
+    render(
+      <AuthProvider>
+        <TestConsumer />
+      </AuthProvider>
+    );
+
+    act(() => {
+      screen.getByText("Trigger Demo Login").click();
+    });
+
+    await waitFor(() => {
+      expect(screen.getByTestId("auth-state").textContent).toBe("authenticated");
+    });
+
+    expect(screen.getByTestId("user-name").textContent).toBe(
+      "District Collector Chamoli"
+    );
+    expect(screen.getByTestId("user-role").textContent).toBe("district_officer");
+    expect(screen.getByTestId("has-officer-role").textContent).toBe("yes");
+    expect(authService.getStoredToken()).toBe(authService.DEMO_AUTH_TOKEN);
   });
 });
