@@ -169,7 +169,7 @@ No chunk may transition to `IN_PROGRESS` until all its listed prerequisite depen
 | **M5-06** | Frontend | Village Vulnerability Analysis UI | M5 | M5-04, M5-05 | **COMMITTED** |
 | **M5-07** | Frontend | GIS API Integration & GeoJSON Layers | M5 | M5-05, M3-10 | **BLOCKED** |
 | **M6-01** | Operations | Operations UI Shell & Navigation | M6 | M5-01 | **COMMITTED** |
-| **M6-02** | Operations | Relocation Planner Workflow UI | M6 | M6-01, M4-04 | **BLOCKED** |
+| **M6-02** | Operations | Relocation Planner Workflow UI | M6 | M6-01, M4-04 | **COMMITTED** |
 | **M6-03** | Operations | Relocation Site Details & Infrastructure UI | M6 | M6-02 | **BLOCKED** |
 | **M6-04** | Operations | Scenario Simulator UI | M6 | M6-01, M4-06 | **BLOCKED** |
 | **M6-05** | Operations | Real-Time Alerts & Threshold Warnings UI | M6 | M6-01, M3-11 | **BLOCKED** |
@@ -187,15 +187,15 @@ No chunk may transition to `IN_PROGRESS` until all its listed prerequisite depen
 
 ## Current Work
 
-- **Active Chunk:** None (Chunk M5-06 and Chunk M6-01 COMMITTED)
-- **Status:** Ready for next scheduled chunks
-- **Next Eligible Chunks:** M5-07, M6-02, M6-04, M6-05, M6-06.
+- **Active Chunk:** Chunk M6-02: Relocation Planner Workflow UI
+- **Status:** `COMMITTED` (Commit: `a00c7e1` — `feat(frontend): implement M6-02 relocation planner`; independent verification passed; RelocationPlanner.test.tsx: 8/8 tests passed; TypeScript check passed; ESLint passed with 0 warnings/errors; Production build passed; M6-02 implementation was committed and pushed to origin/main)
+- **Next Eligible Chunks:** M5-07, M6-03, M6-04, M6-05, M6-06.
 
 ---
 
 ## Blocked Work
 
-Chunks M5-07 through DOC-01 (except committed M3-01 through M3-13, M4-01 through M4-06, M5-01 through M5-06, and M6-01 which are COMMITTED) remain in `BLOCKED` status awaiting completion, independent verification, and commit of their respective prerequisites.
+Chunks M5-07 through DOC-01 (except committed M3-01 through M3-13, M4-01 through M4-06, M5-01 through M5-06, M6-01, and M6-02 which are COMMITTED) remain in `BLOCKED` status awaiting completion, independent verification, and commit of their respective prerequisites.
 
 ---
 
@@ -235,6 +235,7 @@ Chunks M5-07 through DOC-01 (except committed M3-01 through M3-13, M4-01 through
 - M5-05: MapLibre GIS Interactive Map Canvas — COMMITTED (Commit: `54573bb` — `feat(frontend): add MapLibre GIS map canvas`).
 - M6-01: Operations UI Shell & Navigation — COMMITTED (Commit: `05f5991` — `feat(frontend): implement M6-01 operations shell`; independent verification passed; OperationsShell.test.tsx passed 5/5 independently).
 - M5-06: Village Vulnerability Analysis UI — COMMITTED (Commit: `4d6f5ba` — `feat(frontend): add village vulnerability analysis`; independent adversarial review passed; VillageAnalysis.test.tsx passed 22/22 independently).
+- M6-02: Relocation Planner Workflow UI — COMMITTED (Commit: `a00c7e1` — `feat(frontend): implement M6-02 relocation planner`; independent verification passed; RelocationPlanner.test.tsx: 8/8 tests passed; TypeScript check passed; ESLint passed with 0 warnings/errors; Production build passed; M6-02 implementation was committed and pushed to origin/main).
 
 ---
 
@@ -1753,6 +1754,6 @@ Chunks M5-07 through DOC-01 (except committed M3-01 through M3-13, M4-01 through
 
 ## Last Updated
 
-- **Timestamp:** 2026-09-06 16:45:00 IST
-- **Updated By:** M5 (Village Vulnerability Detail / Habitation Analysis — Chunk M5-06 COMMITTED)
-- **Status Summary:** Chunk M5-06 COMMITTED (Commit: `4d6f5ba`); Chunk M6-01 COMMITTED (Commit: `ba8021e`); Chunk M5-05 COMMITTED (Commit: `63d88cd`); Chunk M5-04 COMMITTED (Commit: `85ac1e8`); Chunk M5-03 COMMITTED (Commit: `f1637e4`); Chunk M5-02 COMMITTED; Chunk M5-01 COMMITTED; Chunk M4-06 COMMITTED; Chunk M4-05 COMMITTED; Chunk M4-04 COMMITTED; Chunk M4-03 COMMITTED; Chunk M4-02 COMMITTED; Chunk M4-01 COMMITTED; Chunk M3-13 COMMITTED; Chunk M3-12 COMMITTED; Chunk M3-11 COMMITTED; Chunk M3-10 COMMITTED; Chunk M3-09 COMMITTED; Chunk M3-08 COMMITTED; 171 frontend tests passed in Vitest (22 test suites); 525 total backend regression tests verified passing in container (100% clean). Next eligible chunks: M5-07, M6-02, M6-04, M6-05, M6-06.
+- **Timestamp:** 2026-09-06 16:55:00 IST
+- **Updated By:** M6 (Relocation Planner Workflow UI — Chunk M6-02 COMMITTED)
+- **Status Summary:** Chunk M6-02 COMMITTED (Commit: `a00c7e1`); Chunk M5-06 COMMITTED (Commit: `4d6f5ba`); Chunk M6-01 COMMITTED (Commit: `05f5991`); Chunk M5-05 COMMITTED (Commit: `54573bb`); Chunk M5-04 COMMITTED (Commit: `85ac1e8`); Chunk M5-03 COMMITTED (Commit: `f1637e4`); Chunk M5-02 COMMITTED; Chunk M5-01 COMMITTED; Chunk M4-06 COMMITTED; Chunk M4-05 COMMITTED; Chunk M4-04 COMMITTED; Chunk M4-03 COMMITTED; Chunk M4-02 COMMITTED; Chunk M4-01 COMMITTED; Chunk M3-13 COMMITTED; Chunk M3-12 COMMITTED; Chunk M3-11 COMMITTED; Chunk M3-10 COMMITTED; Chunk M3-09 COMMITTED; Chunk M3-08 COMMITTED; 179 frontend tests passed in Vitest (23 test suites); 525 total backend regression tests verified passing in container (100% clean). Next eligible chunks: M5-07, M6-03, M6-04, M6-05, M6-06.
