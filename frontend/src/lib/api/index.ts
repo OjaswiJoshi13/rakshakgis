@@ -8,3 +8,4 @@ export { ApiError, normalizeApiError } from "./error";
 export { ApiCache, apiCache } from "./cache";
 export { useApiQuery } from "./useApiQuery";
 export { useApiMutation } from "./useApiMutation";
+export * from "./relocation";
