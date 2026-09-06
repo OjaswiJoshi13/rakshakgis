@@ -173,7 +173,7 @@ No chunk may transition to `IN_PROGRESS` until all its listed prerequisite depen
 | **M6-03** | Operations | Relocation Site Details & Infrastructure UI | M6 | M6-02 | **COMMITTED** |
 | **M6-04** | Operations | Scenario Simulator UI | M6 | M6-01, M4-06 | **COMMITTED** |
 | **M6-05** | Operations | Real-Time Alerts & Threshold Warnings UI | M6 | M6-01, M3-11 | **COMMITTED** |
-| **M6-06** | Operations | Data Sources & Freshness Monitoring UI | M6 | M6-01, M3-13 | **AWAITING_REVIEW** |
+| **M6-06** | Operations | Data Sources & Freshness Monitoring UI | M6 | M6-01, M3-13 | **COMMITTED** |
 | **M6-07** | Operations | Report Generation & Export UI | M6 | M6-02, M6-03 | **BLOCKED** |
 | **M6-08** | Operations | Officer Review & Action Sign-Off Workflow | M6 | M6-02, M6-04 | **BLOCKED** |
 | **M6-09** | Operations | Audit Log & Traceability UI | M6 | M6-08 | **BLOCKED** |
@@ -188,14 +188,14 @@ No chunk may transition to `IN_PROGRESS` until all its listed prerequisite depen
 ## Current Work
 
 - **Active Chunk:** Chunk M6-06: Data Sources & Freshness Monitoring UI
-- **Status:** `AWAITING_REVIEW` (Implementation complete; Data Sources & Freshness Monitoring workflow implemented inside `/operations/sources` consuming M3-13 telemetry overview, sources, detail, and probe contracts; DataSourcesOperations.test.tsx passed 13/13 tests independently; Full Vitest suite: 27/27 test files passed, 220/220 tests passed; TypeScript: 0 errors; ESLint: 0 warnings, 0 errors; Production build: passed).
+- **Status:** `COMMITTED` (Commit: `f7d4830` — `feat(frontend): implement M6-06 data sources monitoring`; independent verification passed; Focused M6-06 suite: 13/13 passed; Full frontend suite: 220/220 tests passed across 27 files; TypeScript: 0 errors; ESLint: 0 warnings, 0 errors; Production build: passed; M6-06 implementation was committed and pushed to origin/main)
 - **Next Eligible Chunks:** M5-07, M6-07, M6-08.
 
 ---
 
 ## Blocked Work
 
-Chunks M5-07 through DOC-01 (except committed M3-01 through M3-13, M4-01 through M4-06, M5-01 through M5-06, M6-01, M6-02, M6-03, M6-04, M6-05 which are COMMITTED, and M6-06 which is AWAITING_REVIEW) remain in `BLOCKED` status awaiting completion, independent verification, and commit of their respective prerequisites.
+Chunks M5-07 through DOC-01 (except committed M3-01 through M3-13, M4-01 through M4-06, M5-01 through M5-06, M6-01, M6-02, M6-03, M6-04, M6-05, and M6-06 which are COMMITTED) remain in `BLOCKED` status awaiting completion, independent verification, and commit of their respective prerequisites.
 
 ---
 
@@ -239,6 +239,7 @@ Chunks M5-07 through DOC-01 (except committed M3-01 through M3-13, M4-01 through
 - M6-03: Relocation Site Details & Infrastructure UI — COMMITTED (Commit: `19a8ff8` — `feat(frontend): implement M6-03 relocation site details`; independent verification passed; Full Vitest suite: 22/22 test files passed, 157/157 tests passed; TypeScript: 0 errors; ESLint: 0 warnings, 0 errors; Production build: passed; M6-03 implementation was committed and pushed to origin/main).
 - M6-04: Scenario Simulator UI — COMMITTED (Commit: `37d385b` — `feat(frontend): implement M6-04 scenario simulator`; independent verification passed; M6-04 tests: 9/9 passed; Full frontend suite: 195/195 passed; TypeScript: 0 errors; ESLint: 0 warnings, 0 errors; Production build: passed; M6-04 implementation was committed and pushed to origin/main).
 - M6-05: Real-Time Alerts & Threshold Warnings UI — COMMITTED (Commit: `3aef3a9` — `feat(frontend): implement M6-05 alerts and threshold warnings`; independent verification passed; Focused M6-05 suite: 12/12 passed; Full frontend suite: 207/207 tests passed across 26 files; TypeScript: 0 errors; ESLint: 0 warnings, 0 errors; Production build: passed; M6-05 implementation was committed and pushed to origin/main).
+- M6-06: Data Sources & Freshness Monitoring UI — COMMITTED (Commit: `f7d4830` — `feat(frontend): implement M6-06 data sources monitoring`; independent verification passed; Focused M6-06 suite: 13/13 passed; Full frontend suite: 220/220 tests passed across 27 files; TypeScript: 0 errors; ESLint: 0 warnings, 0 errors; Production build: passed; M6-06 implementation was committed and pushed to origin/main).
 
 ---
 
@@ -1852,7 +1853,7 @@ Chunks M5-07 through DOC-01 (except committed M3-01 through M3-13, M4-01 through
 
 ### Chunk M6-06 Implementation Record: Data Sources & Freshness Monitoring UI
 
-- **Status:** `AWAITING_REVIEW` (Lifecycle: `PLANNED` → `IN_PROGRESS` → `IMPLEMENTED` → `AWAITING_REVIEW`)
+- **Status:** `COMMITTED` (Commit: `f7d4830`; Lifecycle: `PLANNED` → `IN_PROGRESS` → `IMPLEMENTED` → `AWAITING_REVIEW` → `VERIFIED` → `COMMITTED`)
 - **Owner:** M6 (Frontend Operations)
 - **Primary Deliverables:**
   - `frontend/src/types/telemetry.ts`: Strongly typed domain models for `FreshnessStatus` (`fresh`, `stale`, `unavailable`, `clock_skew`, `unknown`), `ProviderHealth` (`healthy`, `degraded`, `unavailable`, `unknown`), `ProviderMode` (`live`, `mock`, `file`, `hybrid`), `SourceCategory` (`rainfall`, `flood`, `landslide`, `hazard_observation`, `population_exposure`, `other`), `FreshnessEvaluationRead`, `DataIngestionRunRead`, `DataSourceTelemetryRead`, `DataSourceDetailRead`, `TelemetryOverviewRead`, `CategoryFreshnessThresholdItem`, and `DataSourceFilterCriteria` strictly conforming to M3-13 telemetry contracts.
@@ -1875,6 +1876,7 @@ Chunks M5-07 through DOC-01 (except committed M3-01 through M3-13, M4-01 through
   - TypeScript: 0 errors (`tsc --noEmit` passed).
   - ESLint: 0 warnings, 0 errors (`next lint` passed).
   - Production Build: passed (`next build` compiled cleanly; 17 static routes generated including `/operations/sources` at 13.1 kB).
+  - Implementation Commit: `f7d4830` pushed to origin/main.
 - **Scope & Invariants Audit:**
   - Zero backend modifications (`backend/` git status completely clean).
   - Purely additive frontend implementation inside M6 operations module.
@@ -1886,6 +1888,6 @@ Chunks M5-07 through DOC-01 (except committed M3-01 through M3-13, M4-01 through
 
 ## Last Updated
 
-- **Timestamp:** 2026-09-06 19:05:00 IST
-- **Updated By:** M6 (Data Sources & Freshness Monitoring UI — Chunk M6-06 AWAITING_REVIEW)
-- **Status Summary:** Chunk M6-06 AWAITING_REVIEW; Chunk M6-05 COMMITTED (Commit: `3aef3a9`); Chunk M6-04 COMMITTED (Commit: `37d385b`); Chunk M6-03 COMMITTED (Commit: `19a8ff8`); Chunk M6-02 COMMITTED (Commit: `a00c7e1`); Chunk M5-06 COMMITTED (Commit: `4d6f5ba`); Chunk M6-01 COMMITTED (Commit: `05f5991`); Chunk M5-05 COMMITTED (Commit: `54573bb`); Chunk M5-04 COMMITTED (Commit: `85ac1e8`); Chunk M5-03 COMMITTED (Commit: `f1637e4`); Chunk M5-02 COMMITTED; Chunk M5-01 COMMITTED; Chunk M4-06 COMMITTED; Chunk M4-05 COMMITTED; Chunk M4-04 COMMITTED; Chunk M4-03 COMMITTED; Chunk M4-02 COMMITTED; Chunk M4-01 COMMITTED; Chunk M3-13 COMMITTED; Chunk M3-12 COMMITTED; Chunk M3-11 COMMITTED; Chunk M3-10 COMMITTED; Chunk M3-09 COMMITTED; Chunk M3-08 COMMITTED; 220/220 frontend tests passing across 27 files; 525 total backend regression tests verified passing in container. Next eligible chunks: M5-07, M6-07, M6-08.
+- **Timestamp:** 2026-09-06 19:15:00 IST
+- **Updated By:** M6 (Data Sources & Freshness Monitoring UI — Chunk M6-06 COMMITTED)
+- **Status Summary:** Chunk M6-06 COMMITTED (Commit: `f7d4830`); Chunk M6-05 COMMITTED (Commit: `3aef3a9`); Chunk M6-04 COMMITTED (Commit: `37d385b`); Chunk M6-03 COMMITTED (Commit: `19a8ff8`); Chunk M6-02 COMMITTED (Commit: `a00c7e1`); Chunk M5-06 COMMITTED (Commit: `4d6f5ba`); Chunk M6-01 COMMITTED (Commit: `05f5991`); Chunk M5-05 COMMITTED (Commit: `54573bb`); Chunk M5-04 COMMITTED (Commit: `85ac1e8`); Chunk M5-03 COMMITTED (Commit: `f1637e4`); Chunk M5-02 COMMITTED; Chunk M5-01 COMMITTED; Chunk M4-06 COMMITTED; Chunk M4-05 COMMITTED; Chunk M4-04 COMMITTED; Chunk M4-03 COMMITTED; Chunk M4-02 COMMITTED; Chunk M4-01 COMMITTED; Chunk M3-13 COMMITTED; Chunk M3-12 COMMITTED; Chunk M3-11 COMMITTED; Chunk M3-10 COMMITTED; Chunk M3-09 COMMITTED; Chunk M3-08 COMMITTED; 220/220 frontend tests passing across 27 files; 525 total backend regression tests verified passing in container. Next eligible chunks: M5-07, M6-07, M6-08.
