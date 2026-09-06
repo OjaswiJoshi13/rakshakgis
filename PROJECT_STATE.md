@@ -164,7 +164,7 @@ No chunk may transition to `IN_PROGRESS` until all its listed prerequisite depen
 | **M5-01** | Frontend | Frontend Foundation & Design System | M5 | M1-01 | **COMMITTED** |
 | **M5-02** | Frontend | Authentication UI & Session Handling | M5 | M5-01, M2-05 | **COMMITTED** |
 | **M5-03** | Frontend | API Client & State Management Setup | M5 | M5-01, M2-04 | **COMMITTED** |
-| **M5-04** | Frontend | Executive Dashboard UI | M5 | M5-03 | **BLOCKED** |
+| **M5-04** | Frontend | Executive Dashboard UI | M5 | M5-03 | **COMMITTED** |
 | **M5-05** | Frontend | MapLibre GIS Interactive Map Canvas | M5 | M5-03 | **BLOCKED** |
 | **M5-06** | Frontend | Village Vulnerability Analysis UI | M5 | M5-04, M5-05 | **BLOCKED** |
 | **M5-07** | Frontend | GIS API Integration & GeoJSON Layers | M5 | M5-05, M3-10 | **BLOCKED** |
@@ -187,9 +187,9 @@ No chunk may transition to `IN_PROGRESS` until all its listed prerequisite depen
 
 ## Current Work
 
-- **Active Chunk:** None (Chunk M5-03 committed; Milestone 5 progressing)
-- **Next Eligible Chunks:** Chunk M5-04: Executive Dashboard UI (depends on M5-03 [COMMITTED]); Chunk M5-05: MapLibre GIS Interactive Map Canvas (depends on M5-03 [COMMITTED]); Chunk M6-01: Operations UI Shell & Navigation (depends on M5-01 [COMMITTED])
-- **Status:** Chunk M5-03 COMMITTED (Commit: `f1637e4`); Chunk M5-02 COMMITTED (Commit: `c538c55`); Chunk M5-01 COMMITTED (Commit: `fda544e`). 104 frontend tests passed across 18 test suites (100% clean), 0 lint errors, tsc clean, production build passed.
+- **Active Chunk:** None (Chunk M5-04 committed; Milestone 5 progressing)
+- **Next Eligible Chunks:** Chunk M5-05: MapLibre GIS Interactive Map Canvas (depends on M5-03 [COMMITTED]); Chunk M6-01: Operations UI Shell & Navigation (depends on M5-01 [COMMITTED]); Chunk M5-06: Village Vulnerability Analysis UI (depends on M5-04 [COMMITTED], M5-05 [BLOCKED])
+- **Status:** Chunk M5-04 COMMITTED (Commit: `85ac1e8`); Chunk M5-03 COMMITTED (Commit: `f1637e4`); Chunk M5-02 COMMITTED (Commit: `c538c55`); Chunk M5-01 COMMITTED (Commit: `fda544e`). 119 frontend tests passed across 19 test suites (100% clean), 0 lint errors, tsc clean, production build passed.
 
 ---
 
@@ -1571,6 +1571,63 @@ Chunks M5-03 through DOC-01 (except committed M3-01 through M3-13, M4-01 through
 
 ---
 
+## Chunk M5-04 Implementation Record: Executive Dashboard UI
+
+- **Status:** `COMMITTED`
+- **Commit Hash:** `85ac1e8`
+- **Owner:** Member 5 (Frontend Core / GIS)
+- **Prerequisites Consumed:**
+  - Chunk M5-01 (`fda544e`): Foundation layout (`AppLayout`, `CommandHeader`, `Sidebar`, `StatusBar`), primitives (`Card`, `MetricCard`, `Badge`, `RiskBadge`, `RelocationBadge`, `Button`, `Alert`).
+  - Chunk M5-02 (`c538c55`, `790751c`): Authentication state (`AuthContext`, `useAuth`, `ProtectedRoute`, session token handling).
+  - Chunk M5-03 (`f1637e4`, `f76cd5b`): API client and query infrastructure (`apiClient`, `useApiQuery`, `OperationalContext`, `useOperational`, `ApiError`).
+- **Backend Contracts Inspected & Verified:**
+  - `GET /api/v1/telemetry/overview` -> `ResponseEnvelope[TelemetryOverviewRead]` (`backend/app/api/v1/telemetry.py`)
+  - `GET /api/v1/telemetry/sources` -> `PaginatedResponse[DataSourceTelemetryRead]` (`backend/app/api/v1/telemetry.py`)
+  - `GET /api/v1/sites` -> `PaginatedResponse[CandidateSiteRead]` (`backend/app/api/v1/sites.py`)
+  - `GET /api/v1/relocation/assignments` -> `PaginatedResponse[RelocationAssignmentRead]` (`backend/app/api/v1/relocation.py`)
+  - `GET /api/v1/scenarios` -> `ResponseEnvelope[List[ScenarioDefinitionRead]]` (`backend/app/api/v1/scenarios.py`)
+  - *No-Mock / No-Fake Invariant:* Inspected absence of `/api/v1/villages` and `/api/v1/alerts`. Habitations layer is explicitly rendered with an honest "Pending Chunk M5-06" status badge; Early warning alerts section displays deterministic SOP-RZ-01 operational threshold parameters (IMD 64.5mm/24h, 25.0° slope trigger, 500m riverine buffer) clearly attributed to upcoming Chunk M6-05. Zero fake random or simulated numerical metrics are fabricated in the frontend.
+- **Component Architecture:**
+  - `frontend/src/types/dashboard.ts`: Types strictly mirroring backend Pydantic schemas (`FreshnessEvaluationRead`, `DataSourceTelemetryRead`, `TelemetryOverviewRead`, `CandidateSiteRead`, `RelocationAssignmentRead`, `ScenarioDefinitionRead`, `GeoJSONPoint`).
+  - `frontend/src/components/dashboard/DashboardHeader.tsx`: Officer profile & role context, active region & data mode badges, overall telemetry health badge, manual refresh action.
+  - `frontend/src/components/dashboard/DashboardKpiStrip.tsx`: 6 `MetricCard` KPIs (Candidate Safe Sites, Planned Relocations, Active Telemetry Feeds, Freshness Ratio, Contingency Scenarios, Habitations status).
+  - `frontend/src/components/dashboard/CandidateSitesTable.tsx`: Candidate relocation safe havens table with elevation, area, status badge, and coordinates.
+  - `frontend/src/components/dashboard/RelocationAssignmentsCard.tsx`: Planned relocation assignments table with assigned households, population, and approval status.
+  - `frontend/src/components/dashboard/TelemetryHealthCard.tsx`: Telemetry health and data freshness visual breakdown with zero-dependency SVG meters, synthetic feed disclosure, and registered source table.
+  - `frontend/src/components/dashboard/ScenarioReadinessCard.tsx`: Pre-configured contingency models with rainfall multiplier and road blockage parameters.
+  - `frontend/src/components/dashboard/AlertsNoticeCard.tsx`: Operational early warning threshold parameters and SOP-RZ-01 notice.
+  - `frontend/src/components/dashboard/index.ts`: Clean barrel export.
+  - `frontend/src/app/dashboard/page.tsx`: Executive command dashboard orchestrating independent `useApiQuery` queries with section-level loading, error, and empty states.
+- **Files Created:**
+  - `frontend/src/types/dashboard.ts`
+  - `frontend/src/components/dashboard/DashboardHeader.tsx`
+  - `frontend/src/components/dashboard/DashboardKpiStrip.tsx`
+  - `frontend/src/components/dashboard/CandidateSitesTable.tsx`
+  - `frontend/src/components/dashboard/RelocationAssignmentsCard.tsx`
+  - `frontend/src/components/dashboard/TelemetryHealthCard.tsx`
+  - `frontend/src/components/dashboard/ScenarioReadinessCard.tsx`
+  - `frontend/src/components/dashboard/AlertsNoticeCard.tsx`
+  - `frontend/src/components/dashboard/index.ts`
+  - `frontend/src/app/dashboard/page.tsx`
+  - `frontend/src/__tests__/Dashboard.test.tsx`
+- **Files Modified:**
+  - `frontend/src/components/layout/Sidebar.tsx` (marked "Executive Dashboard" `/dashboard` active)
+  - `frontend/src/app/page.tsx` (added navigation link button to `/dashboard` while preserving M5-01 landing page tests)
+  - `PROJECT_STATE.md` (updated registry, current work, integration notes, implementation record)
+- **Validation & Automated Tests:**
+  - Vitest: 119/119 passing across 19 test suites (15 new M5-04 tests covering header, KPIs, tables, cards, full page integration, query error isolation, cache isolation).
+  - TypeScript: `tsc --noEmit` passed with 0 errors.
+  - ESLint: `next lint` passed with 0 warnings and 0 errors.
+  - Production Build: `next build` compiled cleanly; `/dashboard` prerendered statically at 10.8 kB (120 kB First Load JS).
+  - Backend Regression Limitation: Docker daemon unavailable on Windows host; zero backend files modified.
+- **Scope & Invariants Audit:**
+  - Zero backend modifications.
+  - No MapLibre GIS canvas (strictly reserved for Chunk M5-05).
+  - No relocation planner or scenario simulation wizard (reserved for M6).
+  - Fault-tolerant section-level error handling ensuring one failing endpoint does not crash the dashboard.
+
+---
+
 ## Known Issues
 
 1. **Untracked Host Virtual Environment:** `backend/venv/` exists locally on Windows host and is properly ignored by `.gitignore`. The Docker service isolates this via an anonymous volume (`/app/venv`).
@@ -1610,12 +1667,12 @@ Chunks M5-03 through DOC-01 (except committed M3-01 through M3-13, M4-01 through
 - Chunk M4-04 established relocation matching & assignment engine (`app.core.relocation.matching`) implementing deterministic greedy village-to-site matching with descending priority processing, dynamic carrying capacity reservation across sequential assignments, M4-02 hard safety constraint gating, M4-03 weakest-link capacity enforcement, distance/suitability ranking, rejection audits, and REST API endpoints under `/api/v1/relocation` (`POST /match`, `POST /assignments`, `POST /assignments/batch`, `GET /assignments`, `GET /assignments/{id}`).
 - Chunk M4-05 established evacuation & access routing engine (`app.core.relocation.routing`) implementing deterministic Dijkstra routing with exact tuple tie-breaking, hard safety blockage omission for cut-off road corridors, dynamic hazard proximity penalties, continuous LineString coordinate assembly, edge-penalty diversion for distinct alternative route discovery, explainability synthesis, and REST API endpoints under `/api/v1/routes` (`POST /generate` pure evaluation with zero DB mutations, `POST /` explicit persistence, `GET /` filtering & pagination, `GET /{id}`).
 - Chunk M4-06 established scenario simulator integration backend (`app.core.scenarios`) orchestrating the 7 backend engines into an isolated what-if simulation pipeline supporting NORMAL, EXTREME_RAINFALL, FLASH_FLOOD, and CAPACITY_CRISIS with before-vs-after deltas, REST API endpoints under `/api/v1/scenarios` (`GET /`, `POST /`, `GET /{id}`, `POST /run`, `GET /runs/{id}`), and zero baseline mutation.
-- Automated tests verified: 525 backend tests passed in container (100% clean); 104 frontend tests passed in Vitest (18 suites, 100% clean).
+- Automated tests verified: 525 backend tests passed in container (100% clean); 119 frontend tests passed in Vitest (19 suites, 100% clean).
 
 ---
 
 ## Last Updated
 
-- **Timestamp:** 2026-09-06 14:38:00 IST
-- **Updated By:** M5 (API Client & State Management Setup — Chunk M5-03 Committed)
-- **Status Summary:** Chunk M5-03 COMMITTED (Commit: `f1637e4`); Chunk M5-02 COMMITTED; Chunk M5-01 COMMITTED; Chunk M4-06 COMMITTED; Chunk M4-05 COMMITTED; Chunk M4-04 COMMITTED; Chunk M4-03 COMMITTED; Chunk M4-02 COMMITTED; Chunk M4-01 COMMITTED; Chunk M3-13 COMMITTED; Chunk M3-12 COMMITTED; Chunk M3-11 COMMITTED; Chunk M3-10 COMMITTED; Chunk M3-09 COMMITTED; Chunk M3-08 COMMITTED; 104 frontend tests passed in Vitest (18 test suites); 525 total backend regression tests verified passing in container (100% clean). Next eligible chunks: M5-04, M5-05, M6-01.
+- **Timestamp:** 2026-09-06 15:05:00 IST
+- **Updated By:** M5 (Executive Dashboard UI — Chunk M5-04 Committed)
+- **Status Summary:** Chunk M5-04 COMMITTED (Commit: `85ac1e8`); Chunk M5-03 COMMITTED (Commit: `f1637e4`); Chunk M5-02 COMMITTED; Chunk M5-01 COMMITTED; Chunk M4-06 COMMITTED; Chunk M4-05 COMMITTED; Chunk M4-04 COMMITTED; Chunk M4-03 COMMITTED; Chunk M4-02 COMMITTED; Chunk M4-01 COMMITTED; Chunk M3-13 COMMITTED; Chunk M3-12 COMMITTED; Chunk M3-11 COMMITTED; Chunk M3-10 COMMITTED; Chunk M3-09 COMMITTED; Chunk M3-08 COMMITTED; 119 frontend tests passed in Vitest (19 test suites); 525 total backend regression tests verified passing in container (100% clean). Next eligible chunks: M5-05, M6-01.
