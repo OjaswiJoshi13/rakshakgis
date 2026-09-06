@@ -26,6 +26,8 @@ vi.mock("@/context/AuthContext", () => ({
       id: 101,
       email: "ddmo_chamoli@rakshakgis.gov.in",
       role: "district_officer",
+      full_name: "Suhani Amnerkar (DDMO)",
+      username: "suhani_ddmo",
       name: "Suhani Amnerkar (DDMO)",
     },
     isAuthenticated: true,
