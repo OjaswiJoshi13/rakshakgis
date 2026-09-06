@@ -175,7 +175,7 @@ No chunk may transition to `IN_PROGRESS` until all its listed prerequisite depen
 | **M6-05** | Operations | Real-Time Alerts & Threshold Warnings UI | M6 | M6-01, M3-11 | **COMMITTED** |
 | **M6-06** | Operations | Data Sources & Freshness Monitoring UI | M6 | M6-01, M3-13 | **COMMITTED** |
 | **M6-07** | Operations | Report Generation & Export UI | M6 | M6-02, M6-03 | **COMMITTED** |
-| **M6-08** | Operations | Officer Review & Action Sign-Off Workflow | M6 | M6-02, M6-04 | **AWAITING_REVIEW** |
+| **M6-08** | Operations | Officer Review & Action Sign-Off Workflow | M6 | M6-02, M6-04 | **COMMITTED** |
 | **M6-09** | Operations | Audit Log & Traceability UI | M6 | M6-08 | **BLOCKED** |
 | **INT-01** | Integration | End-to-End Backend / Frontend Integration | M1 | All M2-M6 | **BLOCKED** |
 | **INT-02** | Integration | End-to-End SIH Demo Flow Validation | M1 | INT-01 | **BLOCKED** |
@@ -187,20 +187,19 @@ No chunk may transition to `IN_PROGRESS` until all its listed prerequisite depen
 
 ## Current Work
 
-- **Active Chunk:** `M6-08` (Officer Review & Action Sign-Off Workflow — AWAITING_REVIEW)
-- **Status:** Chunk M6-08: Officer Review & Action Sign-Off Workflow is implemented and verified, awaiting review (Lifecycle: `PLANNED` → `IN_PROGRESS` → `IMPLEMENTED` → `AWAITING_REVIEW`). All 14 focused tests in `OfficerReviewOperations.test.tsx` passed cleanly (100%); Full frontend suite: 266/266 tests passed across 30 files; TypeScript: 0 errors (`tsc --noEmit` passed); ESLint: 0 warnings, 0 errors (`next lint` passed); Production build: passed (`next build` compiled cleanly; 17 static routes generated including `/operations/review` at 17.2 kB).
+- **Active Chunk:** `None` (No M6 chunk active; Chunk M6-08 is COMMITTED)
+- **Status:** Chunk M6-08: Officer Review & Action Sign-Off Workflow is COMMITTED (Commit: `c9d99a4` — `feat(frontend): implement M6-08 officer review workflow`; independent verification passed: Focused tests: 14/14 passed; Full frontend suite: 269/269 tests passed across 30 files; TypeScript: 0 errors; ESLint: 0 warnings, 0 errors; Production build: passed; Independent verification passed).
 - **Next Eligible Chunks:**
-  - **M6-09:** Audit Log & Traceability UI (Blocked awaiting M6-08 COMMITTED)
+  - **M6-09:** Audit Log & Traceability UI (Prerequisites: M6-08 — COMMITTED; unblocked and ready to start)
 
 ---
 
 ## Blocked Work
 
 ### Next Eligible / Unblocked:
-- **None** (Chunk M6-08 is currently in review. Once M6-08 is marked COMMITTED, M6-09 will become unblocked and ready to start)
+- **M6-09:** Audit Log & Traceability UI (Dependencies: M6-08 — COMMITTED; unblocked and ready to start)
 
 ### Still Blocked:
-- **M6-09:** Audit Log & Traceability UI (Blocked awaiting M6-08 review and commit)
 - **INT-01:** End-to-End Backend / Frontend Integration (Blocked awaiting all M2–M6 chunks)
 - **INT-02:** End-to-End SIH Demo Flow Validation (Blocked awaiting INT-01)
 - **INT-03:** Full Automated Test Suite Execution (Blocked awaiting INT-02)
@@ -252,6 +251,7 @@ No chunk may transition to `IN_PROGRESS` until all its listed prerequisite depen
 - M6-06: Data Sources & Freshness Monitoring UI — COMMITTED (Commit: `f7d4830` — `feat(frontend): implement M6-06 data sources monitoring`; independent verification passed; Focused M6-06 suite: 13/13 passed; Full frontend suite: 220/220 tests passed across 27 files; TypeScript: 0 errors; ESLint: 0 warnings, 0 errors; Production build: passed; M6-06 implementation was committed and pushed to origin/main).
 - M5-07: GIS API Integration & GeoJSON Layers — COMMITTED (Commit: `1517f133c7c4eaad71b1b38418d87fafbc18276d` — `feat(gis): integrate GIS APIs and GeoJSON layers`; independent verification passed; GisGeoJsonIntegration.test.tsx passed 18/18 tests; TypeScript passed with 0 errors; ESLint passed with 0 warnings/errors; Production build passed; pushed to origin/main; Module M5 Frontend Core / GIS is 100% complete).
 - M6-07: Report Generation & Export UI — COMMITTED (Commit: `69e8297` — `feat(frontend): implement M6-07 report generation and export`; independent verification passed: Focused tests: 14/14 passed; Full frontend suite: 234/234 tests passed across 28 files; TypeScript: 0 errors; ESLint: 0 warnings, 0 errors; Production build: passed; implementation committed and pushed to origin/main).
+- M6-08: Officer Review & Action Sign-Off Workflow — COMMITTED (Commit: `c9d99a4` — `feat(frontend): implement M6-08 officer review workflow`; independent verification passed: Focused tests: 14/14 passed; Full frontend suite: 269/269 tests passed across 30 files; TypeScript: 0 errors; ESLint: 0 warnings, 0 errors; Production build: passed; implementation committed to main).
 
 ---
 
@@ -1959,7 +1959,7 @@ No chunk may transition to `IN_PROGRESS` until all its listed prerequisite depen
 
 ### Chunk M6-08 Implementation Record: Officer Review & Action Sign-Off Workflow
 
-- **Status:** `AWAITING_REVIEW` (Lifecycle: `PLANNED` → `IN_PROGRESS` → `IMPLEMENTED` → `AWAITING_REVIEW`)
+- **Status:** `COMMITTED` (Commit: `c9d99a4`; Lifecycle: `PLANNED` → `IN_PROGRESS` → `IMPLEMENTED` → `AWAITING_REVIEW` → `VERIFIED` → `COMMITTED`)
 - **Owner:** M6 (Frontend Operations)
 - **Primary Deliverables:**
   - `frontend/src/types/review.ts`: Strongly typed domain models for `OfficerDecisionAction` (`approve`, `reject`, `return_for_revision`), `ReviewStatus` (`pending_review`, `approved`, `rejected`, `revision_requested`), `RecommendationType` (`relocation_plan`, `scenario_simulation`), `OfficerDecisionRecord` (mirroring backend `OfficerDecision` model), `RecommendationDossier`, `ReviewMetric`, `RelocationRecommendationPayload`, `ScenarioRecommendationPayload`, and `SubmitDecisionRequest`.
@@ -1974,10 +1974,12 @@ No chunk may transition to `IN_PROGRESS` until all its listed prerequisite depen
   - `frontend/src/__tests__/OfficerReviewOperations.test.tsx`: Comprehensive Vitest test suite with 14 unit and integration tests covering section shell, authority posture, review queue rendering, tab filtering, search filtering, analytical inspector, scenario simulation details, statutory checkbox validation, approval flow, rejection validation & recording, revision validation & recording, re-evaluation workflow, and Rule 12 statutory notice display.
 - **Verification Results:**
   - Focused Vitest suite: `OfficerReviewOperations.test.tsx` passed 14/14 tests cleanly (100%).
-  - Full frontend suite: 30/30 test files passed, 266/266 tests passed (100% clean).
+  - Full frontend suite: 30/30 test files passed, 269/269 tests passed (100% clean).
   - TypeScript: 0 errors (`tsc --noEmit` passed).
   - ESLint: 0 warnings, 0 errors (`next lint` passed).
-  - Production Build: passed (`next build` compiled cleanly; 17 static routes generated including `/operations/review` at 17.2 kB).
+  - Production Build: passed (`next build` compiled cleanly; 17 static routes generated including `/operations/review` at 17.3 kB).
+  - Implementation Commit: `c9d99a4` (`feat(frontend): implement M6-08 officer review workflow`).
+  - Independent verification passed (independently reviewed and accepted by M6 owner/reviewer).
 - **Scope & Invariants Audit:**
   - Zero backend modifications (`backend/` git status completely clean).
   - Purely additive frontend implementation inside M6 operations module.
@@ -1990,6 +1992,6 @@ No chunk may transition to `IN_PROGRESS` until all its listed prerequisite depen
 
 ## Last Updated
 
-- **Timestamp:** 2026-09-06 21:20:00 IST
-- **Updated By:** M6 (Officer Review & Action Sign-Off Workflow — Chunk M6-08 AWAITING_REVIEW)
-- **Status Summary:** Chunk M6-08 AWAITING_REVIEW; Chunk M6-07 COMMITTED; Chunk M5-07 COMMITTED; Module M5 Frontend Core / GIS is 100% complete (M5-01 through M5-07 COMMITTED); Chunk M6-06 COMMITTED; Chunk M6-05 COMMITTED; Chunk M6-04 COMMITTED; Chunk M6-03 COMMITTED; Chunk M6-02 COMMITTED; Chunk M5-06 COMMITTED; Chunk M6-01 COMMITTED; Chunk M5-05 COMMITTED; Chunk M5-04 COMMITTED; Chunk M5-03 COMMITTED; Chunk M5-02 COMMITTED; Chunk M5-01 COMMITTED; Chunk M4-06 COMMITTED; Chunk M4-05 COMMITTED; Chunk M4-04 COMMITTED; Chunk M4-03 COMMITTED; Chunk M4-02 COMMITTED; Chunk M4-01 COMMITTED; Chunk M3-13 COMMITTED; Chunk M3-12 COMMITTED; Chunk M3-11 COMMITTED; Chunk M3-10 COMMITTED; Chunk M3-09 COMMITTED; Chunk M3-08 COMMITTED; M6-08 verification evidence: Focused tests: 14/14 passed, Full frontend suite: 266/266 tests passed across 30 files, TypeScript: 0 errors, ESLint: 0 warnings, 0 errors, Production build: passed; Next eligible chunks: M6-09 (blocked awaiting M6-08 COMMITTED); 525 total backend regression tests verified passing in container.
+- **Timestamp:** 2026-09-06 21:58:00 IST
+- **Updated By:** M6 (Officer Review & Action Sign-Off Workflow — Chunk M6-08 COMMITTED)
+- **Status Summary:** Chunk M6-08 COMMITTED (Commit: `c9d99a4`); Chunk M6-07 COMMITTED (Commit: `69e8297`); Chunk M5-07 COMMITTED (Commit: `1517f133c7c4eaad71b1b38418d87fafbc18276d`); Module M5 Frontend Core / GIS is 100% complete (M5-01 through M5-07 COMMITTED); Chunk M6-06 COMMITTED (Commit: `f7d4830`); Chunk M6-05 COMMITTED (Commit: `3aef3a9`); Chunk M6-04 COMMITTED (Commit: `37d385b`); Chunk M6-03 COMMITTED (Commit: `19a8ff8`); Chunk M6-02 COMMITTED (Commit: `a00c7e1`); Chunk M5-06 COMMITTED (Commit: `4d6f5ba`); Chunk M6-01 COMMITTED (Commit: `05f5991`); Chunk M5-05 COMMITTED (Commit: `54573bb`); Chunk M5-04 COMMITTED (Commit: `85ac1e8`); Chunk M5-03 COMMITTED (Commit: `f1637e4`); Chunk M5-02 COMMITTED; Chunk M5-01 COMMITTED; Chunk M4-06 COMMITTED; Chunk M4-05 COMMITTED; Chunk M4-04 COMMITTED; Chunk M4-03 COMMITTED; Chunk M4-02 COMMITTED; Chunk M4-01 COMMITTED; Chunk M3-13 COMMITTED; Chunk M3-12 COMMITTED; Chunk M3-11 COMMITTED; Chunk M3-10 COMMITTED; Chunk M3-09 COMMITTED; Chunk M3-08 COMMITTED; M6-08 verification evidence: Focused tests: 14/14 passed, Full frontend suite: 269/269 tests passed across 30 files, TypeScript: 0 errors, ESLint: 0 warnings, 0 errors, Production build: passed; Next eligible chunks: M6-09 (unblocked and ready to start); 525 total backend regression tests verified passing in container.
