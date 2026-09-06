@@ -171,7 +171,7 @@ No chunk may transition to `IN_PROGRESS` until all its listed prerequisite depen
 | **M6-01** | Operations | Operations UI Shell & Navigation | M6 | M5-01 | **COMMITTED** |
 | **M6-02** | Operations | Relocation Planner Workflow UI | M6 | M6-01, M4-04 | **COMMITTED** |
 | **M6-03** | Operations | Relocation Site Details & Infrastructure UI | M6 | M6-02 | **COMMITTED** |
-| **M6-04** | Operations | Scenario Simulator UI | M6 | M6-01, M4-06 | **BLOCKED** |
+| **M6-04** | Operations | Scenario Simulator UI | M6 | M6-01, M4-06 | **AWAITING_REVIEW** |
 | **M6-05** | Operations | Real-Time Alerts & Threshold Warnings UI | M6 | M6-01, M3-11 | **BLOCKED** |
 | **M6-06** | Operations | Data Sources & Freshness Monitoring UI | M6 | M6-01, M3-13 | **BLOCKED** |
 | **M6-07** | Operations | Report Generation & Export UI | M6 | M6-02, M6-03 | **BLOCKED** |
@@ -187,15 +187,22 @@ No chunk may transition to `IN_PROGRESS` until all its listed prerequisite depen
 
 ## Current Work
 
-- **Active Chunk:** Chunk M6-03: Relocation Site Details & Infrastructure UI
-- **Status:** `COMMITTED` (Commit: `19a8ff8` — `feat(frontend): implement M6-03 relocation site details`; independent verification passed; Full Vitest suite: 22/22 test files passed, 157/157 tests passed; TypeScript: 0 errors; ESLint: 0 warnings, 0 errors; Production build: passed; M6-03 implementation was committed and pushed to origin/main)
-- **Next Eligible Chunks:** M5-07, M6-04, M6-05, M6-06, M6-07.
+- **Active Chunk:** Chunk M6-04: Scenario Simulator UI
+- **Status:** `AWAITING_REVIEW`
+- **Verification Evidence:**
+  - Vitest test suite: `ScenarioSimulator.test.tsx` passed 9/9 tests cleanly (Full frontend test suite: 25/25 test files passed, 195/195 tests passed).
+  - TypeScript: `tsc --noEmit` passed with 0 errors.
+  - ESLint: `next lint` passed with 0 warnings, 0 errors.
+  - Production Build: `next build` compiled cleanly (16/16 routes generated including `/operations/scenarios`).
+  - Zero backend modifications (`backend/` git status completely clean).
+  - Strict adherence to non-mutating sandbox and Rule 12 protocol.
+- **Next Eligible Chunks:** M5-07, M6-05, M6-06, M6-07.
 
 ---
 
 ## Blocked Work
 
-Chunks M5-07 through DOC-01 (except committed M3-01 through M3-13, M4-01 through M4-06, M5-01 through M5-06, M6-01, M6-02, and M6-03 which are COMMITTED) remain in `BLOCKED` status awaiting completion, independent verification, and commit of their respective prerequisites.
+Chunks M5-07 through DOC-01 (except committed M3-01 through M3-13, M4-01 through M4-06, M5-01 through M5-06, M6-01, M6-02, and M6-03 which are COMMITTED, and M6-04 which is AWAITING_REVIEW) remain in `BLOCKED` status awaiting completion, independent verification, and commit of their respective prerequisites.
 
 ---
 
@@ -1784,8 +1791,38 @@ Chunks M5-07 through DOC-01 (except committed M3-01 through M3-13, M4-01 through
 
 ---
 
+### Chunk M6-04 Implementation Record: Scenario Simulator UI
+
+- **Status:** `AWAITING_REVIEW` (Lifecycle: `PLANNED` → `IN_PROGRESS` → `IMPLEMENTED` → `AWAITING_REVIEW`)
+- **Owner:** M6 (Frontend Operations)
+- **Primary Deliverables:**
+  - `frontend/src/types/scenarios.ts`: Strongly typed domain models for ScenarioType (`NORMAL`, `EXTREME_RAINFALL`, `FLASH_FLOOD`, `CAPACITY_CRISIS`), ScenarioParameters (rainfall multiplier, road blockage %, site capacity reduction %, flood hazard increase, seismic MMI), ScenarioDefinitionRead, ScenarioRunRequest, ScenarioSimulationOutput, ScenarioComparison, StagePipelineResult, and M4-05 evacuation routing paths.
+  - `frontend/src/lib/api/scenarios.ts`: Typed API client service methods (`listScenarioDefinitions`, `runScenarioSimulation`, `getScenarioRunRecord`) backed by the M4-06 simulation endpoints with canonical Himalayan pilot scenario catalog and sample baseline datasets.
+  - `frontend/src/lib/api/index.ts`: Barrel export for scenario services.
+  - `frontend/src/components/operations/scenarios/ScenarioConfigPanel.tsx`: Interactive perturbation configuration panel with canonical scenario presets selector, perturbation parameter range sliders with defensive bounds, reset defaults action, and simulation execution trigger.
+  - `frontend/src/components/operations/scenarios/ScenarioComparisonSummary.tsx`: High-impact Before-vs-After delta comparison cards (Average Risk Score, Dynamic Red Zones Triggered, Immediate Urgency Settlements, Unassigned Relocation Deficit, Severed/Diverted Evacuation Corridors), comparison narrative synthesis, and statutory Rule 12 Mandate advisory banner.
+  - `frontend/src/components/operations/scenarios/ScenarioRoutingView.tsx`: M4-05 / M4-06 Evacuation Corridor & Routing table displaying settlement origin, destination site, route status badges (`FEASIBLE`, `DIVERTED`, `CUT_OFF`), distance deltas (+km), transit times, and road blockage bypass counts.
+  - `frontend/src/components/operations/scenarios/ScenarioDeltaTabs.tsx`: 3-domain tab switcher (`risk`, `relocation`, `routing`) with detailed breakdowns for multi-hazard risk factor escalations, relocation capacity contractions, and evacuation routing resilience.
+  - `frontend/src/components/operations/scenarios/index.ts`: Clean barrel export for scenario simulator components.
+  - `frontend/src/app/operations/scenarios/page.tsx`: Full operational page inside `OperationsSectionShell` with `useSearchParams` URL deep-linking wrapped in `<Suspense>`, re-run/reset actions, and two-column responsive layout.
+  - `frontend/src/__tests__/ScenarioSimulator.test.tsx`: Comprehensive Vitest test suite with 9 unit and integration tests covering workspace header, preset switching, parameter bounds, simulation execution, delta KPI metrics, 3-domain delta tabs, M4-05 routing table with severed corridors, and defensive fallbacks.
+- **Verification Results:**
+  - Full Vitest suite: 25/25 test files passed, 195/195 tests passed (100% clean).
+  - Vitest M6-04 unit suite: `ScenarioSimulator.test.tsx` passed 9/9 tests cleanly.
+  - TypeScript: 0 errors (`tsc --noEmit` passed).
+  - ESLint: 0 warnings, 0 errors (`next lint` passed).
+  - Production Build: passed (`next build` compiled cleanly; 16 static routes generated including `/operations/scenarios`).
+- **Scope & Invariants Audit:**
+  - Zero backend modifications (`backend/` git status completely clean).
+  - Purely additive frontend implementation inside M6 operations module.
+  - Strictly non-mutating sandbox: pure simulation evaluation against M4-06 endpoint contracts.
+  - Strict adherence to Rule 12 protocol (all operational data flagged with statutory warning banner: "Simulation Sandbox — Strictly Advisory. All scenario projections require formal officer sign-off before operational execution.").
+  - Zero invented formulas, calculations, or schemas; strictly mirrors M4-06 perturbation logic and M4-05 evacuation routing engine.
+
+---
+
 ## Last Updated
 
-- **Timestamp:** 2026-09-06 17:20:00 IST
-- **Updated By:** M6 (Relocation Site Details & Infrastructure UI — Chunk M6-03 COMMITTED)
-- **Status Summary:** Chunk M6-03 COMMITTED (Commit: `19a8ff8`); Chunk M6-02 COMMITTED (Commit: `a00c7e1`); Chunk M5-06 COMMITTED (Commit: `4d6f5ba`); Chunk M6-01 COMMITTED (Commit: `05f5991`); Chunk M5-05 COMMITTED (Commit: `54573bb`); Chunk M5-04 COMMITTED (Commit: `85ac1e8`); Chunk M5-03 COMMITTED (Commit: `f1637e4`); Chunk M5-02 COMMITTED; Chunk M5-01 COMMITTED; Chunk M4-06 COMMITTED; Chunk M4-05 COMMITTED; Chunk M4-04 COMMITTED; Chunk M4-03 COMMITTED; Chunk M4-02 COMMITTED; Chunk M4-01 COMMITTED; Chunk M3-13 COMMITTED; Chunk M3-12 COMMITTED; Chunk M3-11 COMMITTED; Chunk M3-10 COMMITTED; Chunk M3-09 COMMITTED; Chunk M3-08 COMMITTED; 525 total backend regression tests verified passing in container (100% clean). Next eligible chunks: M5-07, M6-04, M6-05, M6-06, M6-07.
+- **Timestamp:** 2026-09-06 17:35:00 IST
+- **Updated By:** M6 (Scenario Simulator UI — Chunk M6-04 AWAITING_REVIEW)
+- **Status Summary:** Chunk M6-04 IMPLEMENTED & AWAITING_REVIEW; Chunk M6-03 COMMITTED (Commit: `19a8ff8`); Chunk M6-02 COMMITTED (Commit: `a00c7e1`); Chunk M5-06 COMMITTED (Commit: `4d6f5ba`); Chunk M6-01 COMMITTED (Commit: `05f5991`); Chunk M5-05 COMMITTED (Commit: `54573bb`); Chunk M5-04 COMMITTED (Commit: `85ac1e8`); Chunk M5-03 COMMITTED (Commit: `f1637e4`); Chunk M5-02 COMMITTED; Chunk M5-01 COMMITTED; Chunk M4-06 COMMITTED; Chunk M4-05 COMMITTED; Chunk M4-04 COMMITTED; Chunk M4-03 COMMITTED; Chunk M4-02 COMMITTED; Chunk M4-01 COMMITTED; Chunk M3-13 COMMITTED; Chunk M3-12 COMMITTED; Chunk M3-11 COMMITTED; Chunk M3-10 COMMITTED; Chunk M3-09 COMMITTED; Chunk M3-08 COMMITTED; 195/195 frontend tests passing across 25 files; 525 total backend regression tests verified passing in container. Next eligible chunks: M5-07, M6-05, M6-06, M6-07.
