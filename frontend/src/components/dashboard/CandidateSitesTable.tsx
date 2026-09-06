@@ -1,0 +1,140 @@
+"use client";
+
+import React from "react";
+import {
+  Card,
+  CardHeader,
+  CardTitle,
+  CardDescription,
+  CardContent,
+} from "@/components/ui/Card";
+import { Badge } from "@/components/ui/Badge";
+import { CandidateSiteRead } from "@/types/dashboard";
+
+export interface CandidateSitesTableProps {
+  sites?: CandidateSiteRead[] | null;
+  totalCount?: number;
+  isLoading?: boolean;
+  isError?: boolean;
+  errorMessage?: string | null;
+}
+
+export const CandidateSitesTable: React.FC<CandidateSitesTableProps> = ({
+  sites,
+  totalCount,
+  isLoading = false,
+  isError = false,
+  errorMessage,
+}) => {
+  const getStatusBadge = (status: string) => {
+    switch (status.toLowerCase()) {
+      case "active":
+        return (
+          <Badge variant="success" size="sm" className="capitalize">
+            Active
+          </Badge>
+        );
+      case "approved":
+        return (
+          <Badge variant="info" size="sm" className="capitalize">
+            Approved
+          </Badge>
+        );
+      case "proposed":
+        return (
+          <Badge variant="outline" size="sm" className="capitalize">
+            Proposed
+          </Badge>
+        );
+      case "rejected":
+        return (
+          <Badge variant="danger" size="sm" className="capitalize">
+            Rejected
+          </Badge>
+        );
+      default:
+        return (
+          <Badge variant="outline" size="sm" className="capitalize">
+            {status}
+          </Badge>
+        );
+    }
+  };
+
+  return (
+    <Card variant="elevated" className="space-y-4">
+      <CardHeader>
+        <div className="flex items-center justify-between">
+          <div>
+            <CardTitle>Candidate Relocation Sites</CardTitle>
+            <CardDescription>
+              Verified safe havens catalog evaluated against slope, flood buffers, and carrying capacity constraints.
+            </CardDescription>
+          </div>
+          {totalCount !== undefined && (
+            <span className="text-xs font-mono font-medium text-slate-400 bg-slate-900 border border-slate-800 px-2 py-1 rounded">
+              {totalCount} Total Registered Sites
+            </span>
+          )}
+        </div>
+      </CardHeader>
+
+      <CardContent>
+        {isLoading ? (
+          <div className="py-8 text-center text-slate-400 font-mono text-sm animate-pulse">
+            Loading candidate relocation safe havens...
+          </div>
+        ) : isError ? (
+          <div className="rounded-lg border border-red-900/60 bg-red-950/30 p-4 text-sm text-red-300">
+            <div className="font-semibold mb-1">Failed to Load Candidate Sites</div>
+            <p className="text-xs text-red-400">
+              {errorMessage || "Unable to retrieve relocation sites from backend."}
+            </p>
+          </div>
+        ) : !sites || sites.length === 0 ? (
+          <div className="py-8 text-center text-slate-500 text-sm font-mono">
+            No candidate relocation sites found for the active region.
+          </div>
+        ) : (
+          <div className="overflow-x-auto rounded-lg border border-slate-800">
+            <table className="w-full text-left text-xs text-slate-300">
+              <thead className="bg-slate-950 text-[11px] font-mono text-slate-400 uppercase tracking-wider border-b border-slate-800">
+                <tr>
+                  <th className="px-3 py-2.5">Site ID</th>
+                  <th className="px-3 py-2.5">Site Name</th>
+                  <th className="px-3 py-2.5">Status</th>
+                  <th className="px-3 py-2.5 text-right">Elevation</th>
+                  <th className="px-3 py-2.5 text-right">Area</th>
+                  <th className="px-3 py-2.5">Coordinates (Lon, Lat)</th>
+                </tr>
+              </thead>
+              <tbody className="divide-y divide-slate-800/60 bg-slate-900/40">
+                {sites.map((site) => {
+                  const [lon, lat] = site.location?.coordinates || [0, 0];
+                  return (
+                    <tr key={site.id} className="hover:bg-slate-800/40 transition-colors">
+                      <td className="px-3 py-2 font-mono text-slate-400">#{site.id}</td>
+                      <td className="px-3 py-2 font-medium text-slate-200">{site.name}</td>
+                      <td className="px-3 py-2">{getStatusBadge(site.status)}</td>
+                      <td className="px-3 py-2 text-right font-mono text-slate-300">
+                        {site.elevation_m !== null ? `${site.elevation_m}m` : "—"}
+                      </td>
+                      <td className="px-3 py-2 text-right font-mono text-slate-300">
+                        {site.area_sq_m !== null
+                          ? `${Math.round(site.area_sq_m).toLocaleString()} m²`
+                          : "—"}
+                      </td>
+                      <td className="px-3 py-2 font-mono text-[11px] text-slate-400">
+                        {lon.toFixed(4)}, {lat.toFixed(4)}
+                      </td>
+                    </tr>
+                  );
+                })}
+              </tbody>
+            </table>
+          </div>
+        )}
+      </CardContent>
+    </Card>
+  );
+};

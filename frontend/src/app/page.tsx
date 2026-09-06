@@ -1,4 +1,5 @@
 import React from "react";
+import Link from "next/link";
 import { ProtectedRoute } from "@/components/auth/ProtectedRoute";
 import { AppLayout } from "@/components/layout/AppLayout";
 import {
@@ -42,11 +43,13 @@ export default function HomePage() {
             </div>
 
             <div className="flex items-center gap-2">
+              <Link href="/dashboard">
+                <Button variant="primary" size="sm">
+                  Executive Dashboard &rarr;
+                </Button>
+              </Link>
               <Button variant="secondary" size="sm">
                 System Specification
-              </Button>
-              <Button variant="primary" size="sm">
-                Operational Status
               </Button>
             </div>
           </div>
