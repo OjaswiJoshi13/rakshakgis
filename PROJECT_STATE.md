@@ -163,7 +163,7 @@ No chunk may transition to `IN_PROGRESS` until all its listed prerequisite depen
 | **M4-06** | Relocation | Scenario Simulator Integration Backend | M4 | M4-04, M3-11 | **COMMITTED** |
 | **M5-01** | Frontend | Frontend Foundation & Design System | M5 | M1-01 | **COMMITTED** |
 | **M5-02** | Frontend | Authentication UI & Session Handling | M5 | M5-01, M2-05 | **COMMITTED** |
-| **M5-03** | Frontend | API Client & State Management Setup | M5 | M5-01, M2-04 | **BLOCKED** |
+| **M5-03** | Frontend | API Client & State Management Setup | M5 | M5-01, M2-04 | **VERIFIED** |
 | **M5-04** | Frontend | Executive Dashboard UI | M5 | M5-03 | **BLOCKED** |
 | **M5-05** | Frontend | MapLibre GIS Interactive Map Canvas | M5 | M5-03 | **BLOCKED** |
 | **M5-06** | Frontend | Village Vulnerability Analysis UI | M5 | M5-04, M5-05 | **BLOCKED** |
@@ -187,9 +187,9 @@ No chunk may transition to `IN_PROGRESS` until all its listed prerequisite depen
 
 ## Current Work
 
-- **Active Chunk:** None (Chunk M5-02 committed; Milestone 5 progressing)
-- **Next Eligible Chunks:** Chunk M5-03: API Client & State Management Setup (depends on M5-01 and M2-04 [both COMMITTED]); Chunk M6-01: Operations UI Shell & Navigation (depends on M5-01 [COMMITTED]); Chunk M6-04: Scenario Simulator UI (once M6-01 committed)
-- **Status:** Chunk M5-02 COMMITTED (Commit: `c538c55`); Chunk M5-01 COMMITTED (Commit: `fda544e`); Chunk M4-06 COMMITTED; Chunk M2-05 COMMITTED. 58 frontend tests passed (100% clean), 0 lint errors, tsc clean, production build passed.
+- **Active Chunk:** Chunk M5-03: API Client & State Management Setup (`VERIFIED`)
+- **Next Eligible Chunks:** Chunk M5-04: Executive Dashboard UI (once M5-03 committed; depends on M5-03); Chunk M5-05: MapLibre GIS Interactive Map Canvas (once M5-03 committed; depends on M5-03); Chunk M6-01: Operations UI Shell & Navigation (depends on M5-01 [COMMITTED])
+- **Status:** Chunk M5-03 VERIFIED (Independent Review: `PASS — READY FOR VERIFIED STATUS`); Chunk M5-02 COMMITTED (Commit: `c538c55`); Chunk M5-01 COMMITTED (Commit: `fda544e`). 104 frontend tests passed across 18 test suites (100% clean), 0 lint errors, tsc clean, production build passed.
 
 ---
 
@@ -1071,6 +1071,94 @@ Chunks M5-03 through DOC-01 (except committed M3-01 through M3-13, M4-01 through
 
 ---
 
+## Chunk M5-03 Implementation Record
+
+- **Status:** `VERIFIED`
+- **Independent Review Result:** `PASS — READY FOR VERIFIED STATUS` (Independent review verified backend contract conformance, error normalization, race-safe query hooks and caching, region-agnostic operational context, security, 104 tests, strict TypeScript, lint, and production build).
+- **Chunk:** M5-03
+- **Module:** Frontend Core / GIS
+- **Title:** API Client & State Management Setup
+- **Owner:** M5
+- **Dependencies Consumed:**
+  - M5-01 (Frontend Foundation & Design System — COMMITTED, Commit `fda544e`)
+  - M5-02 (Authentication UI & Session Handling — COMMITTED, Commit `c538c55`, State `790751c`)
+  - M2-04 (Backend API Error Contract & Common Schemas — COMMITTED, Commit `d81bbeb`)
+- **Backend Contracts Inspected & Respected:**
+  - **M2-04 Error Contract (`backend/app/schemas/common.py`, `backend/app/core/errors.py`):**
+    - Standardized error response envelope: `{ success: false, error: { code: str, message: str, status_code: int, request_id: Optional[str], details: Optional[Dict], timestamp: str } }`.
+    - HTTP correlation identifier header: `x-request-id`.
+    - Standardized error codes: `BAD_REQUEST`, `UNAUTHORIZED`, `FORBIDDEN`, `NOT_FOUND`, `VALIDATION_ERROR`, `INTERNAL_SERVER_ERROR`, `SERVICE_UNAVAILABLE`.
+  - **M2-05 Authentication Contract (`backend/app/schemas/auth.py`, `backend/app/api/v1/auth.py`):**
+    - `POST /api/v1/auth/login` (request body `username`, `password`; response `access_token`, `token_type: "bearer"`, `expires_in`).
+    - `GET /api/v1/auth/me` (requires `Authorization: Bearer <access_token>`, returns `UserRead`).
+  - **Other Active Backend Contracts Inspected:**
+    - `GET /api/v1/sites` & `POST /api/v1/sites` (`backend/app/api/v1/sites.py`)
+    - `GET /api/v1/telemetry/overview` & `/sources` (`backend/app/api/v1/telemetry.py`)
+    - `POST /api/v1/relocation/match` & `/assignments` (`backend/app/api/v1/relocation.py`)
+    - `POST /api/v1/routes/generate` (`backend/app/api/v1/routing.py`)
+    - `GET /api/v1/scenarios` & `POST /api/v1/scenarios/run` (`backend/app/api/v1/scenarios.py`)
+- **API Client & Networking Architecture:**
+  - **Environment-based Base URL:** Configurable via `NEXT_PUBLIC_API_BASE_URL` (default: `http://localhost:8000/api/v1`). Automatic URL normalization strips redundant leading and trailing slashes to eliminate accidental double slashes.
+  - **Singleton & Instance Client:** `ApiClient` class and singleton `apiClient` supporting `get`, `post`, `put`, `patch`, `delete`, and `request`.
+  - **Serialization & Query Parameters:** Automatic `URLSearchParams` serialization, filtering `undefined` and `null` values cleanly.
+  - **HTTP Headers:** Automatic `Accept: application/json` and `Content-Type: application/json` headers on JSON payloads.
+  - **Empty Response Handling:** Handles 204 No Content responses gracefully without throwing JSON parse errors.
+  - **Request Cancellation:** Supports explicit and implicit `AbortSignal` / `AbortController` cancellation across all request methods.
+- **Authentication Integration:**
+  - Reused existing M5-02 session token accessor (`getStoredToken()`) and validity checker (`isTokenExpired()`).
+  - Automatically attaches `Authorization: Bearer <token>` to all authenticated requests.
+  - Opt-out supported via `{ auth: false }` option for public endpoints (login, health).
+  - Security verification: zero access tokens logged, zero passwords retained, zero DOM exposure, and zero duplicate token storage keys.
+- **Error Normalization (`ApiError` & `normalizeApiError`):**
+  - Strongly-typed `ApiError` class extending native `Error` with prototype chain preserved.
+  - Exposes status, code, requestId, details, timestamp, and boolean getters (`isAuthError`, `isForbidden`, `isNotFound`, `isValidationError`, `isNetworkError`, `isAborted`).
+  - `normalizeApiError` reliably maps M2-04 backend payloads, standard HTTP responses, AbortController cancellations, and network disconnects into normalized `ApiError` instances without leaking credentials or stack traces.
+- **Server-State & Data-Fetching Foundation:**
+  - Evaluated dependency footprint: intentionally avoided adding heavy external server-state dependencies (e.g. TanStack Query / SWR / Redux) to maintain zero dependency bloat, prevent lockfile churn, and strictly preserve React 18 / Next.js 14 App Router performance.
+  - Created lightweight, idiomatic React hooks:
+    - `useApiQuery<T>`: Declarative query fetching with auto-cancellation via `AbortController`, race-condition prevention across rapid key changes, in-memory TTL caching, loading/success/error state transitions, and manual `refetch`/`abort`.
+    - `useApiMutation<TData, TVariables>`: Declarative mutation handling for POST/PUT/PATCH/DELETE lifecycle with loading, success/error callbacks, and reset.
+    - `ApiCache`: In-memory cache with TTL expiration, specific key invalidation, regex pattern invalidation, and clear.
+- **Global Application State:**
+  - Established minimal `OperationalContext` and `useOperational()` hook in `src/context/OperationalContext.tsx` providing cross-screen operational flags: `dataMode` (`"live"` | `"demo"`) and `activeRegion` (default: `"himalayan_pilot"`).
+  - Verified decision: avoided introducing speculative global stores, preserving M5-02 `AuthContext` as the sole authority for user sessions and credentials.
+  - Wrapped root layout (`src/app/layout.tsx`) with `<OperationalProvider>` nested inside `<AuthProvider>`.
+- **Files Created (15 files):**
+  - `frontend/src/types/api.ts` (Strongly-typed API envelopes, pagination, error details, request options, and query/mutation contracts)
+  - `frontend/src/lib/api/error.ts` (`ApiError` class and `normalizeApiError` conforming to M2-04 error response)
+  - `frontend/src/lib/api/client.ts` (`ApiClient` class and singleton `apiClient`)
+  - `frontend/src/lib/api/cache.ts` (`ApiCache` in-memory store with TTL and pattern invalidation)
+  - `frontend/src/lib/api/useApiQuery.ts` (Declarative server query hook with race-condition safety and auto-abort)
+  - `frontend/src/lib/api/useApiMutation.ts` (Declarative mutation hook with lifecycle callbacks and reset)
+  - `frontend/src/lib/api/index.ts` (Centralized barrel export for `@/lib/api`)
+  - `frontend/src/context/OperationalContext.tsx` (Operational state context for dataMode and activeRegion)
+  - `frontend/src/lib/api/README.md` (Architecture, usage guidelines, and integration documentation)
+  - `frontend/src/__tests__/ApiClient.test.ts` (15 unit tests for ApiClient URL building, methods, headers, auth, and errors)
+  - `frontend/src/__tests__/ApiError.test.ts` (10 unit tests for ApiError and normalizeApiError)
+  - `frontend/src/__tests__/ApiCache.test.ts` (7 unit tests for ApiCache TTL expiration, invalidation, and pattern matching)
+  - `frontend/src/__tests__/useApiQuery.test.tsx` (7 unit tests for useApiQuery loading, caching, refetch, and race-condition auto-abort)
+  - `frontend/src/__tests__/useApiMutation.test.tsx` (4 unit tests for useApiMutation lifecycle, success, error, and reset)
+  - `frontend/src/__tests__/OperationalContext.test.tsx` (3 unit tests for OperationalProvider and useOperational)
+- **Files Modified (1 file):**
+  - `frontend/src/app/layout.tsx` (Wrapped root layout children with `<OperationalProvider>`)
+- **Files Removed:** None
+- **Dependencies Added:** None (Zero third-party package additions; zero lockfile churn)
+- **Commands Executed & Exact Results:**
+  - `npm run type-check` (`tsc --noEmit`): PASS (0 errors, strict TypeScript mode intact)
+  - `npm run lint` (`next lint`): PASS (0 warnings, 0 errors)
+  - `npm run test` (`vitest run`): PASS (18 test suites passed, 104 tests passed, 100% clean)
+  - `npm run build` (`next build`): PASS (Compiled successfully, static routes generated for `/`, `/_not-found`, `/login`)
+- **Backend Regression & Environmental Limitations:**
+  - Docker Desktop daemon is unavailable in the local Windows execution environment (`failed to connect to the docker API at npipe:////./pipe/dockerDesktopLinuxEngine`).
+  - Zero backend files were modified or touched. Prior recorded backend regression remains: 525 passed, 6 warnings in container (100% clean).
+- **Scope Audit:**
+  - PASS. Zero backend files modified. Zero M5-04 Dashboard, M5-05 MapLibre GIS, M5-06 Habitations, or M6 Operations UI implemented. Zero hardcoded secrets or production URLs.
+- **Next Eligible M5 Chunk:**
+  - M5-04: Executive Dashboard UI (once M5-03 verified/committed; depends on M5-03)
+  - M5-05: MapLibre GIS Interactive Map Canvas (once M5-03 verified/committed; depends on M5-03)
+
+---
+
 ## Chunk M3-09 Implementation Record
 
 - **Status:** `COMMITTED`
@@ -1521,12 +1609,12 @@ Chunks M5-03 through DOC-01 (except committed M3-01 through M3-13, M4-01 through
 - Chunk M4-04 established relocation matching & assignment engine (`app.core.relocation.matching`) implementing deterministic greedy village-to-site matching with descending priority processing, dynamic carrying capacity reservation across sequential assignments, M4-02 hard safety constraint gating, M4-03 weakest-link capacity enforcement, distance/suitability ranking, rejection audits, and REST API endpoints under `/api/v1/relocation` (`POST /match`, `POST /assignments`, `POST /assignments/batch`, `GET /assignments`, `GET /assignments/{id}`).
 - Chunk M4-05 established evacuation & access routing engine (`app.core.relocation.routing`) implementing deterministic Dijkstra routing with exact tuple tie-breaking, hard safety blockage omission for cut-off road corridors, dynamic hazard proximity penalties, continuous LineString coordinate assembly, edge-penalty diversion for distinct alternative route discovery, explainability synthesis, and REST API endpoints under `/api/v1/routes` (`POST /generate` pure evaluation with zero DB mutations, `POST /` explicit persistence, `GET /` filtering & pagination, `GET /{id}`).
 - Chunk M4-06 established scenario simulator integration backend (`app.core.scenarios`) orchestrating the 7 backend engines into an isolated what-if simulation pipeline supporting NORMAL, EXTREME_RAINFALL, FLASH_FLOOD, and CAPACITY_CRISIS with before-vs-after deltas, REST API endpoints under `/api/v1/scenarios` (`GET /`, `POST /`, `GET /{id}`, `POST /run`, `GET /runs/{id}`), and zero baseline mutation.
-- Automated tests verified: 525 backend tests passed in container (100% clean); 29 frontend tests passed in Vitest.
+- Automated tests verified: 525 backend tests passed in container (100% clean); 104 frontend tests passed in Vitest (18 suites, 100% clean).
 
 ---
 
 ## Last Updated
 
-- **Timestamp:** 2026-09-06 03:45:00 IST
-- **Updated By:** M4 (Scenario Simulator Integration Backend — Chunk M4-06 Committed)
-- **Status Summary:** Chunk M4-06 COMMITTED; Chunk M4-05 COMMITTED; Chunk M4-04 COMMITTED; Chunk M4-03 COMMITTED; Chunk M4-02 COMMITTED; Chunk M4-01 COMMITTED; Chunk M3-13 COMMITTED; Chunk M3-12 COMMITTED; Chunk M3-11 COMMITTED; Chunk M3-10 COMMITTED; Chunk M3-09 COMMITTED; Chunk M3-08 COMMITTED; Chunk M5-01 VERIFIED; 31 focused M4-06 tests passed (48 test cases); 113 M4 regression tests passed; 525 total backend regression tests verified passing in container (100% clean); 29 frontend tests passed in Vitest. Next eligible chunks: M5-02, M5-03, M6-01, M6-04.
+- **Timestamp:** 2026-09-06 14:25:00 IST
+- **Updated By:** M5 (API Client & State Management Setup — Chunk M5-03 Awaiting Review)
+- **Status Summary:** Chunk M5-03 IMPLEMENTED & AWAITING_REVIEW; Chunk M5-02 COMMITTED; Chunk M5-01 COMMITTED; Chunk M4-06 COMMITTED; Chunk M4-05 COMMITTED; Chunk M4-04 COMMITTED; Chunk M4-03 COMMITTED; Chunk M4-02 COMMITTED; Chunk M4-01 COMMITTED; Chunk M3-13 COMMITTED; Chunk M3-12 COMMITTED; Chunk M3-11 COMMITTED; Chunk M3-10 COMMITTED; Chunk M3-09 COMMITTED; Chunk M3-08 COMMITTED; 104 frontend tests passed in Vitest (18 test suites); 525 total backend regression tests verified passing in container (100% clean). Next eligible chunks: M5-04, M5-05, M6-01.
