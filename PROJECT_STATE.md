@@ -165,7 +165,7 @@ No chunk may transition to `IN_PROGRESS` until all its listed prerequisite depen
 | **M5-02** | Frontend | Authentication UI & Session Handling | M5 | M5-01, M2-05 | **COMMITTED** |
 | **M5-03** | Frontend | API Client & State Management Setup | M5 | M5-01, M2-04 | **COMMITTED** |
 | **M5-04** | Frontend | Executive Dashboard UI | M5 | M5-03 | **COMMITTED** |
-| **M5-05** | Frontend | MapLibre GIS Interactive Map Canvas | M5 | M5-03 | **BLOCKED** |
+| **M5-05** | Frontend | MapLibre GIS Interactive Map Canvas | M5 | M5-03 | **COMMITTED** |
 | **M5-06** | Frontend | Village Vulnerability Analysis UI | M5 | M5-04, M5-05 | **BLOCKED** |
 | **M5-07** | Frontend | GIS API Integration & GeoJSON Layers | M5 | M5-05, M3-10 | **BLOCKED** |
 | **M6-01** | Operations | Operations UI Shell & Navigation | M6 | M5-01 | **BLOCKED** |
@@ -187,15 +187,16 @@ No chunk may transition to `IN_PROGRESS` until all its listed prerequisite depen
 
 ## Current Work
 
-- **Active Chunk:** None (Chunk M5-04 committed; Milestone 5 progressing)
-- **Next Eligible Chunks:** Chunk M5-05: MapLibre GIS Interactive Map Canvas (depends on M5-03 [COMMITTED]); Chunk M6-01: Operations UI Shell & Navigation (depends on M5-01 [COMMITTED]); Chunk M5-06: Village Vulnerability Analysis UI (depends on M5-04 [COMMITTED], M5-05 [BLOCKED])
-- **Status:** Chunk M5-04 COMMITTED (Commit: `85ac1e8`); Chunk M5-03 COMMITTED (Commit: `f1637e4`); Chunk M5-02 COMMITTED (Commit: `c538c55`); Chunk M5-01 COMMITTED (Commit: `fda544e`). 119 frontend tests passed across 19 test suites (100% clean), 0 lint errors, tsc clean, production build passed.
+- **Active Chunk:** Chunk M5-05: MapLibre GIS Interactive Map Canvas
+- **Status:** `COMMITTED` (Feature commit: `54573bb`; second independent adversarial review passed; all blocking defects resolved; 144 frontend tests passing; type-check, lint, and production build passing)
+- **Dependencies Consumed:** Chunk M5-01 (Design System), Chunk M5-02 (Authentication UI), Chunk M5-03 (API Client & State Management), Chunk M5-04 (Executive Dashboard)
+- **Next Eligible Chunks:** Chunk M6-01: Operations UI Shell & Navigation (depends on M5-01 [COMMITTED]); Chunk M5-06: Village Vulnerability Analysis UI (depends on M5-04 [COMMITTED], M5-05 [COMMITTED])
 
 ---
 
 ## Blocked Work
 
-Chunks M5-03 through DOC-01 (except committed M3-01 through M3-13, M4-01 through M4-06, and M5-01 and M5-02 which are COMMITTED) remain in `BLOCKED` status awaiting completion, independent verification, and commit of their respective prerequisites.
+Chunks M5-06 through DOC-01 (except committed M3-01 through M3-13, M4-01 through M4-06, and M5-01 through M5-05 which are COMMITTED) remain in `BLOCKED` status awaiting completion, independent verification, and commit of their respective prerequisites.
 
 ---
 
@@ -228,6 +229,11 @@ Chunks M5-03 through DOC-01 (except committed M3-01 through M3-13, M4-01 through
 - M4-04: Relocation Matching & Assignment Engine — COMMITTED (Commit: `b4e984ebc6a567e149881079d36c2580525ab72f`).
 - M4-05: Evacuation & Access Routing Engine — COMMITTED (Commit: `93e62e6392e0903aefc034a9cd13d4ad18e0c1ec` — `feat(m4): implement evacuation and access routing`).
 - M4-06: Scenario Simulator Integration Backend — COMMITTED (Commit: `feat(m4): integrate scenario simulator pipeline`).
+- M5-01: Frontend Foundation & Design System — COMMITTED (Commit: `fda544e`).
+- M5-02: Authentication UI & Session Handling — COMMITTED (Commit: `c538c55`).
+- M5-03: API Client & State Management Setup — COMMITTED (Commit: `f1637e4`).
+- M5-04: Executive Dashboard UI — COMMITTED (Commit: `85ac1e8`).
+- M5-05: MapLibre GIS Interactive Map Canvas — COMMITTED (Commit: `54573bb` — `feat(frontend): add MapLibre GIS map canvas`).
 
 ---
 
@@ -1628,6 +1634,40 @@ Chunks M5-03 through DOC-01 (except committed M3-01 through M3-13, M4-01 through
 
 ---
 
+### Chunk M5-05 Implementation & Correction Record: MapLibre GIS Interactive Map Canvas
+
+- **Status:** `COMMITTED` (Feature commit: `54573bb`; Lifecycle: `IN_PROGRESS` → `IMPLEMENTED` → `AWAITING_REVIEW` → `FAILED_REVIEW` → `IN_PROGRESS` → `IMPLEMENTED` → `AWAITING_REVIEW` → `VERIFIED` → `COMMITTED`)
+- **Owner:** M5 (Frontend Core / GIS)
+- **Review Result:** Second independent adversarial review passed with verdict `PASS — READY FOR VERIFIED STATUS`. All 3 blocking defects and 1 non-blocking improvement verified resolved. 144 frontend tests passing (20 test suites), TypeScript type-check passing with 0 errors, ESLint passing with 0 warnings/errors, and Next.js production build passing.
+- **Review Failure & Corrections Applied:**
+  1. *Blocking Defect 1 (Hardcoded Region Coordinates):* `frontend/src/components/map/MapCanvas.tsx` had hardcoded `initialCenter = [79.5, 30.5], initialZoom = 9` (Chamoli coordinates), violating the region-agnostic requirement. **Corrected:** Replaced with neutral global fallback `initialCenter = [0, 20], initialZoom = 2`, ensuring map positioning relies purely on `calculateBounds()` from loaded GeoJSON features.
+  2. *Blocking Defect 2 (RFC 7946 Polygon Ring Closure):* `isValidGeometry()` in `frontend/src/types/gis.ts` failed to verify that first and last ring coordinates matched, allowing unclosed rings past validation. **Corrected:** Added `isValidLinearRing()` requiring `ring[0][0] === ring[ring.length - 1][0] && ring[0][1] === ring[ring.length - 1][1]` across all rings for both Polygon and MultiPolygon geometries.
+  3. *Blocking Defect 3 (Stale Region State Leak):* Switching `activeRegion` in `frontend/src/app/gis/page.tsx` leaked previously selected feature details and locked viewport bounds. **Corrected:** Added `useEffect` hook on `activeRegion` transition to immediately reset `selectedFeature(null)` and `viewportBounds(null)`, allowing clean auto-fit and inspection in the newly selected region.
+  4. *Non-Blocking Improvement (MultiPolygon Bounds):* Enhanced `calculateBounds()` in `frontend/src/types/gis.ts` to recursively extract and include coordinates from `MultiPolygon` geometries.
+  5. *Regression Tests Added:* Expanded `frontend/src/__tests__/MapCanvas.test.tsx` with 4 new tests verifying closed/unclosed Polygon and MultiPolygon validation, MultiPolygon bounding box computation, neutral default viewport, and region-switch state resets. Total tests increased to 144 across 20 suites.
+- **Primary Deliverables:**
+  - `frontend/src/types/gis.ts`: Strongly typed GeoJSON RFC 7946 specifications with closed-ring validators, multi-geometry bounds calculator, and domain transformers.
+  - `frontend/src/components/map/mapStyle.ts`: Environment-driven MapLibre style resolver with credential-free OpenStreetMap raster tile style (`CREDENTIAL_FREE_OSM_STYLE`).
+  - `frontend/src/components/map/layerConfig.ts`: Authoritative layer configuration registry distinguishing active from pending layers.
+  - `frontend/src/components/map/MapCanvas.tsx`: High-performance, reusable MapLibre GL JS canvas with neutral fallback (`[0, 20]`, zoom 2), auto fit-to-geometry bounds, and lifecycle cleanup.
+  - `frontend/src/components/map/LayerControlPanel.tsx`: Accessible floating layer toggle overlay.
+  - `frontend/src/components/map/FeatureDetailPanel.tsx`: Floating spatial feature inspector rendering verified backend attributes with `—` fallbacks.
+  - `frontend/src/components/map/MapHeader.tsx`: Operational context header displaying active region, layer feature counts, and operational mode badge.
+  - `frontend/src/app/gis/page.tsx`: Protected command GIS map canvas route (`/gis`) with activeRegion reset handling.
+- **Verification Results:**
+  - Vitest: 144 passed across 20 test files (100% clean).
+  - TypeScript: `tsc --noEmit` passed with 0 errors.
+  - ESLint: `next lint` passed with 0 warnings and 0 errors.
+  - Production Build: `next build` compiled cleanly; `/gis` generated at 261 kB (374 kB First Load JS).
+- **Scope & Invariants Audit:**
+  - Zero backend modifications.
+  - Zero hardcoded coordinates (region-agnostic auto-bounds with neutral fallback).
+  - Zero fabricated GIS features.
+  - No relocation wizards or scenario execution workflows (strictly reserved for M6).
+  - No commit/push performed (stopping at `AWAITING_REVIEW`).
+
+---
+
 ## Known Issues
 
 1. **Untracked Host Virtual Environment:** `backend/venv/` exists locally on Windows host and is properly ignored by `.gitignore`. The Docker service isolates this via an anonymous volume (`/app/venv`).
@@ -1667,12 +1707,12 @@ Chunks M5-03 through DOC-01 (except committed M3-01 through M3-13, M4-01 through
 - Chunk M4-04 established relocation matching & assignment engine (`app.core.relocation.matching`) implementing deterministic greedy village-to-site matching with descending priority processing, dynamic carrying capacity reservation across sequential assignments, M4-02 hard safety constraint gating, M4-03 weakest-link capacity enforcement, distance/suitability ranking, rejection audits, and REST API endpoints under `/api/v1/relocation` (`POST /match`, `POST /assignments`, `POST /assignments/batch`, `GET /assignments`, `GET /assignments/{id}`).
 - Chunk M4-05 established evacuation & access routing engine (`app.core.relocation.routing`) implementing deterministic Dijkstra routing with exact tuple tie-breaking, hard safety blockage omission for cut-off road corridors, dynamic hazard proximity penalties, continuous LineString coordinate assembly, edge-penalty diversion for distinct alternative route discovery, explainability synthesis, and REST API endpoints under `/api/v1/routes` (`POST /generate` pure evaluation with zero DB mutations, `POST /` explicit persistence, `GET /` filtering & pagination, `GET /{id}`).
 - Chunk M4-06 established scenario simulator integration backend (`app.core.scenarios`) orchestrating the 7 backend engines into an isolated what-if simulation pipeline supporting NORMAL, EXTREME_RAINFALL, FLASH_FLOOD, and CAPACITY_CRISIS with before-vs-after deltas, REST API endpoints under `/api/v1/scenarios` (`GET /`, `POST /`, `GET /{id}`, `POST /run`, `GET /runs/{id}`), and zero baseline mutation.
-- Automated tests verified: 525 backend tests passed in container (100% clean); 119 frontend tests passed in Vitest (19 suites, 100% clean).
+- Automated tests verified: 525 backend tests passed in container (100% clean); 144 frontend tests passed in Vitest (20 suites, 100% clean).
 
 ---
 
 ## Last Updated
 
-- **Timestamp:** 2026-09-06 15:05:00 IST
-- **Updated By:** M5 (Executive Dashboard UI — Chunk M5-04 Committed)
-- **Status Summary:** Chunk M5-04 COMMITTED (Commit: `85ac1e8`); Chunk M5-03 COMMITTED (Commit: `f1637e4`); Chunk M5-02 COMMITTED; Chunk M5-01 COMMITTED; Chunk M4-06 COMMITTED; Chunk M4-05 COMMITTED; Chunk M4-04 COMMITTED; Chunk M4-03 COMMITTED; Chunk M4-02 COMMITTED; Chunk M4-01 COMMITTED; Chunk M3-13 COMMITTED; Chunk M3-12 COMMITTED; Chunk M3-11 COMMITTED; Chunk M3-10 COMMITTED; Chunk M3-09 COMMITTED; Chunk M3-08 COMMITTED; 119 frontend tests passed in Vitest (19 test suites); 525 total backend regression tests verified passing in container (100% clean). Next eligible chunks: M5-05, M6-01.
+- **Timestamp:** 2026-09-06 15:45:00 IST
+- **Updated By:** M5 (MapLibre GIS Interactive Map Canvas — Chunk M5-05 COMMITTED)
+- **Status Summary:** Chunk M5-05 COMMITTED (Commit: `54573bb`); Chunk M5-04 COMMITTED (Commit: `85ac1e8`); Chunk M5-03 COMMITTED (Commit: `f1637e4`); Chunk M5-02 COMMITTED; Chunk M5-01 COMMITTED; Chunk M4-06 COMMITTED; Chunk M4-05 COMMITTED; Chunk M4-04 COMMITTED; Chunk M4-03 COMMITTED; Chunk M4-02 COMMITTED; Chunk M4-01 COMMITTED; Chunk M3-13 COMMITTED; Chunk M3-12 COMMITTED; Chunk M3-11 COMMITTED; Chunk M3-10 COMMITTED; Chunk M3-09 COMMITTED; Chunk M3-08 COMMITTED; 144 frontend tests passed in Vitest (20 test suites); 525 total backend regression tests verified passing in container (100% clean). Next eligible chunks: M5-06, M6-01.
