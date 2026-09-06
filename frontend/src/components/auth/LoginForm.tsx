@@ -16,7 +16,7 @@ export const LoginForm: React.FC<LoginFormProps> = ({
   className = "",
 }) => {
   const router = useRouter();
-  const { login, error: serverError, clearError, isLoading } = useAuth();
+  const { login, loginDemo, error: serverError, clearError, isLoading } = useAuth();
 
   const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
@@ -43,6 +43,20 @@ export const LoginForm: React.FC<LoginFormProps> = ({
       password,
     });
 
+    if (success) {
+      if (onSuccess) {
+        onSuccess();
+      } else {
+        router.push("/");
+      }
+    }
+  };
+
+  const handleDemoLogin = async () => {
+    setClientError(null);
+    clearError();
+
+    const success = await loginDemo();
     if (success) {
       if (onSuccess) {
         onSuccess();
@@ -141,6 +155,33 @@ export const LoginForm: React.FC<LoginFormProps> = ({
         >
           {isLoading ? "Authenticating Credentials..." : "Sign In to Command Center"}
         </Button>
+      </div>
+
+      <div className="relative my-4">
+        <div className="absolute inset-0 flex items-center">
+          <div className="w-full border-t border-slate-800" />
+        </div>
+        <div className="relative flex justify-center text-xs uppercase">
+          <span className="bg-slate-900 px-2 font-mono text-[10px] text-slate-500 tracking-wider">
+            Evaluation &amp; Offline Access
+          </span>
+        </div>
+      </div>
+
+      <div>
+        <Button
+          type="button"
+          variant="outline"
+          size="md"
+          disabled={isLoading}
+          onClick={handleDemoLogin}
+          className="w-full border-emerald-600/50 bg-emerald-950/30 text-emerald-300 hover:bg-emerald-900/50 hover:text-emerald-100 font-medium shadow transition-all duration-150"
+        >
+          ⚡ Sign In as Demo District Officer
+        </Button>
+        <p className="mt-1.5 text-center text-[10px] font-mono text-slate-400">
+          One-click evaluation access • District Collector (Chamoli)
+        </p>
       </div>
 
       <div className="border-t border-slate-800/80 pt-3 text-center">
