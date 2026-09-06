@@ -3,21 +3,31 @@
 import React, { useState, useMemo, useEffect } from "react";
 import { ProtectedRoute } from "@/components/auth/ProtectedRoute";
 import { AppLayout } from "@/components/layout/AppLayout";
-import { apiClient, useApiQuery } from "@/lib/api";
+import {
+  useApiQuery,
+  fetchCandidateSites,
+  fetchRoutes,
+  fetchRedZones,
+  fetchVillages,
+} from "@/lib/api";
 import { useOperational } from "@/context/OperationalContext";
 import { PaginatedResponse } from "@/types/api";
 import { CandidateSiteRead } from "@/types/dashboard";
 import {
   GeoJSONFeatureCollection,
+  RedZoneRead,
   RouteRead,
   SelectedFeatureInfo,
+  VillageRead,
   calculateBounds,
   candidateSiteBoundariesToGeoJSON,
   candidateSitesToGeoJSON,
+  redZonesToGeoJSON,
   routesToGeoJSON,
+  villagesToGeoJSON,
 } from "@/types/gis";
 import {
-  DEFAULT_MAP_LAYERS,
+  GIS_ACTIVE_MAP_LAYERS,
   FeatureDetailPanel,
   LayerControlPanel,
   MapCanvas,
@@ -36,8 +46,8 @@ export default function GisMapPage() {
     "candidate-sites-points": true,
     "candidate-sites-boundaries": true,
     "routes-lines": true,
-    "habitations-points": false,
-    "red-zones-polygons": false,
+    "red-zones-polygons": true,
+    "habitations-points": true,
     "hazards-extents": false,
   });
 
@@ -56,11 +66,7 @@ export default function GisMapPage() {
     refetch: refetchSites,
   } = useApiQuery<PaginatedResponse<CandidateSiteRead>>(
     `gis-sites-${activeRegion}`,
-    (signal) =>
-      apiClient.get("/sites", {
-        params: { page: 1, page_size: 50 },
-        signal,
-      }),
+    (signal) => fetchCandidateSites({ page: 1, page_size: 50 }, signal),
     { cacheTtlMs: 60000 }
   );
 
@@ -73,15 +79,37 @@ export default function GisMapPage() {
     refetch: refetchRoutes,
   } = useApiQuery<PaginatedResponse<RouteRead>>(
     `gis-routes-${activeRegion}`,
-    (signal) =>
-      apiClient.get("/routes", {
-        params: { page: 1, page_size: 50 },
-        signal,
-      }),
+    (signal) => fetchRoutes({ page: 1, page_size: 50 }, signal),
     { cacheTtlMs: 60000 }
   );
 
-  // Transform backend models to standard GeoJSON
+  // 3. Fetch Permanent & Dynamic Red Zones (Polygons / MultiPolygons)
+  const {
+    data: redZonesEnvelope,
+    isLoading: redZonesLoading,
+    isError: redZonesError,
+    error: redZonesErrObj,
+    refetch: refetchRedZones,
+  } = useApiQuery<PaginatedResponse<RedZoneRead>>(
+    `gis-red-zones-${activeRegion}`,
+    (signal) => fetchRedZones({ page: 1, page_size: 50 }, signal),
+    { cacheTtlMs: 60000 }
+  );
+
+  // 4. Fetch Administrative Habitations / Settlements (Points)
+  const {
+    data: villagesEnvelope,
+    isLoading: villagesLoading,
+    isError: villagesError,
+    error: villagesErrObj,
+    refetch: refetchVillages,
+  } = useApiQuery<PaginatedResponse<VillageRead>>(
+    `gis-villages-${activeRegion}`,
+    (signal) => fetchVillages({ page: 1, page_size: 50 }, signal),
+    { cacheTtlMs: 60000 }
+  );
+
+  // Transform backend models to standard GeoJSON FeatureCollections
   const sitesGeoJSON = useMemo(() => {
     return candidateSitesToGeoJSON(sitesEnvelope?.data || []);
   }, [sitesEnvelope?.data]);
@@ -94,14 +122,24 @@ export default function GisMapPage() {
     return routesToGeoJSON(routesEnvelope?.data || []);
   }, [routesEnvelope?.data]);
 
+  const redZonesGeoJSON = useMemo(() => {
+    return redZonesToGeoJSON(redZonesEnvelope?.data || []);
+  }, [redZonesEnvelope?.data]);
+
+  const villagesGeoJSON = useMemo(() => {
+    return villagesToGeoJSON(villagesEnvelope?.data || []);
+  }, [villagesEnvelope?.data]);
+
   // Dictionary of GeoJSON sources fed to MapLibre
   const sourcesData: Record<string, GeoJSONFeatureCollection> = useMemo(() => {
     return {
       "candidate-sites-source": sitesGeoJSON,
       "candidate-site-boundaries-source": siteBoundariesGeoJSON,
       "routes-source": routesGeoJSON,
+      "red-zones-source": redZonesGeoJSON,
+      "habitations-source": villagesGeoJSON,
     };
-  }, [sitesGeoJSON, siteBoundariesGeoJSON, routesGeoJSON]);
+  }, [sitesGeoJSON, siteBoundariesGeoJSON, routesGeoJSON, redZonesGeoJSON, villagesGeoJSON]);
 
   // Dynamic feature counts for layer controls
   const featureCounts = useMemo(() => {
@@ -109,8 +147,10 @@ export default function GisMapPage() {
       "candidate-sites-points": sitesGeoJSON.features.length,
       "candidate-sites-boundaries": siteBoundariesGeoJSON.features.length,
       "routes-lines": routesGeoJSON.features.length,
+      "red-zones-polygons": redZonesGeoJSON.features.length,
+      "habitations-points": villagesGeoJSON.features.length,
     };
-  }, [sitesGeoJSON, siteBoundariesGeoJSON, routesGeoJSON]);
+  }, [sitesGeoJSON, siteBoundariesGeoJSON, routesGeoJSON, redZonesGeoJSON, villagesGeoJSON]);
 
   // Toggle individual layer visibility
   const handleToggleLayer = (layerId: string) => {
@@ -124,7 +164,12 @@ export default function GisMapPage() {
   const handleRefreshAll = async () => {
     setIsRefreshing(true);
     try {
-      await Promise.allSettled([refetchSites(), refetchRoutes()]);
+      await Promise.allSettled([
+        refetchSites(),
+        refetchRoutes(),
+        refetchRedZones(),
+        refetchVillages(),
+      ]);
     } finally {
       setIsRefreshing(false);
     }
@@ -136,10 +181,11 @@ export default function GisMapPage() {
       ...sitesGeoJSON.features,
       ...siteBoundariesGeoJSON.features,
       ...routesGeoJSON.features,
+      ...redZonesGeoJSON.features,
+      ...villagesGeoJSON.features,
     ];
     return calculateBounds(allFeatures);
-  }, [sitesGeoJSON, siteBoundariesGeoJSON, routesGeoJSON]);
-
+  }, [sitesGeoJSON, siteBoundariesGeoJSON, routesGeoJSON, redZonesGeoJSON, villagesGeoJSON]);
 
   const handleResetView = () => {
     if (computedBounds) {
@@ -147,8 +193,8 @@ export default function GisMapPage() {
     }
   };
 
-  const isMapLoading = sitesLoading || routesLoading;
-  const hasMapErrors = sitesError || routesError;
+  const isMapLoading = sitesLoading || routesLoading || redZonesLoading || villagesLoading;
+  const hasMapErrors = sitesError || routesError || redZonesError || villagesError;
 
   return (
     <ProtectedRoute>
@@ -158,6 +204,8 @@ export default function GisMapPage() {
           <MapHeader
             totalSites={sitesGeoJSON.features.length}
             totalRoutes={routesGeoJSON.features.length}
+            totalRedZones={redZonesGeoJSON.features.length}
+            totalVillages={villagesGeoJSON.features.length}
             isRefreshing={isRefreshing}
             onRefresh={handleRefreshAll}
             onResetView={handleResetView}
@@ -172,10 +220,15 @@ export default function GisMapPage() {
               <div>
                 <strong className="text-amber-400">Layer Notice:</strong> Some spatial layers could
                 not be retrieved from backend (
-                {sitesError && `Sites: ${sitesErrObj?.message || "Unavailable"}`}
-                {sitesError && routesError && " | "}
-                {routesError && `Routes: ${routesErrObj?.message || "Unavailable"}`}). Available
-                layers remain operational.
+                {[
+                  sitesError && `Sites: ${sitesErrObj?.message || "Unavailable"}`,
+                  routesError && `Routes: ${routesErrObj?.message || "Unavailable"}`,
+                  redZonesError && `Red Zones: ${redZonesErrObj?.message || "Unavailable"}`,
+                  villagesError && `Habitations: ${villagesErrObj?.message || "Unavailable"}`,
+                ]
+                  .filter(Boolean)
+                  .join(" | ")}
+                ). Available layers remain operational.
               </div>
             </div>
           )}
@@ -184,7 +237,7 @@ export default function GisMapPage() {
           <div className="relative w-full h-[calc(100vh-210px)] min-h-[580px] rounded-xl overflow-hidden shadow-2xl border border-slate-800">
             {/* Interactive Map Canvas */}
             <MapCanvas
-              layers={DEFAULT_MAP_LAYERS}
+              layers={GIS_ACTIVE_MAP_LAYERS}
               layerVisibility={layerVisibility}
               sourcesData={sourcesData}
               onFeatureSelect={setSelectedFeature}
@@ -197,7 +250,7 @@ export default function GisMapPage() {
             {/* Floating Layer Control Panel (Top-Left) */}
             <div className="absolute top-4 left-4 max-w-xs w-full pointer-events-auto">
               <LayerControlPanel
-                layers={DEFAULT_MAP_LAYERS}
+                layers={GIS_ACTIVE_MAP_LAYERS}
                 layerVisibility={layerVisibility}
                 onToggleLayer={handleToggleLayer}
                 featureCounts={featureCounts}

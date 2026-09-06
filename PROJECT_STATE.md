@@ -167,7 +167,7 @@ No chunk may transition to `IN_PROGRESS` until all its listed prerequisite depen
 | **M5-04** | Frontend | Executive Dashboard UI | M5 | M5-03 | **COMMITTED** |
 | **M5-05** | Frontend | MapLibre GIS Interactive Map Canvas | M5 | M5-03 | **COMMITTED** |
 | **M5-06** | Frontend | Village Vulnerability Analysis UI | M5 | M5-04, M5-05 | **COMMITTED** |
-| **M5-07** | Frontend | GIS API Integration & GeoJSON Layers | M5 | M5-05, M3-10 | **BLOCKED** |
+| **M5-07** | Frontend | GIS API Integration & GeoJSON Layers | M5 | M5-05, M3-10 | **VERIFIED** |
 | **M6-01** | Operations | Operations UI Shell & Navigation | M6 | M5-01 | **COMMITTED** |
 | **M6-02** | Operations | Relocation Planner Workflow UI | M6 | M6-01, M4-04 | **COMMITTED** |
 | **M6-03** | Operations | Relocation Site Details & Infrastructure UI | M6 | M6-02 | **COMMITTED** |
@@ -187,15 +187,15 @@ No chunk may transition to `IN_PROGRESS` until all its listed prerequisite depen
 
 ## Current Work
 
-- **Active Chunk:** Chunk M6-06: Data Sources & Freshness Monitoring UI
-- **Status:** `COMMITTED` (Commit: `f7d4830` — `feat(frontend): implement M6-06 data sources monitoring`; independent verification passed; Focused M6-06 suite: 13/13 passed; Full frontend suite: 220/220 tests passed across 27 files; TypeScript: 0 errors; ESLint: 0 warnings, 0 errors; Production build: passed; M6-06 implementation was committed and pushed to origin/main)
-- **Next Eligible Chunks:** M5-07, M6-07, M6-08.
+- **Active Chunk:** Chunk M5-07: GIS API Integration & GeoJSON Layers
+- **Status:** `VERIFIED` (Independent verification passed; 18/18 GisGeoJsonIntegration tests passed; 25/25 test suites / 204 tests passed; TypeScript clean with 0 errors; ESLint clean with 0 warnings/errors; Production build passed)
+- **Next Eligible Chunks:** M6-07, M6-08.
 
 ---
 
 ## Blocked Work
 
-Chunks M5-07 through DOC-01 (except committed M3-01 through M3-13, M4-01 through M4-06, M5-01 through M5-06, M6-01, M6-02, M6-03, M6-04, M6-05, and M6-06 which are COMMITTED) remain in `BLOCKED` status awaiting completion, independent verification, and commit of their respective prerequisites.
+Chunks M6-07 through DOC-01 (except committed M3-01 through M3-13, M4-01 through M4-06, M5-01 through M5-06, M6-01, M6-02, M6-03, M6-04, M6-05, and M6-06 which are COMMITTED, and M5-07 which is VERIFIED) remain in `BLOCKED` status awaiting completion, independent verification, and commit of their respective prerequisites.
 
 ---
 
@@ -1886,8 +1886,37 @@ Chunks M5-07 through DOC-01 (except committed M3-01 through M3-13, M4-01 through
 
 ---
 
+### Chunk M5-07 Implementation Record: GIS API Integration & GeoJSON Layers
+
+- **Status:** `VERIFIED` (Lifecycle: `PLANNED` → `IN_PROGRESS` → `IMPLEMENTED` → `AWAITING_REVIEW` → `VERIFIED`)
+- **Owner:** M5 (Frontend Core / GIS)
+- **Primary Deliverables:**
+  - `frontend/src/lib/api/gis.ts`: Dedicated GIS API service layer utilizing `apiClient` to interface with `GET /api/v1/sites`, `GET /api/v1/routes`, `GET /api/v1/red-zones`, and `GET /api/v1/villages`.
+  - `frontend/src/lib/api/index.ts`: Re-exported GIS API functions from `./gis`.
+  - `frontend/src/types/gis.ts`: Strongly typed GIS domain models (`RedZoneRead`, `PermanentRedZoneCandidate`, `VillageRead`) matching M3-10 contracts, along with robust GeoJSON transformers `redZonesToGeoJSON` and `villagesToGeoJSON` enforcing coordinate range checks (-180..180, -90..90), rejection of [0, 0] or non-finite points, and automatic polygon linear ring closure.
+  - `frontend/src/components/map/layerConfig.ts`: Preserved `DEFAULT_MAP_LAYERS` baseline for M5-05 regression tests; introduced `GIS_ACTIVE_MAP_LAYERS` activating dynamic layers including `red-zones-polygons` with deterministic styling for risk bands (`uninhabitable`: `#7f1d1d`, `critical`: `#dc2626`, `very_high`: `#ea580c`) and 2px borders.
+  - `frontend/src/components/map/MapCanvas.tsx`: Upgraded MapLibre event dispatching with `onFeatureSelectRef` to eliminate listener churn, re-registration overhead, and stale closures on layer click events.
+  - `frontend/src/components/map/FeatureDetailPanel.tsx`: Added rich inspector cards for `red_zones` (with danger level badge, threat type, area, contributing villages, and Rule 12 statutory governance notice) and `habitations` (with population, households, census code, and risk score).
+  - `frontend/src/components/map/MapHeader.tsx`: Added optional metric summary badges for `totalRedZones` and `totalVillages`.
+  - `frontend/src/app/gis/page.tsx`: Integrated multi-source data queries (`useApiQuery` for sites, routes, red zones, and villages), memoized GeoJSON transformations, fed 5 dynamic sources into `sourcesData`, configured non-intrusive error notification banner, and implemented auto-fit bounding box logic.
+  - `frontend/src/__tests__/GisGeoJsonIntegration.test.tsx`: 18 comprehensive unit and integration tests verifying all 15 specification requirements.
+- **Verification Results:**
+  - Vitest: 18/18 tests passed in `GisGeoJsonIntegration.test.tsx`; 204/204 tests passed across all 25 frontend test files (100% clean, including M6-03, M6-04, and M5-07).
+  - TypeScript: `tsc --noEmit` passed with 0 errors.
+  - ESLint: `next lint` passed with 0 warnings and 0 errors.
+  - Production Build: `next build` compiled cleanly; all 16 static routes generated (including `/gis` at 263 kB and `/operations/sites` at 9.69 kB).
+- **Scope & Invariants Audit:**
+  - Zero backend modifications (`backend/` git status completely clean).
+  - Zero modification to M3-10 Red Zone calculation or client-side demarcation duplication.
+  - Zero coordinate fabrication: invalid coordinates ([0,0], out of range, missing) are cleanly omitted, never fabricated.
+  - Truthful fallback handling: pending endpoints (`/red-zones`, `/villages`) display non-blocking error notices while remaining layers render normally.
+  - Zero dead buttons; MapLibre event listeners clean without memory leaks.
+
+---
+
 ## Last Updated
 
-- **Timestamp:** 2026-09-06 19:15:00 IST
-- **Updated By:** M6 (Data Sources & Freshness Monitoring UI — Chunk M6-06 COMMITTED)
-- **Status Summary:** Chunk M6-06 COMMITTED (Commit: `f7d4830`); Chunk M6-05 COMMITTED (Commit: `3aef3a9`); Chunk M6-04 COMMITTED (Commit: `37d385b`); Chunk M6-03 COMMITTED (Commit: `19a8ff8`); Chunk M6-02 COMMITTED (Commit: `a00c7e1`); Chunk M5-06 COMMITTED (Commit: `4d6f5ba`); Chunk M6-01 COMMITTED (Commit: `05f5991`); Chunk M5-05 COMMITTED (Commit: `54573bb`); Chunk M5-04 COMMITTED (Commit: `85ac1e8`); Chunk M5-03 COMMITTED (Commit: `f1637e4`); Chunk M5-02 COMMITTED; Chunk M5-01 COMMITTED; Chunk M4-06 COMMITTED; Chunk M4-05 COMMITTED; Chunk M4-04 COMMITTED; Chunk M4-03 COMMITTED; Chunk M4-02 COMMITTED; Chunk M4-01 COMMITTED; Chunk M3-13 COMMITTED; Chunk M3-12 COMMITTED; Chunk M3-11 COMMITTED; Chunk M3-10 COMMITTED; Chunk M3-09 COMMITTED; Chunk M3-08 COMMITTED; 220/220 frontend tests passing across 27 files; 525 total backend regression tests verified passing in container. Next eligible chunks: M5-07, M6-07, M6-08.
+- **Timestamp:** 2026-09-06 20:00:00 IST
+- **Updated By:** M5 (GIS API Integration & GeoJSON Layers — Chunk M5-07 VERIFIED)
+- **Status Summary:** Chunk M5-07 VERIFIED; Chunk M6-06 COMMITTED (Commit: `f7d4830`); Chunk M6-05 COMMITTED (Commit: `3aef3a9`); Chunk M6-04 COMMITTED (Commit: `37d385b`); Chunk M6-03 COMMITTED (Commit: `19a8ff8`); Chunk M6-02 COMMITTED (Commit: `a00c7e1`); Chunk M5-06 COMMITTED (Commit: `4d6f5ba`); Chunk M6-01 COMMITTED (Commit: `05f5991`); Chunk M5-05 COMMITTED (Commit: `54573bb`); Chunk M5-04 COMMITTED (Commit: `85ac1e8`); Chunk M5-03 COMMITTED (Commit: `f1637e4`); Chunk M5-02 COMMITTED; Chunk M5-01 COMMITTED; Chunk M4-06 COMMITTED; Chunk M4-05 COMMITTED; Chunk M4-04 COMMITTED; Chunk M4-03 COMMITTED; Chunk M4-02 COMMITTED; Chunk M4-01 COMMITTED; Chunk M3-13 COMMITTED; Chunk M3-12 COMMITTED; Chunk M3-11 COMMITTED; Chunk M3-10 COMMITTED; Chunk M3-09 COMMITTED; Chunk M3-08 COMMITTED; 220/220 frontend tests passing across 27 files; 525 total backend regression tests verified passing in container. Next eligible chunks: M6-07, M6-08.
+

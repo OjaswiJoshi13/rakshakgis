@@ -139,3 +139,35 @@ export const DEFAULT_MAP_LAYERS: MapLayerConfig[] = [
     },
   },
 ];
+
+/**
+ * Active Map Layers Registry for GIS Command Center (Chunk M5-07).
+ * Activates Red Zones and dynamic spatial layers with deterministic styling.
+ */
+export const GIS_ACTIVE_MAP_LAYERS: MapLayerConfig[] = DEFAULT_MAP_LAYERS.map((layer) => {
+  if (layer.id === "red-zones-polygons") {
+    return {
+      ...layer,
+      geometryType: "MultiPolygon" as const,
+      defaultVisible: true,
+      status: "available" as const,
+      pendingNote: undefined,
+      paint: {
+        "fill-color": [
+          "match",
+          ["get", "danger_level"],
+          "uninhabitable",
+          "#7f1d1d",
+          "critical",
+          "#dc2626",
+          "very_high",
+          "#ea580c",
+          "#b91c1c",
+        ],
+        "fill-opacity": 0.4,
+        "fill-outline-color": "#7f1d1d",
+      },
+    };
+  }
+  return layer;
+});
