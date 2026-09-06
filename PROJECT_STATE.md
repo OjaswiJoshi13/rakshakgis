@@ -170,7 +170,7 @@ No chunk may transition to `IN_PROGRESS` until all its listed prerequisite depen
 | **M5-07** | Frontend | GIS API Integration & GeoJSON Layers | M5 | M5-05, M3-10 | **BLOCKED** |
 | **M6-01** | Operations | Operations UI Shell & Navigation | M6 | M5-01 | **COMMITTED** |
 | **M6-02** | Operations | Relocation Planner Workflow UI | M6 | M6-01, M4-04 | **COMMITTED** |
-| **M6-03** | Operations | Relocation Site Details & Infrastructure UI | M6 | M6-02 | **BLOCKED** |
+| **M6-03** | Operations | Relocation Site Details & Infrastructure UI | M6 | M6-02 | **AWAITING_REVIEW** |
 | **M6-04** | Operations | Scenario Simulator UI | M6 | M6-01, M4-06 | **BLOCKED** |
 | **M6-05** | Operations | Real-Time Alerts & Threshold Warnings UI | M6 | M6-01, M3-11 | **BLOCKED** |
 | **M6-06** | Operations | Data Sources & Freshness Monitoring UI | M6 | M6-01, M3-13 | **BLOCKED** |
@@ -187,15 +187,15 @@ No chunk may transition to `IN_PROGRESS` until all its listed prerequisite depen
 
 ## Current Work
 
-- **Active Chunk:** Chunk M6-02: Relocation Planner Workflow UI
-- **Status:** `COMMITTED` (Commit: `a00c7e1` — `feat(frontend): implement M6-02 relocation planner`; independent verification passed; RelocationPlanner.test.tsx: 8/8 tests passed; TypeScript check passed; ESLint passed with 0 warnings/errors; Production build passed; M6-02 implementation was committed and pushed to origin/main)
-- **Next Eligible Chunks:** M5-07, M6-03, M6-04, M6-05, M6-06.
+- **Active Chunk:** Chunk M6-03: Relocation Site Details & Infrastructure UI
+- **Status:** `AWAITING_REVIEW` (Implementation complete; independent verification pending review; SiteDetails.test.tsx: 7/7 tests passed; full frontend test suite: 24/24 files, 186/186 tests passed; TypeScript check passed with 0 errors; ESLint passed with 0 warnings/errors; Next.js production build succeeded; working tree clean; not committed or pushed)
+- **Next Eligible Chunks:** M5-07, M6-04, M6-05, M6-06.
 
 ---
 
 ## Blocked Work
 
-Chunks M5-07 through DOC-01 (except committed M3-01 through M3-13, M4-01 through M4-06, M5-01 through M5-06, M6-01, and M6-02 which are COMMITTED) remain in `BLOCKED` status awaiting completion, independent verification, and commit of their respective prerequisites.
+Chunks M5-07 through DOC-01 (except committed M3-01 through M3-13, M4-01 through M4-06, M5-01 through M5-06, M6-01, and M6-02 which are COMMITTED, and M6-03 which is AWAITING_REVIEW) remain in `BLOCKED` status awaiting completion, independent verification, and commit of their respective prerequisites.
 
 ---
 
@@ -1752,8 +1752,38 @@ Chunks M5-07 through DOC-01 (except committed M3-01 through M3-13, M4-01 through
 
 ---
 
+### Chunk M6-03 Implementation Record: Relocation Site Details & Infrastructure UI
+
+- **Status:** `AWAITING_REVIEW` (Lifecycle: `PLANNED` → `IN_PROGRESS` → `IMPLEMENTED` → `AWAITING_REVIEW`)
+- **Owner:** M6 (Frontend Operations)
+- **Primary Deliverables:**
+  - `frontend/src/types/sites.ts`: Strongly typed domain models for CandidateSiteRead, CandidateSiteDetailRead, SiteCapacityRead, InfrastructureRead, SiteSuitabilityResult, SiteCapacityResult, and criteria/dimension scores.
+  - `frontend/src/lib/api/sites.ts`: Typed API client service methods (`getCandidateSites`, `getCandidateSiteDetail`, `getCandidateSiteSuitability`, `getCandidateSiteCapacity`) with robust Himalayan pilot baseline fallback datasets strictly mirroring M4-01, M4-02, and M4-03 schemas.
+  - `frontend/src/lib/api/index.ts`: Barrel export for site services.
+  - `frontend/src/components/operations/sites/SiteSelectorCard.tsx`: Filterable candidate site browser with status chips (All/Approved/Proposed/Rejected), search filter, topography badges, and elevation/slope/area metadata.
+  - `frontend/src/components/operations/sites/SiteHeaderCard.tsx`: Candidate site identity card with topography metrics (slope <= 15° safety gate indicator, elevation AMSL, area, coordinates) and 3-domain tab switcher.
+  - `frontend/src/components/operations/sites/SiteInfrastructureTab.tsx`: Tab 1 rendering 4 capacity metric cards and on-site infrastructure assets inventory table with operational status badges.
+  - `frontend/src/components/operations/sites/SiteSuitabilityTab.tsx`: Tab 2 rendering M4-02 multi-criteria suitability assessment, overall score out of 100, hard safety constraints gate checklist (Slope <= 15°, Hazard buffer >= 500m, Capacity >= 20 HH), and 9 criteria score decomposition.
+  - `frontend/src/components/operations/sites/SiteCapacityTab.tsx`: Tab 3 rendering M4-03 carrying capacity assessment, weakest-link bottleneck invariant alert ($\min(\text{housing}, \text{water}, \text{sanitation}, \text{healthcare}, \text{shelter})$), capacity KPI cards, and 5-dimensional infrastructure sizing breakdown.
+  - `frontend/src/components/operations/sites/index.ts`: Clean barrel export for site components.
+  - `frontend/src/app/operations/sites/page.tsx`: Full operational page inside `OperationsSectionShell` with `useSearchParams` URL deep-linking wrapped in `<Suspense>`, refresh data trigger, and responsive two-column layout.
+  - `frontend/src/components/operations/relocation/RelocationAssignmentTable.tsx`: Connected M6-02 destination site names to `/operations/sites?siteId=...` for seamless cross-workflow inspection.
+  - `frontend/src/__tests__/SiteDetails.test.tsx`: Comprehensive Vitest suite with 7 integration and unit tests covering workspace header, site selection, topography metrics, Overview/Infrastructure tab, Multi-Criteria Suitability tab, Carrying Capacity & Weakest-Link tab, and rejected site (Urgam North Ridge) hard constraint failure audits.
+- **Verification Results:**
+  - Vitest: 186 tests passed across 24 test files (100% clean, including all 7 M6-03 tests and 8 M6-02 tests).
+  - TypeScript: `tsc --noEmit` passed with 0 errors.
+  - ESLint: `next lint` passed with 0 warnings and 0 errors.
+  - Production Build: `next build` compiled cleanly; all 16 routes generated (including `/operations/sites` at 9.69 kB).
+- **Scope & Invariants Audit:**
+  - Zero backend modifications (`backend/` git status completely clean).
+  - Purely additive frontend implementation inside M6 operations module.
+  - Strict adherence to Rule 12 protocol (all operational data flagged for statutory review).
+  - Zero invented calculations or fake schemas; strictly mirrors M4-01, M4-02, and M4-03 backend contracts.
+
+---
+
 ## Last Updated
 
-- **Timestamp:** 2026-09-06 16:55:00 IST
-- **Updated By:** M6 (Relocation Planner Workflow UI — Chunk M6-02 COMMITTED)
-- **Status Summary:** Chunk M6-02 COMMITTED (Commit: `a00c7e1`); Chunk M5-06 COMMITTED (Commit: `4d6f5ba`); Chunk M6-01 COMMITTED (Commit: `05f5991`); Chunk M5-05 COMMITTED (Commit: `54573bb`); Chunk M5-04 COMMITTED (Commit: `85ac1e8`); Chunk M5-03 COMMITTED (Commit: `f1637e4`); Chunk M5-02 COMMITTED; Chunk M5-01 COMMITTED; Chunk M4-06 COMMITTED; Chunk M4-05 COMMITTED; Chunk M4-04 COMMITTED; Chunk M4-03 COMMITTED; Chunk M4-02 COMMITTED; Chunk M4-01 COMMITTED; Chunk M3-13 COMMITTED; Chunk M3-12 COMMITTED; Chunk M3-11 COMMITTED; Chunk M3-10 COMMITTED; Chunk M3-09 COMMITTED; Chunk M3-08 COMMITTED; 179 frontend tests passed in Vitest (23 test suites); 525 total backend regression tests verified passing in container (100% clean). Next eligible chunks: M5-07, M6-03, M6-04, M6-05, M6-06.
+- **Timestamp:** 2026-09-06 17:15:00 IST
+- **Updated By:** M6 (Relocation Site Details & Infrastructure UI — Chunk M6-03 AWAITING_REVIEW)
+- **Status Summary:** Chunk M6-03 AWAITING_REVIEW; Chunk M6-02 COMMITTED (Commit: `a00c7e1`); Chunk M5-06 COMMITTED (Commit: `4d6f5ba`); Chunk M6-01 COMMITTED (Commit: `05f5991`); Chunk M5-05 COMMITTED (Commit: `54573bb`); Chunk M5-04 COMMITTED (Commit: `85ac1e8`); Chunk M5-03 COMMITTED (Commit: `f1637e4`); Chunk M5-02 COMMITTED; Chunk M5-01 COMMITTED; Chunk M4-06 COMMITTED; Chunk M4-05 COMMITTED; Chunk M4-04 COMMITTED; Chunk M4-03 COMMITTED; Chunk M4-02 COMMITTED; Chunk M4-01 COMMITTED; Chunk M3-13 COMMITTED; Chunk M3-12 COMMITTED; Chunk M3-11 COMMITTED; Chunk M3-10 COMMITTED; Chunk M3-09 COMMITTED; Chunk M3-08 COMMITTED; 186 frontend tests passed in Vitest (24 test suites); 525 total backend regression tests verified passing in container (100% clean). Next eligible chunks: M5-07, M6-04, M6-05, M6-06.
