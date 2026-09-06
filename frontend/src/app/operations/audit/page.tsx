@@ -1,54 +1,261 @@
 "use client";
 
-import React from "react";
+import React, { useState, useEffect, useCallback, Suspense } from "react";
 import { OperationsSectionShell } from "@/components/operations/OperationsSectionShell";
-import { Card, CardTitle, CardDescription } from "@/components/ui/Card";
+import { Alert } from "@/components/ui/Alert";
 import { Button } from "@/components/ui/Button";
-import { Badge } from "@/components/ui/Badge";
-import { History, Shield, Layers } from "lucide-react";
+import {
+  AuditSummaryCards,
+  AuditFilterBar,
+  AuditTable,
+  AuditDetailModal,
+} from "@/components/operations/audit";
+import {
+  AuditActionCategory,
+  AuditRecord,
+  AuditSummaryKPIs,
+  HashIntegrityResult,
+} from "@/types/audit";
+import {
+  listAuditRecords,
+  getAuditKPIs,
+  verifyAuditIntegrity,
+  INITIAL_AUDIT_RECORDS,
+} from "@/lib/api/audit";
+import { ShieldCheck, RefreshCw, ShieldAlert, Lock } from "lucide-react";
 
-export default function AuditOperationsPage() {
+function AuditOperationsContent() {
+  const [records, setRecords] = useState<AuditRecord[]>(INITIAL_AUDIT_RECORDS);
+  const [kpis, setKpis] = useState<AuditSummaryKPIs>({
+    totalEvents: INITIAL_AUDIT_RECORDS.length,
+    officerSignOffs: INITIAL_AUDIT_RECORDS.filter((r) => r.category === "officer_decision").length,
+    automatedActions: INITIAL_AUDIT_RECORDS.filter((r) => r.category !== "officer_decision").length,
+    integrityPercentage: 100,
+  });
+
+  // Filter & Search state
+  const [searchQuery, setSearchQuery] = useState("");
+  const [selectedCategory, setSelectedCategory] = useState<AuditActionCategory>("all");
+  const [selectedStatus, setSelectedStatus] = useState("all");
+  const [selectedTimeRange, setSelectedTimeRange] = useState<"all" | "24h" | "7d" | "30d">("all");
+
+  // Selection & Modal state
+  const [selectedRecord, setSelectedRecord] = useState<AuditRecord | null>(null);
+  const [isDetailOpen, setIsDetailOpen] = useState(false);
+
+  // Status flags
+  const [isLoading, setIsLoading] = useState(false);
+  const [isVerifying, setIsVerifying] = useState(false);
+  const [notification, setNotification] = useState<{
+    type: "success" | "error" | "info";
+    message: string;
+    details?: string;
+  } | null>(null);
+
+  // Load records and KPIs
+  const loadData = useCallback(async () => {
+    setIsLoading(true);
+    try {
+      const [fetchedRecords, fetchedKpis] = await Promise.all([
+        listAuditRecords({
+          query: searchQuery,
+          category: selectedCategory,
+          decisionStatus: selectedStatus,
+          timeRange: selectedTimeRange,
+        }),
+        getAuditKPIs(),
+      ]);
+
+      setRecords(fetchedRecords);
+      setKpis(fetchedKpis);
+    } catch {
+      setNotification({
+        type: "error",
+        message: "Failed to retrieve audit log events. Please retry.",
+      });
+    } finally {
+      setIsLoading(false);
+    }
+  }, [searchQuery, selectedCategory, selectedStatus, selectedTimeRange]);
+
+  useEffect(() => {
+    loadData();
+  }, [loadData]);
+
+  // Reset all filters
+  const handleResetFilters = () => {
+    setSearchQuery("");
+    setSelectedCategory("all");
+    setSelectedStatus("all");
+    setSelectedTimeRange("all");
+    setNotification(null);
+  };
+
+  // Inspect a specific record
+  const handleInspectRecord = (record: AuditRecord) => {
+    setSelectedRecord(record);
+    setIsDetailOpen(true);
+  };
+
+  // Run cryptographic hash integrity verification
+  const handleVerifyIntegrity = async () => {
+    setIsVerifying(true);
+    try {
+      const result: HashIntegrityResult = await verifyAuditIntegrity();
+      if (result.isValid) {
+        setNotification({
+          type: "success",
+          message: `Cryptographic Audit Verification Passed: 100% of recorded actions (${result.verifiedCount}/${result.totalCount}) match their cryptographic SHA-256 seal.`,
+          details: `Verification Engine: ${result.algorithm} • Timestamp: ${new Date(result.verifiedAt).toLocaleTimeString("en-IN")}`,
+        });
+      } else {
+        setNotification({
+          type: "error",
+          message: `Integrity Warning: ${result.totalCount - result.verifiedCount} records failed hash seal verification.`,
+        });
+      }
+    } catch {
+      setNotification({
+        type: "error",
+        message: "Failed to execute cryptographic verification probe.",
+      });
+    } finally {
+      setIsVerifying(false);
+    }
+  };
+
   return (
     <OperationsSectionShell
       title="Audit Log & Traceability"
       description="Immutable decision trail, cryptographically verifiable action history, and compliance logging for all AI recommendations and officer sign-offs."
       chunkId="M6-09"
       chunkTitle="Audit Log & Traceability UI"
-      prerequisiteChunk="Chunk M6-08 (Officer Sign-Off Workflow)"
+      prerequisiteChunk="Chunk M6-08 (Officer Review & Action Sign-Off Workflow — COMMITTED)"
       actionToolbar={
-        <Button variant="secondary" size="sm" disabled className="opacity-70 cursor-not-allowed">
-          <Shield className="h-3.5 w-3.5 mr-1.5" />
-          <span>Verify Cryptographic Hashes</span>
-        </Button>
+        <div className="flex items-center gap-2">
+          <Button
+            type="button"
+            variant="secondary"
+            size="sm"
+            onClick={handleVerifyIntegrity}
+            isLoading={isVerifying}
+            disabled={isVerifying}
+            className="text-xs gap-1.5"
+            data-testid="verify-hashes-btn"
+          >
+            <ShieldCheck className="h-3.5 w-3.5 text-emerald-400" />
+            <span>Verify Cryptographic Hashes</span>
+          </Button>
+          <Button
+            type="button"
+            variant="secondary"
+            size="sm"
+            onClick={loadData}
+            isLoading={isLoading}
+            disabled={isLoading}
+            className="text-xs gap-1.5"
+            data-testid="refresh-audit-btn"
+          >
+            <RefreshCw className="h-3.5 w-3.5 text-slate-400" />
+            <span>Refresh Trail</span>
+          </Button>
+        </div>
       }
     >
       <div className="space-y-6">
-        {/* Mount Point / Workflow Container for Chunk M6-09 */}
-        <Card className="border-dashed border-slate-800 bg-slate-900/30 p-8 text-center">
-          <div className="mx-auto flex h-12 w-12 items-center justify-center rounded-full bg-sky-950/80 border border-sky-600/60 text-sky-400 mb-4">
-            <History className="h-6 w-6" />
+        {/* Statutory Governance & Audit Trail Posture Header */}
+        <div className="flex flex-wrap items-center justify-between gap-3 rounded-lg border border-slate-800/80 bg-slate-900/40 px-3.5 py-2.5 text-xs text-slate-300 font-mono">
+          <div className="flex items-center gap-2">
+            <Lock className="h-4 w-4 text-sky-400 shrink-0" />
+            <span>
+              Protocol: <strong className="text-slate-200">Statutory Governance & Compliance Ledger</strong>
+            </span>
           </div>
-
-          <Badge variant="outline" size="sm" className="font-mono text-sky-300 border-sky-600/50 mb-2">
-            Chunk M6-09 Workspace Mount Point
-          </Badge>
-
-          <CardTitle className="text-lg font-bold text-slate-100">
-            Audit Log & Decision Traceability Canvas
-          </CardTitle>
-
-          <CardDescription className="text-xs sm:text-sm text-slate-400 max-w-xl mx-auto mt-2">
-            This operational container provides the layout shell for Chunk M6-09. When implemented,
-            it will render chronological decision event timelines, actor identification,
-            cryptographic action hashes, and compliance export options.
-          </CardDescription>
-
-          <div className="mt-6 inline-flex items-center gap-2 rounded-md bg-slate-900 border border-slate-800 px-3 py-1.5 text-xs font-mono text-slate-400">
-            <Layers className="h-3.5 w-3.5 text-emerald-400" />
-            <span>Backend Binding: Immutable Audit Trail & Event Ledger</span>
+          <div className="flex items-center gap-3">
+            <div className="flex items-center gap-1.5 text-emerald-400">
+              <span className="h-2 w-2 rounded-full bg-emerald-400 animate-pulse" />
+              <span>Tamper-Evident SHA-256 Ledger</span>
+            </div>
+            <span className="text-slate-600">|</span>
+            <span className="text-slate-400">Read-Only Statutory Archive</span>
           </div>
-        </Card>
+        </div>
+
+        {/* Feedback Alert Banner */}
+        {notification && (
+          <Alert
+            severity={notification.type === "success" ? "success" : "danger"}
+            title={notification.type === "success" ? "Cryptographic Verification" : "Operational Notice"}
+          >
+            <div className="flex items-center justify-between gap-2">
+              <div className="space-y-0.5">
+                <div>{notification.message}</div>
+                {notification.details && (
+                  <div className="text-[11px] font-mono opacity-80">
+                    {notification.details}
+                  </div>
+                )}
+              </div>
+              <button
+                type="button"
+                onClick={() => setNotification(null)}
+                className="text-xs underline font-mono ml-4 hover:opacity-80 shrink-0"
+              >
+                Dismiss
+              </button>
+            </div>
+          </Alert>
+        )}
+
+        {/* Executive Summary Metric Cards */}
+        <AuditSummaryCards metrics={kpis} isLoading={isLoading} />
+
+        {/* Filter & Search Bar */}
+        <AuditFilterBar
+          searchQuery={searchQuery}
+          onSearchChange={setSearchQuery}
+          selectedCategory={selectedCategory}
+          onCategoryChange={setSelectedCategory}
+          selectedStatus={selectedStatus}
+          onStatusChange={setSelectedStatus}
+          selectedTimeRange={selectedTimeRange}
+          onTimeRangeChange={setSelectedTimeRange}
+          onReset={handleResetFilters}
+          totalResults={records.length}
+        />
+
+        {/* Read-Only Audit Table */}
+        <AuditTable
+          records={records}
+          selectedRecordId={selectedRecord?.id}
+          onSelectRecord={handleInspectRecord}
+          isLoading={isLoading}
+        />
+
+        {/* Deep Inspection Detail Modal */}
+        <AuditDetailModal
+          record={selectedRecord}
+          isOpen={isDetailOpen}
+          onClose={() => {
+            setIsDetailOpen(false);
+            setSelectedRecord(null);
+          }}
+        />
       </div>
     </OperationsSectionShell>
+  );
+}
+
+export default function AuditOperationsPage() {
+  return (
+    <Suspense
+      fallback={
+        <div className="py-16 text-center text-xs text-slate-400 font-mono">
+          Loading audit log and decision traceability workspace...
+        </div>
+      }
+    >
+      <AuditOperationsContent />
+    </Suspense>
   );
 }
