@@ -168,7 +168,7 @@ No chunk may transition to `IN_PROGRESS` until all its listed prerequisite depen
 | **M5-05** | Frontend | MapLibre GIS Interactive Map Canvas | M5 | M5-03 | **COMMITTED** |
 | **M5-06** | Frontend | Village Vulnerability Analysis UI | M5 | M5-04, M5-05 | **BLOCKED** |
 | **M5-07** | Frontend | GIS API Integration & GeoJSON Layers | M5 | M5-05, M3-10 | **BLOCKED** |
-| **M6-01** | Operations | Operations UI Shell & Navigation | M6 | M5-01 | **VERIFIED** |
+| **M6-01** | Operations | Operations UI Shell & Navigation | M6 | M5-01 | **COMMITTED** |
 | **M6-02** | Operations | Relocation Planner Workflow UI | M6 | M6-01, M4-04 | **BLOCKED** |
 | **M6-03** | Operations | Relocation Site Details & Infrastructure UI | M6 | M6-02 | **BLOCKED** |
 | **M6-04** | Operations | Scenario Simulator UI | M6 | M6-01, M4-06 | **BLOCKED** |
@@ -188,15 +188,14 @@ No chunk may transition to `IN_PROGRESS` until all its listed prerequisite depen
 ## Current Work
 
 - **Active Chunk:** Chunk M6-01: Operations UI Shell & Navigation
-- **Status:** VERIFIED
-- **Verification:** OperationsShell.test.tsx passed 5/5 independently; working tree clean; code is pushed to origin/main.
+- **Status:** `COMMITTED` (Commit: `05f5991` — `feat(frontend): implement M6-01 operations shell`; independent verification passed; OperationsShell.test.tsx passed 5/5 independently; working tree clean; pushed to origin/main)
 - **Next Eligible Chunks:** M6-02, M6-04, M6-05, M6-06, and M5-06, since their prerequisites are now satisfied.
 
 ---
 
 ## Blocked Work
 
-Chunks M5-06 through DOC-01 (except committed M3-01 through M3-13, M4-01 through M4-06, M5-01 through M5-05 which are COMMITTED, and M6-01 which is VERIFIED) remain in `BLOCKED` status awaiting completion, independent verification, and commit of their respective prerequisites.
+Chunks M5-06 through DOC-01 (except committed M3-01 through M3-13, M4-01 through M4-06, M5-01 through M5-05, and M6-01 which are COMMITTED) remain in `BLOCKED` status awaiting completion, independent verification, and commit of their respective prerequisites.
 
 ---
 
@@ -234,7 +233,7 @@ Chunks M5-06 through DOC-01 (except committed M3-01 through M3-13, M4-01 through
 - M5-03: API Client & State Management Setup — COMMITTED (Commit: `f1637e4`).
 - M5-04: Executive Dashboard UI — COMMITTED (Commit: `85ac1e8`).
 - M5-05: MapLibre GIS Interactive Map Canvas — COMMITTED (Commit: `54573bb` — `feat(frontend): add MapLibre GIS map canvas`).
-- M6-01: Operations UI Shell & Navigation — VERIFIED (OperationsShell.test.tsx passed 5/5 independently; working tree clean; code is pushed to origin/main).
+- M6-01: Operations UI Shell & Navigation — COMMITTED (Commit: `05f5991` — `feat(frontend): implement M6-01 operations shell`; independent verification passed; OperationsShell.test.tsx passed 5/5 independently).
 
 ---
 
