@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import { AuthProvider } from "@/context/AuthContext";
+import { OperationalProvider } from "@/context/OperationalContext";
 import "./globals.css";
 
 export const metadata: Metadata = {
@@ -30,7 +31,9 @@ export default function RootLayout({
         <link rel="icon" href="/favicon.ico" sizes="any" />
       </head>
       <body className="bg-slate-950 text-slate-100 min-h-screen">
-        <AuthProvider>{children}</AuthProvider>
+        <AuthProvider>
+          <OperationalProvider>{children}</OperationalProvider>
+        </AuthProvider>
       </body>
     </html>
   );

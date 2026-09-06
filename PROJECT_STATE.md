@@ -163,12 +163,12 @@ No chunk may transition to `IN_PROGRESS` until all its listed prerequisite depen
 | **M4-06** | Relocation | Scenario Simulator Integration Backend | M4 | M4-04, M3-11 | **COMMITTED** |
 | **M5-01** | Frontend | Frontend Foundation & Design System | M5 | M1-01 | **COMMITTED** |
 | **M5-02** | Frontend | Authentication UI & Session Handling | M5 | M5-01, M2-05 | **COMMITTED** |
-| **M5-03** | Frontend | API Client & State Management Setup | M5 | M5-01, M2-04 | **BLOCKED** |
-| **M5-04** | Frontend | Executive Dashboard UI | M5 | M5-03 | **BLOCKED** |
+| **M5-03** | Frontend | API Client & State Management Setup | M5 | M5-01, M2-04 | **COMMITTED** |
+| **M5-04** | Frontend | Executive Dashboard UI | M5 | M5-03 | **COMMITTED** |
 | **M5-05** | Frontend | MapLibre GIS Interactive Map Canvas | M5 | M5-03 | **BLOCKED** |
 | **M5-06** | Frontend | Village Vulnerability Analysis UI | M5 | M5-04, M5-05 | **BLOCKED** |
 | **M5-07** | Frontend | GIS API Integration & GeoJSON Layers | M5 | M5-05, M3-10 | **BLOCKED** |
-| **M6-01** | Operations | Operations UI Shell & Navigation | M6 | M5-01 | **IMPLEMENTED** |
+| **M6-01** | Operations | Operations UI Shell & Navigation | M6 | M5-01 | **BLOCKED** |
 | **M6-02** | Operations | Relocation Planner Workflow UI | M6 | M6-01, M4-04 | **BLOCKED** |
 | **M6-03** | Operations | Relocation Site Details & Infrastructure UI | M6 | M6-02 | **BLOCKED** |
 | **M6-04** | Operations | Scenario Simulator UI | M6 | M6-01, M4-06 | **BLOCKED** |
@@ -187,9 +187,9 @@ No chunk may transition to `IN_PROGRESS` until all its listed prerequisite depen
 
 ## Current Work
 
-- **Active Chunk:** None (Chunk M6-01 implemented and awaiting independent review)
-- **Next Eligible Chunks:** Chunk M6-02: Relocation Planner Workflow UI (once M6-01 verified/committed; depends on M6-01, M4-04 [COMMITTED]); Chunk M6-04: Scenario Simulator UI (once M6-01 verified/committed; depends on M6-01, M4-06 [COMMITTED]); Chunk M6-05: Real-Time Alerts & Threshold Warnings UI (once M6-01 verified/committed; depends on M6-01, M3-11 [COMMITTED]); Chunk M5-03: API Client & State Management Setup (depends on M5-01 and M2-04 [both COMMITTED])
-- **Status:** Chunk M6-01 IMPLEMENTED (awaiting review); Chunk M5-02 COMMITTED (Commit: `c538c55`); Chunk M5-01 COMMITTED (Commit: `fda544e`); Chunk M4-06 COMMITTED; Chunk M2-05 COMMITTED. 63 frontend tests passed across 13 suites (100% clean), 0 lint errors, tsc clean, production build passed (20 static routes generated).
+- **Active Chunk:** None (Chunk M5-04 committed; Milestone 5 progressing)
+- **Next Eligible Chunks:** Chunk M5-05: MapLibre GIS Interactive Map Canvas (depends on M5-03 [COMMITTED]); Chunk M6-01: Operations UI Shell & Navigation (depends on M5-01 [COMMITTED]); Chunk M5-06: Village Vulnerability Analysis UI (depends on M5-04 [COMMITTED], M5-05 [BLOCKED])
+- **Status:** Chunk M5-04 COMMITTED (Commit: `85ac1e8`); Chunk M5-03 COMMITTED (Commit: `f1637e4`); Chunk M5-02 COMMITTED (Commit: `c538c55`); Chunk M5-01 COMMITTED (Commit: `fda544e`). 119 frontend tests passed across 19 test suites (100% clean), 0 lint errors, tsc clean, production build passed.
 
 ---
 
@@ -1071,6 +1071,95 @@ Chunks M5-03 through DOC-01 (except committed M3-01 through M3-13, M4-01 through
 
 ---
 
+## Chunk M5-03 Implementation Record
+
+- **Status:** `COMMITTED`
+- **Commit:** `f1637e4` (`feat(frontend): add API client and state management`)
+- **Independent Review Result:** `PASS — READY FOR VERIFIED STATUS` (Independent review verified backend contract conformance, error normalization, race-safe query hooks and caching, region-agnostic operational context, security, 104 tests, strict TypeScript, lint, and production build).
+- **Chunk:** M5-03
+- **Module:** Frontend Core / GIS
+- **Title:** API Client & State Management Setup
+- **Owner:** M5
+- **Dependencies Consumed:**
+  - M5-01 (Frontend Foundation & Design System — COMMITTED, Commit `fda544e`)
+  - M5-02 (Authentication UI & Session Handling — COMMITTED, Commit `c538c55`, State `790751c`)
+  - M2-04 (Backend API Error Contract & Common Schemas — COMMITTED, Commit `d81bbeb`)
+- **Backend Contracts Inspected & Respected:**
+  - **M2-04 Error Contract (`backend/app/schemas/common.py`, `backend/app/core/errors.py`):**
+    - Standardized error response envelope: `{ success: false, error: { code: str, message: str, status_code: int, request_id: Optional[str], details: Optional[Dict], timestamp: str } }`.
+    - HTTP correlation identifier header: `x-request-id`.
+    - Standardized error codes: `BAD_REQUEST`, `UNAUTHORIZED`, `FORBIDDEN`, `NOT_FOUND`, `VALIDATION_ERROR`, `INTERNAL_SERVER_ERROR`, `SERVICE_UNAVAILABLE`.
+  - **M2-05 Authentication Contract (`backend/app/schemas/auth.py`, `backend/app/api/v1/auth.py`):**
+    - `POST /api/v1/auth/login` (request body `username`, `password`; response `access_token`, `token_type: "bearer"`, `expires_in`).
+    - `GET /api/v1/auth/me` (requires `Authorization: Bearer <access_token>`, returns `UserRead`).
+  - **Other Active Backend Contracts Inspected:**
+    - `GET /api/v1/sites` & `POST /api/v1/sites` (`backend/app/api/v1/sites.py`)
+    - `GET /api/v1/telemetry/overview` & `/sources` (`backend/app/api/v1/telemetry.py`)
+    - `POST /api/v1/relocation/match` & `/assignments` (`backend/app/api/v1/relocation.py`)
+    - `POST /api/v1/routes/generate` (`backend/app/api/v1/routing.py`)
+    - `GET /api/v1/scenarios` & `POST /api/v1/scenarios/run` (`backend/app/api/v1/scenarios.py`)
+- **API Client & Networking Architecture:**
+  - **Environment-based Base URL:** Configurable via `NEXT_PUBLIC_API_BASE_URL` (default: `http://localhost:8000/api/v1`). Automatic URL normalization strips redundant leading and trailing slashes to eliminate accidental double slashes.
+  - **Singleton & Instance Client:** `ApiClient` class and singleton `apiClient` supporting `get`, `post`, `put`, `patch`, `delete`, and `request`.
+  - **Serialization & Query Parameters:** Automatic `URLSearchParams` serialization, filtering `undefined` and `null` values cleanly.
+  - **HTTP Headers:** Automatic `Accept: application/json` and `Content-Type: application/json` headers on JSON payloads.
+  - **Empty Response Handling:** Handles 204 No Content responses gracefully without throwing JSON parse errors.
+  - **Request Cancellation:** Supports explicit and implicit `AbortSignal` / `AbortController` cancellation across all request methods.
+- **Authentication Integration:**
+  - Reused existing M5-02 session token accessor (`getStoredToken()`) and validity checker (`isTokenExpired()`).
+  - Automatically attaches `Authorization: Bearer <token>` to all authenticated requests.
+  - Opt-out supported via `{ auth: false }` option for public endpoints (login, health).
+  - Security verification: zero access tokens logged, zero passwords retained, zero DOM exposure, and zero duplicate token storage keys.
+- **Error Normalization (`ApiError` & `normalizeApiError`):**
+  - Strongly-typed `ApiError` class extending native `Error` with prototype chain preserved.
+  - Exposes status, code, requestId, details, timestamp, and boolean getters (`isAuthError`, `isForbidden`, `isNotFound`, `isValidationError`, `isNetworkError`, `isAborted`).
+  - `normalizeApiError` reliably maps M2-04 backend payloads, standard HTTP responses, AbortController cancellations, and network disconnects into normalized `ApiError` instances without leaking credentials or stack traces.
+- **Server-State & Data-Fetching Foundation:**
+  - Evaluated dependency footprint: intentionally avoided adding heavy external server-state dependencies (e.g. TanStack Query / SWR / Redux) to maintain zero dependency bloat, prevent lockfile churn, and strictly preserve React 18 / Next.js 14 App Router performance.
+  - Created lightweight, idiomatic React hooks:
+    - `useApiQuery<T>`: Declarative query fetching with auto-cancellation via `AbortController`, race-condition prevention across rapid key changes, in-memory TTL caching, loading/success/error state transitions, and manual `refetch`/`abort`.
+    - `useApiMutation<TData, TVariables>`: Declarative mutation handling for POST/PUT/PATCH/DELETE lifecycle with loading, success/error callbacks, and reset.
+    - `ApiCache`: In-memory cache with TTL expiration, specific key invalidation, regex pattern invalidation, and clear.
+- **Global Application State:**
+  - Established minimal `OperationalContext` and `useOperational()` hook in `src/context/OperationalContext.tsx` providing cross-screen operational flags: `dataMode` (`"live"` | `"demo"`) and `activeRegion` (default: `"himalayan_pilot"`).
+  - Verified decision: avoided introducing speculative global stores, preserving M5-02 `AuthContext` as the sole authority for user sessions and credentials.
+  - Wrapped root layout (`src/app/layout.tsx`) with `<OperationalProvider>` nested inside `<AuthProvider>`.
+- **Files Created (15 files):**
+  - `frontend/src/types/api.ts` (Strongly-typed API envelopes, pagination, error details, request options, and query/mutation contracts)
+  - `frontend/src/lib/api/error.ts` (`ApiError` class and `normalizeApiError` conforming to M2-04 error response)
+  - `frontend/src/lib/api/client.ts` (`ApiClient` class and singleton `apiClient`)
+  - `frontend/src/lib/api/cache.ts` (`ApiCache` in-memory store with TTL and pattern invalidation)
+  - `frontend/src/lib/api/useApiQuery.ts` (Declarative server query hook with race-condition safety and auto-abort)
+  - `frontend/src/lib/api/useApiMutation.ts` (Declarative mutation hook with lifecycle callbacks and reset)
+  - `frontend/src/lib/api/index.ts` (Centralized barrel export for `@/lib/api`)
+  - `frontend/src/context/OperationalContext.tsx` (Operational state context for dataMode and activeRegion)
+  - `frontend/src/lib/api/README.md` (Architecture, usage guidelines, and integration documentation)
+  - `frontend/src/__tests__/ApiClient.test.ts` (15 unit tests for ApiClient URL building, methods, headers, auth, and errors)
+  - `frontend/src/__tests__/ApiError.test.ts` (10 unit tests for ApiError and normalizeApiError)
+  - `frontend/src/__tests__/ApiCache.test.ts` (7 unit tests for ApiCache TTL expiration, invalidation, and pattern matching)
+  - `frontend/src/__tests__/useApiQuery.test.tsx` (7 unit tests for useApiQuery loading, caching, refetch, and race-condition auto-abort)
+  - `frontend/src/__tests__/useApiMutation.test.tsx` (4 unit tests for useApiMutation lifecycle, success, error, and reset)
+  - `frontend/src/__tests__/OperationalContext.test.tsx` (3 unit tests for OperationalProvider and useOperational)
+- **Files Modified (1 file):**
+  - `frontend/src/app/layout.tsx` (Wrapped root layout children with `<OperationalProvider>`)
+- **Files Removed:** None
+- **Dependencies Added:** None (Zero third-party package additions; zero lockfile churn)
+- **Commands Executed & Exact Results:**
+  - `npm run type-check` (`tsc --noEmit`): PASS (0 errors, strict TypeScript mode intact)
+  - `npm run lint` (`next lint`): PASS (0 warnings, 0 errors)
+  - `npm run test` (`vitest run`): PASS (18 test suites passed, 104 tests passed, 100% clean)
+  - `npm run build` (`next build`): PASS (Compiled successfully, static routes generated for `/`, `/_not-found`, `/login`)
+- **Backend Regression & Environmental Limitations:**
+  - Docker Desktop daemon is unavailable in the local Windows execution environment (`failed to connect to the docker API at npipe:////./pipe/dockerDesktopLinuxEngine`).
+  - Zero backend files were modified or touched. Prior recorded backend regression remains: 525 passed, 6 warnings in container (100% clean).
+- **Scope Audit:**
+  - PASS. Zero backend files modified. Zero M5-04 Dashboard, M5-05 MapLibre GIS, M5-06 Habitations, or M6 Operations UI implemented. Zero hardcoded secrets or production URLs.
+- **Next Eligible M5 Chunk:**
+  - M5-04: Executive Dashboard UI (once M5-03 verified/committed; depends on M5-03)
+  - M5-05: MapLibre GIS Interactive Map Canvas (once M5-03 verified/committed; depends on M5-03)
+
+---
+
 ## Chunk M3-09 Implementation Record
 
 - **Status:** `COMMITTED`
@@ -1482,83 +1571,67 @@ Chunks M5-03 through DOC-01 (except committed M3-01 through M3-13, M4-01 through
 
 ---
 
+## Chunk M5-04 Implementation Record: Executive Dashboard UI
+
+- **Status:** `COMMITTED`
+- **Commit Hash:** `85ac1e8`
+- **Owner:** Member 5 (Frontend Core / GIS)
+- **Prerequisites Consumed:**
+  - Chunk M5-01 (`fda544e`): Foundation layout (`AppLayout`, `CommandHeader`, `Sidebar`, `StatusBar`), primitives (`Card`, `MetricCard`, `Badge`, `RiskBadge`, `RelocationBadge`, `Button`, `Alert`).
+  - Chunk M5-02 (`c538c55`, `790751c`): Authentication state (`AuthContext`, `useAuth`, `ProtectedRoute`, session token handling).
+  - Chunk M5-03 (`f1637e4`, `f76cd5b`): API client and query infrastructure (`apiClient`, `useApiQuery`, `OperationalContext`, `useOperational`, `ApiError`).
+- **Backend Contracts Inspected & Verified:**
+  - `GET /api/v1/telemetry/overview` -> `ResponseEnvelope[TelemetryOverviewRead]` (`backend/app/api/v1/telemetry.py`)
+  - `GET /api/v1/telemetry/sources` -> `PaginatedResponse[DataSourceTelemetryRead]` (`backend/app/api/v1/telemetry.py`)
+  - `GET /api/v1/sites` -> `PaginatedResponse[CandidateSiteRead]` (`backend/app/api/v1/sites.py`)
+  - `GET /api/v1/relocation/assignments` -> `PaginatedResponse[RelocationAssignmentRead]` (`backend/app/api/v1/relocation.py`)
+  - `GET /api/v1/scenarios` -> `ResponseEnvelope[List[ScenarioDefinitionRead]]` (`backend/app/api/v1/scenarios.py`)
+  - *No-Mock / No-Fake Invariant:* Inspected absence of `/api/v1/villages` and `/api/v1/alerts`. Habitations layer is explicitly rendered with an honest "Pending Chunk M5-06" status badge; Early warning alerts section displays deterministic SOP-RZ-01 operational threshold parameters (IMD 64.5mm/24h, 25.0° slope trigger, 500m riverine buffer) clearly attributed to upcoming Chunk M6-05. Zero fake random or simulated numerical metrics are fabricated in the frontend.
+- **Component Architecture:**
+  - `frontend/src/types/dashboard.ts`: Types strictly mirroring backend Pydantic schemas (`FreshnessEvaluationRead`, `DataSourceTelemetryRead`, `TelemetryOverviewRead`, `CandidateSiteRead`, `RelocationAssignmentRead`, `ScenarioDefinitionRead`, `GeoJSONPoint`).
+  - `frontend/src/components/dashboard/DashboardHeader.tsx`: Officer profile & role context, active region & data mode badges, overall telemetry health badge, manual refresh action.
+  - `frontend/src/components/dashboard/DashboardKpiStrip.tsx`: 6 `MetricCard` KPIs (Candidate Safe Sites, Planned Relocations, Active Telemetry Feeds, Freshness Ratio, Contingency Scenarios, Habitations status).
+  - `frontend/src/components/dashboard/CandidateSitesTable.tsx`: Candidate relocation safe havens table with elevation, area, status badge, and coordinates.
+  - `frontend/src/components/dashboard/RelocationAssignmentsCard.tsx`: Planned relocation assignments table with assigned households, population, and approval status.
+  - `frontend/src/components/dashboard/TelemetryHealthCard.tsx`: Telemetry health and data freshness visual breakdown with zero-dependency SVG meters, synthetic feed disclosure, and registered source table.
+  - `frontend/src/components/dashboard/ScenarioReadinessCard.tsx`: Pre-configured contingency models with rainfall multiplier and road blockage parameters.
+  - `frontend/src/components/dashboard/AlertsNoticeCard.tsx`: Operational early warning threshold parameters and SOP-RZ-01 notice.
+  - `frontend/src/components/dashboard/index.ts`: Clean barrel export.
+  - `frontend/src/app/dashboard/page.tsx`: Executive command dashboard orchestrating independent `useApiQuery` queries with section-level loading, error, and empty states.
+- **Files Created:**
+  - `frontend/src/types/dashboard.ts`
+  - `frontend/src/components/dashboard/DashboardHeader.tsx`
+  - `frontend/src/components/dashboard/DashboardKpiStrip.tsx`
+  - `frontend/src/components/dashboard/CandidateSitesTable.tsx`
+  - `frontend/src/components/dashboard/RelocationAssignmentsCard.tsx`
+  - `frontend/src/components/dashboard/TelemetryHealthCard.tsx`
+  - `frontend/src/components/dashboard/ScenarioReadinessCard.tsx`
+  - `frontend/src/components/dashboard/AlertsNoticeCard.tsx`
+  - `frontend/src/components/dashboard/index.ts`
+  - `frontend/src/app/dashboard/page.tsx`
+  - `frontend/src/__tests__/Dashboard.test.tsx`
+- **Files Modified:**
+  - `frontend/src/components/layout/Sidebar.tsx` (marked "Executive Dashboard" `/dashboard` active)
+  - `frontend/src/app/page.tsx` (added navigation link button to `/dashboard` while preserving M5-01 landing page tests)
+  - `PROJECT_STATE.md` (updated registry, current work, integration notes, implementation record)
+- **Validation & Automated Tests:**
+  - Vitest: 119/119 passing across 19 test suites (15 new M5-04 tests covering header, KPIs, tables, cards, full page integration, query error isolation, cache isolation).
+  - TypeScript: `tsc --noEmit` passed with 0 errors.
+  - ESLint: `next lint` passed with 0 warnings and 0 errors.
+  - Production Build: `next build` compiled cleanly; `/dashboard` prerendered statically at 10.8 kB (120 kB First Load JS).
+  - Backend Regression Limitation: Docker daemon unavailable on Windows host; zero backend files modified.
+- **Scope & Invariants Audit:**
+  - Zero backend modifications.
+  - No MapLibre GIS canvas (strictly reserved for Chunk M5-05).
+  - No relocation planner or scenario simulation wizard (reserved for M6).
+  - Fault-tolerant section-level error handling ensuring one failing endpoint does not crash the dashboard.
+
+---
+
 ## Known Issues
 
 1. **Untracked Host Virtual Environment:** `backend/venv/` exists locally on Windows host and is properly ignored by `.gitignore`. The Docker service isolates this via an anonymous volume (`/app/venv`).
 2. **Frontend Foundation Established:** `frontend/` scaffolded with Next.js 14 App Router, TypeScript, Tailwind CSS, UI primitives, command center shell, and Vitest testing suite in Chunk M5-01. Backend API client and authentication UI scheduled for M5-02 and M5-03.
-
----
-
-## Chunk M6-01 Implementation Record
-
-- **Status:** `IMPLEMENTED` (Awaiting Independent Review)
-- **Chunk:** M6-01
-- **Module:** Frontend Operations
-- **Title:** Operations UI Shell & Navigation
-- **Owner:** M6
-- **Dependencies Consumed:**
-  - M5-01 (Frontend Foundation & Design System — COMMITTED, Commit `fda544e`)
-  - M5-02 (Authentication UI & Session Handling — COMMITTED, Commit `c538c55`)
-- **Self-Verification Summary:**
-  - Prerequisite dependencies verified: M5-01 (`fda544e`) COMMITTED, M5-02 (`c538c55`) COMMITTED.
-  - Frontend type-check: PASS (0 errors via `tsc --noEmit`).
-  - Frontend lint: PASS (0 warnings, 0 errors via `next lint`).
-  - Frontend tests: PASS (13/13 test suites, 63/63 tests passed, 100% clean via `vitest run`).
-  - Next.js production build: PASS (13 static pages generated cleanly via `next build`).
-  - Scope discipline check: PASS (Strictly within M6-01 scope; zero relocation calculations, zero scenario simulation logic, zero alert threshold calculations, zero report generation, zero backend API invention, zero mock business data).
-- **Next Eligible M6 Chunks:**
-  - M6-02: Relocation Planner Workflow UI (once M6-01 verified/committed; depends on M6-01 and M4-04 [COMMITTED])
-  - M6-04: Scenario Simulator UI (once M6-01 verified/committed; depends on M6-01 and M4-06 [COMMITTED])
-  - M6-05: Real-Time Alerts & Threshold Warnings UI (once M6-01 verified/committed; depends on M6-01 and M3-11 [COMMITTED])
-  - M6-06: Data Sources & Freshness Monitoring UI (once M6-01 verified/committed; depends on M6-01 and M3-13 [COMMITTED])
-- **Scope Discipline:**
-  - Establishes operations-facing command center application shell within the existing Next.js 14 App Router under `/operations`.
-  - Implements `OperationsShell` with persistent command subheader, authenticated officer role display from `useAuth()`, active region indicator, and data mode badges.
-  - Implements `OperationsNav` secondary navigation bar providing seamless, accessible, and responsive navigation across all 7 operational domains + Overview with active route detection (`aria-current="page"`) and chunk badges.
-  - Implements `OperationsSectionShell` reusable container providing standardized breadcrumbs, Rule 12 protocol mandate banner, prerequisite engine binding indicators, action toolbar slots, and workspace containers for future M6 chunks (M6-02 through M6-09) to plug into.
-  - Implements Operations Command Hub overview page (`src/app/operations/page.tsx`) with operational readiness metric cards, statutory governance alert, and 7 module launch cards.
-  - Implements clean mount points for all M6 operational domains:
-    - Relocation Planner (`/operations/relocation` — Chunk M6-02)
-    - Relocation Sites & Infrastructure (`/operations/sites` — Chunk M6-03)
-    - Scenario Simulator (`/operations/scenarios` — Chunk M6-04)
-    - Real-Time Alerts & Threshold Warnings (`/operations/alerts` — Chunk M6-05)
-    - Report Generation & Export (`/operations/reports` — Chunk M6-07)
-    - Officer Review & Sign-Off (`/operations/review` — Chunk M6-08)
-    - Audit Log & Traceability (`/operations/audit` — Chunk M6-09)
-  - Updates `Sidebar.tsx` to organize modules into Platform Core (M5) and Officer Operations (M6), activating all operations items as functional Next.js `<Link>` elements.
-  - 100% preserves existing M5-01 and M5-02 components, routes, and tests.
-  - Zero relocation business logic or calculations (deferred to M6-02).
-  - Zero scenario simulation logic (deferred to M6-04).
-  - Zero alert threshold calculations (deferred to M6-05).
-  - Zero report compilation or generation (deferred to M6-07).
-  - Zero mock/random business data introduced.
-  - Zero modifications to backend business logic, schemas, or models.
-- **Files Created (14 files):**
-  - `frontend/src/components/operations/OperationsNav.tsx`
-  - `frontend/src/components/operations/OperationsSectionShell.tsx`
-  - `frontend/src/components/operations/OperationsShell.tsx`
-  - `frontend/src/components/operations/index.ts`
-  - `frontend/src/app/operations/layout.tsx`
-  - `frontend/src/app/operations/page.tsx`
-  - `frontend/src/app/operations/relocation/page.tsx`
-  - `frontend/src/app/operations/sites/page.tsx`
-  - `frontend/src/app/operations/scenarios/page.tsx`
-  - `frontend/src/app/operations/alerts/page.tsx`
-  - `frontend/src/app/operations/reports/page.tsx`
-  - `frontend/src/app/operations/review/page.tsx`
-  - `frontend/src/app/operations/audit/page.tsx`
-  - `frontend/src/__tests__/OperationsShell.test.tsx`
-- **Files Modified (4 files):**
-  - `frontend/src/components/layout/Sidebar.tsx` (Grouped navigation into Platform Core and Officer Operations; activated operations routes)
-  - `frontend/src/components/layout/index.ts` (Re-exported operations components)
-  - `frontend/src/__tests__/Layout.test.tsx` (Added assertions for operations navigation items and status footer)
-  - `PROJECT_STATE.md` (Updated M6-01 status to `IMPLEMENTED` and added implementation record)
-- **Files Removed:** None
-- **Commands Executed & Results:**
-  - `npm.cmd test` (`vitest run`) -> Exited 0, 13 test files, 63 tests passed (100% clean)
-  - `npm.cmd run type-check` (`tsc --noEmit`) -> Exited 0, zero type errors
-  - `npm.cmd run lint` (`next lint`) -> Exited 0, "No ESLint warnings or errors"
-  - `npm.cmd run build` (`next build`) -> Exited 0, 13 static routes generated successfully
 
 ---
 
@@ -1594,13 +1667,12 @@ Chunks M5-03 through DOC-01 (except committed M3-01 through M3-13, M4-01 through
 - Chunk M4-04 established relocation matching & assignment engine (`app.core.relocation.matching`) implementing deterministic greedy village-to-site matching with descending priority processing, dynamic carrying capacity reservation across sequential assignments, M4-02 hard safety constraint gating, M4-03 weakest-link capacity enforcement, distance/suitability ranking, rejection audits, and REST API endpoints under `/api/v1/relocation` (`POST /match`, `POST /assignments`, `POST /assignments/batch`, `GET /assignments`, `GET /assignments/{id}`).
 - Chunk M4-05 established evacuation & access routing engine (`app.core.relocation.routing`) implementing deterministic Dijkstra routing with exact tuple tie-breaking, hard safety blockage omission for cut-off road corridors, dynamic hazard proximity penalties, continuous LineString coordinate assembly, edge-penalty diversion for distinct alternative route discovery, explainability synthesis, and REST API endpoints under `/api/v1/routes` (`POST /generate` pure evaluation with zero DB mutations, `POST /` explicit persistence, `GET /` filtering & pagination, `GET /{id}`).
 - Chunk M4-06 established scenario simulator integration backend (`app.core.scenarios`) orchestrating the 7 backend engines into an isolated what-if simulation pipeline supporting NORMAL, EXTREME_RAINFALL, FLASH_FLOOD, and CAPACITY_CRISIS with before-vs-after deltas, REST API endpoints under `/api/v1/scenarios` (`GET /`, `POST /`, `GET /{id}`, `POST /run`, `GET /runs/{id}`), and zero baseline mutation.
-- Chunk M6-01 established operations UI shell & navigation (Next.js 14 App Router `/operations`), persistent command console subheader, 8-item accessible operations sub-navigation (`OperationsNav`), reusable `OperationsSectionShell` container, Operations Hub overview page, and mount points across all 7 operational domains (Relocation M6-02, Sites M6-03, Scenarios M6-04, Alerts M6-05, Reports M6-07, Officer Review M6-08, Audit Log M6-09).
-- Automated tests verified: 525 backend tests passed in container (100% clean); 63 frontend tests passed in Vitest across 13 suites (100% clean).
+- Automated tests verified: 525 backend tests passed in container (100% clean); 119 frontend tests passed in Vitest (19 suites, 100% clean).
 
 ---
 
 ## Last Updated
 
-- **Timestamp:** 2026-09-06 15:15:00 IST
-- **Updated By:** M6 (Operations UI Shell & Navigation — Chunk M6-01 Implemented)
-- **Status Summary:** Chunk M6-01 IMPLEMENTED (awaiting independent review); Chunk M5-02 COMMITTED; Chunk M5-01 COMMITTED; Chunk M4-06 COMMITTED; Chunk M4-05 COMMITTED; Chunk M4-04 COMMITTED; Chunk M4-03 COMMITTED; Chunk M4-02 COMMITTED; Chunk M4-01 COMMITTED; Chunk M3-13 COMMITTED; Chunk M3-12 COMMITTED; Chunk M3-11 COMMITTED; Chunk M3-10 COMMITTED; Chunk M3-09 COMMITTED; Chunk M3-08 COMMITTED; 63 frontend tests passed across 13 test suites (100% clean); 525 backend regression tests passed in container; zero lint warnings; Next.js production build verified (20 static routes generated). Next eligible chunks: M6-02, M6-04, M6-05, M5-03.
+- **Timestamp:** 2026-09-06 15:05:00 IST
+- **Updated By:** M5 (Executive Dashboard UI — Chunk M5-04 Committed)
+- **Status Summary:** Chunk M5-04 COMMITTED (Commit: `85ac1e8`); Chunk M5-03 COMMITTED (Commit: `f1637e4`); Chunk M5-02 COMMITTED; Chunk M5-01 COMMITTED; Chunk M4-06 COMMITTED; Chunk M4-05 COMMITTED; Chunk M4-04 COMMITTED; Chunk M4-03 COMMITTED; Chunk M4-02 COMMITTED; Chunk M4-01 COMMITTED; Chunk M3-13 COMMITTED; Chunk M3-12 COMMITTED; Chunk M3-11 COMMITTED; Chunk M3-10 COMMITTED; Chunk M3-09 COMMITTED; Chunk M3-08 COMMITTED; 119 frontend tests passed in Vitest (19 test suites); 525 total backend regression tests verified passing in container (100% clean). Next eligible chunks: M5-05, M6-01.
