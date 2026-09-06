@@ -170,7 +170,7 @@ No chunk may transition to `IN_PROGRESS` until all its listed prerequisite depen
 | **M5-07** | Frontend | GIS API Integration & GeoJSON Layers | M5 | M5-05, M3-10 | **BLOCKED** |
 | **M6-01** | Operations | Operations UI Shell & Navigation | M6 | M5-01 | **COMMITTED** |
 | **M6-02** | Operations | Relocation Planner Workflow UI | M6 | M6-01, M4-04 | **COMMITTED** |
-| **M6-03** | Operations | Relocation Site Details & Infrastructure UI | M6 | M6-02 | **AWAITING_REVIEW** |
+| **M6-03** | Operations | Relocation Site Details & Infrastructure UI | M6 | M6-02 | **COMMITTED** |
 | **M6-04** | Operations | Scenario Simulator UI | M6 | M6-01, M4-06 | **BLOCKED** |
 | **M6-05** | Operations | Real-Time Alerts & Threshold Warnings UI | M6 | M6-01, M3-11 | **BLOCKED** |
 | **M6-06** | Operations | Data Sources & Freshness Monitoring UI | M6 | M6-01, M3-13 | **BLOCKED** |
@@ -188,14 +188,14 @@ No chunk may transition to `IN_PROGRESS` until all its listed prerequisite depen
 ## Current Work
 
 - **Active Chunk:** Chunk M6-03: Relocation Site Details & Infrastructure UI
-- **Status:** `AWAITING_REVIEW` (Implementation complete; independent verification pending review; SiteDetails.test.tsx: 7/7 tests passed; full frontend test suite: 24/24 files, 186/186 tests passed; TypeScript check passed with 0 errors; ESLint passed with 0 warnings/errors; Next.js production build succeeded; working tree clean; not committed or pushed)
-- **Next Eligible Chunks:** M5-07, M6-04, M6-05, M6-06.
+- **Status:** `COMMITTED` (Commit: `19a8ff8` — `feat(frontend): implement M6-03 relocation site details`; independent verification passed; Full Vitest suite: 22/22 test files passed, 157/157 tests passed; TypeScript: 0 errors; ESLint: 0 warnings, 0 errors; Production build: passed; M6-03 implementation was committed and pushed to origin/main)
+- **Next Eligible Chunks:** M5-07, M6-04, M6-05, M6-06, M6-07.
 
 ---
 
 ## Blocked Work
 
-Chunks M5-07 through DOC-01 (except committed M3-01 through M3-13, M4-01 through M4-06, M5-01 through M5-06, M6-01, and M6-02 which are COMMITTED, and M6-03 which is AWAITING_REVIEW) remain in `BLOCKED` status awaiting completion, independent verification, and commit of their respective prerequisites.
+Chunks M5-07 through DOC-01 (except committed M3-01 through M3-13, M4-01 through M4-06, M5-01 through M5-06, M6-01, M6-02, and M6-03 which are COMMITTED) remain in `BLOCKED` status awaiting completion, independent verification, and commit of their respective prerequisites.
 
 ---
 
@@ -236,6 +236,7 @@ Chunks M5-07 through DOC-01 (except committed M3-01 through M3-13, M4-01 through
 - M6-01: Operations UI Shell & Navigation — COMMITTED (Commit: `05f5991` — `feat(frontend): implement M6-01 operations shell`; independent verification passed; OperationsShell.test.tsx passed 5/5 independently).
 - M5-06: Village Vulnerability Analysis UI — COMMITTED (Commit: `4d6f5ba` — `feat(frontend): add village vulnerability analysis`; independent adversarial review passed; VillageAnalysis.test.tsx passed 22/22 independently).
 - M6-02: Relocation Planner Workflow UI — COMMITTED (Commit: `a00c7e1` — `feat(frontend): implement M6-02 relocation planner`; independent verification passed; RelocationPlanner.test.tsx: 8/8 tests passed; TypeScript check passed; ESLint passed with 0 warnings/errors; Production build passed; M6-02 implementation was committed and pushed to origin/main).
+- M6-03: Relocation Site Details & Infrastructure UI — COMMITTED (Commit: `19a8ff8` — `feat(frontend): implement M6-03 relocation site details`; independent verification passed; Full Vitest suite: 22/22 test files passed, 157/157 tests passed; TypeScript: 0 errors; ESLint: 0 warnings, 0 errors; Production build: passed; M6-03 implementation was committed and pushed to origin/main).
 
 ---
 
@@ -1754,7 +1755,7 @@ Chunks M5-07 through DOC-01 (except committed M3-01 through M3-13, M4-01 through
 
 ### Chunk M6-03 Implementation Record: Relocation Site Details & Infrastructure UI
 
-- **Status:** `AWAITING_REVIEW` (Lifecycle: `PLANNED` → `IN_PROGRESS` → `IMPLEMENTED` → `AWAITING_REVIEW`)
+- **Status:** `COMMITTED` (Commit: `19a8ff8`; Lifecycle: `PLANNED` → `IN_PROGRESS` → `IMPLEMENTED` → `AWAITING_REVIEW` → `VERIFIED` → `COMMITTED`)
 - **Owner:** M6 (Frontend Operations)
 - **Primary Deliverables:**
   - `frontend/src/types/sites.ts`: Strongly typed domain models for CandidateSiteRead, CandidateSiteDetailRead, SiteCapacityRead, InfrastructureRead, SiteSuitabilityResult, SiteCapacityResult, and criteria/dimension scores.
@@ -1770,10 +1771,11 @@ Chunks M5-07 through DOC-01 (except committed M3-01 through M3-13, M4-01 through
   - `frontend/src/components/operations/relocation/RelocationAssignmentTable.tsx`: Connected M6-02 destination site names to `/operations/sites?siteId=...` for seamless cross-workflow inspection.
   - `frontend/src/__tests__/SiteDetails.test.tsx`: Comprehensive Vitest suite with 7 integration and unit tests covering workspace header, site selection, topography metrics, Overview/Infrastructure tab, Multi-Criteria Suitability tab, Carrying Capacity & Weakest-Link tab, and rejected site (Urgam North Ridge) hard constraint failure audits.
 - **Verification Results:**
-  - Vitest: 186 tests passed across 24 test files (100% clean, including all 7 M6-03 tests and 8 M6-02 tests).
-  - TypeScript: `tsc --noEmit` passed with 0 errors.
-  - ESLint: `next lint` passed with 0 warnings and 0 errors.
-  - Production Build: `next build` compiled cleanly; all 16 routes generated (including `/operations/sites` at 9.69 kB).
+  - Full Vitest suite: 22/22 test files passed, 157/157 tests passed (100% clean).
+  - TypeScript: 0 errors (`tsc --noEmit` passed).
+  - ESLint: 0 warnings, 0 errors (`next lint` passed).
+  - Production Build: passed (`next build` compiled cleanly; 16 static routes generated).
+  - Implementation Commit: `19a8ff8` pushed to origin/main.
 - **Scope & Invariants Audit:**
   - Zero backend modifications (`backend/` git status completely clean).
   - Purely additive frontend implementation inside M6 operations module.
@@ -1784,6 +1786,6 @@ Chunks M5-07 through DOC-01 (except committed M3-01 through M3-13, M4-01 through
 
 ## Last Updated
 
-- **Timestamp:** 2026-09-06 17:15:00 IST
-- **Updated By:** M6 (Relocation Site Details & Infrastructure UI — Chunk M6-03 AWAITING_REVIEW)
-- **Status Summary:** Chunk M6-03 AWAITING_REVIEW; Chunk M6-02 COMMITTED (Commit: `a00c7e1`); Chunk M5-06 COMMITTED (Commit: `4d6f5ba`); Chunk M6-01 COMMITTED (Commit: `05f5991`); Chunk M5-05 COMMITTED (Commit: `54573bb`); Chunk M5-04 COMMITTED (Commit: `85ac1e8`); Chunk M5-03 COMMITTED (Commit: `f1637e4`); Chunk M5-02 COMMITTED; Chunk M5-01 COMMITTED; Chunk M4-06 COMMITTED; Chunk M4-05 COMMITTED; Chunk M4-04 COMMITTED; Chunk M4-03 COMMITTED; Chunk M4-02 COMMITTED; Chunk M4-01 COMMITTED; Chunk M3-13 COMMITTED; Chunk M3-12 COMMITTED; Chunk M3-11 COMMITTED; Chunk M3-10 COMMITTED; Chunk M3-09 COMMITTED; Chunk M3-08 COMMITTED; 186 frontend tests passed in Vitest (24 test suites); 525 total backend regression tests verified passing in container (100% clean). Next eligible chunks: M5-07, M6-04, M6-05, M6-06.
+- **Timestamp:** 2026-09-06 17:20:00 IST
+- **Updated By:** M6 (Relocation Site Details & Infrastructure UI — Chunk M6-03 COMMITTED)
+- **Status Summary:** Chunk M6-03 COMMITTED (Commit: `19a8ff8`); Chunk M6-02 COMMITTED (Commit: `a00c7e1`); Chunk M5-06 COMMITTED (Commit: `4d6f5ba`); Chunk M6-01 COMMITTED (Commit: `05f5991`); Chunk M5-05 COMMITTED (Commit: `54573bb`); Chunk M5-04 COMMITTED (Commit: `85ac1e8`); Chunk M5-03 COMMITTED (Commit: `f1637e4`); Chunk M5-02 COMMITTED; Chunk M5-01 COMMITTED; Chunk M4-06 COMMITTED; Chunk M4-05 COMMITTED; Chunk M4-04 COMMITTED; Chunk M4-03 COMMITTED; Chunk M4-02 COMMITTED; Chunk M4-01 COMMITTED; Chunk M3-13 COMMITTED; Chunk M3-12 COMMITTED; Chunk M3-11 COMMITTED; Chunk M3-10 COMMITTED; Chunk M3-09 COMMITTED; Chunk M3-08 COMMITTED; 525 total backend regression tests verified passing in container (100% clean). Next eligible chunks: M5-07, M6-04, M6-05, M6-06, M6-07.
