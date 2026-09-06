@@ -163,7 +163,7 @@ No chunk may transition to `IN_PROGRESS` until all its listed prerequisite depen
 | **M4-06** | Relocation | Scenario Simulator Integration Backend | M4 | M4-04, M3-11 | **COMMITTED** |
 | **M5-01** | Frontend | Frontend Foundation & Design System | M5 | M1-01 | **COMMITTED** |
 | **M5-02** | Frontend | Authentication UI & Session Handling | M5 | M5-01, M2-05 | **COMMITTED** |
-| **M5-03** | Frontend | API Client & State Management Setup | M5 | M5-01, M2-04 | **VERIFIED** |
+| **M5-03** | Frontend | API Client & State Management Setup | M5 | M5-01, M2-04 | **COMMITTED** |
 | **M5-04** | Frontend | Executive Dashboard UI | M5 | M5-03 | **BLOCKED** |
 | **M5-05** | Frontend | MapLibre GIS Interactive Map Canvas | M5 | M5-03 | **BLOCKED** |
 | **M5-06** | Frontend | Village Vulnerability Analysis UI | M5 | M5-04, M5-05 | **BLOCKED** |
@@ -187,9 +187,9 @@ No chunk may transition to `IN_PROGRESS` until all its listed prerequisite depen
 
 ## Current Work
 
-- **Active Chunk:** Chunk M5-03: API Client & State Management Setup (`VERIFIED`)
-- **Next Eligible Chunks:** Chunk M5-04: Executive Dashboard UI (once M5-03 committed; depends on M5-03); Chunk M5-05: MapLibre GIS Interactive Map Canvas (once M5-03 committed; depends on M5-03); Chunk M6-01: Operations UI Shell & Navigation (depends on M5-01 [COMMITTED])
-- **Status:** Chunk M5-03 VERIFIED (Independent Review: `PASS — READY FOR VERIFIED STATUS`); Chunk M5-02 COMMITTED (Commit: `c538c55`); Chunk M5-01 COMMITTED (Commit: `fda544e`). 104 frontend tests passed across 18 test suites (100% clean), 0 lint errors, tsc clean, production build passed.
+- **Active Chunk:** None (Chunk M5-03 committed; Milestone 5 progressing)
+- **Next Eligible Chunks:** Chunk M5-04: Executive Dashboard UI (depends on M5-03 [COMMITTED]); Chunk M5-05: MapLibre GIS Interactive Map Canvas (depends on M5-03 [COMMITTED]); Chunk M6-01: Operations UI Shell & Navigation (depends on M5-01 [COMMITTED])
+- **Status:** Chunk M5-03 COMMITTED (Commit: `f1637e4`); Chunk M5-02 COMMITTED (Commit: `c538c55`); Chunk M5-01 COMMITTED (Commit: `fda544e`). 104 frontend tests passed across 18 test suites (100% clean), 0 lint errors, tsc clean, production build passed.
 
 ---
 
@@ -1073,7 +1073,8 @@ Chunks M5-03 through DOC-01 (except committed M3-01 through M3-13, M4-01 through
 
 ## Chunk M5-03 Implementation Record
 
-- **Status:** `VERIFIED`
+- **Status:** `COMMITTED`
+- **Commit:** `f1637e4` (`feat(frontend): add API client and state management`)
 - **Independent Review Result:** `PASS — READY FOR VERIFIED STATUS` (Independent review verified backend contract conformance, error normalization, race-safe query hooks and caching, region-agnostic operational context, security, 104 tests, strict TypeScript, lint, and production build).
 - **Chunk:** M5-03
 - **Module:** Frontend Core / GIS
@@ -1615,6 +1616,6 @@ Chunks M5-03 through DOC-01 (except committed M3-01 through M3-13, M4-01 through
 
 ## Last Updated
 
-- **Timestamp:** 2026-09-06 14:25:00 IST
-- **Updated By:** M5 (API Client & State Management Setup — Chunk M5-03 Awaiting Review)
-- **Status Summary:** Chunk M5-03 IMPLEMENTED & AWAITING_REVIEW; Chunk M5-02 COMMITTED; Chunk M5-01 COMMITTED; Chunk M4-06 COMMITTED; Chunk M4-05 COMMITTED; Chunk M4-04 COMMITTED; Chunk M4-03 COMMITTED; Chunk M4-02 COMMITTED; Chunk M4-01 COMMITTED; Chunk M3-13 COMMITTED; Chunk M3-12 COMMITTED; Chunk M3-11 COMMITTED; Chunk M3-10 COMMITTED; Chunk M3-09 COMMITTED; Chunk M3-08 COMMITTED; 104 frontend tests passed in Vitest (18 test suites); 525 total backend regression tests verified passing in container (100% clean). Next eligible chunks: M5-04, M5-05, M6-01.
+- **Timestamp:** 2026-09-06 14:38:00 IST
+- **Updated By:** M5 (API Client & State Management Setup — Chunk M5-03 Committed)
+- **Status Summary:** Chunk M5-03 COMMITTED (Commit: `f1637e4`); Chunk M5-02 COMMITTED; Chunk M5-01 COMMITTED; Chunk M4-06 COMMITTED; Chunk M4-05 COMMITTED; Chunk M4-04 COMMITTED; Chunk M4-03 COMMITTED; Chunk M4-02 COMMITTED; Chunk M4-01 COMMITTED; Chunk M3-13 COMMITTED; Chunk M3-12 COMMITTED; Chunk M3-11 COMMITTED; Chunk M3-10 COMMITTED; Chunk M3-09 COMMITTED; Chunk M3-08 COMMITTED; 104 frontend tests passed in Vitest (18 test suites); 525 total backend regression tests verified passing in container (100% clean). Next eligible chunks: M5-04, M5-05, M6-01.
