@@ -172,7 +172,7 @@ No chunk may transition to `IN_PROGRESS` until all its listed prerequisite depen
 | **M6-02** | Operations | Relocation Planner Workflow UI | M6 | M6-01, M4-04 | **COMMITTED** |
 | **M6-03** | Operations | Relocation Site Details & Infrastructure UI | M6 | M6-02 | **COMMITTED** |
 | **M6-04** | Operations | Scenario Simulator UI | M6 | M6-01, M4-06 | **COMMITTED** |
-| **M6-05** | Operations | Real-Time Alerts & Threshold Warnings UI | M6 | M6-01, M3-11 | **AWAITING_REVIEW** |
+| **M6-05** | Operations | Real-Time Alerts & Threshold Warnings UI | M6 | M6-01, M3-11 | **COMMITTED** |
 | **M6-06** | Operations | Data Sources & Freshness Monitoring UI | M6 | M6-01, M3-13 | **BLOCKED** |
 | **M6-07** | Operations | Report Generation & Export UI | M6 | M6-02, M6-03 | **BLOCKED** |
 | **M6-08** | Operations | Officer Review & Action Sign-Off Workflow | M6 | M6-02, M6-04 | **BLOCKED** |
@@ -188,14 +188,14 @@ No chunk may transition to `IN_PROGRESS` until all its listed prerequisite depen
 ## Current Work
 
 - **Active Chunk:** Chunk M6-05: Real-Time Alerts & Threshold Warnings UI
-- **Status:** `AWAITING_REVIEW` (Implementation complete; Real-Time multi-hazard alerts & threshold warnings workflow implemented inside `/operations/alerts` consuming M3-11 trigger contracts and M3-13 alert telemetry; AlertsOperations.test.tsx passed 12/12 tests independently; Full Vitest suite: 26/26 test files passed, 207/207 tests passed; TypeScript: 0 errors; ESLint: 0 warnings, 0 errors; Production build: passed).
+- **Status:** `COMMITTED` (Commit: `3aef3a9` — `feat(frontend): implement M6-05 alerts and threshold warnings`; independent verification passed; Focused M6-05 suite: 12/12 passed; Full frontend suite: 207/207 tests passed across 26 files; TypeScript: 0 errors; ESLint: 0 warnings, 0 errors; Production build: passed; M6-05 implementation was committed and pushed to origin/main)
 - **Next Eligible Chunks:** M5-07, M6-06, M6-07, M6-08.
 
 ---
 
 ## Blocked Work
 
-Chunks M5-07 through DOC-01 (except committed M3-01 through M3-13, M4-01 through M4-06, M5-01 through M5-06, M6-01, M6-02, M6-03, M6-04 which are COMMITTED, and M6-05 which is AWAITING_REVIEW) remain in `BLOCKED` status awaiting completion, independent verification, and commit of their respective prerequisites.
+Chunks M5-07 through DOC-01 (except committed M3-01 through M3-13, M4-01 through M4-06, M5-01 through M5-06, M6-01, M6-02, M6-03, M6-04, and M6-05 which are COMMITTED) remain in `BLOCKED` status awaiting completion, independent verification, and commit of their respective prerequisites.
 
 ---
 
@@ -238,6 +238,7 @@ Chunks M5-07 through DOC-01 (except committed M3-01 through M3-13, M4-01 through
 - M6-02: Relocation Planner Workflow UI — COMMITTED (Commit: `a00c7e1` — `feat(frontend): implement M6-02 relocation planner`; independent verification passed; RelocationPlanner.test.tsx: 8/8 tests passed; TypeScript check passed; ESLint passed with 0 warnings/errors; Production build passed; M6-02 implementation was committed and pushed to origin/main).
 - M6-03: Relocation Site Details & Infrastructure UI — COMMITTED (Commit: `19a8ff8` — `feat(frontend): implement M6-03 relocation site details`; independent verification passed; Full Vitest suite: 22/22 test files passed, 157/157 tests passed; TypeScript: 0 errors; ESLint: 0 warnings, 0 errors; Production build: passed; M6-03 implementation was committed and pushed to origin/main).
 - M6-04: Scenario Simulator UI — COMMITTED (Commit: `37d385b` — `feat(frontend): implement M6-04 scenario simulator`; independent verification passed; M6-04 tests: 9/9 passed; Full frontend suite: 195/195 passed; TypeScript: 0 errors; ESLint: 0 warnings, 0 errors; Production build: passed; M6-04 implementation was committed and pushed to origin/main).
+- M6-05: Real-Time Alerts & Threshold Warnings UI — COMMITTED (Commit: `3aef3a9` — `feat(frontend): implement M6-05 alerts and threshold warnings`; independent verification passed; Focused M6-05 suite: 12/12 passed; Full frontend suite: 207/207 tests passed across 26 files; TypeScript: 0 errors; ESLint: 0 warnings, 0 errors; Production build: passed; M6-05 implementation was committed and pushed to origin/main).
 
 ---
 
@@ -1818,7 +1819,7 @@ Chunks M5-07 through DOC-01 (except committed M3-01 through M3-13, M4-01 through
 
 ### Chunk M6-05 Implementation Record: Real-Time Alerts & Threshold Warnings UI
 
-- **Status:** `AWAITING_REVIEW` (Lifecycle: `PLANNED` → `IN_PROGRESS` → `IMPLEMENTED` → `AWAITING_REVIEW`)
+- **Status:** `COMMITTED` (Commit: `3aef3a9`; Lifecycle: `PLANNED` → `IN_PROGRESS` → `IMPLEMENTED` → `AWAITING_REVIEW` → `VERIFIED` → `COMMITTED`)
 - **Owner:** M6 (Frontend Operations)
 - **Primary Deliverables:**
   - `frontend/src/types/alerts.ts`: Strongly typed domain models for DynamicTriggerStatus (`no_trigger`, `triggered`, `insufficient_data`), DynamicHazardIndicator (`rainfall_24h`, `seismic_mmi`, `slope_deg`, `water_level_above_danger`, `landslide_debris_volume`, `landslide_activity`, `custom`), ComparisonOperator, AlertSeverity, AlertType, DangerLevel, SingleTriggerEvaluation, DynamicRedZoneExplainability, OperationalAlertItem, DynamicThresholdSummary, AlertFilterCriteria, and AlertSummaryMetrics strictly conforming to M3-11 dynamic trigger contracts and M3-13 alert telemetry.
@@ -1838,6 +1839,7 @@ Chunks M5-07 through DOC-01 (except committed M3-01 through M3-13, M4-01 through
   - TypeScript: 0 errors (`tsc --noEmit` passed).
   - ESLint: 0 warnings, 0 errors (`next lint` passed).
   - Production Build: passed (`next build` compiled cleanly; 16 static routes generated including `/operations/alerts` at 11.7 kB).
+  - Implementation Commit: `3aef3a9` pushed to origin/main.
 - **Scope & Invariants Audit:**
   - Zero backend modifications (`backend/` git status completely clean).
   - Purely additive frontend implementation inside M6 operations module.
@@ -1850,6 +1852,6 @@ Chunks M5-07 through DOC-01 (except committed M3-01 through M3-13, M4-01 through
 
 ## Last Updated
 
-- **Timestamp:** 2026-09-06 18:45:00 IST
-- **Updated By:** M6 (Real-Time Alerts & Threshold Warnings UI — Chunk M6-05 AWAITING_REVIEW)
-- **Status Summary:** Chunk M6-05 AWAITING_REVIEW; Chunk M6-04 COMMITTED (Commit: `37d385b`); Chunk M6-03 COMMITTED (Commit: `19a8ff8`); Chunk M6-02 COMMITTED (Commit: `a00c7e1`); Chunk M5-06 COMMITTED (Commit: `4d6f5ba`); Chunk M6-01 COMMITTED (Commit: `05f5991`); Chunk M5-05 COMMITTED (Commit: `54573bb`); Chunk M5-04 COMMITTED (Commit: `85ac1e8`); Chunk M5-03 COMMITTED (Commit: `f1637e4`); Chunk M5-02 COMMITTED; Chunk M5-01 COMMITTED; Chunk M4-06 COMMITTED; Chunk M4-05 COMMITTED; Chunk M4-04 COMMITTED; Chunk M4-03 COMMITTED; Chunk M4-02 COMMITTED; Chunk M4-01 COMMITTED; Chunk M3-13 COMMITTED; Chunk M3-12 COMMITTED; Chunk M3-11 COMMITTED; Chunk M3-10 COMMITTED; Chunk M3-09 COMMITTED; Chunk M3-08 COMMITTED; 207/207 frontend tests passing across 26 files; 525 total backend regression tests verified passing in container. Next eligible chunks: M5-07, M6-06, M6-07, M6-08.
+- **Timestamp:** 2026-09-06 18:50:00 IST
+- **Updated By:** M6 (Real-Time Alerts & Threshold Warnings UI — Chunk M6-05 COMMITTED)
+- **Status Summary:** Chunk M6-05 COMMITTED (Commit: `3aef3a9`); Chunk M6-04 COMMITTED (Commit: `37d385b`); Chunk M6-03 COMMITTED (Commit: `19a8ff8`); Chunk M6-02 COMMITTED (Commit: `a00c7e1`); Chunk M5-06 COMMITTED (Commit: `4d6f5ba`); Chunk M6-01 COMMITTED (Commit: `05f5991`); Chunk M5-05 COMMITTED (Commit: `54573bb`); Chunk M5-04 COMMITTED (Commit: `85ac1e8`); Chunk M5-03 COMMITTED (Commit: `f1637e4`); Chunk M5-02 COMMITTED; Chunk M5-01 COMMITTED; Chunk M4-06 COMMITTED; Chunk M4-05 COMMITTED; Chunk M4-04 COMMITTED; Chunk M4-03 COMMITTED; Chunk M4-02 COMMITTED; Chunk M4-01 COMMITTED; Chunk M3-13 COMMITTED; Chunk M3-12 COMMITTED; Chunk M3-11 COMMITTED; Chunk M3-10 COMMITTED; Chunk M3-09 COMMITTED; Chunk M3-08 COMMITTED; 207/207 frontend tests passing across 26 files; 525 total backend regression tests verified passing in container. Next eligible chunks: M5-07, M6-06, M6-07, M6-08.
