@@ -174,7 +174,7 @@ No chunk may transition to `IN_PROGRESS` until all its listed prerequisite depen
 | **M6-04** | Operations | Scenario Simulator UI | M6 | M6-01, M4-06 | **COMMITTED** |
 | **M6-05** | Operations | Real-Time Alerts & Threshold Warnings UI | M6 | M6-01, M3-11 | **COMMITTED** |
 | **M6-06** | Operations | Data Sources & Freshness Monitoring UI | M6 | M6-01, M3-13 | **COMMITTED** |
-| **M6-07** | Operations | Report Generation & Export UI | M6 | M6-02, M6-03 | **AWAITING_REVIEW** |
+| **M6-07** | Operations | Report Generation & Export UI | M6 | M6-02, M6-03 | **COMMITTED** |
 | **M6-08** | Operations | Officer Review & Action Sign-Off Workflow | M6 | M6-02, M6-04 | **BLOCKED** |
 | **M6-09** | Operations | Audit Log & Traceability UI | M6 | M6-08 | **BLOCKED** |
 | **INT-01** | Integration | End-to-End Backend / Frontend Integration | M1 | All M2-M6 | **BLOCKED** |
@@ -187,8 +187,8 @@ No chunk may transition to `IN_PROGRESS` until all its listed prerequisite depen
 
 ## Current Work
 
-- **Active Chunk:** Chunk M6-07: Report Generation & Export UI
-- **Status:** `AWAITING_REVIEW` (Implementation complete; Report Generation & Export workflow implemented inside `/operations/reports` aggregating M6-02 relocation matching and M6-03 candidate site infrastructure contracts into formal executive dossiers with JSON, CSV, and print-ready document export; ReportsOperations.test.tsx passed 14/14 tests independently; Full Vitest suite: 28/28 test files passed, 234/234 tests passed; TypeScript: 0 errors; ESLint: 0 warnings, 0 errors; Production build: passed). Module M5 Frontend Core / GIS is 100% complete (M5-01 through M5-07 COMMITTED; Latest: Chunk M5-07 COMMITTED; Commit: `1517f133c7c4eaad71b1b38418d87fafbc18276d` — `feat(gis): integrate GIS APIs and GeoJSON layers`).
+- **Active Chunk:** `None` (No M6 chunk active; Chunk M6-07 is COMMITTED)
+- **Status:** Chunk M6-07: Report Generation & Export UI is COMMITTED (Commit: `69e8297` — `feat(frontend): implement M6-07 report generation and export`; independent verification passed: Focused tests: 14/14 passed; Full frontend suite: 234/234 tests passed across 28 files; TypeScript: 0 errors; ESLint: 0 warnings, 0 errors; Production build: passed). Module M5 Frontend Core / GIS is 100% complete (M5-01 through M5-07 COMMITTED).
 - **Next Eligible Chunks:**
   - **M6-08:** Officer Review & Action Sign-Off Workflow (Prerequisites: M6-02, M6-04 — both COMMITTED; unblocked and ready to start)
 
@@ -196,8 +196,7 @@ No chunk may transition to `IN_PROGRESS` until all its listed prerequisite depen
 
 ## Blocked Work
 
-### In Review / Next Eligible:
-- **M6-07:** Report Generation & Export UI (`AWAITING_REVIEW` — Implementation complete, verified, awaiting review)
+### Next Eligible / Unblocked:
 - **M6-08:** Officer Review & Action Sign-Off Workflow (Dependencies: M6-02, M6-04 — both COMMITTED; unblocked and ready to start)
 
 ### Still Blocked:
@@ -252,6 +251,7 @@ No chunk may transition to `IN_PROGRESS` until all its listed prerequisite depen
 - M6-05: Real-Time Alerts & Threshold Warnings UI — COMMITTED (Commit: `3aef3a9` — `feat(frontend): implement M6-05 alerts and threshold warnings`; independent verification passed; Focused M6-05 suite: 12/12 passed; Full frontend suite: 207/207 tests passed across 26 files; TypeScript: 0 errors; ESLint: 0 warnings, 0 errors; Production build: passed; M6-05 implementation was committed and pushed to origin/main).
 - M6-06: Data Sources & Freshness Monitoring UI — COMMITTED (Commit: `f7d4830` — `feat(frontend): implement M6-06 data sources monitoring`; independent verification passed; Focused M6-06 suite: 13/13 passed; Full frontend suite: 220/220 tests passed across 27 files; TypeScript: 0 errors; ESLint: 0 warnings, 0 errors; Production build: passed; M6-06 implementation was committed and pushed to origin/main).
 - M5-07: GIS API Integration & GeoJSON Layers — COMMITTED (Commit: `1517f133c7c4eaad71b1b38418d87fafbc18276d` — `feat(gis): integrate GIS APIs and GeoJSON layers`; independent verification passed; GisGeoJsonIntegration.test.tsx passed 18/18 tests; TypeScript passed with 0 errors; ESLint passed with 0 warnings/errors; Production build passed; pushed to origin/main; Module M5 Frontend Core / GIS is 100% complete).
+- M6-07: Report Generation & Export UI — COMMITTED (Commit: `69e8297` — `feat(frontend): implement M6-07 report generation and export`; independent verification passed: Focused tests: 14/14 passed; Full frontend suite: 234/234 tests passed across 28 files; TypeScript: 0 errors; ESLint: 0 warnings, 0 errors; Production build: passed; implementation committed and pushed to origin/main).
 
 ---
 
@@ -1898,7 +1898,7 @@ No chunk may transition to `IN_PROGRESS` until all its listed prerequisite depen
 
 ### Chunk M6-07 Implementation Record: Report Generation & Export UI
 
-- **Status:** `AWAITING_REVIEW` (Lifecycle: `PLANNED` → `IN_PROGRESS` → `IMPLEMENTED` → `AWAITING_REVIEW`)
+- **Status:** `COMMITTED` (Commit: `69e8297`; Lifecycle: `PLANNED` → `IN_PROGRESS` → `IMPLEMENTED` → `AWAITING_REVIEW` → `VERIFIED` → `COMMITTED`)
 - **Owner:** M6 (Frontend Operations)
 - **Primary Deliverables:**
   - `frontend/src/types/reports.ts`: Strongly typed domain models for `ReportTemplateId` (`relocation_allocation`, `site_infrastructure`, `suitability_capacity`, `comprehensive_dossier`), `ReportStatusFilter` (`all`, `assigned`, `unassigned`), `ReportExportFormat` (`json`, `csv`), `ReportTemplateMeta`, `ReportConfig`, `ReportMetric`, and `CompiledDossier` strictly composing existing M6-02 and M6-03 contracts.
@@ -1917,6 +1917,7 @@ No chunk may transition to `IN_PROGRESS` until all its listed prerequisite depen
   - TypeScript: 0 errors (`tsc --noEmit` passed).
   - ESLint: 0 warnings, 0 errors (`next lint` passed).
   - Production Build: passed (`next build` compiled cleanly; 17 static routes generated including `/operations/reports` at 12.3 kB).
+  - Implementation Commit: `69e8297` pushed to origin/main.
 - **Scope & Invariants Audit:**
   - Zero backend modifications (`backend/` git status completely clean).
   - Purely additive frontend implementation inside M6 operations module.
@@ -1958,6 +1959,6 @@ No chunk may transition to `IN_PROGRESS` until all its listed prerequisite depen
 
 ## Last Updated
 
-- **Timestamp:** 2026-09-06 20:45:00 IST
-- **Updated By:** M6 (Report Generation & Export UI — Chunk M6-07 AWAITING_REVIEW; Merged with M5-07 COMMITTED from origin/main)
-- **Status Summary:** Chunk M6-07 AWAITING_REVIEW; Chunk M5-07 COMMITTED (Commit: `1517f133c7c4eaad71b1b38418d87fafbc18276d`); Module M5 Frontend Core / GIS is 100% complete (M5-01 through M5-07 COMMITTED); Chunk M6-06 COMMITTED (Commit: `f7d4830`); Chunk M6-05 COMMITTED (Commit: `3aef3a9`); Chunk M6-04 COMMITTED (Commit: `37d385b`); Chunk M6-03 COMMITTED (Commit: `19a8ff8`); Chunk M6-02 COMMITTED (Commit: `a00c7e1`); Chunk M5-06 COMMITTED (Commit: `4d6f5ba`); Chunk M6-01 COMMITTED (Commit: `05f5991`); Chunk M5-05 COMMITTED (Commit: `54573bb`); Chunk M5-04 COMMITTED (Commit: `85ac1e8`); Chunk M5-03 COMMITTED (Commit: `f1637e4`); Chunk M5-02 COMMITTED; Chunk M5-01 COMMITTED; Chunk M4-06 COMMITTED; Chunk M4-05 COMMITTED; Chunk M4-04 COMMITTED; Chunk M4-03 COMMITTED; Chunk M4-02 COMMITTED; Chunk M4-01 COMMITTED; Chunk M3-13 COMMITTED; Chunk M3-12 COMMITTED; Chunk M3-11 COMMITTED; Chunk M3-10 COMMITTED; Chunk M3-09 COMMITTED; Chunk M3-08 COMMITTED; M6-07 verification evidence preserved (ReportsOperations.test.tsx passed 14/14 tests; 234/234 frontend tests passed across 28 files prior to merge; TypeScript: 0 errors; ESLint: 0 warnings, 0 errors; Production build: passed); Next eligible chunks: M6-08; 525 total backend regression tests verified passing in container.
+- **Timestamp:** 2026-09-06 20:50:00 IST
+- **Updated By:** M6 (Report Generation & Export UI — Chunk M6-07 COMMITTED)
+- **Status Summary:** Chunk M6-07 COMMITTED (Commit: `69e8297`); Chunk M5-07 COMMITTED (Commit: `1517f133c7c4eaad71b1b38418d87fafbc18276d`); Module M5 Frontend Core / GIS is 100% complete (M5-01 through M5-07 COMMITTED); Chunk M6-06 COMMITTED (Commit: `f7d4830`); Chunk M6-05 COMMITTED (Commit: `3aef3a9`); Chunk M6-04 COMMITTED (Commit: `37d385b`); Chunk M6-03 COMMITTED (Commit: `19a8ff8`); Chunk M6-02 COMMITTED (Commit: `a00c7e1`); Chunk M5-06 COMMITTED (Commit: `4d6f5ba`); Chunk M6-01 COMMITTED (Commit: `05f5991`); Chunk M5-05 COMMITTED (Commit: `54573bb`); Chunk M5-04 COMMITTED (Commit: `85ac1e8`); Chunk M5-03 COMMITTED (Commit: `f1637e4`); Chunk M5-02 COMMITTED; Chunk M5-01 COMMITTED; Chunk M4-06 COMMITTED; Chunk M4-05 COMMITTED; Chunk M4-04 COMMITTED; Chunk M4-03 COMMITTED; Chunk M4-02 COMMITTED; Chunk M4-01 COMMITTED; Chunk M3-13 COMMITTED; Chunk M3-12 COMMITTED; Chunk M3-11 COMMITTED; Chunk M3-10 COMMITTED; Chunk M3-09 COMMITTED; Chunk M3-08 COMMITTED; M6-07 verification evidence: Focused tests: 14/14 passed, Full frontend suite: 234/234 tests passed across 28 files, TypeScript: 0 errors, ESLint: 0 warnings, 0 errors, Production build: passed; Next eligible chunks: M6-08; 525 total backend regression tests verified passing in container.

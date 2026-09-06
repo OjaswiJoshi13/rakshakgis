@@ -12,6 +12,7 @@ import {
   FileText,
   ShieldCheck,
   History,
+  Database,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 
@@ -64,6 +65,14 @@ export const OPERATIONS_NAV_ITEMS: OperationsNavItem[] = [
     chunkId: "M6-05",
     description: "Real-time hazard telemetry & dynamic red zone threshold warnings",
     icon: ShieldAlert,
+  },
+  {
+    id: "sources",
+    label: "Data Sources",
+    href: "/operations/sources",
+    chunkId: "M6-06",
+    description: "Real-time provider adapter health & freshness diagnostics",
+    icon: Database,
   },
   {
     id: "reports",

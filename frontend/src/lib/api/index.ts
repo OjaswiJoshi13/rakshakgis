@@ -12,5 +12,5 @@ export * from "./relocation";
 export * from "./sites";
 export * from "./scenarios";
 export * from "./alerts";
-export * from "./gis";
-
+export * from "./telemetry";
+export * from "./reports";

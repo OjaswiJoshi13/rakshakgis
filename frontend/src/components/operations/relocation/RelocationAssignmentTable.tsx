@@ -1,6 +1,7 @@
 "use client";
 
 import React, { useState, useMemo } from "react";
+import Link from "next/link";
 import {
   AssignmentFilter,
   VillageAssignmentResult,
@@ -199,10 +200,18 @@ export const RelocationAssignmentTable: React.FC<RelocationAssignmentTableProps>
                     <td className="py-3 px-3">
                       {isAssigned ? (
                         <div>
-                          <div className="font-medium text-sky-300 flex items-center gap-1">
+                          <Link
+                            href={`/operations/sites?siteId=${
+                              typeof assignment.assigned_site_id === "string"
+                                ? assignment.assigned_site_id.replace(/\D/g, "") || assignment.assigned_site_id
+                                : assignment.assigned_site_id
+                            }`}
+                            className="font-medium text-sky-300 hover:text-sky-200 hover:underline flex items-center gap-1 group/link"
+                            title="Inspect site infrastructure and suitability details"
+                          >
                             <Building2 className="h-3.5 w-3.5 text-sky-400 shrink-0" />
                             <span>{assignment.assigned_site_name}</span>
-                          </div>
+                          </Link>
                           <div className="text-[11px] font-mono text-slate-500">
                             Site ID: {assignment.assigned_site_id}
                           </div>

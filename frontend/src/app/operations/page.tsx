@@ -13,6 +13,7 @@ import {
   ArrowRight,
   Shield,
   Layers,
+  Database,
 } from "lucide-react";
 import {
   Card,
@@ -83,6 +84,17 @@ const OPERATIONS_MODULES: OperationsModuleCard[] = [
     href: "/operations/alerts",
     icon: ShieldAlert,
     backendBinding: "M3-11 Red Zone Threshold Engine",
+  },
+  {
+    id: "sources",
+    title: "Data Sources & Freshness",
+    chunkId: "M6-06",
+    chunkTitle: "Data Sources & Freshness Monitoring UI",
+    description:
+      "Provider adapter health monitoring, deterministic 5-state temporal freshness evaluation, and ingestion run telemetry.",
+    href: "/operations/sources",
+    icon: Database,
+    backendBinding: "M3-13 Freshness & Telemetry Backend",
   },
   {
     id: "reports",
