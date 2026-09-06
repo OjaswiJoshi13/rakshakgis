@@ -17,11 +17,26 @@ describe("Layout components suite", () => {
 
   it("renders Sidebar with module navigation items and chunk badges", () => {
     render(<Sidebar isOpen={true} />);
+    expect(screen.getByText("Platform Core")).toBeInTheDocument();
     expect(screen.getByText("System Foundation")).toBeInTheDocument();
     expect(screen.getByText("Executive Dashboard")).toBeInTheDocument();
     expect(screen.getByText("MapLibre GIS Canvas")).toBeInTheDocument();
     expect(screen.getByText("M5-01")).toBeInTheDocument();
     expect(screen.getByText("M5-04")).toBeInTheDocument();
+
+    // Officer Operations Section
+    expect(screen.getByText("Officer Operations")).toBeInTheDocument();
+    expect(screen.getByText("Operations Hub")).toBeInTheDocument();
+    expect(screen.getByText("Relocation Planner")).toBeInTheDocument();
+    expect(screen.getByText("Relocation Sites")).toBeInTheDocument();
+    expect(screen.getByText("Scenario Simulator")).toBeInTheDocument();
+    expect(screen.getByText("Threshold Warnings")).toBeInTheDocument();
+    expect(screen.getByText("Reports & Export")).toBeInTheDocument();
+    expect(screen.getByText("Officer Sign-Off")).toBeInTheDocument();
+    expect(screen.getByText("Audit & Traceability")).toBeInTheDocument();
+    expect(screen.getByText("M6-01")).toBeInTheDocument();
+    expect(screen.getByText("M6-02")).toBeInTheDocument();
+    expect(screen.getByText("M6-01 READY")).toBeInTheDocument();
   });
 
   it("renders StatusBar with CRS, region, and version", () => {

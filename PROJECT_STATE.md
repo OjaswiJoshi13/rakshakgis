@@ -168,7 +168,7 @@ No chunk may transition to `IN_PROGRESS` until all its listed prerequisite depen
 | **M5-05** | Frontend | MapLibre GIS Interactive Map Canvas | M5 | M5-03 | **BLOCKED** |
 | **M5-06** | Frontend | Village Vulnerability Analysis UI | M5 | M5-04, M5-05 | **BLOCKED** |
 | **M5-07** | Frontend | GIS API Integration & GeoJSON Layers | M5 | M5-05, M3-10 | **BLOCKED** |
-| **M6-01** | Operations | Operations UI Shell & Navigation | M6 | M5-01 | **BLOCKED** |
+| **M6-01** | Operations | Operations UI Shell & Navigation | M6 | M5-01 | **IMPLEMENTED** |
 | **M6-02** | Operations | Relocation Planner Workflow UI | M6 | M6-01, M4-04 | **BLOCKED** |
 | **M6-03** | Operations | Relocation Site Details & Infrastructure UI | M6 | M6-02 | **BLOCKED** |
 | **M6-04** | Operations | Scenario Simulator UI | M6 | M6-01, M4-06 | **BLOCKED** |
@@ -187,9 +187,9 @@ No chunk may transition to `IN_PROGRESS` until all its listed prerequisite depen
 
 ## Current Work
 
-- **Active Chunk:** None (Chunk M5-02 committed; Milestone 5 progressing)
-- **Next Eligible Chunks:** Chunk M5-03: API Client & State Management Setup (depends on M5-01 and M2-04 [both COMMITTED]); Chunk M6-01: Operations UI Shell & Navigation (depends on M5-01 [COMMITTED]); Chunk M6-04: Scenario Simulator UI (once M6-01 committed)
-- **Status:** Chunk M5-02 COMMITTED (Commit: `c538c55`); Chunk M5-01 COMMITTED (Commit: `fda544e`); Chunk M4-06 COMMITTED; Chunk M2-05 COMMITTED. 58 frontend tests passed (100% clean), 0 lint errors, tsc clean, production build passed.
+- **Active Chunk:** None (Chunk M6-01 implemented and awaiting independent review)
+- **Next Eligible Chunks:** Chunk M6-02: Relocation Planner Workflow UI (once M6-01 verified/committed; depends on M6-01, M4-04 [COMMITTED]); Chunk M6-04: Scenario Simulator UI (once M6-01 verified/committed; depends on M6-01, M4-06 [COMMITTED]); Chunk M6-05: Real-Time Alerts & Threshold Warnings UI (once M6-01 verified/committed; depends on M6-01, M3-11 [COMMITTED]); Chunk M5-03: API Client & State Management Setup (depends on M5-01 and M2-04 [both COMMITTED])
+- **Status:** Chunk M6-01 IMPLEMENTED (awaiting review); Chunk M5-02 COMMITTED (Commit: `c538c55`); Chunk M5-01 COMMITTED (Commit: `fda544e`); Chunk M4-06 COMMITTED; Chunk M2-05 COMMITTED. 63 frontend tests passed across 13 suites (100% clean), 0 lint errors, tsc clean, production build passed (20 static routes generated).
 
 ---
 
@@ -1489,6 +1489,79 @@ Chunks M5-03 through DOC-01 (except committed M3-01 through M3-13, M4-01 through
 
 ---
 
+## Chunk M6-01 Implementation Record
+
+- **Status:** `IMPLEMENTED` (Awaiting Independent Review)
+- **Chunk:** M6-01
+- **Module:** Frontend Operations
+- **Title:** Operations UI Shell & Navigation
+- **Owner:** M6
+- **Dependencies Consumed:**
+  - M5-01 (Frontend Foundation & Design System — COMMITTED, Commit `fda544e`)
+  - M5-02 (Authentication UI & Session Handling — COMMITTED, Commit `c538c55`)
+- **Self-Verification Summary:**
+  - Prerequisite dependencies verified: M5-01 (`fda544e`) COMMITTED, M5-02 (`c538c55`) COMMITTED.
+  - Frontend type-check: PASS (0 errors via `tsc --noEmit`).
+  - Frontend lint: PASS (0 warnings, 0 errors via `next lint`).
+  - Frontend tests: PASS (13/13 test suites, 63/63 tests passed, 100% clean via `vitest run`).
+  - Next.js production build: PASS (13 static pages generated cleanly via `next build`).
+  - Scope discipline check: PASS (Strictly within M6-01 scope; zero relocation calculations, zero scenario simulation logic, zero alert threshold calculations, zero report generation, zero backend API invention, zero mock business data).
+- **Next Eligible M6 Chunks:**
+  - M6-02: Relocation Planner Workflow UI (once M6-01 verified/committed; depends on M6-01 and M4-04 [COMMITTED])
+  - M6-04: Scenario Simulator UI (once M6-01 verified/committed; depends on M6-01 and M4-06 [COMMITTED])
+  - M6-05: Real-Time Alerts & Threshold Warnings UI (once M6-01 verified/committed; depends on M6-01 and M3-11 [COMMITTED])
+  - M6-06: Data Sources & Freshness Monitoring UI (once M6-01 verified/committed; depends on M6-01 and M3-13 [COMMITTED])
+- **Scope Discipline:**
+  - Establishes operations-facing command center application shell within the existing Next.js 14 App Router under `/operations`.
+  - Implements `OperationsShell` with persistent command subheader, authenticated officer role display from `useAuth()`, active region indicator, and data mode badges.
+  - Implements `OperationsNav` secondary navigation bar providing seamless, accessible, and responsive navigation across all 7 operational domains + Overview with active route detection (`aria-current="page"`) and chunk badges.
+  - Implements `OperationsSectionShell` reusable container providing standardized breadcrumbs, Rule 12 protocol mandate banner, prerequisite engine binding indicators, action toolbar slots, and workspace containers for future M6 chunks (M6-02 through M6-09) to plug into.
+  - Implements Operations Command Hub overview page (`src/app/operations/page.tsx`) with operational readiness metric cards, statutory governance alert, and 7 module launch cards.
+  - Implements clean mount points for all M6 operational domains:
+    - Relocation Planner (`/operations/relocation` — Chunk M6-02)
+    - Relocation Sites & Infrastructure (`/operations/sites` — Chunk M6-03)
+    - Scenario Simulator (`/operations/scenarios` — Chunk M6-04)
+    - Real-Time Alerts & Threshold Warnings (`/operations/alerts` — Chunk M6-05)
+    - Report Generation & Export (`/operations/reports` — Chunk M6-07)
+    - Officer Review & Sign-Off (`/operations/review` — Chunk M6-08)
+    - Audit Log & Traceability (`/operations/audit` — Chunk M6-09)
+  - Updates `Sidebar.tsx` to organize modules into Platform Core (M5) and Officer Operations (M6), activating all operations items as functional Next.js `<Link>` elements.
+  - 100% preserves existing M5-01 and M5-02 components, routes, and tests.
+  - Zero relocation business logic or calculations (deferred to M6-02).
+  - Zero scenario simulation logic (deferred to M6-04).
+  - Zero alert threshold calculations (deferred to M6-05).
+  - Zero report compilation or generation (deferred to M6-07).
+  - Zero mock/random business data introduced.
+  - Zero modifications to backend business logic, schemas, or models.
+- **Files Created (14 files):**
+  - `frontend/src/components/operations/OperationsNav.tsx`
+  - `frontend/src/components/operations/OperationsSectionShell.tsx`
+  - `frontend/src/components/operations/OperationsShell.tsx`
+  - `frontend/src/components/operations/index.ts`
+  - `frontend/src/app/operations/layout.tsx`
+  - `frontend/src/app/operations/page.tsx`
+  - `frontend/src/app/operations/relocation/page.tsx`
+  - `frontend/src/app/operations/sites/page.tsx`
+  - `frontend/src/app/operations/scenarios/page.tsx`
+  - `frontend/src/app/operations/alerts/page.tsx`
+  - `frontend/src/app/operations/reports/page.tsx`
+  - `frontend/src/app/operations/review/page.tsx`
+  - `frontend/src/app/operations/audit/page.tsx`
+  - `frontend/src/__tests__/OperationsShell.test.tsx`
+- **Files Modified (4 files):**
+  - `frontend/src/components/layout/Sidebar.tsx` (Grouped navigation into Platform Core and Officer Operations; activated operations routes)
+  - `frontend/src/components/layout/index.ts` (Re-exported operations components)
+  - `frontend/src/__tests__/Layout.test.tsx` (Added assertions for operations navigation items and status footer)
+  - `PROJECT_STATE.md` (Updated M6-01 status to `IMPLEMENTED` and added implementation record)
+- **Files Removed:** None
+- **Commands Executed & Results:**
+  - `npm.cmd test` (`vitest run`) -> Exited 0, 13 test files, 63 tests passed (100% clean)
+  - `npm.cmd run type-check` (`tsc --noEmit`) -> Exited 0, zero type errors
+  - `npm.cmd run lint` (`next lint`) -> Exited 0, "No ESLint warnings or errors"
+  - `npm.cmd run build` (`next build`) -> Exited 0, 13 static routes generated successfully
+
+---
+
 ## Integration Notes
 
 - Docker Compose defines two core services: `db` (`postgis/postgis:16-3.4`) and `backend` (`python:3.11-slim-bookworm` with native GDAL 3.6.2, GEOS 3.11.1, PROJ 9.1.1, and libpq 15.19).
@@ -1521,12 +1594,13 @@ Chunks M5-03 through DOC-01 (except committed M3-01 through M3-13, M4-01 through
 - Chunk M4-04 established relocation matching & assignment engine (`app.core.relocation.matching`) implementing deterministic greedy village-to-site matching with descending priority processing, dynamic carrying capacity reservation across sequential assignments, M4-02 hard safety constraint gating, M4-03 weakest-link capacity enforcement, distance/suitability ranking, rejection audits, and REST API endpoints under `/api/v1/relocation` (`POST /match`, `POST /assignments`, `POST /assignments/batch`, `GET /assignments`, `GET /assignments/{id}`).
 - Chunk M4-05 established evacuation & access routing engine (`app.core.relocation.routing`) implementing deterministic Dijkstra routing with exact tuple tie-breaking, hard safety blockage omission for cut-off road corridors, dynamic hazard proximity penalties, continuous LineString coordinate assembly, edge-penalty diversion for distinct alternative route discovery, explainability synthesis, and REST API endpoints under `/api/v1/routes` (`POST /generate` pure evaluation with zero DB mutations, `POST /` explicit persistence, `GET /` filtering & pagination, `GET /{id}`).
 - Chunk M4-06 established scenario simulator integration backend (`app.core.scenarios`) orchestrating the 7 backend engines into an isolated what-if simulation pipeline supporting NORMAL, EXTREME_RAINFALL, FLASH_FLOOD, and CAPACITY_CRISIS with before-vs-after deltas, REST API endpoints under `/api/v1/scenarios` (`GET /`, `POST /`, `GET /{id}`, `POST /run`, `GET /runs/{id}`), and zero baseline mutation.
-- Automated tests verified: 525 backend tests passed in container (100% clean); 29 frontend tests passed in Vitest.
+- Chunk M6-01 established operations UI shell & navigation (Next.js 14 App Router `/operations`), persistent command console subheader, 8-item accessible operations sub-navigation (`OperationsNav`), reusable `OperationsSectionShell` container, Operations Hub overview page, and mount points across all 7 operational domains (Relocation M6-02, Sites M6-03, Scenarios M6-04, Alerts M6-05, Reports M6-07, Officer Review M6-08, Audit Log M6-09).
+- Automated tests verified: 525 backend tests passed in container (100% clean); 63 frontend tests passed in Vitest across 13 suites (100% clean).
 
 ---
 
 ## Last Updated
 
-- **Timestamp:** 2026-09-06 03:45:00 IST
-- **Updated By:** M4 (Scenario Simulator Integration Backend — Chunk M4-06 Committed)
-- **Status Summary:** Chunk M4-06 COMMITTED; Chunk M4-05 COMMITTED; Chunk M4-04 COMMITTED; Chunk M4-03 COMMITTED; Chunk M4-02 COMMITTED; Chunk M4-01 COMMITTED; Chunk M3-13 COMMITTED; Chunk M3-12 COMMITTED; Chunk M3-11 COMMITTED; Chunk M3-10 COMMITTED; Chunk M3-09 COMMITTED; Chunk M3-08 COMMITTED; Chunk M5-01 VERIFIED; 31 focused M4-06 tests passed (48 test cases); 113 M4 regression tests passed; 525 total backend regression tests verified passing in container (100% clean); 29 frontend tests passed in Vitest. Next eligible chunks: M5-02, M5-03, M6-01, M6-04.
+- **Timestamp:** 2026-09-06 15:15:00 IST
+- **Updated By:** M6 (Operations UI Shell & Navigation — Chunk M6-01 Implemented)
+- **Status Summary:** Chunk M6-01 IMPLEMENTED (awaiting independent review); Chunk M5-02 COMMITTED; Chunk M5-01 COMMITTED; Chunk M4-06 COMMITTED; Chunk M4-05 COMMITTED; Chunk M4-04 COMMITTED; Chunk M4-03 COMMITTED; Chunk M4-02 COMMITTED; Chunk M4-01 COMMITTED; Chunk M3-13 COMMITTED; Chunk M3-12 COMMITTED; Chunk M3-11 COMMITTED; Chunk M3-10 COMMITTED; Chunk M3-09 COMMITTED; Chunk M3-08 COMMITTED; 63 frontend tests passed across 13 test suites (100% clean); 525 backend regression tests passed in container; zero lint warnings; Next.js production build verified (20 static routes generated). Next eligible chunks: M6-02, M6-04, M6-05, M5-03.
