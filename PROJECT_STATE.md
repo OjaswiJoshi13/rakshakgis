@@ -175,7 +175,7 @@ No chunk may transition to `IN_PROGRESS` until all its listed prerequisite depen
 | **M6-05** | Operations | Real-Time Alerts & Threshold Warnings UI | M6 | M6-01, M3-11 | **COMMITTED** |
 | **M6-06** | Operations | Data Sources & Freshness Monitoring UI | M6 | M6-01, M3-13 | **COMMITTED** |
 | **M6-07** | Operations | Report Generation & Export UI | M6 | M6-02, M6-03 | **COMMITTED** |
-| **M6-08** | Operations | Officer Review & Action Sign-Off Workflow | M6 | M6-02, M6-04 | **BLOCKED** |
+| **M6-08** | Operations | Officer Review & Action Sign-Off Workflow | M6 | M6-02, M6-04 | **AWAITING_REVIEW** |
 | **M6-09** | Operations | Audit Log & Traceability UI | M6 | M6-08 | **BLOCKED** |
 | **INT-01** | Integration | End-to-End Backend / Frontend Integration | M1 | All M2-M6 | **BLOCKED** |
 | **INT-02** | Integration | End-to-End SIH Demo Flow Validation | M1 | INT-01 | **BLOCKED** |
@@ -187,20 +187,20 @@ No chunk may transition to `IN_PROGRESS` until all its listed prerequisite depen
 
 ## Current Work
 
-- **Active Chunk:** `None` (No M6 chunk active; Chunk M6-07 is COMMITTED)
-- **Status:** Chunk M6-07: Report Generation & Export UI is COMMITTED (Commit: `69e8297` — `feat(frontend): implement M6-07 report generation and export`; independent verification passed: Focused tests: 14/14 passed; Full frontend suite: 234/234 tests passed across 28 files; TypeScript: 0 errors; ESLint: 0 warnings, 0 errors; Production build: passed). Module M5 Frontend Core / GIS is 100% complete (M5-01 through M5-07 COMMITTED).
+- **Active Chunk:** `M6-08` (Officer Review & Action Sign-Off Workflow — AWAITING_REVIEW)
+- **Status:** Chunk M6-08: Officer Review & Action Sign-Off Workflow is implemented and verified, awaiting review (Lifecycle: `PLANNED` → `IN_PROGRESS` → `IMPLEMENTED` → `AWAITING_REVIEW`). All 14 focused tests in `OfficerReviewOperations.test.tsx` passed cleanly (100%); Full frontend suite: 266/266 tests passed across 30 files; TypeScript: 0 errors (`tsc --noEmit` passed); ESLint: 0 warnings, 0 errors (`next lint` passed); Production build: passed (`next build` compiled cleanly; 17 static routes generated including `/operations/review` at 17.2 kB).
 - **Next Eligible Chunks:**
-  - **M6-08:** Officer Review & Action Sign-Off Workflow (Prerequisites: M6-02, M6-04 — both COMMITTED; unblocked and ready to start)
+  - **M6-09:** Audit Log & Traceability UI (Blocked awaiting M6-08 COMMITTED)
 
 ---
 
 ## Blocked Work
 
 ### Next Eligible / Unblocked:
-- **M6-08:** Officer Review & Action Sign-Off Workflow (Dependencies: M6-02, M6-04 — both COMMITTED; unblocked and ready to start)
+- **None** (Chunk M6-08 is currently in review. Once M6-08 is marked COMMITTED, M6-09 will become unblocked and ready to start)
 
 ### Still Blocked:
-- **M6-09:** Audit Log & Traceability UI (Blocked awaiting M6-08)
+- **M6-09:** Audit Log & Traceability UI (Blocked awaiting M6-08 review and commit)
 - **INT-01:** End-to-End Backend / Frontend Integration (Blocked awaiting all M2–M6 chunks)
 - **INT-02:** End-to-End SIH Demo Flow Validation (Blocked awaiting INT-01)
 - **INT-03:** Full Automated Test Suite Execution (Blocked awaiting INT-02)
@@ -1957,8 +1957,39 @@ No chunk may transition to `IN_PROGRESS` until all its listed prerequisite depen
 
 ---
 
+### Chunk M6-08 Implementation Record: Officer Review & Action Sign-Off Workflow
+
+- **Status:** `AWAITING_REVIEW` (Lifecycle: `PLANNED` → `IN_PROGRESS` → `IMPLEMENTED` → `AWAITING_REVIEW`)
+- **Owner:** M6 (Frontend Operations)
+- **Primary Deliverables:**
+  - `frontend/src/types/review.ts`: Strongly typed domain models for `OfficerDecisionAction` (`approve`, `reject`, `return_for_revision`), `ReviewStatus` (`pending_review`, `approved`, `rejected`, `revision_requested`), `RecommendationType` (`relocation_plan`, `scenario_simulation`), `OfficerDecisionRecord` (mirroring backend `OfficerDecision` model), `RecommendationDossier`, `ReviewMetric`, `RelocationRecommendationPayload`, `ScenarioRecommendationPayload`, and `SubmitDecisionRequest`.
+  - `frontend/src/lib/api/review.ts`: Typed API client service methods (`listReviewDossiers`, `getReviewDossierById`, `submitOfficerDecision`, `resetDossierDecision`, `resetReviewCache`, `INITIAL_REVIEW_DOSSIERS`) with seed dossiers for Chamoli Monsoon Priority Relocation Plan, Extreme Rainfall Shock Escalation (+40%), and Flash Flood & GLOF Inundation Surge. Bridges approvals to `POST /api/v1/relocation/assignments/batch` and documents backend requirement for dedicated `/api/v1/governance/decisions` endpoint.
+  - `frontend/src/lib/api/index.ts`: Re-exported review service module and types.
+  - `frontend/src/components/operations/review/ReviewQueueCard.tsx`: Queue list component with real-time search, filter tabs (`All`, `Pending`, `Decided` with test IDs), urgency badges, and dossier selection.
+  - `frontend/src/components/operations/review/RecommendationDetailCard.tsx`: Analytical inspector displaying engine provenance, Rule 12 statutory mandate banner, proposed operational directive, 4 dynamic KPI cards, and detailed village allocation or scenario parameter breakdown tables.
+  - `frontend/src/components/operations/review/OfficerDecisionPanel.tsx`: Interactive sign-off panel with action selector buttons (Approve, Reject, Return for Revision), mandatory rationale validation, statutory Rule 12 ground certification checkbox, override AI toggle, officer identity attribution, and duplicate submission prevention (`isSubmitting`).
+  - `frontend/src/components/operations/review/DecisionStatusBanner.tsx`: High-visibility banner rendering recorded decision status, deciding officer attribution, timestamp, rationale quote, and a "Re-evaluate Decision" button.
+  - `frontend/src/components/operations/review/index.ts`: Clean barrel export.
+  - `frontend/src/app/operations/review/page.tsx`: Full operational route mounted in `OperationsSectionShell` with Rule 12 Authority Posture banner, responsive 2-column workspace, review queue, dossier inspector, interactive decision form, and feedback notifications.
+  - `frontend/src/__tests__/OfficerReviewOperations.test.tsx`: Comprehensive Vitest test suite with 14 unit and integration tests covering section shell, authority posture, review queue rendering, tab filtering, search filtering, analytical inspector, scenario simulation details, statutory checkbox validation, approval flow, rejection validation & recording, revision validation & recording, re-evaluation workflow, and Rule 12 statutory notice display.
+- **Verification Results:**
+  - Focused Vitest suite: `OfficerReviewOperations.test.tsx` passed 14/14 tests cleanly (100%).
+  - Full frontend suite: 30/30 test files passed, 266/266 tests passed (100% clean).
+  - TypeScript: 0 errors (`tsc --noEmit` passed).
+  - ESLint: 0 warnings, 0 errors (`next lint` passed).
+  - Production Build: passed (`next build` compiled cleanly; 17 static routes generated including `/operations/review` at 17.2 kB).
+- **Scope & Invariants Audit:**
+  - Zero backend modifications (`backend/` git status completely clean).
+  - Purely additive frontend implementation inside M6 operations module.
+  - Zero invented endpoints: maps explicitly to existing `POST /api/v1/relocation/assignments/batch` on approval and provides typed in-memory session persistence mirroring `backend/app/models/governance.py` (`OfficerDecision`) while documenting the missing `/api/v1/governance/decisions` backend route.
+  - Strict adherence to Rule 12: no automated or AI recommendations can take legal or operational effect without authenticated officer sign-off.
+  - Strict enforcement of mandatory rationale on Rejection or Return for Revision.
+  - Zero dead buttons, full duplicate submission prevention.
+
+---
+
 ## Last Updated
 
-- **Timestamp:** 2026-09-06 20:50:00 IST
-- **Updated By:** M6 (Report Generation & Export UI — Chunk M6-07 COMMITTED)
-- **Status Summary:** Chunk M6-07 COMMITTED (Commit: `69e8297`); Chunk M5-07 COMMITTED (Commit: `1517f133c7c4eaad71b1b38418d87fafbc18276d`); Module M5 Frontend Core / GIS is 100% complete (M5-01 through M5-07 COMMITTED); Chunk M6-06 COMMITTED (Commit: `f7d4830`); Chunk M6-05 COMMITTED (Commit: `3aef3a9`); Chunk M6-04 COMMITTED (Commit: `37d385b`); Chunk M6-03 COMMITTED (Commit: `19a8ff8`); Chunk M6-02 COMMITTED (Commit: `a00c7e1`); Chunk M5-06 COMMITTED (Commit: `4d6f5ba`); Chunk M6-01 COMMITTED (Commit: `05f5991`); Chunk M5-05 COMMITTED (Commit: `54573bb`); Chunk M5-04 COMMITTED (Commit: `85ac1e8`); Chunk M5-03 COMMITTED (Commit: `f1637e4`); Chunk M5-02 COMMITTED; Chunk M5-01 COMMITTED; Chunk M4-06 COMMITTED; Chunk M4-05 COMMITTED; Chunk M4-04 COMMITTED; Chunk M4-03 COMMITTED; Chunk M4-02 COMMITTED; Chunk M4-01 COMMITTED; Chunk M3-13 COMMITTED; Chunk M3-12 COMMITTED; Chunk M3-11 COMMITTED; Chunk M3-10 COMMITTED; Chunk M3-09 COMMITTED; Chunk M3-08 COMMITTED; M6-07 verification evidence: Focused tests: 14/14 passed, Full frontend suite: 234/234 tests passed across 28 files, TypeScript: 0 errors, ESLint: 0 warnings, 0 errors, Production build: passed; Next eligible chunks: M6-08; 525 total backend regression tests verified passing in container.
+- **Timestamp:** 2026-09-06 21:20:00 IST
+- **Updated By:** M6 (Officer Review & Action Sign-Off Workflow — Chunk M6-08 AWAITING_REVIEW)
+- **Status Summary:** Chunk M6-08 AWAITING_REVIEW; Chunk M6-07 COMMITTED; Chunk M5-07 COMMITTED; Module M5 Frontend Core / GIS is 100% complete (M5-01 through M5-07 COMMITTED); Chunk M6-06 COMMITTED; Chunk M6-05 COMMITTED; Chunk M6-04 COMMITTED; Chunk M6-03 COMMITTED; Chunk M6-02 COMMITTED; Chunk M5-06 COMMITTED; Chunk M6-01 COMMITTED; Chunk M5-05 COMMITTED; Chunk M5-04 COMMITTED; Chunk M5-03 COMMITTED; Chunk M5-02 COMMITTED; Chunk M5-01 COMMITTED; Chunk M4-06 COMMITTED; Chunk M4-05 COMMITTED; Chunk M4-04 COMMITTED; Chunk M4-03 COMMITTED; Chunk M4-02 COMMITTED; Chunk M4-01 COMMITTED; Chunk M3-13 COMMITTED; Chunk M3-12 COMMITTED; Chunk M3-11 COMMITTED; Chunk M3-10 COMMITTED; Chunk M3-09 COMMITTED; Chunk M3-08 COMMITTED; M6-08 verification evidence: Focused tests: 14/14 passed, Full frontend suite: 266/266 tests passed across 30 files, TypeScript: 0 errors, ESLint: 0 warnings, 0 errors, Production build: passed; Next eligible chunks: M6-09 (blocked awaiting M6-08 COMMITTED); 525 total backend regression tests verified passing in container.
