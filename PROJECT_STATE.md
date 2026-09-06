@@ -165,7 +165,7 @@ No chunk may transition to `IN_PROGRESS` until all its listed prerequisite depen
 | **M5-02** | Frontend | Authentication UI & Session Handling | M5 | M5-01, M2-05 | **COMMITTED** |
 | **M5-03** | Frontend | API Client & State Management Setup | M5 | M5-01, M2-04 | **COMMITTED** |
 | **M5-04** | Frontend | Executive Dashboard UI | M5 | M5-03 | **COMMITTED** |
-| **M5-05** | Frontend | MapLibre GIS Interactive Map Canvas | M5 | M5-03 | **VERIFIED** |
+| **M5-05** | Frontend | MapLibre GIS Interactive Map Canvas | M5 | M5-03 | **COMMITTED** |
 | **M5-06** | Frontend | Village Vulnerability Analysis UI | M5 | M5-04, M5-05 | **BLOCKED** |
 | **M5-07** | Frontend | GIS API Integration & GeoJSON Layers | M5 | M5-05, M3-10 | **BLOCKED** |
 | **M6-01** | Operations | Operations UI Shell & Navigation | M6 | M5-01 | **BLOCKED** |
@@ -188,15 +188,15 @@ No chunk may transition to `IN_PROGRESS` until all its listed prerequisite depen
 ## Current Work
 
 - **Active Chunk:** Chunk M5-05: MapLibre GIS Interactive Map Canvas
-- **Status:** `VERIFIED` (Second independent adversarial review passed; previous blocking defects resolved; 144 frontend tests passing; type-check, lint, and production build passing)
+- **Status:** `COMMITTED` (Feature commit: `54573bb`; second independent adversarial review passed; all blocking defects resolved; 144 frontend tests passing; type-check, lint, and production build passing)
 - **Dependencies Consumed:** Chunk M5-01 (Design System), Chunk M5-02 (Authentication UI), Chunk M5-03 (API Client & State Management), Chunk M5-04 (Executive Dashboard)
-- **Next Eligible Chunks:** Chunk M6-01: Operations UI Shell & Navigation (depends on M5-01 [COMMITTED]); Chunk M5-06: Village Vulnerability Analysis UI (blocked on M5-04 [COMMITTED], M5-05 [VERIFIED])
+- **Next Eligible Chunks:** Chunk M6-01: Operations UI Shell & Navigation (depends on M5-01 [COMMITTED]); Chunk M5-06: Village Vulnerability Analysis UI (depends on M5-04 [COMMITTED], M5-05 [COMMITTED])
 
 ---
 
 ## Blocked Work
 
-Chunks M5-03 through DOC-01 (except committed M3-01 through M3-13, M4-01 through M4-06, and M5-01 and M5-02 which are COMMITTED) remain in `BLOCKED` status awaiting completion, independent verification, and commit of their respective prerequisites.
+Chunks M5-06 through DOC-01 (except committed M3-01 through M3-13, M4-01 through M4-06, and M5-01 through M5-05 which are COMMITTED) remain in `BLOCKED` status awaiting completion, independent verification, and commit of their respective prerequisites.
 
 ---
 
@@ -229,6 +229,11 @@ Chunks M5-03 through DOC-01 (except committed M3-01 through M3-13, M4-01 through
 - M4-04: Relocation Matching & Assignment Engine — COMMITTED (Commit: `b4e984ebc6a567e149881079d36c2580525ab72f`).
 - M4-05: Evacuation & Access Routing Engine — COMMITTED (Commit: `93e62e6392e0903aefc034a9cd13d4ad18e0c1ec` — `feat(m4): implement evacuation and access routing`).
 - M4-06: Scenario Simulator Integration Backend — COMMITTED (Commit: `feat(m4): integrate scenario simulator pipeline`).
+- M5-01: Frontend Foundation & Design System — COMMITTED (Commit: `fda544e`).
+- M5-02: Authentication UI & Session Handling — COMMITTED (Commit: `c538c55`).
+- M5-03: API Client & State Management Setup — COMMITTED (Commit: `f1637e4`).
+- M5-04: Executive Dashboard UI — COMMITTED (Commit: `85ac1e8`).
+- M5-05: MapLibre GIS Interactive Map Canvas — COMMITTED (Commit: `54573bb` — `feat(frontend): add MapLibre GIS map canvas`).
 
 ---
 
@@ -1631,7 +1636,7 @@ Chunks M5-03 through DOC-01 (except committed M3-01 through M3-13, M4-01 through
 
 ### Chunk M5-05 Implementation & Correction Record: MapLibre GIS Interactive Map Canvas
 
-- **Status:** `VERIFIED` (Lifecycle: `IN_PROGRESS` → `IMPLEMENTED` → `AWAITING_REVIEW` → `FAILED_REVIEW` → `IN_PROGRESS` → `IMPLEMENTED` → `AWAITING_REVIEW` → `VERIFIED`)
+- **Status:** `COMMITTED` (Feature commit: `54573bb`; Lifecycle: `IN_PROGRESS` → `IMPLEMENTED` → `AWAITING_REVIEW` → `FAILED_REVIEW` → `IN_PROGRESS` → `IMPLEMENTED` → `AWAITING_REVIEW` → `VERIFIED` → `COMMITTED`)
 - **Owner:** M5 (Frontend Core / GIS)
 - **Review Result:** Second independent adversarial review passed with verdict `PASS — READY FOR VERIFIED STATUS`. All 3 blocking defects and 1 non-blocking improvement verified resolved. 144 frontend tests passing (20 test suites), TypeScript type-check passing with 0 errors, ESLint passing with 0 warnings/errors, and Next.js production build passing.
 - **Review Failure & Corrections Applied:**
@@ -1708,6 +1713,6 @@ Chunks M5-03 through DOC-01 (except committed M3-01 through M3-13, M4-01 through
 
 ## Last Updated
 
-- **Timestamp:** 2026-09-06 15:33:00 IST
-- **Updated By:** M5 (MapLibre GIS Interactive Map Canvas — Chunk M5-05 Corrections Complete, Awaiting Review)
-- **Status Summary:** Chunk M5-05 AWAITING_REVIEW (corrected after independent review failure); Chunk M5-04 COMMITTED (Commit: `85ac1e8`); Chunk M5-03 COMMITTED (Commit: `f1637e4`); Chunk M5-02 COMMITTED; Chunk M5-01 COMMITTED; Chunk M4-06 COMMITTED; Chunk M4-05 COMMITTED; Chunk M4-04 COMMITTED; Chunk M4-03 COMMITTED; Chunk M4-02 COMMITTED; Chunk M4-01 COMMITTED; Chunk M3-13 COMMITTED; Chunk M3-12 COMMITTED; Chunk M3-11 COMMITTED; Chunk M3-10 COMMITTED; Chunk M3-09 COMMITTED; Chunk M3-08 COMMITTED; 144 frontend tests passed in Vitest (20 test suites); 525 total backend regression tests verified passing in container (100% clean). Next eligible chunks: M5-05 review, M6-01.
+- **Timestamp:** 2026-09-06 15:45:00 IST
+- **Updated By:** M5 (MapLibre GIS Interactive Map Canvas — Chunk M5-05 COMMITTED)
+- **Status Summary:** Chunk M5-05 COMMITTED (Commit: `54573bb`); Chunk M5-04 COMMITTED (Commit: `85ac1e8`); Chunk M5-03 COMMITTED (Commit: `f1637e4`); Chunk M5-02 COMMITTED; Chunk M5-01 COMMITTED; Chunk M4-06 COMMITTED; Chunk M4-05 COMMITTED; Chunk M4-04 COMMITTED; Chunk M4-03 COMMITTED; Chunk M4-02 COMMITTED; Chunk M4-01 COMMITTED; Chunk M3-13 COMMITTED; Chunk M3-12 COMMITTED; Chunk M3-11 COMMITTED; Chunk M3-10 COMMITTED; Chunk M3-09 COMMITTED; Chunk M3-08 COMMITTED; 144 frontend tests passed in Vitest (20 test suites); 525 total backend regression tests verified passing in container (100% clean). Next eligible chunks: M5-06, M6-01.
