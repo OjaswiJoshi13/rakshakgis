@@ -162,7 +162,7 @@ No chunk may transition to `IN_PROGRESS` until all its listed prerequisite depen
 | **M4-05** | Relocation | Evacuation & Access Routing Engine | M4 | M4-04 | **COMMITTED** |
 | **M4-06** | Relocation | Scenario Simulator Integration Backend | M4 | M4-04, M3-11 | **COMMITTED** |
 | **M5-01** | Frontend | Frontend Foundation & Design System | M5 | M1-01 | **COMMITTED** |
-| **M5-02** | Frontend | Authentication UI & Session Handling | M5 | M5-01, M2-05 | **VERIFIED** |
+| **M5-02** | Frontend | Authentication UI & Session Handling | M5 | M5-01, M2-05 | **COMMITTED** |
 | **M5-03** | Frontend | API Client & State Management Setup | M5 | M5-01, M2-04 | **BLOCKED** |
 | **M5-04** | Frontend | Executive Dashboard UI | M5 | M5-03 | **BLOCKED** |
 | **M5-05** | Frontend | MapLibre GIS Interactive Map Canvas | M5 | M5-03 | **BLOCKED** |
@@ -187,15 +187,15 @@ No chunk may transition to `IN_PROGRESS` until all its listed prerequisite depen
 
 ## Current Work
 
-- **Active Chunk:** Chunk M5-02 — Authentication UI & Session Handling (VERIFIED)
+- **Active Chunk:** None (Chunk M5-02 committed; Milestone 5 progressing)
 - **Next Eligible Chunks:** Chunk M5-03: API Client & State Management Setup (depends on M5-01 and M2-04 [both COMMITTED]); Chunk M6-01: Operations UI Shell & Navigation (depends on M5-01 [COMMITTED]); Chunk M6-04: Scenario Simulator UI (once M6-01 committed)
-- **Status:** Chunk M5-02 VERIFIED; Chunk M5-01 COMMITTED (Commit: `fda544e`); Chunk M4-06 COMMITTED; Chunk M2-05 COMMITTED. 58 frontend tests passed (100% clean), 0 lint errors, tsc clean, production build passed.
+- **Status:** Chunk M5-02 COMMITTED (Commit: `c538c55`); Chunk M5-01 COMMITTED (Commit: `fda544e`); Chunk M4-06 COMMITTED; Chunk M2-05 COMMITTED. 58 frontend tests passed (100% clean), 0 lint errors, tsc clean, production build passed.
 
 ---
 
 ## Blocked Work
 
-Chunks M5-03 through DOC-01 (except committed M3-01 through M3-13, M4-01 through M4-06, and M5-01 which is COMMITTED, and M5-02 which is VERIFIED) remain in `BLOCKED` status awaiting completion, independent verification, and commit of their respective prerequisites.
+Chunks M5-03 through DOC-01 (except committed M3-01 through M3-13, M4-01 through M4-06, and M5-01 and M5-02 which are COMMITTED) remain in `BLOCKED` status awaiting completion, independent verification, and commit of their respective prerequisites.
 
 ---
 
@@ -1001,7 +1001,8 @@ Chunks M5-03 through DOC-01 (except committed M3-01 through M3-13, M4-01 through
 
 ## Chunk M5-02 Implementation Record
 
-- **Status:** `VERIFIED`
+- **Status:** `COMMITTED`
+- **Commit:** `c538c55`
 - **Chunk:** M5-02
 - **Module:** Frontend Core / GIS
 - **Title:** Authentication UI & Session Handling
