@@ -172,7 +172,7 @@ No chunk may transition to `IN_PROGRESS` until all its listed prerequisite depen
 | **M6-02** | Operations | Relocation Planner Workflow UI | M6 | M6-01, M4-04 | **COMMITTED** |
 | **M6-03** | Operations | Relocation Site Details & Infrastructure UI | M6 | M6-02 | **COMMITTED** |
 | **M6-04** | Operations | Scenario Simulator UI | M6 | M6-01, M4-06 | **COMMITTED** |
-| **M6-05** | Operations | Real-Time Alerts & Threshold Warnings UI | M6 | M6-01, M3-11 | **BLOCKED** |
+| **M6-05** | Operations | Real-Time Alerts & Threshold Warnings UI | M6 | M6-01, M3-11 | **AWAITING_REVIEW** |
 | **M6-06** | Operations | Data Sources & Freshness Monitoring UI | M6 | M6-01, M3-13 | **BLOCKED** |
 | **M6-07** | Operations | Report Generation & Export UI | M6 | M6-02, M6-03 | **BLOCKED** |
 | **M6-08** | Operations | Officer Review & Action Sign-Off Workflow | M6 | M6-02, M6-04 | **BLOCKED** |
@@ -187,15 +187,15 @@ No chunk may transition to `IN_PROGRESS` until all its listed prerequisite depen
 
 ## Current Work
 
-- **Active Chunk:** Chunk M6-04: Scenario Simulator UI
-- **Status:** `COMMITTED` (Commit: `37d385b` — `feat(frontend): implement M6-04 scenario simulator`; independent verification passed; M6-04 tests: 9/9 passed; Full frontend suite: 195/195 passed; TypeScript: 0 errors; ESLint: 0 warnings, 0 errors; Production build: passed; M6-04 implementation was committed and pushed to origin/main)
-- **Next Eligible Chunks:** M5-07, M6-05, M6-06, M6-07, M6-08.
+- **Active Chunk:** Chunk M6-05: Real-Time Alerts & Threshold Warnings UI
+- **Status:** `AWAITING_REVIEW` (Implementation complete; Real-Time multi-hazard alerts & threshold warnings workflow implemented inside `/operations/alerts` consuming M3-11 trigger contracts and M3-13 alert telemetry; AlertsOperations.test.tsx passed 12/12 tests independently; Full Vitest suite: 26/26 test files passed, 207/207 tests passed; TypeScript: 0 errors; ESLint: 0 warnings, 0 errors; Production build: passed).
+- **Next Eligible Chunks:** M5-07, M6-06, M6-07, M6-08.
 
 ---
 
 ## Blocked Work
 
-Chunks M5-07 through DOC-01 (except committed M3-01 through M3-13, M4-01 through M4-06, M5-01 through M5-06, M6-01, M6-02, M6-03, and M6-04 which are COMMITTED) remain in `BLOCKED` status awaiting completion, independent verification, and commit of their respective prerequisites.
+Chunks M5-07 through DOC-01 (except committed M3-01 through M3-13, M4-01 through M4-06, M5-01 through M5-06, M6-01, M6-02, M6-03, M6-04 which are COMMITTED, and M6-05 which is AWAITING_REVIEW) remain in `BLOCKED` status awaiting completion, independent verification, and commit of their respective prerequisites.
 
 ---
 
@@ -1816,8 +1816,40 @@ Chunks M5-07 through DOC-01 (except committed M3-01 through M3-13, M4-01 through
 
 ---
 
+### Chunk M6-05 Implementation Record: Real-Time Alerts & Threshold Warnings UI
+
+- **Status:** `AWAITING_REVIEW` (Lifecycle: `PLANNED` → `IN_PROGRESS` → `IMPLEMENTED` → `AWAITING_REVIEW`)
+- **Owner:** M6 (Frontend Operations)
+- **Primary Deliverables:**
+  - `frontend/src/types/alerts.ts`: Strongly typed domain models for DynamicTriggerStatus (`no_trigger`, `triggered`, `insufficient_data`), DynamicHazardIndicator (`rainfall_24h`, `seismic_mmi`, `slope_deg`, `water_level_above_danger`, `landslide_debris_volume`, `landslide_activity`, `custom`), ComparisonOperator, AlertSeverity, AlertType, DangerLevel, SingleTriggerEvaluation, DynamicRedZoneExplainability, OperationalAlertItem, DynamicThresholdSummary, AlertFilterCriteria, and AlertSummaryMetrics strictly conforming to M3-11 dynamic trigger contracts and M3-13 alert telemetry.
+  - `frontend/src/lib/api/alerts.ts`: Typed API client service methods (`listAlerts`, `getAlertDetail`, `acknowledgeAlert`, `acknowledgeAllAlerts`, `getThresholdConfig`, `getAlertSummaryMetrics`) with deterministic Himalayan Pilot baseline fallback datasets (`HIMALAYAN_PILOT_THRESHOLDS`, `HIMALAYAN_PILOT_ALERT_DATASET`).
+  - `frontend/src/lib/api/index.ts`: Barrel export for alerts service and types.
+  - `frontend/src/components/operations/alerts/AlertSummaryCards.tsx`: 4 high-impact KPI summary cards (Total Monitored Feeds, Triggered Threshold Breaches, Pending Acknowledgment, Sensor Telemetry Gaps / Insufficient Data).
+  - `frontend/src/components/operations/alerts/AlertFilterBar.tsx`: Interactive filter and search toolbar with query input and 4 filter selectors (Severity, Trigger Status, Indicator Type, Officer Action Status) with accessible label associations and reset action.
+  - `frontend/src/components/operations/alerts/AlertCard.tsx`: Rich alert cards with severity badges, status badges, indicator icon pills, observed vs threshold comparison blocks, settlement and geodesic buffer metadata, and acknowledge/audit actions.
+  - `frontend/src/components/operations/alerts/AlertDetailModal.tsx`: Complete M3-11 explainability audit modal with single trigger evaluations table, source provenance, geodesic buffer distance, statutory Rule 12 warning banner, and officer acknowledgment trigger.
+  - `frontend/src/components/operations/alerts/ThresholdConfigCard.tsx`: Collapsible reference card displaying authoritative Himalayan Pilot regional profile trigger thresholds (64.5 mm rainfall, 6.0 MMI seismic, 25.0° slope, 1.5 m water level above danger, 500 m buffer distance).
+  - `frontend/src/components/operations/alerts/index.ts`: Clean barrel export for alert components.
+  - `frontend/src/app/operations/alerts/page.tsx`: Full operational page inside `OperationsSectionShell` with `useSearchParams` URL deep-linking wrapped in `<Suspense>`, action toolbar with "Refresh Telemetry" and "Acknowledge All ({count})", dismissible success notice, and audit modal integration.
+  - `frontend/src/__tests__/AlertsOperations.test.tsx`: Comprehensive Vitest test suite with 12 unit and integration tests covering workspace header, telemetry refresh, regional profile thresholds panel, summary KPI counts, severity filtering, indicator filtering, search filtering, single alert acknowledgment, bulk Acknowledge All, explainability audit modal inspection with single triggers table, and empty filter states.
+- **Verification Results:**
+  - Full Vitest suite: 26/26 test files passed, 207/207 tests passed (100% clean).
+  - Vitest M6-05 unit suite: `AlertsOperations.test.tsx` passed 12/12 tests cleanly.
+  - TypeScript: 0 errors (`tsc --noEmit` passed).
+  - ESLint: 0 warnings, 0 errors (`next lint` passed).
+  - Production Build: passed (`next build` compiled cleanly; 16 static routes generated including `/operations/alerts` at 11.7 kB).
+- **Scope & Invariants Audit:**
+  - Zero backend modifications (`backend/` git status completely clean).
+  - Purely additive frontend implementation inside M6 operations module.
+  - Strict adherence to Rule 12 protocol: all operational data flagged with statutory warning banner: "STATUTORY WARNING: Candidate dynamic Red Zone demarcation proposals generated by threshold breaches are strictly advisory and require formal officer review under Rule 12 prior to field enforcement or evacuation dispatch."
+  - Zero invented calculations, formulas, or client-side threshold math: thresholds strictly resolved from backend regional profiles (`RegionProfileId.HIMALAYAN_PILOT`).
+  - Strict 3-state evaluation: missing observations strictly evaluate as `INSUFFICIENT_DATA` (never coerced to safe or 0.0).
+  - Non-mutating candidate proposals only: alerts display candidate proposals; operational execution requires explicit officer sign-off.
+
+---
+
 ## Last Updated
 
-- **Timestamp:** 2026-09-06 17:40:00 IST
-- **Updated By:** M6 (Scenario Simulator UI — Chunk M6-04 COMMITTED)
-- **Status Summary:** Chunk M6-04 COMMITTED (Commit: `37d385b`); Chunk M6-03 COMMITTED (Commit: `19a8ff8`); Chunk M6-02 COMMITTED (Commit: `a00c7e1`); Chunk M5-06 COMMITTED (Commit: `4d6f5ba`); Chunk M6-01 COMMITTED (Commit: `05f5991`); Chunk M5-05 COMMITTED (Commit: `54573bb`); Chunk M5-04 COMMITTED (Commit: `85ac1e8`); Chunk M5-03 COMMITTED (Commit: `f1637e4`); Chunk M5-02 COMMITTED; Chunk M5-01 COMMITTED; Chunk M4-06 COMMITTED; Chunk M4-05 COMMITTED; Chunk M4-04 COMMITTED; Chunk M4-03 COMMITTED; Chunk M4-02 COMMITTED; Chunk M4-01 COMMITTED; Chunk M3-13 COMMITTED; Chunk M3-12 COMMITTED; Chunk M3-11 COMMITTED; Chunk M3-10 COMMITTED; Chunk M3-09 COMMITTED; Chunk M3-08 COMMITTED; 195/195 frontend tests passing across 25 files; 525 total backend regression tests verified passing in container. Next eligible chunks: M5-07, M6-05, M6-06, M6-07, M6-08.
+- **Timestamp:** 2026-09-06 18:45:00 IST
+- **Updated By:** M6 (Real-Time Alerts & Threshold Warnings UI — Chunk M6-05 AWAITING_REVIEW)
+- **Status Summary:** Chunk M6-05 AWAITING_REVIEW; Chunk M6-04 COMMITTED (Commit: `37d385b`); Chunk M6-03 COMMITTED (Commit: `19a8ff8`); Chunk M6-02 COMMITTED (Commit: `a00c7e1`); Chunk M5-06 COMMITTED (Commit: `4d6f5ba`); Chunk M6-01 COMMITTED (Commit: `05f5991`); Chunk M5-05 COMMITTED (Commit: `54573bb`); Chunk M5-04 COMMITTED (Commit: `85ac1e8`); Chunk M5-03 COMMITTED (Commit: `f1637e4`); Chunk M5-02 COMMITTED; Chunk M5-01 COMMITTED; Chunk M4-06 COMMITTED; Chunk M4-05 COMMITTED; Chunk M4-04 COMMITTED; Chunk M4-03 COMMITTED; Chunk M4-02 COMMITTED; Chunk M4-01 COMMITTED; Chunk M3-13 COMMITTED; Chunk M3-12 COMMITTED; Chunk M3-11 COMMITTED; Chunk M3-10 COMMITTED; Chunk M3-09 COMMITTED; Chunk M3-08 COMMITTED; 207/207 frontend tests passing across 26 files; 525 total backend regression tests verified passing in container. Next eligible chunks: M5-07, M6-06, M6-07, M6-08.
