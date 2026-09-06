@@ -1,4 +1,5 @@
 import React from "react";
+import { ProtectedRoute } from "@/components/auth/ProtectedRoute";
 import { AppLayout } from "@/components/layout/AppLayout";
 import {
   Card,
@@ -16,7 +17,8 @@ import { RISK_BANDS, RELOCATION_PRIORITY_BANDS } from "@/design-system/tokens";
 
 export default function HomePage() {
   return (
-    <AppLayout>
+    <ProtectedRoute>
+      <AppLayout>
       <div className="space-y-8">
         {/* Foundation Hero Banner */}
         <div className="border-b border-slate-800 pb-5">
@@ -237,5 +239,6 @@ export default function HomePage() {
         </section>
       </div>
     </AppLayout>
+    </ProtectedRoute>
   );
 }

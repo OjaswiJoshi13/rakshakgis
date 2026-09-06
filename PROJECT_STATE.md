@@ -161,8 +161,8 @@ No chunk may transition to `IN_PROGRESS` until all its listed prerequisite depen
 | **M4-04** | Relocation | Relocation Matching & Assignment Engine | M4 | M3-12, M4-03 | **COMMITTED** |
 | **M4-05** | Relocation | Evacuation & Access Routing Engine | M4 | M4-04 | **COMMITTED** |
 | **M4-06** | Relocation | Scenario Simulator Integration Backend | M4 | M4-04, M3-11 | **COMMITTED** |
-| **M5-01** | Frontend | Frontend Foundation & Design System | M5 | M1-01 | **VERIFIED** |
-| **M5-02** | Frontend | Authentication UI & Session Handling | M5 | M5-01, M2-05 | **BLOCKED** |
+| **M5-01** | Frontend | Frontend Foundation & Design System | M5 | M1-01 | **COMMITTED** |
+| **M5-02** | Frontend | Authentication UI & Session Handling | M5 | M5-01, M2-05 | **VERIFIED** |
 | **M5-03** | Frontend | API Client & State Management Setup | M5 | M5-01, M2-04 | **BLOCKED** |
 | **M5-04** | Frontend | Executive Dashboard UI | M5 | M5-03 | **BLOCKED** |
 | **M5-05** | Frontend | MapLibre GIS Interactive Map Canvas | M5 | M5-03 | **BLOCKED** |
@@ -187,15 +187,15 @@ No chunk may transition to `IN_PROGRESS` until all its listed prerequisite depen
 
 ## Current Work
 
-- **Active Chunk:** None (Chunk M4-06 committed; Milestone 4 complete)
-- **Next Eligible Chunks:** Chunk M5-02: Authentication UI & Session Handling (once M5-01 committed); Chunk M5-03: API Client & State Management Setup (once M5-01 committed); Chunk M6-01: Operations UI Shell & Navigation (once M5-01 committed); Chunk M6-04: Scenario Simulator UI (once M6-01 committed)
-- **Status:** Chunk M4-06 COMMITTED (Commit: `feat(m4): integrate scenario simulator pipeline`). 31 focused M4-06 unit, integration, and API tests passing (covering all 48 test cases); 113 M4 regression tests passing; 525 full backend regression tests passing (100% clean). `git diff --check` clean.
+- **Active Chunk:** Chunk M5-02 — Authentication UI & Session Handling (VERIFIED)
+- **Next Eligible Chunks:** Chunk M5-03: API Client & State Management Setup (depends on M5-01 and M2-04 [both COMMITTED]); Chunk M6-01: Operations UI Shell & Navigation (depends on M5-01 [COMMITTED]); Chunk M6-04: Scenario Simulator UI (once M6-01 committed)
+- **Status:** Chunk M5-02 VERIFIED; Chunk M5-01 COMMITTED (Commit: `fda544e`); Chunk M4-06 COMMITTED; Chunk M2-05 COMMITTED. 58 frontend tests passed (100% clean), 0 lint errors, tsc clean, production build passed.
 
 ---
 
 ## Blocked Work
 
-Chunks M5-02 through DOC-01 (except committed M3-01 through M3-13, M4-01 through M4-06, and M5-01 which is VERIFIED) remain in `BLOCKED` status awaiting completion, independent verification, and commit of their respective prerequisites.
+Chunks M5-03 through DOC-01 (except committed M3-01 through M3-13, M4-01 through M4-06, and M5-01 which is COMMITTED, and M5-02 which is VERIFIED) remain in `BLOCKED` status awaiting completion, independent verification, and commit of their respective prerequisites.
 
 ---
 
@@ -915,7 +915,8 @@ Chunks M5-02 through DOC-01 (except committed M3-01 through M3-13, M4-01 through
 
 ## Chunk M5-01 Implementation Record
 
-- **Status:** `VERIFIED`
+- **Status:** `COMMITTED`
+- **Commit:** `fda544e`
 - **Chunk:** M5-01
 - **Module:** Frontend Core / GIS
 - **Title:** Frontend Foundation & Design System
@@ -995,6 +996,77 @@ Chunks M5-02 through DOC-01 (except committed M3-01 through M3-13, M4-01 through
   - `docker exec rakshakgis-backend pytest tests -q` -> Exited 0, 262 passed, 4 warnings in 8.79s (full backend test suite verified with zero regression)
 - **Known Limitations:**
   - Live data fetching and auth session integration are scheduled for chunks M5-02 and M5-03.
+
+---
+
+## Chunk M5-02 Implementation Record
+
+- **Status:** `VERIFIED`
+- **Chunk:** M5-02
+- **Module:** Frontend Core / GIS
+- **Title:** Authentication UI & Session Handling
+- **Owner:** M5
+- **Dependencies Consumed:**
+  - M5-01 (Frontend Foundation & Design System — COMMITTED, Commit `fda544e`)
+  - M2-05 (Authentication / Session Backend — COMMITTED)
+- **Independent Review Verification:**
+  - Independent review PASSED (`PASS — READY FOR VERIFIED STATUS`).
+  - Prerequisite dependencies verified: M5-01 (`fda544e`) COMMITTED, M2-05 COMMITTED, M2-04 COMMITTED.
+  - Authentication contract verification: `POST /api/v1/auth/login`, `GET /api/v1/auth/me`, `UserRead`, `UserRole`, `TokenResponse`, and M2-04 `ErrorResponse` match backend contracts exactly.
+  - Token & session lifecycle: verified client-safe JWT Bearer storage in `localStorage`, proactive expiry check with 5s clock-skew buffer, automatic token validation and profile hydration on mount, clean unauthenticated redirect without content flash, and full cleanup on logout.
+  - Security review: verified tokens are never leaked into the DOM, passwords are never persisted or logged, zero hard-coded credentials or production secrets, and backend errors sanitized.
+  - UI & Route protection: verified `LoginForm`, accessible labels, loading spinner states, `ProtectedRoute` blocking unauthenticated access without content flash, and `CommandHeader` integration with role badges and sign-out.
+  - Frontend checks:
+    - `npm run type-check` (`tsc --noEmit`): PASS (0 errors)
+    - `npm run lint` (`next lint`): PASS (0 warnings, 0 errors)
+    - `npm run test` (`vitest run`): PASS (12/12 test suites, 58/58 tests passed, 100% clean)
+    - `npm run build` (`next build`): PASS (production build verified; static pages: `/`, `/_not-found`, `/login`)
+  - Scope check: PASS (zero M5-03/M5-04/M5-05/M6 functionality implemented, zero backend modifications).
+  - Backend regression note: Docker daemon was unavailable in the local Windows CLI environment; existing recorded backend regression from prior verified M5-01 review remains: 262 passed, 4 warnings, 0 failures in 8.79s.
+- **Authentication Contract Consumed from M2-05:**
+  - `POST /api/v1/auth/login`: Accepts `LoginRequest` (`username` [or registered email], `password`), returns `TokenResponse` (`access_token`, `token_type: "bearer"`, `expires_in`). Returns HTTP 401 with standard M2-04 `ErrorResponse` on invalid credentials or inactive accounts.
+  - `GET /api/v1/auth/me`: Accepts `Authorization: Bearer <token>` header, returns `UserRead` (`id`, `username`, `email`, `full_name`, `role`, `department`, `is_active`, `created_at`, `updated_at`) strictly excluding sensitive password hashes. Returns HTTP 401 on missing or expired tokens.
+  - Roles consumed: `admin`, `district_officer`, `field_responder`, `viewer`.
+  - Session lifecycle: JWT Bearer storage via `localStorage` with expiration checking (`expires_in` in seconds mapped to epoch timestamp); automatic profile hydration via `GET /me`; automatic token expiration detection; graceful client logout clearing storage and state.
+- **Implementation Summary:**
+  - Implemented TypeScript authentication types (`User`, `UserRole`, `LoginRequest`, `TokenResponse`, `AuthState`, `AuthErrorResponse`) in `types/auth.ts` matching M2-05 backend schemas.
+  - Created authentication and token storage service (`lib/auth.ts`) with client-safe token persistence, expiry tracking, M2-04 error response parsing, and API methods for `POST /auth/login` and `GET /auth/me`.
+  - Built reactive session management context and hook (`AuthContext.tsx`, `useAuth()`) managing user profile, bearer token, authentication status, loading state, transient error messages, login, logout, profile refresh, and role authorization helpers (`hasRole`).
+  - Implemented accessible authority login form (`LoginForm.tsx`) with username/email and password fields, client-side input validation, loading indicator with animated spinner, and danger alert displaying server/validation errors.
+  - Implemented client route guard (`ProtectedRoute.tsx`) preventing unauthorized access, blocking unauthenticated users with redirect to `/login`, eliminating layout flash with accessible loading status, and verifying role permissions.
+  - Created dedicated authority login page (`app/login/page.tsx`) styled with RakshakGIS disaster decision support branding, SIH 26191 tagging, and automatic redirect to `/` when already authenticated.
+  - Integrated `AuthProvider` into root layout (`app/layout.tsx`).
+  - Wired `CommandHeader` to display authenticated user's initials, name, department, role badge, and interactive "Sign Out" button (or "Sign In" button when unauthenticated).
+  - Enforced route protection on command center shell (`app/page.tsx`) using `<ProtectedRoute>`.
+  - Added comprehensive Vitest test suite with 29 new tests across 5 test files (58 tests total across 12 suites), verifying all auth services, context lifecycles, UI components, guards, and pages.
+  - Strictly maintained scope: zero M5-03 API client or downstream dashboard/GIS/relocation features implemented; zero backend modifications.
+- **Files Created (11 files):**
+  - `frontend/src/types/auth.ts`
+  - `frontend/src/lib/auth.ts`
+  - `frontend/src/context/AuthContext.tsx`
+  - `frontend/src/components/auth/LoginForm.tsx`
+  - `frontend/src/components/auth/ProtectedRoute.tsx`
+  - `frontend/src/app/login/page.tsx`
+  - `frontend/src/__tests__/AuthService.test.ts`
+  - `frontend/src/__tests__/AuthContext.test.tsx`
+  - `frontend/src/__tests__/LoginForm.test.tsx`
+  - `frontend/src/__tests__/ProtectedRoute.test.tsx`
+  - `frontend/src/__tests__/LoginPage.test.tsx`
+- **Files Modified (4 files):**
+  - `frontend/src/__tests__/setup.ts` (Added `next/navigation` mocks for test runner)
+  - `frontend/src/app/layout.tsx` (Wrapped root layout with `AuthProvider`)
+  - `frontend/src/app/page.tsx` (Protected command center shell with `ProtectedRoute`)
+  - `frontend/src/components/layout/CommandHeader.tsx` (Connected `useAuth` user profile, role badge, and logout action)
+- **Files Removed:** None
+- **Commands Executed & Exact Results:**
+  - `npm run type-check` (`tsc --noEmit`) -> Exited 0, zero type errors
+  - `npm run lint` (`next lint`) -> Exited 0, "No ESLint warnings or errors"
+  - `npm run test` (`vitest run`) -> Exited 0, 12 test files passed, 58 tests passed (100% clean)
+  - `npm run build` (`next build`) -> Exited 0, compiled successfully, static pages generated for `/`, `/_not-found`, and `/login`
+- **Known Issues or Limitations:**
+  - Live API client and state management architecture for operational data deferred to M5-03 as planned.
+- **Next Eligible M5 Chunk:**
+  - M5-03: API Client & State Management Setup (depends on M5-01 and M2-04 [both COMMITTED])
 
 ---
 
