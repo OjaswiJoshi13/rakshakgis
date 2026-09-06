@@ -174,7 +174,7 @@ No chunk may transition to `IN_PROGRESS` until all its listed prerequisite depen
 | **M6-04** | Operations | Scenario Simulator UI | M6 | M6-01, M4-06 | **COMMITTED** |
 | **M6-05** | Operations | Real-Time Alerts & Threshold Warnings UI | M6 | M6-01, M3-11 | **COMMITTED** |
 | **M6-06** | Operations | Data Sources & Freshness Monitoring UI | M6 | M6-01, M3-13 | **COMMITTED** |
-| **M6-07** | Operations | Report Generation & Export UI | M6 | M6-02, M6-03 | **BLOCKED** |
+| **M6-07** | Operations | Report Generation & Export UI | M6 | M6-02, M6-03 | **AWAITING_REVIEW** |
 | **M6-08** | Operations | Officer Review & Action Sign-Off Workflow | M6 | M6-02, M6-04 | **BLOCKED** |
 | **M6-09** | Operations | Audit Log & Traceability UI | M6 | M6-08 | **BLOCKED** |
 | **INT-01** | Integration | End-to-End Backend / Frontend Integration | M1 | All M2-M6 | **BLOCKED** |
@@ -187,15 +187,15 @@ No chunk may transition to `IN_PROGRESS` until all its listed prerequisite depen
 
 ## Current Work
 
-- **Active Chunk:** Chunk M6-06: Data Sources & Freshness Monitoring UI
-- **Status:** `COMMITTED` (Commit: `f7d4830` — `feat(frontend): implement M6-06 data sources monitoring`; independent verification passed; Focused M6-06 suite: 13/13 passed; Full frontend suite: 220/220 tests passed across 27 files; TypeScript: 0 errors; ESLint: 0 warnings, 0 errors; Production build: passed; M6-06 implementation was committed and pushed to origin/main)
-- **Next Eligible Chunks:** M5-07, M6-07, M6-08.
+- **Active Chunk:** Chunk M6-07: Report Generation & Export UI
+- **Status:** `AWAITING_REVIEW` (Implementation complete; Report Generation & Export workflow implemented inside `/operations/reports` aggregating M6-02 relocation matching and M6-03 candidate site infrastructure contracts into formal executive dossiers with JSON, CSV, and print-ready document export; ReportsOperations.test.tsx passed 14/14 tests independently; Full Vitest suite: 28/28 test files passed, 234/234 tests passed; TypeScript: 0 errors; ESLint: 0 warnings, 0 errors; Production build: passed).
+- **Next Eligible Chunks:** M5-07, M6-08.
 
 ---
 
 ## Blocked Work
 
-Chunks M5-07 through DOC-01 (except committed M3-01 through M3-13, M4-01 through M4-06, M5-01 through M5-06, M6-01, M6-02, M6-03, M6-04, M6-05, and M6-06 which are COMMITTED) remain in `BLOCKED` status awaiting completion, independent verification, and commit of their respective prerequisites.
+Chunks M5-07 through DOC-01 (except committed M3-01 through M3-13, M4-01 through M4-06, M5-01 through M5-06, M6-01 through M6-06 which are COMMITTED, and M6-07 which is AWAITING_REVIEW) remain in `BLOCKED` status awaiting completion, independent verification, and commit of their respective prerequisites.
 
 ---
 
@@ -1884,10 +1884,39 @@ Chunks M5-07 through DOC-01 (except committed M3-01 through M3-13, M4-01 through
   - Strict adherence to Rule 8: all mock providers labeled with synthetic provenance.
   - Strict adherence to Rule 12: operational data and health diagnostics require formal officer verification before downstream operational enforcement.
 
+### Chunk M6-07 Implementation Record: Report Generation & Export UI
+
+- **Status:** `AWAITING_REVIEW` (Lifecycle: `PLANNED` → `IN_PROGRESS` → `IMPLEMENTED` → `AWAITING_REVIEW`)
+- **Owner:** M6 (Frontend Operations)
+- **Primary Deliverables:**
+  - `frontend/src/types/reports.ts`: Strongly typed domain models for `ReportTemplateId` (`relocation_allocation`, `site_infrastructure`, `suitability_capacity`, `comprehensive_dossier`), `ReportStatusFilter` (`all`, `assigned`, `unassigned`), `ReportExportFormat` (`json`, `csv`), `ReportTemplateMeta`, `ReportConfig`, `ReportMetric`, and `CompiledDossier` strictly composing existing M6-02 and M6-03 contracts.
+  - `frontend/src/lib/api/reports.ts`: Typed API client service methods (`compileReportDossier`, `downloadFile`, `generateDossierJson`, `generateAssignmentsCsv`, `generateSitesCsv`, `REPORT_TEMPLATES`) aggregating relocation matching and candidate sites contracts with deterministic fallback datasets.
+  - `frontend/src/lib/api/index.ts`: Barrel export for reports services and export utilities.
+  - `frontend/src/components/operations/reports/ReportConfigPanel.tsx`: Interactive template selector with 4 cards, parameter filters (village assignment status pills, candidate site dropdown selector, candidate rejection audits toggle, infrastructure deficits toggle), and compilation action trigger.
+  - `frontend/src/components/operations/reports/ReportSummaryCards.tsx`: 4 executive KPI summary cards dynamically calculated per report template.
+  - `frontend/src/components/operations/reports/DossierViewer.tsx`: Official government decision-support document viewer with classification badges, Rule 12 legal decision-support mandate banner, Rule 8 analytical provenance banner, executive narrative block, village allocation ledger with expandable candidate evaluation rejection audits, candidate relocation sites inventory table, surveyed infrastructure assets cards, and 9 suitability criteria / 5 capacity dimensions sizing cards.
+  - `frontend/src/components/operations/reports/ReportEmptyState.tsx`: Informative guide and template quick-launch canvas displayed prior to dossier compilation.
+  - `frontend/src/components/operations/reports/index.ts`: Clean barrel export.
+  - `frontend/src/app/operations/reports/page.tsx`: Full operational route mounted in `OperationsSectionShell` with Action Toolbar ("Export JSON", "Export CSV", "Print Dossier", "New Report", "Compile Dossier"), error banner with retry trigger, and export notification feedback.
+  - `frontend/src/__tests__/ReportsOperations.test.tsx`: Comprehensive Vitest test suite with 14 unit and integration tests covering workspace header, template switching, operational parameter toggling, relocation allocation compilation, status filtering, candidate rejection audits, candidate sites inventory, suitability/capacity assessment, JSON export download, CSV export download, window.print browser printing, reset flow, compilation error retry, and Rule 8/12 statutory callouts.
+- **Verification Results:**
+  - Full Vitest suite: 28/28 test files passed, 234/234 tests passed (100% clean).
+  - Vitest M6-07 unit suite: `ReportsOperations.test.tsx` passed 14/14 tests cleanly.
+  - TypeScript: 0 errors (`tsc --noEmit` passed).
+  - ESLint: 0 warnings, 0 errors (`next lint` passed).
+  - Production Build: passed (`next build` compiled cleanly; 17 static routes generated including `/operations/reports` at 12.3 kB).
+- **Scope & Invariants Audit:**
+  - Zero backend modifications (`backend/` git status completely clean).
+  - Purely additive frontend implementation inside M6 operations module.
+  - Zero invented endpoints, request/response schemas, report fields, or backend behavior.
+  - Client-side data compilation consumes existing `/relocation/match` and `/sites` endpoints with deterministic Himalayan Pilot fallback datasets.
+  - Strict adherence to Rule 8: all synthetic baseline data clearly attributed to Himalayan Pilot profile.
+  - Strict adherence to Rule 12: all dossiers prominently declare operational decision support status requiring officer sign-off in Chunk M6-08 before legal enactment.
+
 ---
 
 ## Last Updated
 
-- **Timestamp:** 2026-09-06 19:15:00 IST
-- **Updated By:** M6 (Data Sources & Freshness Monitoring UI — Chunk M6-06 COMMITTED)
-- **Status Summary:** Chunk M6-06 COMMITTED (Commit: `f7d4830`); Chunk M6-05 COMMITTED (Commit: `3aef3a9`); Chunk M6-04 COMMITTED (Commit: `37d385b`); Chunk M6-03 COMMITTED (Commit: `19a8ff8`); Chunk M6-02 COMMITTED (Commit: `a00c7e1`); Chunk M5-06 COMMITTED (Commit: `4d6f5ba`); Chunk M6-01 COMMITTED (Commit: `05f5991`); Chunk M5-05 COMMITTED (Commit: `54573bb`); Chunk M5-04 COMMITTED (Commit: `85ac1e8`); Chunk M5-03 COMMITTED (Commit: `f1637e4`); Chunk M5-02 COMMITTED; Chunk M5-01 COMMITTED; Chunk M4-06 COMMITTED; Chunk M4-05 COMMITTED; Chunk M4-04 COMMITTED; Chunk M4-03 COMMITTED; Chunk M4-02 COMMITTED; Chunk M4-01 COMMITTED; Chunk M3-13 COMMITTED; Chunk M3-12 COMMITTED; Chunk M3-11 COMMITTED; Chunk M3-10 COMMITTED; Chunk M3-09 COMMITTED; Chunk M3-08 COMMITTED; 220/220 frontend tests passing across 27 files; 525 total backend regression tests verified passing in container. Next eligible chunks: M5-07, M6-07, M6-08.
+- **Timestamp:** 2026-09-06 20:30:00 IST
+- **Updated By:** M6 (Report Generation & Export UI — Chunk M6-07 AWAITING_REVIEW)
+- **Status Summary:** Chunk M6-07 AWAITING_REVIEW; Chunk M6-06 COMMITTED (Commit: `f7d4830`); Chunk M6-05 COMMITTED (Commit: `3aef3a9`); Chunk M6-04 COMMITTED (Commit: `37d385b`); Chunk M6-03 COMMITTED (Commit: `19a8ff8`); Chunk M6-02 COMMITTED (Commit: `a00c7e1`); Chunk M5-06 COMMITTED (Commit: `4d6f5ba`); Chunk M6-01 COMMITTED (Commit: `05f5991`); Chunk M5-05 COMMITTED (Commit: `54573bb`); Chunk M5-04 COMMITTED (Commit: `85ac1e8`); Chunk M5-03 COMMITTED (Commit: `f1637e4`); Chunk M5-02 COMMITTED; Chunk M5-01 COMMITTED; Chunk M4-06 COMMITTED; Chunk M4-05 COMMITTED; Chunk M4-04 COMMITTED; Chunk M4-03 COMMITTED; Chunk M4-02 COMMITTED; Chunk M4-01 COMMITTED; Chunk M3-13 COMMITTED; Chunk M3-12 COMMITTED; Chunk M3-11 COMMITTED; Chunk M3-10 COMMITTED; Chunk M3-09 COMMITTED; Chunk M3-08 COMMITTED; 234/234 frontend tests passing across 28 files; 525 total backend regression tests verified passing in container. Next eligible chunks: M5-07, M6-08.
