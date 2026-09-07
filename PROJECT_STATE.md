@@ -251,7 +251,7 @@ No chunk may transition to `IN_PROGRESS` until all its listed prerequisite depen
 - M6-07: Report Generation & Export UI — COMMITTED (Commit: `69e8297` — `feat(frontend): implement M6-07 report generation and export`; independent verification passed: Focused tests: 14/14 passed; Full frontend suite: 234/234 tests passed across 28 files; TypeScript: 0 errors; ESLint: 0 warnings, 0 errors; Production build: passed; implementation committed and pushed to origin/main).
 - M6-08: Officer Review & Action Sign-Off Workflow — COMMITTED (Commit: `c9d99a4` — `feat(frontend): implement M6-08 officer review workflow`; independent verification passed: Focused tests: 14/14 passed; Full frontend suite: 269/269 tests passed across 30 files; TypeScript: 0 errors; ESLint: 0 warnings, 0 errors; Production build: passed; implementation committed to main).
 - M6-09: Audit Log & Traceability UI — COMMITTED (Commit: `029b416` — `feat(frontend): implement M6-09 audit log and traceability UI`; independent verification passed: Focused tests: 12/12 passed; Full frontend suite: 281/281 tests passed across 31 files; TypeScript: 0 errors; ESLint: 0 warnings, 0 errors; Production build: passed; implementation committed to main; Module M6 Frontend Operations is 100% complete).
-- INT-01: End-to-End Backend / Frontend Integration — COMMITTED (Commit: `feat(integration): complete INT-01 platform integration`; independent review passed; runtime verification passed across all 8 endpoints, 541 backend tests passed, 282 frontend tests passed across 31 files, TypeScript 0 errors, ESLint 0 errors, production build passed).
+- INT-01: End-to-End Backend / Frontend Integration — COMMITTED (Commit: `55569b4` — `feat(integration): complete INT-01 platform integration`; independent review passed; runtime verification passed across all 8 endpoints, 541 backend tests passed, 282 frontend tests passed across 31 files, TypeScript 0 errors, ESLint 0 errors, production build passed).
 
 ---
 
@@ -2067,4 +2067,4 @@ No chunk may transition to `IN_PROGRESS` until all its listed prerequisite depen
 
 - **Timestamp:** 2026-09-07 20:10:00 IST
 - **Updated By:** Platform / Integration (Chunk INT-01 COMMITTED)
-- **Status Summary:** Chunk INT-01 COMMITTED (Commit: `feat(integration): complete INT-01 platform integration`); Option A demo authentication strictly guarded without virtual fallback; 40 villages, 12 sites, 7 red zones, 53 routes, 4 alerts, 5 data sources seeded; 541 backend tests passed; 282 frontend tests passed; Next.js production build passed; Next eligible chunk: INT-02 (unblocked and ready to start).
+- **Status Summary:** Chunk INT-01 COMMITTED (Commit: `55569b4`); Option A demo authentication strictly guarded without virtual fallback; 40 villages, 12 sites, 7 red zones, 53 routes, 4 alerts, 5 data sources seeded; 541 backend tests passed; 282 frontend tests passed; Next.js production build passed; Next eligible chunk: INT-02 (unblocked and ready to start).
