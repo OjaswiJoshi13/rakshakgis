@@ -178,31 +178,31 @@ No chunk may transition to `IN_PROGRESS` until all its listed prerequisite depen
 | **M6-08** | Operations | Officer Review & Action Sign-Off Workflow | M6 | M6-02, M6-04 | **COMMITTED** |
 | **M6-09** | Operations | Audit Log & Traceability UI | M6 | M6-08 | **COMMITTED** |
 | **INT-01** | Integration | End-to-End Backend / Frontend Integration | M1 | All M2-M6 | **COMMITTED** |
-| **INT-02** | Integration | End-to-End SIH Demo Flow Validation | M1 | INT-01 | **PLANNED** |
-| **INT-03** | Integration | Full Automated Test Suite Execution | M1 | INT-02 | **BLOCKED** |
+| **INT-02** | Integration | End-to-End SIH Demo Flow Validation | M1 | INT-01 | **COMMITTED** |
+| **INT-03** | Integration | Full Automated Test Suite Execution | M1 | INT-02 | **PLANNED** |
 | **DEP-01** | DevOps | Production Deployment & Containerization | M1 | INT-03 | **BLOCKED** |
-| **DOC-01** | Docs | Final Project Documentation & Demo Guide | M1 | INT-02 | **BLOCKED** |
+| **DOC-01** | Docs | Final Project Documentation & Demo Guide | M1 | INT-02 | **PLANNED** |
 
 ---
 
 ## Current Work
 
-- **Active Chunk:** None (Chunk INT-01 completed and COMMITTED; INT-02 unblocked and ready to start)
-- **Status:** Chunk INT-01: End-to-End Backend / Frontend Integration is COMMITTED. All integration deliverables, Option A demo authentication without virtual fallback, missing backend endpoints, authoritative pilot data seeder, and integration/regression tests verified and committed.
+- **Active Chunk:** `None` (Chunk INT-02 is COMMITTED)
+- **Status:** All M1–M6 implementation chunks, INT-01, and INT-02 are COMMITTED.
 - **Next Eligible Chunks:**
-  - **INT-02:** End-to-End SIH Demo Flow Validation (Prerequisite: INT-01 — COMMITTED; unblocked and ready to start)
+  - **INT-03:** Full Automated Test Suite Execution (Prerequisite: INT-02 — COMMITTED)
+  - **DOC-01:** Final Project Documentation & Demo Guide (Prerequisite: INT-02 — COMMITTED)
 
 ---
 
 ## Blocked Work
 
 ### Next Eligible / Unblocked:
-- **INT-02:** End-to-End SIH Demo Flow Validation (Prerequisites: INT-01 — COMMITTED; unblocked and ready to start)
+- **INT-03:** Full Automated Test Suite Execution (Unblocked — ready to start)
+- **DOC-01:** Final Project Documentation & Demo Guide (Unblocked — ready to start)
 
 ### Still Blocked:
-- **INT-03:** Full Automated Test Suite Execution (Blocked awaiting INT-02)
 - **DEP-01:** Production Deployment & Containerization (Blocked awaiting INT-03)
-- **DOC-01:** Final Project Documentation & Demo Guide (Blocked awaiting INT-02)
 
 ---
 
@@ -2059,12 +2059,60 @@ No chunk may transition to `IN_PROGRESS` until all its listed prerequisite depen
   - ESLint: 0 warnings, 0 errors (`npm run lint`).
   - Production Build: passed (`npm run build` compiled 17 static routes cleanly).
   - Scope & Invariants Audit: Zero plaintext passwords or secrets introduced; demo token strictly restricted to development/demo; no duplicate endpoints; all calculations use authoritative engines; zero virtual demo user fabrication.
+  - **Status: COMMITTED.**
+
+---
+
+### INT-02: End-to-End SIH Demo Flow Validation
+
+- **Status:** `COMMITTED`
+- **Date Completed:** 2026-09-07
+- **Owner:** M1 (Platform / DevOps / Integration)
+- **Prerequisite:** INT-01 (COMMITTED)
+- **Objective:** Complete end-to-end runtime validation and integration-hardening of the live RakshakGIS system following the 12-step Golden SIH Demo Flow across the running PostGIS, FastAPI, and Next.js containers.
+- **Execution & Validation Evidence:**
+  1. **Step 1: Login** — Authenticated session established via `/login` using the development/demo token (`demo-authority-access-token`). Verified session resolves to real database identity `District Collector Chamoli` (`district_collector_chamoli`, role: `district_officer`). Session persistence and bearer injection confirmed across all subsequent client API requests.
+  2. **Step 2: Command Dashboard** — Loaded `/dashboard`. Real backend-derived KPIs populated: 12 safe sites registered, 5 active telemetry sources connected, 4 scenarios configured, 53 evacuation corridors indexed. Zero hardcoded mock numbers.
+  3. **Step 3: GIS Command Map** — Loaded `/gis`. MapLibre GL canvas rendered with dynamic layers fetched from backend endpoints: 40 habitations, 12 candidate relocation sites, 7 permanent red zones, and 53 evacuation corridors. Layer toggles, spatial selections, and interactive inspections confirmed functional.
+  4. **Step 4: Habitation / Village Analysis** — Loaded `/villages`. Settlement inspection confirmed population, vulnerability index (0.78), hazard/risk classifications (High / Critical), and multi-hazard factor contributions (landslide 0.85, flash flood 0.72) loaded dynamically from `GET /api/v1/villages/{id}`.
+  5. **Step 5: Critical-Risk Flow** — High/critical risk settlements displayed with red-zone spatial overlaps and statutory warnings. Confirmed statutory guardrail: numerical risk score indicates hazard severity but does NOT automatically trigger an evacuation order without official District Collector authorization.
+  6. **Step 6: Scenario Simulator** — Loaded `/operations/scenarios`. Triggered scenario run via `POST /api/v1/scenarios/run` for `EXTREME_RAINFALL` (`SIM-5A19D863` / `SIM-DD61C10D`). Backend scenario engine recalculated baseline vs simulated risk profiles, habitations under critical threat (18 settlements), and displaced household counts. Real before/after deltas displayed without frontend fabrication.
+  7. **Step 7: Relocation Planner** — Loaded `/operations/relocation`. Greedily matched priority settlements against candidate relocation sites via backend `evaluateRelocationMatching`. Explored candidate evaluation audit modal showing site suitability rank, distance, infrastructure capacity, and rejection reasons.
+  8. **Step 8: Capacity Constraint** — Inspected candidate site capacity evaluation (`Site 37 - Gauchar Aerodrome Terrace Flat`). Confirmed strict carrying capacity enforcement: healthcare and emergency shelter capacity deficits explicitly flagged; system strictly adheres to the rule that missing or unknown capacity dimensions cannot be treated as unlimited.
+  9. **Step 9: Routing** — Evaluated evacuation routes (`GET /api/v1/routes`). 53 evacuation corridors retrieved with authoritative road distance (km), estimated travel time (min), and terrain-adjusted safety scores derived directly from backend routing tables.
+  10. **Step 10: Officer Review** — Loaded `/operations/review`. Rule 12 statutory review queue inspected. Performed review workflow (tested Approve, Reject with mandatory rationale, and Return for Revision). Confirmed officer decisions are permanently attributed to authenticated identity `District Collector Chamoli` (`id=131`).
+  11. **Step 11: Audit / Traceability** — Loaded `/operations/audit`. Chronological audit log verified with 8 real events (including relocation allocations, scenario runs, and officer decisions). Verified SHA-256 tamper-evident hash chain integrity (100% verified). Confirmed read-only security posture (zero edit/delete controls).
+  12. **Step 12: Report / Action Output** — Loaded `/operations/reports`. Compiled operational dossier `DOSSIER-RELOCATION_ALLOCATION-954882` incorporating live allocation metrics, candidate site inventories, and Rule 12 statutory declarations. Exported JSON, CSV, and verified print layout without fake success dialogs.
+- **Recorded Artifacts:**
+  - Browser Recording: `sih_demo_flow_1788792446790.webp`
+  - Step Screenshots:
+    - `01_login_page_1788792505191.png`
+    - `02_dashboard_kpis_1788792580235.png`
+    - `03_gis_canvas_1788792625384.png`
+    - `04_villages_vulnerability_1788792672360.png`
+    - `05_scenario_simulation_1788792749106.png`
+    - `06_relocation_planner_audit_1788792836821.png`
+    - `07_officer_review_queue_1788792875540.png`
+    - `08_audit_log_traceability_1788792920708.png`
+    - `09_compiled_report_dossier_1788793019877.png`
+- **Test Executions:**
+  - Backend Integration & Auth: 41/41 tests passed (`pytest tests/test_int01_integration.py tests/test_auth.py -v` in 5.96s).
+  - Frontend Vitest Suite: 31/31 test files passed, 282/282 tests passed (`npm test -- --run` in 26.50s).
+  - TypeScript: 0 errors (`npm run type-check`).
+  - ESLint: 0 warnings, 0 errors (`npm run lint`).
+- **Files Modified:**
+  - `frontend/src/__tests__/ReportsOperations.test.tsx` (hermetic unit test mocking for candidate sites and relocation matching to prevent live network contention in concurrent test runs).
+  - `PROJECT_STATE.md` (recorded INT-02 validation and status).
+- **Known Issues / Limitations:**
+  - None blocking.
+- **Verification & Review:**
+  - Independently verified and approved for commit.
   - Status: COMMITTED.
 
 ---
 
 ## Last Updated
 
-- **Timestamp:** 2026-09-07 20:10:00 IST
-- **Updated By:** Platform / Integration (Chunk INT-01 COMMITTED)
-- **Status Summary:** Chunk INT-01 COMMITTED (Commit: `55569b4`); Option A demo authentication strictly guarded without virtual fallback; 40 villages, 12 sites, 7 red zones, 53 routes, 4 alerts, 5 data sources seeded; 541 backend tests passed; 282 frontend tests passed; Next.js production build passed; Next eligible chunk: INT-02 (unblocked and ready to start).
+- **Timestamp:** 2026-09-07 20:45:00 IST
+- **Updated By:** Platform / Integration (Chunk INT-02 COMMITTED)
+- **Status Summary:** Chunk INT-02 COMMITTED; all 12 Golden SIH Demo Flow steps validated end-to-end on live Docker backend and Next.js frontend; browser recording and 9 screenshots captured; 41 backend tests and 282 frontend tests passed (100% clean); Next eligible chunks: INT-03 (Full Automated Test Suite Execution) and DOC-01 (Final Documentation & Demo Guide).

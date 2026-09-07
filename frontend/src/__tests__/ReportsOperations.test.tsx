@@ -52,6 +52,17 @@ describe("Report Generation & Export UI Suite (Chunk M6-07)", () => {
     } else {
       vi.spyOn(window.URL, "revokeObjectURL").mockImplementation(() => {});
     }
+
+    vi.spyOn(sitesApi, "listCandidateSites").mockResolvedValue({
+      success: true,
+      count: sitesApi.HIMALAYAN_PILOT_SAMPLE_SITES.length,
+      data: sitesApi.HIMALAYAN_PILOT_SAMPLE_SITES,
+    });
+
+    vi.spyOn(relocationApi, "evaluateRelocationMatching").mockResolvedValue({
+      success: true,
+      data: relocationApi.HIMALAYAN_PILOT_SAMPLE_MATCH_RESULT,
+    });
   });
 
   it("1. Renders Reports Section Shell with M6-07 badge, title, and initial empty state", async () => {
