@@ -55,8 +55,15 @@ describe("Report Generation & Export UI Suite (Chunk M6-07)", () => {
 
     vi.spyOn(sitesApi, "listCandidateSites").mockResolvedValue({
       success: true,
-      count: sitesApi.HIMALAYAN_PILOT_SAMPLE_SITES.length,
       data: sitesApi.HIMALAYAN_PILOT_SAMPLE_SITES,
+      pagination: {
+        total: sitesApi.HIMALAYAN_PILOT_SAMPLE_SITES.length,
+        page: 1,
+        page_size: 10,
+        total_pages: 1,
+        has_next: false,
+        has_prev: false,
+      },
     });
 
     vi.spyOn(relocationApi, "evaluateRelocationMatching").mockResolvedValue({

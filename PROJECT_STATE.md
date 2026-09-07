@@ -179,18 +179,18 @@ No chunk may transition to `IN_PROGRESS` until all its listed prerequisite depen
 | **M6-09** | Operations | Audit Log & Traceability UI | M6 | M6-08 | **COMMITTED** |
 | **INT-01** | Integration | End-to-End Backend / Frontend Integration | M1 | All M2-M6 | **COMMITTED** |
 | **INT-02** | Integration | End-to-End SIH Demo Flow Validation | M1 | INT-01 | **COMMITTED** |
-| **INT-03** | Integration | Full Automated Test Suite Execution | M1 | INT-02 | **PLANNED** |
-| **DEP-01** | DevOps | Production Deployment & Containerization | M1 | INT-03 | **BLOCKED** |
+| **INT-03** | Integration | Full Automated Test Suite Execution | M1 | INT-02 | **COMMITTED** |
+| **DEP-01** | DevOps | Production Deployment & Containerization | M1 | INT-03 | **PLANNED** |
 | **DOC-01** | Docs | Final Project Documentation & Demo Guide | M1 | INT-02 | **PLANNED** |
 
 ---
 
 ## Current Work
 
-- **Active Chunk:** `None` (Chunk INT-02 is COMMITTED)
-- **Status:** All M1–M6 implementation chunks, INT-01, and INT-02 are COMMITTED.
+- **Active Chunk:** `None` (Chunk INT-03 is COMMITTED)
+- **Status:** All implementation and integration quality-gate chunks (M1–M6, INT-01, INT-02, INT-03) are COMMITTED.
 - **Next Eligible Chunks:**
-  - **INT-03:** Full Automated Test Suite Execution (Prerequisite: INT-02 — COMMITTED)
+  - **DEP-01:** Production Deployment & Containerization (Prerequisite: INT-03 — COMMITTED)
   - **DOC-01:** Final Project Documentation & Demo Guide (Prerequisite: INT-02 — COMMITTED)
 
 ---
@@ -198,11 +198,11 @@ No chunk may transition to `IN_PROGRESS` until all its listed prerequisite depen
 ## Blocked Work
 
 ### Next Eligible / Unblocked:
-- **INT-03:** Full Automated Test Suite Execution (Unblocked — ready to start)
+- **DEP-01:** Production Deployment & Containerization (Unblocked — ready to start)
 - **DOC-01:** Final Project Documentation & Demo Guide (Unblocked — ready to start)
 
 ### Still Blocked:
-- **DEP-01:** Production Deployment & Containerization (Blocked awaiting INT-03)
+- None (All core pipeline dependencies satisfied)
 
 ---
 
@@ -2107,12 +2107,53 @@ No chunk may transition to `IN_PROGRESS` until all its listed prerequisite depen
   - None blocking.
 - **Verification & Review:**
   - Independently verified and approved for commit.
+  - Status: COMMITTED (Commit: `ca9a1f2`).
+
+---
+
+### INT-03: Full Automated Test Suite Execution
+
+- **Status:** `COMMITTED`
+- **Date Completed:** 2026-09-07
+- **Owner:** M1 (Platform / DevOps / Integration)
+- **Prerequisite:** INT-02 (COMMITTED)
+- **Objective:** Comprehensive automated quality-gate validation of the synchronized RakshakGIS repository after INT-02, verifying backend pytest suites, frontend vitest suites, TypeScript type safety, ESLint compliance, Next.js production builds, Docker container stability, and cross-system integration integrity.
+- **Quality-Gate Results:**
+  1. **Backend Test Suite:**
+     - Command: `wsl docker exec rakshakgis-backend pytest -v tests`
+     - Result: **541 passed, 0 failed, 0 skipped, 6 warnings in 14.33s (100% pass rate)**.
+     - Coverage: Core auth, models, schemas, multi-hazard risk engine, vulnerability scoring, candidate site suitability, carrying capacity, relocation matching, evacuation routing, scenario simulations, alerts, telemetry, synthetic datasets, and INT-01 integration tests.
+     - Warnings: 6 Starlette/AnyIO deprecation warnings (standard library deprecations, non-breaking).
+  2. **Frontend Test Suite:**
+     - Command: `npm test` (`vitest run`)
+     - Result: **31 test files passed, 282 tests passed, 0 failed, 0 skipped in 84.72s (100% pass rate)**.
+     - Coverage: UI shells, auth context, login forms, navigation, dashboard KPIs, MapLibre GIS canvas, GeoJSON layers, village analysis, relocation planner, site infrastructure details, scenario simulator, operational alerts, telemetry sources, report generation dossiers, officer review workflows, audit traceability log, and API networking client.
+  3. **TypeScript Type Check:**
+     - Command: `npm run type-check` (`tsc --noEmit`)
+     - Result: **0 errors, clean exit code 0**.
+  4. **ESLint Code Quality:**
+     - Command: `npm run lint` (`next lint`)
+     - Result: **0 warnings, 0 errors**.
+  5. **Production Build:**
+     - Command: `npm run build` (`next build`)
+     - Result: **17 static routes compiled and optimized cleanly**. Zero build errors.
+  6. **Docker / Runtime Environment Health:**
+     - Containers `rakshakgis-backend` (port 8000) and `rakshakgis-db` (port 5432) active and healthy.
+     - Live REST endpoints verified: `/api/v1/auth/me`, `/api/v1/telemetry/overview`, `/api/v1/villages`, `/api/v1/sites`, `/api/v1/routes`, `/api/v1/relocation/assignments`.
+- **Modifications Made & Rationale:**
+  - `frontend/src/__tests__/ReportsOperations.test.tsx`: Fixed mock for `sitesApi.listCandidateSites` to conform to the `PaginatedResponse<CandidateSiteRead>` type contract (`pagination` metadata object instead of `count`), resolving TS2353 error.
+  - `frontend/vitest.config.ts`: Added `fileParallelism: false` to test configuration to prevent concurrent JSDOM thread contention and asynchronous timer flakiness across the 31 test suites on Windows.
+- **Test Integrity:**
+  - Zero tests weakened, skipped, or deleted.
+  - All original assertions, mock bounds, and coverage criteria maintained.
+- **Verification & Review:**
+  - Independently verified and approved for commit.
   - Status: COMMITTED.
 
 ---
 
 ## Last Updated
 
-- **Timestamp:** 2026-09-07 20:45:00 IST
-- **Updated By:** Platform / Integration (Chunk INT-02 COMMITTED)
-- **Status Summary:** Chunk INT-02 COMMITTED; all 12 Golden SIH Demo Flow steps validated end-to-end on live Docker backend and Next.js frontend; browser recording and 9 screenshots captured; 41 backend tests and 282 frontend tests passed (100% clean); Next eligible chunks: INT-03 (Full Automated Test Suite Execution) and DOC-01 (Final Documentation & Demo Guide).
+- **Timestamp:** 2026-09-07 21:33:00 IST
+- **Updated By:** Platform / Integration (Chunk INT-03 COMMITTED)
+- **Status Summary:** Chunk INT-03 COMMITTED; full automated test suite executed across backend (541/541 passed) and frontend (31/31 files, 282/282 tests passed); TypeScript, ESLint, and Next.js production build 100% clean; Next eligible chunks: DEP-01 (Production Deployment & Containerization) and DOC-01 (Final Documentation & Demo Guide) both unblocked and PLANNED.
