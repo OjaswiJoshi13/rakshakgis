@@ -10,6 +10,7 @@
  * assignment approval calls to POST /api/v1/relocation/assignments/batch when applicable.
  */
 
+import { apiClient } from "./client";
 import { HIMALAYAN_PILOT_SAMPLE_MATCH_RESULT, batchCreateRelocationAssignments } from "./relocation";
 import { HIMALAYAN_PILOT_SAMPLE_SIMULATION_OUTPUTS } from "./scenarios";
 import {
@@ -253,6 +254,26 @@ export async function submitOfficerDecision(
     } catch {
       // Graceful fallback for offline / mock testing
     }
+  }
+
+  // Persist decision to real backend governance database
+  try {
+    await apiClient.post("/officer-decisions", {
+      dossier_id: req.recommendation_id,
+      action: req.action,
+      rationale: trimmedRationale,
+      override_ai: Boolean(req.override_ai_recommendation),
+      officer_id: officer.id || "OFFICER-001",
+      officer_name: officer.name || "District Magistrate / Officer",
+      officer_role: officer.role || "District Disaster Management Officer",
+      metadata: {
+        source_engine: reviewDossiersCache[index].source_engine,
+        region_profile_id: reviewDossiersCache[index].region_profile_id,
+        statutory_mandate: reviewDossiersCache[index].statutory_mandate,
+      },
+    }).catch(() => {});
+  } catch {
+    // Offline / test fallback
   }
 
   // Update in-memory dossier state

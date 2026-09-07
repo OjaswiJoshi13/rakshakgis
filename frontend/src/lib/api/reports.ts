@@ -4,6 +4,8 @@
  * and M6-03 (Candidate Relocation Sites & Infrastructure) contracts.
  */
 
+import { apiClient } from "./client";
+import { ResponseEnvelope } from "@/types/api";
 import {
   CompiledDossier,
   ReportConfig,
@@ -446,4 +448,18 @@ export function generateSitesCsv(sites: CandidateSiteRead[]): string {
   ]);
 
   return [headers.join(","), ...rows.map((r) => r.join(","))].join("\n");
+}
+
+/**
+ * Retrieves authoritative server-side report via GET /reports/{type}.
+ */
+export async function fetchBackendReport(
+  type: "action_plan" | "risk_assessment" | "site_dossier" | "audit_report",
+  params?: { region_id?: string; village_id?: string | number; site_id?: string | number },
+  signal?: AbortSignal
+): Promise<ResponseEnvelope<any>> {
+  return apiClient.get<ResponseEnvelope<any>>(`/reports/${type}`, {
+    params,
+    signal,
+  });
 }

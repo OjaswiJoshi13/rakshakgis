@@ -11,6 +11,8 @@
  * dynamically incorporating session-recorded officer sign-offs, and verifying SHA-256 integrity.
  */
 
+import { apiClient } from "./client";
+import { ResponseEnvelope } from "@/types/api";
 import {
   AuditActionCategory,
   AuditFilterParams,
@@ -504,4 +506,17 @@ export function recordOfficerDecisionAudit(
   // Prepend so latest appears first
   auditRecordsCache.unshift(newRecord);
   return newRecord;
+}
+
+/**
+ * Retrieves immutable statutory audit logs directly from PostgreSQL via GET /audit/logs.
+ */
+export async function fetchBackendAuditLogs(
+  params?: { limit?: number; offset?: number },
+  signal?: AbortSignal
+): Promise<ResponseEnvelope<any[]>> {
+  return apiClient.get<ResponseEnvelope<any[]>>("/audit/logs", {
+    params,
+    signal,
+  });
 }

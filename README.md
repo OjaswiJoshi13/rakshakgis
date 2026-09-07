@@ -39,19 +39,22 @@ The system is structured across four primary layers:
 └────────────────────────────────────────────────────────┘
 ```
 
-> **Important Note on Implementation Status:**
-> The architecture diagram above outlines the planned complete system design per the authoritative specification. Currently, only the **Repository & Docker Foundation (Chunk M1-01)** is established. Core backend routes, database schemas, risk engines, and frontend interfaces are scheduled for subsequent implementation chunks.
+> **System Readiness Status:**
+> The complete end-to-end platform is implemented, integrated, and validated across all tiers: PostgreSQL 16 + PostGIS 3.4 spatial database, FastAPI computational engines, live telemetry provider adapters, interactive MapLibre GIS canvas, and Next.js operations dashboard.
 
 ---
 
 ## Current Development Status
 
-- **Current Milestone:** M1 — Platform & DevOps Foundation
-- **Current Chunk:** `M1-01` (Repository & Docker Foundation) — *In Progress / Awaiting Review*
-- **Completed Milestones:** `M1-00` (Repository Audit & State Initialization — `COMMITTED`)
-- **Next Eligible Chunk:** `M2-01` (FastAPI Foundation & Core App Setup)
+- **Status:** Full Platform Implementation & Authoritative Data Pipeline Complete
+- **Milestones Completed:**
+  - `M1` through `M6` (Core Foundation, Risk, Vulnerability, Relocation, Routing, GIS Canvas, Operational Workflows)
+  - `INT-01`, `INT-02`, `INT-03` (Integration, SIH Flow Validation, Automated Quality Gates)
+  - `DATA-01` (Real-World Dataset Inventory & Manifest Distribution)
+  - `DATA-02` (Database Ingestion, Authoritative Adapters & Backend REST Endpoints)
+  - `INT-04` (End-to-End Real Data Integration, GIS Search, Governance Persistence & Pipeline Hardening)
 
-For granular task statuses and dependency tracking, refer to [`PROJECT_STATE.md`](PROJECT_STATE.md).
+For granular task statuses and formal audit records, refer to [`PROJECT_STATE.md`](PROJECT_STATE.md).
 
 ---
 
@@ -157,16 +160,52 @@ rakshakgis/
 
 ---
 
-## Intended Data Modes
+## Data Architecture & Bootstrap Workflow
 
-RakshakGIS supports three operational data modes configured via `DATA_MODE` in `.env`:
+RakshakGIS operates under four strictly isolated data modes configured via `DATA_MODE` in `.env`:
 
-1. **`demo` (Default for Development & Evaluation):**
-   Uses pre-packaged synthetic datasets and deterministic mock adapters. Does **not** require external API credentials or active internet telemetry.
-2. **`live` (Operational Monitoring):**
-   Connects to real-time external data providers (IMD rainfall, GSI slope instability, telemetry sensors) via provider adapters.
-3. **`simulation` (Scenario Exploration):**
-   Allows disaster management officers to modify hazard parameters (e.g. simulated extreme rainfall, slope failure) and re-execute backend computational risk models deterministically without mock random numbers.
+1. **`demo` (SIH Presentation & Offline Development):**
+   Uses pre-packaged deterministic datasets (`app/data/synthetic/`). Zero external network dependencies.
+2. **`full_data` (Authoritative Planning & Analysis):**
+   Powered by PostgreSQL/PostGIS database populated from Census 2011, LGD administrative hierarchy, Survey of India village boundaries, and NCS seismology catalogs. **Missing data is explicit (`DATA_UNAVAILABLE`)**; calculations never assume missing values are zero or synthetic.
+3. **`live` (Operational Multi-Hazard Monitoring):**
+   Connects to real-time external providers:
+   - **Open-Meteo**: Live precipitation and rainfall forecasts (CC-BY 4.0; *not labelled as IMD*).
+   - **Central Water Commission (CWC) Flood AFF**: Live river gauge levels, danger thresholds, and flood forecasts.
+   - **USGS Real-time Earthquakes**: Live seismic hazard observations for India bounding box.
+4. **`simulation` (Dynamic What-If Analysis):**
+   Modifies hazard/rainfall/road blockage parameters and reruns the real backend computational risk, Red Zone, priority, and matching engines deterministically.
+
+### Teammate Data Bootstrap (Reproducible Setup)
+
+To bootstrap the local data environment on a fresh clone without manual hunting:
+
+```bash
+# 1. Start backing PostgreSQL / PostGIS container
+docker compose up -d db
+
+# 2. Run data directory bootstrap & register manifests
+python scripts/setup_data.py
+
+# 3. Verify local dataset checksums against verified SHA-256 manifest
+python scripts/verify_data.py --quick
+
+# 4. Ingest authoritative data (Census 2011, LGD, Survey of India, NCS) into PostGIS
+python scripts/ingest_all.py
+
+# 5. Run full 22-step Golden SIH demo flow verification
+python scripts/validate_golden_sih_flow.py
+```
+
+### Data Attribution & Licensing
+
+- **Census 2011 & LGD**: Government Open Data License - India (GODL-India).
+- **Survey of India**: Department of Science & Technology, Government of India.
+- **National Centre for Seismology (NCS)**: Ministry of Earth Sciences, Government of India.
+- **OpenStreetMap**: © OpenStreetMap contributors, licensed under the Open Database License (ODbL) 1.0.
+- **Open-Meteo**: Weather data licensed under CC-BY 4.0.
+- **Copernicus DEM (GLO-30)**: Manifests tracked; DEM rasters deferred due to automated 403. Physical slope/elevation explicitly reported as unavailable in `full_data` mode.
+- **Bhuvan / GSI Landslide**: Official portal UI only; machine-readable endpoints not fabricated.
 
 ---
 

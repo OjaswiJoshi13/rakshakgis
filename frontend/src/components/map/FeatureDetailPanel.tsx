@@ -1,9 +1,9 @@
-"use client";
-
-import React from "react";
+import React, { useState, useEffect } from "react";
 import { Badge } from "@/components/ui/Badge";
 import { Button } from "@/components/ui/Button";
 import { SelectedFeatureInfo } from "@/types/gis";
+import { fetchVillageAnalysis } from "@/lib/api/gis";
+import { apiClient } from "@/lib/api/client";
 
 export interface FeatureDetailPanelProps {
   feature: SelectedFeatureInfo | null;
@@ -16,6 +16,42 @@ export const FeatureDetailPanel: React.FC<FeatureDetailPanelProps> = ({
   onClose,
   className = "",
 }) => {
+  const [authoritativeData, setAuthoritativeData] = useState<any>(null);
+  const [isLoadingAuthoritative, setIsLoadingAuthoritative] = useState<boolean>(false);
+
+  useEffect(() => {
+    if (!feature || !feature.id) {
+      setAuthoritativeData(null);
+      return;
+    }
+    let isMounted = true;
+    const fetchAuthoritative = async () => {
+      setIsLoadingAuthoritative(true);
+      try {
+        const cat = feature.layerCategory;
+        const eType = feature.properties?.entity_type;
+        if (cat === "habitations" || eType === "village") {
+          const res = await fetchVillageAnalysis(feature.id);
+          if (isMounted && res.data) setAuthoritativeData(res.data);
+        } else if (cat === "candidate_sites" || eType === "candidate_site") {
+          const res = await apiClient.get<any>(`/sites/${feature.id}`);
+          if (isMounted && res.data) setAuthoritativeData(res.data);
+        } else if (cat === "red_zones" || eType === "red_zone") {
+          const res = await apiClient.get<any>(`/red-zones/${feature.id}`);
+          if (isMounted && res.data) setAuthoritativeData(res.data);
+        }
+      } catch (err) {
+        // Fall back to GeoJSON properties
+      } finally {
+        if (isMounted) setIsLoadingAuthoritative(false);
+      }
+    };
+    fetchAuthoritative();
+    return () => {
+      isMounted = false;
+    };
+  }, [feature]);
+
   if (!feature) return null;
 
   const props = feature.properties || {};
@@ -257,7 +293,32 @@ export const FeatureDetailPanel: React.FC<FeatureDetailPanelProps> = ({
         </Badge>
       </div>
 
+      {isLoadingAuthoritative && (
+        <div className="text-[10px] text-sky-400 font-mono animate-pulse">
+          Querying authoritative backend entity records...
+        </div>
+      )}
+
+      {/* Authoritative Population & Demographics (Census 2011) */}
       <div className="grid grid-cols-2 gap-2 text-[11px] font-mono bg-slate-900/80 p-2.5 rounded border border-slate-800">
+        <div>
+          <span className="text-slate-400 block text-[10px]">Population (Census)</span>
+          <span className="font-semibold text-slate-200">
+            {authoritativeData?.population?.total !== null && authoritativeData?.population?.total !== undefined
+              ? `${Number(authoritativeData.population.total).toLocaleString()} persons`
+              : props.population !== undefined && props.population !== null
+              ? `${Number(props.population).toLocaleString()} persons`
+              : "—"}
+          </span>
+        </div>
+        <div>
+          <span className="text-slate-400 block text-[10px]">Households</span>
+          <span className="font-semibold text-slate-200">
+            {authoritativeData?.population?.households !== null && authoritativeData?.population?.households !== undefined
+              ? `${Number(authoritativeData.population.households).toLocaleString()} HH`
+              : "—"}
+          </span>
+        </div>
         <div>
           <span className="text-slate-400 block text-[10px]">Elevation</span>
           <span className="font-semibold text-slate-200">
@@ -271,6 +332,33 @@ export const FeatureDetailPanel: React.FC<FeatureDetailPanelProps> = ({
           </span>
         </div>
       </div>
+
+      {/* Authoritative Risk Assessment */}
+      {(authoritativeData?.risk?.score !== null && authoritativeData?.risk?.score !== undefined || props.risk_score !== undefined) && (
+        <div className="bg-slate-900/90 border border-slate-800 rounded p-2.5 space-y-1.5 font-mono text-[11px]">
+          <div className="flex items-center justify-between">
+            <span className="text-slate-400 text-[10px] uppercase">Composite Risk</span>
+            <Badge
+              variant={
+                (authoritativeData?.risk?.band || props.risk_band) === "CRITICAL"
+                  ? "danger"
+                  : (authoritativeData?.risk?.band || props.risk_band) === "HIGH" || (authoritativeData?.risk?.band || props.risk_band) === "VERY_HIGH"
+                  ? "warning"
+                  : "info"
+              }
+              size="sm"
+            >
+              Score: {authoritativeData?.risk?.score ?? props.risk_score} ({authoritativeData?.risk?.band ?? props.risk_band})
+            </Badge>
+          </div>
+
+          {authoritativeData?.red_zone?.is_in_red_zone && (
+            <div className="text-[10px] text-red-300 bg-red-950/40 border border-red-800/60 p-1.5 rounded">
+              <strong>RED ZONE WARNING:</strong> Habitation located within declared Red Zone perimeter ({authoritativeData.red_zone.details?.danger_level?.toUpperCase()}).
+            </div>
+          )}
+        </div>
+      )}
 
       {feature.coordinates && (
         <div className="text-[10px] font-mono text-slate-400">

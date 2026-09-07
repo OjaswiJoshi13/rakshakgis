@@ -101,3 +101,76 @@ export async function fetchVillages(
     signal,
   });
 }
+
+/**
+ * Searches spatial GIS entities via GET /gis/search.
+ */
+export async function searchGis(
+  q: string,
+  types?: string,
+  limit: number = 20,
+  signal?: AbortSignal
+): Promise<ResponseEnvelope<any[]>> {
+  return apiClient.get<ResponseEnvelope<any[]>>("/gis/search", {
+    params: { q, types, limit },
+    signal,
+  });
+}
+
+/**
+ * Retrieves GeoJSON vector layers via GET /map/layers.
+ */
+export async function fetchMapLayers(
+  layerType?: string,
+  regionId?: string,
+  signal?: AbortSignal
+): Promise<ResponseEnvelope<Record<string, any>>> {
+  return apiClient.get<ResponseEnvelope<Record<string, any>>>("/map/layers", {
+    params: { layer_type: layerType, region_id: regionId },
+    signal,
+  });
+}
+
+/**
+ * Retrieves comprehensive village disaster dossier via GET /villages/{id}/analysis.
+ */
+export async function fetchVillageAnalysis(
+  id: number | string,
+  signal?: AbortSignal
+): Promise<ResponseEnvelope<any>> {
+  return apiClient.get<ResponseEnvelope<any>>(`/villages/${id}/analysis`, { signal });
+}
+
+/**
+ * Retrieves village risk score and factors via GET /villages/{id}/risk.
+ */
+export async function fetchVillageRisk(
+  id: number | string,
+  signal?: AbortSignal
+): Promise<ResponseEnvelope<any>> {
+  return apiClient.get<ResponseEnvelope<any>>(`/villages/${id}/risk`, { signal });
+}
+
+/**
+ * Retrieves platform multi-hazard risk summary via GET /risk/summary.
+ */
+export async function fetchRiskSummary(
+  regionId?: string,
+  signal?: AbortSignal
+): Promise<ResponseEnvelope<any>> {
+  return apiClient.get<ResponseEnvelope<any>>("/risk/summary", {
+    params: { region_id: regionId },
+    signal,
+  });
+}
+
+/**
+ * Triggers multi-hazard dynamic risk recalculation via POST /risk/recalculate.
+ */
+export async function recalculateRisk(
+  payload: any,
+  signal?: AbortSignal
+): Promise<ResponseEnvelope<any>> {
+  return apiClient.post<ResponseEnvelope<any>>("/risk/recalculate", payload, { signal });
+}
+

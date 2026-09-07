@@ -16,14 +16,20 @@ governance_router = APIRouter()
 class OfficerDecisionCreate(BaseModel):
     """Payload for submitting an officer operational decision."""
 
-    officer_id: Optional[int] = Field(None, description="Officer user ID (defaults to demo officer if unauthenticated)")
-    decision_type: str = Field(..., description="e.g. evacuation_order, site_approval, relocation_authorization, zone_declaration")
-    target_entity_type: str = Field(..., description="e.g. village, candidate_site, red_zone")
-    target_entity_id: int = Field(..., description="Target entity primary key")
-    action_taken: str = Field(..., description="Brief action title (e.g. Authorized Relocation Plan)")
+    officer_id: Optional[Any] = Field(None, description="Officer user ID (defaults to demo officer if unauthenticated)")
+    officer_name: Optional[str] = None
+    officer_role: Optional[str] = None
+    dossier_id: Optional[str] = None
+    action: Optional[str] = None
+    decision_type: Optional[str] = Field(None, description="e.g. evacuation_order, site_approval, relocation_authorization, zone_declaration")
+    target_entity_type: Optional[str] = Field(None, description="e.g. village, candidate_site, red_zone")
+    target_entity_id: Optional[Any] = Field(None, description="Target entity primary key")
+    action_taken: Optional[str] = Field(None, description="Brief action title (e.g. Authorized Relocation Plan)")
     rationale: str = Field(..., min_length=5, description="Officer analytical justification")
-    overridden_recommendation: bool = Field(False, description="Whether officer chose to override algorithmic recommendation")
+    overridden_recommendation: Optional[bool] = Field(False, description="Whether officer chose to override algorithmic recommendation")
+    override_ai: Optional[bool] = Field(False)
     decision_metadata: Optional[Dict[str, Any]] = Field(None, description="Additional context metadata")
+    metadata: Optional[Dict[str, Any]] = None
 
 
 @governance_router.get(
@@ -80,10 +86,17 @@ def list_officer_decisions(
 
 
 @governance_router.post(
-    "/decisions",
+    "",
     response_model=ResponseEnvelope[Dict[str, Any]],
     status_code=status.HTTP_201_CREATED,
     summary="Record officer decision",
+    description="Persist an authoritative officer decision with audit traceability.",
+)
+@governance_router.post(
+    "/decisions",
+    response_model=ResponseEnvelope[Dict[str, Any]],
+    status_code=status.HTTP_201_CREATED,
+    summary="Record officer decision (alias)",
     description="Persist an authoritative officer decision with audit traceability.",
 )
 def record_officer_decision(
@@ -91,21 +104,37 @@ def record_officer_decision(
     db: Session = Depends(get_db),
 ):
     """Persist new officer decision and write corresponding audit trail."""
-    officer_id = decision_in.officer_id
+    officer_id = None
+    if isinstance(decision_in.officer_id, int):
+        officer_id = decision_in.officer_id
+    elif isinstance(decision_in.officer_id, str) and decision_in.officer_id.isdigit():
+        officer_id = int(decision_in.officer_id)
+
     if not officer_id:
-        # Fallback to demo user if available
         first_user = db.query(User).first()
         officer_id = first_user.id if first_user else 1
 
+    action_val = decision_in.action_taken or decision_in.action or "APPROVED"
+    decision_type_val = decision_in.decision_type or "relocation_authorization"
+    entity_type_val = decision_in.target_entity_type or "relocation_plan"
+    entity_id_val = 1
+    if decision_in.target_entity_id is not None:
+        try:
+            entity_id_val = int(decision_in.target_entity_id)
+        except (ValueError, TypeError):
+            entity_id_val = 1
+    overridden_val = decision_in.overridden_recommendation or decision_in.override_ai or False
+    metadata_val = decision_in.decision_metadata or decision_in.metadata or {}
+
     dec = OfficerDecision(
         officer_id=officer_id,
-        decision_type=decision_in.decision_type,
-        target_entity_type=decision_in.target_entity_type,
-        target_entity_id=decision_in.target_entity_id,
-        action_taken=decision_in.action_taken,
+        decision_type=decision_type_val,
+        target_entity_type=entity_type_val,
+        target_entity_id=entity_id_val,
+        action_taken=action_val,
         rationale=decision_in.rationale,
-        overridden_recommendation=decision_in.overridden_recommendation,
-        decision_metadata_json=decision_in.decision_metadata,
+        overridden_recommendation=overridden_val,
+        decision_metadata_json=metadata_val,
     )
     db.add(dec)
     db.flush()
@@ -113,9 +142,9 @@ def record_officer_decision(
     # Create immutable audit log entry
     audit = AuditLog(
         user_id=officer_id,
-        action=f"OFFICER_DECISION_{decision_in.decision_type.upper()}",
-        resource_type=decision_in.target_entity_type,
-        resource_id=str(decision_in.target_entity_id),
+        action=f"OFFICER_DECISION_{decision_type_val.upper()}",
+        resource_type=entity_type_val,
+        resource_id=str(entity_id_val),
         payload_after_json={
             "decision_id": dec.id,
             "action_taken": dec.action_taken,

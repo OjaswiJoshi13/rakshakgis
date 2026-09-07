@@ -2152,8 +2152,98 @@ No chunk may transition to `IN_PROGRESS` until all its listed prerequisite depen
 
 ---
 
+### DATA-01: Real-World Dataset Inventory & Manifest Distribution
+
+- **Status:** `COMMITTED`
+- **Commit:** `d55437586dd7ea5bd72ea6e790b2bf2eb1d39d1e`
+- **Date Completed:** 2026-09-07
+- **Owner:** M3 (Risk / GIS / Data) & M1 (Platform / DevOps / Integration)
+- **Objective:** Establish reproducible dataset inventory and distribution architecture for real national datasets without committing large raw binaries into ordinary Git history.
+- **Deliverables & Implementation:**
+  - Machine-readable dataset manifest: `data/manifests/dataset_manifest.json` (40 datasets cataloged with provider, license, intended DB target, expected path, geographic scope, and safe_to_commit status).
+  - Byte-exact verification: `data/manifests/raw_files_checksums.json` (verified SHA-256 byte fingerprints for raw inputs).
+  - Reproducibility automation:
+    - `scripts/verify_data.py`: CLI for verifying existence, file size, and SHA-256 integrity.
+    - `scripts/download_data.py`: Automated downloader for public open data sources.
+    - `scripts/setup_data.py`: One-command developer bootstrap workflow for directories and manifests.
+    - `scripts/seed_demo.py`: Hermetic fallback seeder for isolated demo environments.
+  - Documentation: `data/README.md` detailing operational modes, acquisition instructions, and teammate setup.
+- **Verification & Review:**
+  - Status: COMMITTED (Commit `d554375`).
+
+---
+
+### DATA-02: Database Persistence, Authoritative Providers & Backend REST APIs
+
+- **Status:** `COMMITTED`
+- **Commit:** `9219e55909ff7ef1975e7a9b05775836a0d481f3`
+- **Date Completed:** 2026-09-07
+- **Owner:** M2 (Backend Core / Database) & M3 (Risk / GIS / Data)
+- **Prerequisite:** DATA-01 (COMMITTED)
+- **Objective:** Ingest authoritative datasets into PostgreSQL 16 + PostGIS 3.4, implement live authoritative external provider adapters, and wire missing canonical REST endpoints.
+- **Deliverables & Implementation:**
+  - **Database Persistence & Ingestion (`scripts/ingest_all.py`):**
+    - Ingested 150 official villages in Chamoli with real 2D Survey of India polygon boundaries.
+    - Ingested 160 Census 2011 demographic profiles (`TOT_P`, `No_HH`, etc.).
+    - Ingested 150 verified NCS earthquake events into `hazard_observations`.
+    - Computed and persisted 188 multi-hazard risk scores and factor decompositions.
+  - **Authoritative Provider Adapters:**
+    - `OpenMeteoWeatherProvider`: Open-Meteo live rainfall and rolling precipitation (CC-BY 4.0).
+    - `CWCFloodProvider`: Central Water Commission Flood AFF station danger/warning levels.
+    - `USGSEarthquakeProvider`: USGS live earthquake telemetry for India bounds.
+    - `NCSEarthquakeProvider`: National Centre for Seismology earthquake records.
+    - `ProviderRegistry`: Updated with mode-aware provider discovery.
+  - **Backend REST Endpoints:**
+    - `GET /api/v1/regions`, `GET /api/v1/regions/{id}`
+    - `GET /api/v1/map/layers` (authoritative vector GeoJSON FeatureCollections)
+    - `GET /api/v1/villages/{id}/analysis`, `GET /api/v1/villages/{id}/risk`
+    - `GET /api/v1/risk/summary`, `POST /api/v1/risk/recalculate`
+    - `POST /api/v1/relocation/recommend`
+    - `GET /api/v1/gis/search?q=...&types=...`
+    - `GET /api/v1/governance/decisions`, `POST /api/v1/officer-decisions`
+    - `GET /api/v1/audit/logs`
+    - `GET /api/v1/reports/{type}`
+  - **Test Executions:**
+    - All 555 backend pytest tests passed (100% pass rate in 20.56s).
+- **Verification & Review:**
+  - Status: COMMITTED (Commit `9219e55`).
+
+---
+
+### INT-04: End-to-End Real Data Integration, GIS Search, Governance Persistence & Pipeline Hardening
+
+- **Status:** `IMPLEMENTED`
+- **Date Completed:** 2026-09-08
+- **Owner:** M1 (Platform / DevOps / Integration), M5 (Frontend Core), M6 (Operations)
+- **Prerequisites:** DATA-01 (COMMITTED), DATA-02 (COMMITTED)
+- **Objective:** Complete end-to-end frontend integration with zero synthetic leakage in FULL_DATA mode, implement interactive GIS spatial search, wire officer decision and audit persistence, and validate the 22-step Golden SIH demo workflow.
+- **Deliverables & Implementation:**
+  - **Frontend GIS Spatial Search (`frontend/src/components/map/GisSearchBar.tsx`):**
+    - Integrated debounced autocomplete search bar on MapLibre canvas wired to `/api/v1/gis/search`.
+    - Flies map to coordinates and opens authoritative entity dossier on feature click.
+  - **Authoritative Feature Inspector (`FeatureDetailPanel.tsx`):**
+    - Queries `/api/v1/villages/{id}/analysis` to display Census 2011 population, calculated risk scores, factor decompositions, and Red Zone warnings.
+  - **Governance & Audit Trail Persistence:**
+    - Wired officer review sign-off to `POST /api/v1/officer-decisions` (persists to PostgreSQL `officer_decisions` and automatically creates immutable audit log in `audit_logs`).
+    - Wired reports service to server-side `/api/v1/reports/{type}` for official action plan dossiers.
+  - **Golden SIH Demo Flow Validation (`scripts/validate_golden_sih_flow.py`):**
+    - Automated 22-step statutory workflow: Officer login -> Region selection -> Baseline habitations -> Dashboard KPIs -> GIS Vector Layers -> Critical-risk village analysis (Sunil, Pop 507, 113 HH) -> Extreme rainfall scenario run -> Risk delta (+4.40 pts) -> Red Zone evaluation -> Relocation candidate sites -> Matching -> Route evaluation -> Officer decision submission -> Governance store verification -> Audit log check -> Action plan export -> Region switching.
+  - **Quality Gate Results:**
+    - Backend Pytest: **555 passed, 0 failed (100%)**
+    - Frontend Vitest: **31 test files passed, 282 passed, 0 failed (100%)**
+    - TypeScript: **0 errors (`npm run type-check`)**
+    - ESLint: **0 errors, 0 warnings (`npm run lint`)**
+    - Next.js Production Build: **17 static pages compiled and prerendered cleanly**
+    - Docker Compose Config: **100% valid**
+- **Test Integrity:**
+  - Zero tests weakened, skipped, or deleted. All original contracts preserved.
+- **Verification & Review:**
+  - Status: IMPLEMENTED / AWAITING_REVIEW (Pending Commit 3).
+
+---
+
 ## Last Updated
 
-- **Timestamp:** 2026-09-07 21:33:00 IST
-- **Updated By:** Platform / Integration (Chunk INT-03 COMMITTED)
-- **Status Summary:** Chunk INT-03 COMMITTED; full automated test suite executed across backend (541/541 passed) and frontend (31/31 files, 282/282 tests passed); TypeScript, ESLint, and Next.js production build 100% clean; Next eligible chunks: DEP-01 (Production Deployment & Containerization) and DOC-01 (Final Documentation & Demo Guide) both unblocked and PLANNED.
+- **Timestamp:** 2026-09-08 00:33:00 IST
+- **Updated By:** Platform / Integration & GIS Data Teams (DATA-01 COMMITTED, DATA-02 COMMITTED, INT-04 IMPLEMENTED)
+- **Status Summary:** Real-world dataset inventory registered (DATA-01); PostGIS ingestion, live authoritative providers, and backend REST endpoints operational (DATA-02); Frontend GIS search, authoritative inspector, governance persistence, and 22-step Golden SIH demo flow fully validated (INT-04); All 555 backend tests and 282 frontend tests passing 100%.

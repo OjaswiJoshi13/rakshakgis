@@ -29,6 +29,8 @@ import {
 import {
   GIS_ACTIVE_MAP_LAYERS,
   FeatureDetailPanel,
+  GisSearchBar,
+  GisSearchResult,
   LayerControlPanel,
   MapCanvas,
   MapHeader,
@@ -193,6 +195,41 @@ export default function GisMapPage() {
     }
   };
 
+  const handleSelectSearchResult = (result: GisSearchResult) => {
+    if (result.coordinates && Array.isArray(result.coordinates)) {
+      const [lon, lat] = result.coordinates;
+      setViewportBounds([
+        [lon - 0.02, lat - 0.02],
+        [lon + 0.02, lat + 0.02],
+      ]);
+    }
+    let layerId = "habitations-points";
+    let layerCategory: "habitations" | "candidate_sites" | "red_zones" = "habitations";
+    if (result.entity_type === "candidate_site") {
+      layerId = "candidate-sites-points";
+      layerCategory = "candidate_sites";
+    } else if (result.entity_type === "red_zone") {
+      layerId = "red-zones-polygons";
+      layerCategory = "red_zones";
+    }
+
+    setSelectedFeature({
+      id: result.id,
+      layerId,
+      layerCategory,
+      properties: {
+        id: result.id,
+        name: result.name,
+        code: result.code,
+        entity_type: result.entity_type,
+        elevation_m: result.elevation_m,
+        slope_deg: result.slope_deg,
+      },
+      geometryType: "Point",
+      coordinates: result.coordinates || undefined,
+    });
+  };
+
   const isMapLoading = sitesLoading || routesLoading || redZonesLoading || villagesLoading;
   const hasMapErrors = sitesError || routesError || redZonesError || villagesError;
 
@@ -246,6 +283,11 @@ export default function GisMapPage() {
               isLoading={isMapLoading}
               className="w-full h-full"
             />
+
+            {/* Floating Spatial Search Bar (Top-Center) */}
+            <div className="absolute top-4 left-1/2 -translate-x-1/2 z-20 w-80 md:w-96 pointer-events-auto">
+              <GisSearchBar onSelectResult={handleSelectSearchResult} />
+            </div>
 
             {/* Floating Layer Control Panel (Top-Left) */}
             <div className="absolute top-4 left-4 max-w-xs w-full pointer-events-auto">

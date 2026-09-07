@@ -4,3 +4,4 @@ export * from "./FeatureDetailPanel";
 export * from "./MapHeader";
 export * from "./mapStyle";
 export * from "./layerConfig";
+export * from "./GisSearchBar";
