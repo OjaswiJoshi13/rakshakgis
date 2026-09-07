@@ -52,6 +52,17 @@ describe("ApiClient", () => {
       });
       expect(url).toBe("http://localhost:8000/api/v1/routes?profile=himalayan&limit=5");
     });
+
+    it("normalizes redundant /api/v1 prefix from path to ensure exactly one /api/v1 prefix", () => {
+      const urlWithPrefix = client.buildUrl("/api/v1/sites");
+      const urlWithoutPrefix = client.buildUrl("/sites");
+      const urlJustPrefix = client.buildUrl("/api/v1");
+
+      expect(urlWithPrefix).toBe("http://localhost:8000/api/v1/sites");
+      expect(urlWithoutPrefix).toBe("http://localhost:8000/api/v1/sites");
+      expect(urlJustPrefix).toBe("http://localhost:8000/api/v1");
+      expect(urlWithPrefix).toBe(urlWithoutPrefix);
+    });
   });
 
   describe("HTTP Requests and Headers", () => {

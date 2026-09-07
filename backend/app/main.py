@@ -28,6 +28,19 @@ async def lifespan(app: FastAPI) -> AsyncGenerator[None, None]:
         settings.APP_ENV,
         settings.DATA_MODE,
     )
+    if settings.APP_ENV == "development" and settings.DATA_MODE == "demo":
+        try:
+            from app.core.database import SessionLocal
+            from app.data.seed import seed_himalayan_pilot_data
+
+            db = SessionLocal()
+            try:
+                seed_himalayan_pilot_data(db)
+            finally:
+                db.close()
+        except Exception as e:
+            logger.warning("Development demo seeding encountered an issue during startup: %s", e)
+
     yield
     logger.info("Shutting down %s", settings.PROJECT_NAME)
 

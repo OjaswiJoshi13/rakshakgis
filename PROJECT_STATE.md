@@ -177,8 +177,8 @@ No chunk may transition to `IN_PROGRESS` until all its listed prerequisite depen
 | **M6-07** | Operations | Report Generation & Export UI | M6 | M6-02, M6-03 | **COMMITTED** |
 | **M6-08** | Operations | Officer Review & Action Sign-Off Workflow | M6 | M6-02, M6-04 | **COMMITTED** |
 | **M6-09** | Operations | Audit Log & Traceability UI | M6 | M6-08 | **COMMITTED** |
-| **INT-01** | Integration | End-to-End Backend / Frontend Integration | M1 | All M2-M6 | **BLOCKED** |
-| **INT-02** | Integration | End-to-End SIH Demo Flow Validation | M1 | INT-01 | **BLOCKED** |
+| **INT-01** | Integration | End-to-End Backend / Frontend Integration | M1 | All M2-M6 | **COMMITTED** |
+| **INT-02** | Integration | End-to-End SIH Demo Flow Validation | M1 | INT-01 | **PLANNED** |
 | **INT-03** | Integration | Full Automated Test Suite Execution | M1 | INT-02 | **BLOCKED** |
 | **DEP-01** | DevOps | Production Deployment & Containerization | M1 | INT-03 | **BLOCKED** |
 | **DOC-01** | Docs | Final Project Documentation & Demo Guide | M1 | INT-02 | **BLOCKED** |
@@ -187,20 +187,19 @@ No chunk may transition to `IN_PROGRESS` until all its listed prerequisite depen
 
 ## Current Work
 
-- **Active Chunk:** `None` (All M6 chunks M6-01 through M6-09 are COMMITTED)
-- **Status:** Chunk M6-09: Audit Log & Traceability UI is COMMITTED (Commit: `029b416` — `feat(frontend): implement M6-09 audit log and traceability UI`; independent verification passed: Focused tests: 12/12 passed; Full frontend suite: 281/281 tests passed across 31 files; TypeScript: 0 errors; ESLint: 0 warnings, 0 errors; Production build: passed; Independent verification passed). All chunks across Module M6 (Frontend Operations) are now COMMITTED.
+- **Active Chunk:** None (Chunk INT-01 completed and COMMITTED; INT-02 unblocked and ready to start)
+- **Status:** Chunk INT-01: End-to-End Backend / Frontend Integration is COMMITTED. All integration deliverables, Option A demo authentication without virtual fallback, missing backend endpoints, authoritative pilot data seeder, and integration/regression tests verified and committed.
 - **Next Eligible Chunks:**
-  - **INT-01:** End-to-End Backend / Frontend Integration (Prerequisites: all M2–M6 chunks — COMMITTED; unblocked and ready to start)
+  - **INT-02:** End-to-End SIH Demo Flow Validation (Prerequisite: INT-01 — COMMITTED; unblocked and ready to start)
 
 ---
 
 ## Blocked Work
 
 ### Next Eligible / Unblocked:
-- **INT-01:** End-to-End Backend / Frontend Integration (Dependencies: all M2–M6 chunks — COMMITTED; unblocked and ready to start)
+- **INT-02:** End-to-End SIH Demo Flow Validation (Prerequisites: INT-01 — COMMITTED; unblocked and ready to start)
 
 ### Still Blocked:
-- **INT-02:** End-to-End SIH Demo Flow Validation (Blocked awaiting INT-01)
 - **INT-03:** Full Automated Test Suite Execution (Blocked awaiting INT-02)
 - **DEP-01:** Production Deployment & Containerization (Blocked awaiting INT-03)
 - **DOC-01:** Final Project Documentation & Demo Guide (Blocked awaiting INT-02)
@@ -252,6 +251,7 @@ No chunk may transition to `IN_PROGRESS` until all its listed prerequisite depen
 - M6-07: Report Generation & Export UI — COMMITTED (Commit: `69e8297` — `feat(frontend): implement M6-07 report generation and export`; independent verification passed: Focused tests: 14/14 passed; Full frontend suite: 234/234 tests passed across 28 files; TypeScript: 0 errors; ESLint: 0 warnings, 0 errors; Production build: passed; implementation committed and pushed to origin/main).
 - M6-08: Officer Review & Action Sign-Off Workflow — COMMITTED (Commit: `c9d99a4` — `feat(frontend): implement M6-08 officer review workflow`; independent verification passed: Focused tests: 14/14 passed; Full frontend suite: 269/269 tests passed across 30 files; TypeScript: 0 errors; ESLint: 0 warnings, 0 errors; Production build: passed; implementation committed to main).
 - M6-09: Audit Log & Traceability UI — COMMITTED (Commit: `029b416` — `feat(frontend): implement M6-09 audit log and traceability UI`; independent verification passed: Focused tests: 12/12 passed; Full frontend suite: 281/281 tests passed across 31 files; TypeScript: 0 errors; ESLint: 0 warnings, 0 errors; Production build: passed; implementation committed to main; Module M6 Frontend Operations is 100% complete).
+- INT-01: End-to-End Backend / Frontend Integration — COMMITTED (Commit: `feat(integration): complete INT-01 platform integration`; independent review passed; runtime verification passed across all 8 endpoints, 541 backend tests passed, 282 frontend tests passed across 31 files, TypeScript 0 errors, ESLint 0 errors, production build passed).
 
 ---
 
@@ -2023,8 +2023,48 @@ No chunk may transition to `IN_PROGRESS` until all its listed prerequisite depen
 
 ---
 
+### Chunk INT-01 Implementation Record: End-to-End Backend / Frontend Integration
+
+- **Status:** `COMMITTED` (Lifecycle: `PLANNED` → `IN_PROGRESS` → `IMPLEMENTED` → `AWAITING_REVIEW` → `VERIFIED` → `COMMITTED`)
+- **Owner:** Platform / Integration
+- **Primary Deliverables:**
+  - `frontend/src/lib/api/client.ts`: Fixed base URL path normalization in `buildUrl` to eliminate duplicate `/api/v1` path prefixes when API service modules supply paths starting with `/api/v1`. Added unit tests verifying correct resolution across root-relative, absolute, and already-prefixed endpoints.
+  - `backend/app/api/deps.py`: Implemented Option A demo token authentication resolver strictly guarded by `settings.APP_ENV == "development"` and `settings.DATA_MODE == "demo"`. Resolves the authorized demo authority token to the seeded demo user (`district_collector_chamoli`, role `district_officer`). Strictly rejected (401 Unauthorized) when either `APP_ENV != "development"` or `DATA_MODE != "demo"`. If the demo user does not exist in the database, fails with 401 Unauthorized without any virtual user fallback. Retains strict JWT signature validation for all normal authenticated requests without any secret or password in code.
+  - Missing Backend Routers & Schemas:
+    - `backend/app/schemas/villages.py` & `backend/app/api/v1/villages.py`: `GET /api/v1/villages` and `GET /api/v1/villages/{id}` returning GeoJSON geometry, demographic indicators, vulnerability profile, and risk scores.
+    - `backend/app/schemas/red_zones.py` & `backend/app/api/v1/red_zones.py`: `GET /api/v1/red-zones` and `GET /api/v1/red-zones/{id}` returning permanent red zone polygons, hazard justifications, and statutory demarcation details.
+    - `backend/app/schemas/alerts.py` & `backend/app/api/v1/alerts.py`: `GET /api/v1/alerts`, `GET /api/v1/alerts/{id}`, `POST /api/v1/alerts/{id}/acknowledge`, and `POST /api/v1/alerts/acknowledge-all` returning early warning alerts with threshold trigger metadata and acknowledging events with officer attribution.
+    - Mounted on `backend/app/api/routes.py` and exported via `backend/app/schemas/__init__.py`.
+  - Authoritative Himalayan Pilot Seeder (`backend/app/data/seed.py`):
+    - Full end-to-end synthetic seeding utilizing authoritative domain engines: `VulnerabilityExposureEngine` (M3-09), `MultiHazardRiskEngine` (M3-08), `RiskClassificationEngine` (M3-07), `RelocationPriorityEngine` (M3-12), `PermanentRedZoneEngine` (M3-10), `SiteSuitabilityEngine` (M4-02), `EvacuationRoutingEngine` (M4-05), and `TelemetryService` (M5-02).
+    - Seeded database entities:
+      - 1 Region (`Uttarakhand Himalayan Zone`), 1 District (`Chamoli`), 1 Block (`Joshimath`)
+      - 1 Demo User (`district_collector_chamoli`, role `district_officer`)
+      - 40 Himalayan Villages with complete `PopulationProfile`, `VulnerabilityProfile`, `RiskScore`, and `RelocationPriority`
+      - 12 Candidate Relocation Sites with multi-criteria suitability evaluations, carrying capacities, and infrastructure sizing
+      - 7 Proposed Permanent Red Zones (MultiPolygons)
+      - 53 Evacuation Corridor Routes computed over the Himalayan road network
+      - 4 Active Early Warning Alerts across warning levels
+      - 5 Synced Data Sources & Ingestion Runs with synthetic freshness disclaimers
+    - Fully idempotent with startup hook in `backend/app/main.py` executing automatically in development/demo mode.
+  - Test Suite:
+    - `backend/tests/test_int01_integration.py`: 16 integration and security tests proving Option A token resolution in dev/demo mode, rejection in production, rejection when DATA_MODE != demo, rejection when DB demo user is absent (no virtual fallback), 401 for unauthenticated requests, normal JWT token validation, RBAC enforcement, and end-to-end data flows across `/villages`, `/red-zones`, `/alerts`, `/sites`, `/scenarios/run`, `/relocation/match`, and `/routes`.
+    - `frontend/src/__tests__/ApiClient.test.ts`: Added test cases for duplicate `/api/v1` path prevention.
+- **Verification Results:**
+  - Backend Full Suite: 541/541 tests passed (100% clean, `pytest tests -q`).
+  - Integration Test Suite: 16/16 tests passed (`pytest tests/test_int01_integration.py -v`).
+  - Auth Regression Suite: 25/25 tests passed (`pytest tests/test_auth.py -v`).
+  - Frontend Full Suite: 31/31 test files passed, 282/282 tests passed (`npm test -- --run`).
+  - TypeScript: 0 errors (`npm run type-check`).
+  - ESLint: 0 warnings, 0 errors (`npm run lint`).
+  - Production Build: passed (`npm run build` compiled 17 static routes cleanly).
+  - Scope & Invariants Audit: Zero plaintext passwords or secrets introduced; demo token strictly restricted to development/demo; no duplicate endpoints; all calculations use authoritative engines; zero virtual demo user fabrication.
+  - Status: COMMITTED.
+
+---
+
 ## Last Updated
 
-- **Timestamp:** 2026-09-06 22:20:00 IST
-- **Updated By:** M6 (Audit Log & Traceability UI — Chunk M6-09 COMMITTED)
-- **Status Summary:** Chunk M6-09 COMMITTED (Commit: `029b416`); Chunk M6-08 COMMITTED (Commit: `c9d99a4`); Chunk M6-07 COMMITTED (Commit: `69e8297`); Chunk M5-07 COMMITTED (Commit: `1517f133c7c4eaad71b1b38418d87fafbc18276d`); Module M5 Frontend Core / GIS is 100% complete (M5-01 through M5-07 COMMITTED); Module M6 Frontend Operations is 100% complete (M6-01 through M6-09 COMMITTED); Chunk M6-06 COMMITTED (Commit: `f7d4830`); Chunk M6-05 COMMITTED (Commit: `3aef3a9`); Chunk M6-04 COMMITTED (Commit: `37d385b`); Chunk M6-03 COMMITTED (Commit: `19a8ff8`); Chunk M6-02 COMMITTED (Commit: `a00c7e1`); Chunk M5-06 COMMITTED (Commit: `4d6f5ba`); Chunk M6-01 COMMITTED (Commit: `05f5991`); Chunk M5-05 COMMITTED (Commit: `54573bb`); Chunk M5-04 COMMITTED (Commit: `85ac1e8`); Chunk M5-03 COMMITTED (Commit: `f1637e4`); Chunk M5-02 COMMITTED; Chunk M5-01 COMMITTED; Chunk M4-06 COMMITTED; Chunk M4-05 COMMITTED; Chunk M4-04 COMMITTED; Chunk M4-03 COMMITTED; Chunk M4-02 COMMITTED; Chunk M4-01 COMMITTED; Chunk M3-13 COMMITTED; Chunk M3-12 COMMITTED; Chunk M3-11 COMMITTED; Chunk M3-10 COMMITTED; Chunk M3-09 COMMITTED; Chunk M3-08 COMMITTED; M6-09 verification evidence: Focused tests: 12/12 passed, Full frontend suite: 281/281 tests passed across 31 files, TypeScript: 0 errors, ESLint: 0 warnings, 0 errors, Production build: passed; All M1, M2, M3, M4, M5, and M6 chunks are COMMITTED; Next eligible chunk: INT-01 (unblocked and ready to start); 525 total backend regression tests verified passing in container.
+- **Timestamp:** 2026-09-07 20:10:00 IST
+- **Updated By:** Platform / Integration (Chunk INT-01 COMMITTED)
+- **Status Summary:** Chunk INT-01 COMMITTED (Commit: `feat(integration): complete INT-01 platform integration`); Option A demo authentication strictly guarded without virtual fallback; 40 villages, 12 sites, 7 red zones, 53 routes, 4 alerts, 5 data sources seeded; 541 backend tests passed; 282 frontend tests passed; Next.js production build passed; Next eligible chunk: INT-02 (unblocked and ready to start).

@@ -34,7 +34,12 @@ export class ApiClient {
   ): string {
     const isAbsolute = /^https?:\/\//i.test(path);
     const baseUrl = this.getBaseUrl();
-    const cleanPath = path.replace(/^\/+/, "");
+    let cleanPath = path.replace(/^\/+/, "");
+    if (baseUrl.endsWith("/api/v1") && cleanPath.startsWith("api/v1/")) {
+      cleanPath = cleanPath.slice("api/v1/".length);
+    } else if (baseUrl.endsWith("/api/v1") && cleanPath === "api/v1") {
+      cleanPath = "";
+    }
     const fullPath = isAbsolute ? path : cleanPath ? `${baseUrl}/${cleanPath}` : baseUrl;
 
     if (!params || Object.keys(params).length === 0) {

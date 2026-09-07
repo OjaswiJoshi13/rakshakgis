@@ -8,6 +8,7 @@ from fastapi import Depends
 from fastapi.security import HTTPAuthorizationCredentials, HTTPBearer
 from sqlalchemy.orm import Session
 
+from app.core.config import get_settings
 from app.core.database import get_db
 from app.core.exceptions import ForbiddenError, UnauthorizedError
 from app.core.security import decode_access_token
@@ -35,6 +36,24 @@ def get_current_user(
         raise UnauthorizedError("Authentication credentials were not provided.")
 
     token = credentials.credentials
+
+    # Secure token-level demo clearance (Option A: strictly restricted to development/demo mode)
+    settings = get_settings()
+    if (
+        settings.APP_ENV == "development"
+        and settings.DATA_MODE == "demo"
+        and token == "demo-authority-access-token"
+    ):
+        demo_user = (
+            db.query(User)
+            .filter(User.username == "district_collector_chamoli")
+            .first()
+        )
+        if demo_user is None:
+            raise UnauthorizedError("User associated with token does not exist.")
+        if not demo_user.is_active:
+            raise UnauthorizedError("User account is inactive.")
+        return demo_user
 
     try:
         payload = decode_access_token(token)
