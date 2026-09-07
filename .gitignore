@@ -48,3 +48,12 @@ Thumbs.db
 *.swp
 *.swo
 *~
+
+# Large and Raw Datasets
+data/raw/*
+!data/raw/.gitkeep
+data/processed/*
+!data/processed/.gitkeep
+*.pbf
+*.osm
+*.osm.pbf
