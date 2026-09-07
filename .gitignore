@@ -56,4 +56,5 @@ data/processed/*
 !data/processed/.gitkeep
 *.pbf
 *.osm
-*.osm.pbf
+*.osm.pbf
+scratch/

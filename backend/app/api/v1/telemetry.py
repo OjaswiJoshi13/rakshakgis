@@ -233,3 +233,47 @@ def probe_data_source(
     )
 
     return ResponseEnvelope(success=True, data=read_model)
+
+
+@telemetry_router.post(
+    "/import",
+    response_model=ResponseEnvelope[dict],
+    summary="Trigger data import",
+    description="Trigger automated data ingestion pipeline for live or static datasets.",
+)
+def import_data(
+    source_id: Optional[str] = Query(None, description="Optional data source identifier to sync"),
+    db: Session = Depends(get_db),
+):
+    """Trigger manual data import execution."""
+    from datetime import datetime, timezone
+    now = datetime.now(timezone.utc)
+
+    if source_id:
+        try:
+            summary = _telemetry_service.probe_and_sync_source(db, source_id)
+            return ResponseEnvelope(
+                success=True,
+                data={
+                    "status": "completed",
+                    "source_id": summary.source_id,
+                    "name": summary.name,
+                    "records_ingested": summary.records_ingested_total,
+                    "timestamp": now.isoformat(),
+                },
+            )
+        except DataSourceNotFoundError:
+            raise NotFoundError(message=f"Data source with identifier '{source_id}' was not found.")
+
+    # Platform-wide sync
+    synced = _telemetry_service.sync_registered_providers(db)
+    return ResponseEnvelope(
+        success=True,
+        data={
+            "status": "completed",
+            "message": f"Successfully checked and synced {len(synced)} authoritative data sources.",
+            "sources_synced": [s.name for s in synced],
+            "timestamp": now.isoformat(),
+        },
+    )
+

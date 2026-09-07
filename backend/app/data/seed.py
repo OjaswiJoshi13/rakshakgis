@@ -72,7 +72,16 @@ def seed_himalayan_pilot_data(db: Session, force: bool = False) -> Dict[str, int
         logger.info("Database already contains %d villages. Skipping seed.", village_count)
         return {"status": "skipped", "existing_villages": village_count}
 
+    if force:
+        logger.info("Force flag enabled; resetting existing demo data before re-seeding...")
+        # Clear child tables that might not cascade or might conflict
+        db.query(RedZone).delete()
+        db.query(CandidateSite).delete()
+        db.query(Region).delete()
+        db.commit()
+
     logger.info("Starting Himalayan Pilot Data Seeding (APP_ENV=%s, DATA_MODE=%s)...", settings.APP_ENV, settings.DATA_MODE)
+
 
     # 1. Load Synthetic Fixtures & Regional Profile
     dataset = load_himalayan_pilot_dataset()

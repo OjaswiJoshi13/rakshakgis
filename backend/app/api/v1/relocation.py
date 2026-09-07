@@ -41,6 +41,12 @@ def _resolve_matching_engine(profile_id: Optional[str]) -> RelocationMatchingEng
 
 
 @relocation_router.post(
+    "/recommend",
+    response_model=ResponseEnvelope[RelocationMatchingResult],
+    summary="Recommend relocation site matching",
+    description="Calculate deterministic greedy village-to-site relocation recommendations with full explainability.",
+)
+@relocation_router.post(
     "/match",
     response_model=ResponseEnvelope[RelocationMatchingResult],
     summary="Evaluate deterministic relocation matching",

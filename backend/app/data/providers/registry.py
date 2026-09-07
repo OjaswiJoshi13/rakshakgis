@@ -46,6 +46,33 @@ class ProviderRegistry:
         for p in defaults:
             self.register(p, set_default_for_categories=True)
 
+        self._load_authoritative_providers()
+
+    def _load_authoritative_providers(self) -> None:
+        """Register live and static authoritative data providers."""
+        try:
+            from app.core.config import get_settings
+            from app.data.providers.cwc_flood import CWCFloodProvider
+            from app.data.providers.ncs_earthquake import NCSEarthquakeProvider
+            from app.data.providers.open_meteo import OpenMeteoWeatherProvider
+            from app.data.providers.usgs_earthquake import USGSEarthquakeProvider
+
+            settings = get_settings()
+            make_default = settings.DATA_MODE in ["live", "full_data"]
+
+            live_providers = [
+                OpenMeteoWeatherProvider(),
+                CWCFloodProvider(),
+                USGSEarthquakeProvider(),
+                NCSEarthquakeProvider(),
+            ]
+            for p in live_providers:
+                self.register(p, set_default_for_categories=make_default)
+        except Exception as exc:
+            import logging
+            logging.getLogger("rakshakgis.providers").warning("Could not load authoritative providers: %s", exc)
+
+
     def register(
         self, provider: BaseDataProvider, set_default_for_categories: bool = True
     ) -> None:

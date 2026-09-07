@@ -239,7 +239,12 @@ class TelemetryService:
         total_failed = int(run_stats[1]) if run_stats else 0
 
         # 4. Determine last successful and attempted update timestamps
-        meta = source.metadata_json or {}
+        meta = dict(source.metadata_json or {})
+        if "disclaimer" not in meta:
+            meta["disclaimer"] = (
+                "DEMO / SYNTHETIC DATASET for SIH Problem Statement 26191. "
+                "Not official statutory or live operational government data."
+            )
         explicit_last_success = meta.get("last_successful_update")
         if latest_successful_run and latest_successful_run.completed_at:
             last_successful = latest_successful_run.completed_at
