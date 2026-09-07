@@ -22,8 +22,8 @@ export const PopulationExposureCard: React.FC<PopulationExposureCardProps> = ({
     <Card className="h-full">
       <CardHeader>
         <div className="flex items-center justify-between">
-          <CardTitle className="text-base font-medium text-slate-100 flex items-center gap-2">
-            <svg className="w-4 h-4 text-sky-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+          <CardTitle className="text-base font-semibold text-text-primary flex items-center gap-2">
+            <svg className="w-4 h-4 text-sky-600 dark:text-sky-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
               <path
                 strokeLinecap="round"
                 strokeLinejoin="round"
@@ -33,59 +33,59 @@ export const PopulationExposureCard: React.FC<PopulationExposureCardProps> = ({
             </svg>
             Demographics & Exposure
           </CardTitle>
-          <span className="text-xs font-mono text-slate-400">M3-09 Profile</span>
+          <span className="text-xs font-mono text-text-muted">M3-09 Profile</span>
         </div>
       </CardHeader>
 
       <CardContent>
         {/* Core Population Metrics Grid */}
         <div className="grid grid-cols-2 gap-3 mb-4">
-          <div className="bg-slate-950/80 border border-slate-800 rounded p-3">
-            <div className="text-xs font-mono text-slate-400 uppercase tracking-wider mb-1">
+          <div className="bg-surface-elevated border border-border-subtle rounded-md p-3">
+            <div className="text-xs font-medium text-text-muted mb-1">
               Total Population
             </div>
-            <div className="text-xl font-bold font-mono text-slate-100">
+            <div className="text-xl font-bold font-mono text-text-primary tabular-nums">
               {formatNum(demographics.total_population)}
             </div>
-            <div className="text-xs text-slate-500 mt-0.5">
+            <div className="text-xs text-text-muted mt-0.5">
               {demographics.total_population !== null ? "Authoritative census" : "Census record unavailable"}
             </div>
           </div>
 
-          <div className="bg-slate-950/80 border border-slate-800 rounded p-3">
-            <div className="text-xs font-mono text-slate-400 uppercase tracking-wider mb-1">
+          <div className="bg-surface-elevated border border-border-subtle rounded-md p-3">
+            <div className="text-xs font-medium text-text-muted mb-1">
               Total Households
             </div>
-            <div className="text-xl font-bold font-mono text-slate-100">
+            <div className="text-xl font-bold font-mono text-text-primary tabular-nums">
               {formatNum(demographics.households)}
             </div>
-            <div className="text-xs text-slate-500 mt-0.5">Settlement units</div>
+            <div className="text-xs text-text-muted mt-0.5">Settlement units</div>
           </div>
         </div>
 
         {/* Vulnerable Sub-groups Breakdown */}
-        <div className="space-y-2 border-t border-slate-800/80 pt-3">
-          <div className="text-xs font-mono font-medium text-slate-300 mb-2">
+        <div className="space-y-2 border-t border-border-subtle pt-3">
+          <div className="text-xs font-medium text-text-secondary mb-2">
             Vulnerable Demographics Breakdown
           </div>
 
-          <div className="flex items-center justify-between text-xs py-1 px-2 rounded bg-slate-950/40">
-            <span className="text-slate-400">Elderly Population (&ge; 60y)</span>
-            <span className="font-mono font-medium text-slate-200">
+          <div className="flex items-center justify-between text-xs py-1.5 px-2.5 rounded bg-surface-elevated border border-border-subtle">
+            <span className="text-text-muted">Elderly Population (&ge; 60y)</span>
+            <span className="font-mono font-semibold text-text-primary tabular-nums">
               {formatNum(demographics.elderly_count)}
             </span>
           </div>
 
-          <div className="flex items-center justify-between text-xs py-1 px-2 rounded bg-slate-950/40">
-            <span className="text-slate-400">Children (&le; 10y)</span>
-            <span className="font-mono font-medium text-slate-200">
+          <div className="flex items-center justify-between text-xs py-1.5 px-2.5 rounded bg-surface-elevated border border-border-subtle">
+            <span className="text-text-muted">Children (&le; 10y)</span>
+            <span className="font-mono font-semibold text-text-primary tabular-nums">
               {formatNum(demographics.children_count)}
             </span>
           </div>
 
-          <div className="flex items-center justify-between text-xs py-1 px-2 rounded bg-slate-950/40">
-            <span className="text-slate-500">Persons with Disabilities</span>
-            <span className="font-mono text-slate-500 italic">
+          <div className="flex items-center justify-between text-xs py-1.5 px-2.5 rounded bg-surface-elevated border border-border-subtle">
+            <span className="text-text-muted">Persons with Disabilities</span>
+            <span className="font-mono text-text-muted italic">
               {demographics.disabled_count !== undefined && demographics.disabled_count !== null
                 ? formatNum(demographics.disabled_count)
                 : "Unavailable from backend"}

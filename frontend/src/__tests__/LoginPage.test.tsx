@@ -30,7 +30,7 @@ describe("LoginPage (/login)", () => {
     );
 
     expect(screen.getByText("RakshakGIS")).toBeInTheDocument();
-    expect(screen.getByText("SIH 26191")).toBeInTheDocument();
+    expect(screen.getByText("Authority Access")).toBeInTheDocument();
     expect(
       screen.getByRole("heading", { name: /Authority Sign In/i })
     ).toBeInTheDocument();

@@ -152,8 +152,8 @@ function ScenariosOperationsContent() {
       }
     >
       {error && (
-        <div className="rounded-lg border border-rose-800 bg-rose-950/30 p-3 text-xs text-rose-200 flex items-center gap-2 font-mono">
-          <AlertCircle className="h-4 w-4 text-rose-400 shrink-0" />
+        <div className="rounded-lg border border-[#cf222e]/30 bg-[#cf222e]/10 p-3 text-xs text-[#cf222e] dark:text-[#ff7b72] flex items-center gap-2 font-mono">
+          <AlertCircle className="h-4 w-4 text-[#cf222e] dark:text-[#ff7b72] shrink-0" />
           <span>{error}</span>
         </div>
       )}
@@ -184,8 +184,8 @@ function ScenariosOperationsContent() {
               <ScenarioDeltaTabs simulationOutput={simulationOutput} />
             </>
           ) : (
-            <div className="rounded-lg border border-dashed border-slate-800 p-12 text-center text-xs text-slate-400 font-mono">
-              <Sliders className="h-8 w-8 mx-auto text-slate-600 mb-3" />
+            <div className="rounded-lg border border-dashed border-border-base p-12 text-center text-xs text-text-muted font-mono">
+              <Sliders className="h-8 w-8 mx-auto text-text-muted mb-3" />
               <p>Configure scenario parameters and execute a simulation to inspect before-vs-after delta impacts.</p>
             </div>
           )}

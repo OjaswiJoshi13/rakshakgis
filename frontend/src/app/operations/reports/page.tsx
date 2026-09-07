@@ -215,8 +215,8 @@ function ReportsOperationsContent() {
       <div className="space-y-6">
         {/* Export Success Notification Banner */}
         {exportNotice && (
-          <div className="flex items-center gap-2 rounded-lg border border-emerald-500/50 bg-emerald-950/40 p-3.5 text-xs text-emerald-200 shadow-md">
-            <CheckCircle2 className="h-4 w-4 text-emerald-400 shrink-0" />
+          <div className="flex items-center gap-2 rounded-lg border border-[#1a7f37]/40 bg-[#1a7f37]/10 p-3.5 text-xs text-[#1a7f37] dark:text-[#3fb950] shadow-2xs">
+            <CheckCircle2 className="h-4 w-4 text-[#1a7f37] dark:text-[#3fb950] shrink-0" />
             <span>{exportNotice}</span>
           </div>
         )}

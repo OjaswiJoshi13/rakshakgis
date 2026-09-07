@@ -8,8 +8,8 @@ export const HistoricalEventsCard: React.FC = () => {
     <Card className="h-full">
       <CardHeader>
         <div className="flex items-center justify-between">
-          <CardTitle className="text-base font-medium text-slate-100 flex items-center gap-2">
-            <svg className="w-4 h-4 text-slate-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+          <CardTitle className="text-base font-semibold text-text-primary flex items-center gap-2">
+            <svg className="w-4 h-4 text-text-muted" fill="none" viewBox="0 0 24 24" stroke="currentColor">
               <path
                 strokeLinecap="round"
                 strokeLinejoin="round"
@@ -19,13 +19,13 @@ export const HistoricalEventsCard: React.FC = () => {
             </svg>
             Historical Disaster Events
           </CardTitle>
-          <span className="text-xs font-mono text-slate-500">Registry</span>
+          <span className="text-xs font-mono text-text-muted">Registry</span>
         </div>
       </CardHeader>
 
       <CardContent>
-        <div className="p-4 bg-slate-950/60 border border-slate-800 rounded-lg text-center">
-          <div className="inline-flex items-center justify-center w-8 h-8 rounded-full bg-slate-800/80 text-slate-400 mb-2">
+        <div className="p-4 bg-surface-elevated border border-border-subtle rounded-md text-center">
+          <div className="inline-flex items-center justify-center w-8 h-8 rounded-full bg-surface-panel border border-border-subtle text-text-muted mb-2">
             <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
               <path
                 strokeLinecap="round"
@@ -35,10 +35,10 @@ export const HistoricalEventsCard: React.FC = () => {
               />
             </svg>
           </div>
-          <div className="text-sm font-medium text-slate-300 mb-1">
+          <div className="text-sm font-medium text-text-secondary mb-1">
             Historical Event Registry Unavailable
           </div>
-          <p className="text-xs text-slate-500 max-w-sm mx-auto leading-relaxed">
+          <p className="text-xs text-text-muted max-w-sm mx-auto leading-relaxed">
             Historical disaster event history endpoint is not yet exposed by the backend API. In compliance with RakshakGIS data integrity standards, no historical events are fabricated.
           </p>
         </div>

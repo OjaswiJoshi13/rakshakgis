@@ -161,24 +161,24 @@ function ReviewOperationsContent() {
     >
       <div className="space-y-6">
         {/* Officer Authority Header Badge */}
-        <div className="flex flex-wrap items-center justify-between gap-3 rounded-lg border border-slate-800/80 bg-slate-900/40 px-3.5 py-2.5 text-xs text-slate-300 font-mono">
+        <div className="flex flex-wrap items-center justify-between gap-3 rounded-md border border-border-base bg-surface-raised px-3.5 py-2.5 text-xs text-text-secondary font-mono shadow-2xs">
           <div className="flex items-center gap-2">
-            <ShieldCheck className="h-4 w-4 text-emerald-400 shrink-0" />
+            <ShieldCheck className="h-4 w-4 text-[#1a7f37] dark:text-[#3fb950] shrink-0" />
             <span>
               Authority Level:{" "}
-              <strong className="text-slate-200">
+              <strong className="text-text-primary">
                 {user?.role === "admin" ? "State / District Magistrate" : "District Disaster Officer"}
               </strong>{" "}
               ({user?.full_name || user?.username || "Officer Session Active"})
             </span>
           </div>
           <div className="flex items-center gap-3">
-            <div className="flex items-center gap-1.5 text-amber-400">
-              <span className="h-2 w-2 rounded-full bg-amber-400 animate-pulse" />
+            <div className="flex items-center gap-1.5 text-amber-800 dark:text-amber-300 font-medium">
+              <span className="h-2 w-2 rounded-full bg-amber-500 animate-pulse" />
               <span>{pendingCount} Pending Sign-Off</span>
             </div>
-            <span className="text-slate-600">|</span>
-            <div className="flex items-center gap-1.5 text-emerald-400">
+            <span className="text-border-base">|</span>
+            <div className="flex items-center gap-1.5 text-[#1a7f37] dark:text-[#3fb950] font-medium">
               <CheckCircle2 className="h-3.5 w-3.5" />
               <span>{approvedCount} Enacted</span>
             </div>
@@ -251,8 +251,8 @@ function ReviewOperationsContent() {
                 )}
               </>
             ) : (
-              <div className="rounded-lg border border-dashed border-slate-800 p-12 text-center text-xs text-slate-400">
-                <FileCheck2 className="h-8 w-8 mx-auto text-slate-600 mb-3" />
+              <div className="rounded-lg border border-dashed border-border-base p-12 text-center text-xs text-text-muted">
+                <FileCheck2 className="h-8 w-8 mx-auto text-text-muted mb-3" />
                 <p>Select a recommendation dossier from the queue to begin officer review.</p>
               </div>
             )}

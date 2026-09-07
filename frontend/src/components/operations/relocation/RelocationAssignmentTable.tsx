@@ -64,20 +64,20 @@ export const RelocationAssignmentTable: React.FC<RelocationAssignmentTableProps>
   }, [assignments, filter, searchQuery]);
 
   return (
-    <div className="space-y-4 rounded-lg border border-slate-800 bg-slate-900/60 p-4">
+    <div className="space-y-4 rounded-lg border border-border-base bg-surface-raised p-4 shadow-2xs">
       {/* Table Header: Filters & Search */}
       <div className="flex flex-wrap items-center justify-between gap-3">
         {/* Status Filter Tabs */}
-        <div className="inline-flex rounded-lg bg-slate-950 p-1 border border-slate-800" role="tablist">
+        <div className="inline-flex rounded-md bg-surface-base p-1 border border-border-base" role="tablist">
           <button
             type="button"
             role="tab"
             aria-selected={filter === "all"}
             onClick={() => setFilter("all")}
-            className={`px-3 py-1 text-xs font-medium rounded-md transition-colors ${
+            className={`px-3 py-1 text-xs font-medium rounded transition-all ${
               filter === "all"
-                ? "bg-slate-800 text-sky-300 font-semibold"
-                : "text-slate-400 hover:text-slate-200"
+                ? "bg-surface-raised dark:bg-[#21262d] text-text-primary border border-border-base dark:border-[#30363d] shadow-2xs font-semibold"
+                : "text-text-secondary hover:text-text-primary border border-transparent"
             }`}
           >
             All Villages ({assignments.length})
@@ -88,13 +88,13 @@ export const RelocationAssignmentTable: React.FC<RelocationAssignmentTableProps>
             role="tab"
             aria-selected={filter === "assigned"}
             onClick={() => setFilter("assigned")}
-            className={`px-3 py-1 text-xs font-medium rounded-md transition-colors flex items-center gap-1.5 ${
+            className={`px-3 py-1 text-xs font-medium rounded transition-all flex items-center gap-1.5 ${
               filter === "assigned"
-                ? "bg-emerald-950 text-emerald-300 font-semibold border border-emerald-800/60"
-                : "text-slate-400 hover:text-slate-200"
+                ? "bg-[#1a7f37]/10 text-[#1a7f37] dark:text-[#3fb950] font-semibold border border-[#1a7f37]/30 shadow-2xs"
+                : "text-text-secondary hover:text-text-primary border border-transparent"
             }`}
           >
-            <CheckCircle2 className="h-3 w-3 text-emerald-400" />
+            <CheckCircle2 className="h-3 w-3 text-[#1a7f37] dark:text-[#3fb950]" />
             <span>Assigned ({assignedCount})</span>
           </button>
 
@@ -103,40 +103,40 @@ export const RelocationAssignmentTable: React.FC<RelocationAssignmentTableProps>
             role="tab"
             aria-selected={filter === "unassigned"}
             onClick={() => setFilter("unassigned")}
-            className={`px-3 py-1 text-xs font-medium rounded-md transition-colors flex items-center gap-1.5 ${
+            className={`px-3 py-1 text-xs font-medium rounded transition-all flex items-center gap-1.5 ${
               filter === "unassigned"
-                ? "bg-amber-950 text-amber-300 font-semibold border border-amber-800/60"
-                : "text-slate-400 hover:text-slate-200"
+                ? "bg-amber-500/10 text-amber-800 dark:text-amber-300 font-semibold border border-amber-600/30 shadow-2xs"
+                : "text-text-secondary hover:text-text-primary border border-transparent"
             }`}
           >
-            <AlertCircle className="h-3 w-3 text-amber-400" />
+            <AlertCircle className="h-3 w-3 text-amber-600 dark:text-amber-400" />
             <span>Unassigned ({unassignedCount})</span>
           </button>
         </div>
 
         {/* Search Bar */}
         <div className="relative min-w-[240px] max-w-sm">
-          <Search className="absolute left-2.5 top-2.5 h-3.5 w-3.5 text-slate-500" />
+          <Search className="absolute left-2.5 top-2.5 h-3.5 w-3.5 text-text-muted" />
           <input
             type="text"
             value={searchQuery}
             onChange={(e) => setSearchQuery(e.target.value)}
             placeholder="Search village or site..."
-            className="w-full rounded-md border border-slate-700 bg-slate-950 pl-8 pr-3 py-1.5 text-xs text-slate-200 placeholder-slate-500 focus:border-sky-500 focus:outline-none font-mono"
+            className="w-full rounded-md border border-border-strong bg-surface-elevated pl-8 pr-3 py-1.5 text-xs text-text-primary placeholder:text-text-muted focus:border-focus-ring focus:outline-none"
           />
         </div>
       </div>
 
       {/* Village Assignments Table / Cards */}
       {filteredAssignments.length === 0 ? (
-        <div className="rounded-lg border border-dashed border-slate-800 p-8 text-center text-xs text-slate-400">
+        <div className="rounded-lg border border-border-subtle p-8 text-center text-xs text-text-muted">
           No village assignments match the current filter or search criteria.
         </div>
       ) : (
         <div className="overflow-x-auto">
           <table className="w-full text-left border-collapse text-xs">
             <thead>
-              <tr className="border-b border-slate-800 bg-slate-950/70 font-mono text-slate-400 uppercase tracking-wider">
+              <tr className="border-b border-border-subtle bg-surface-elevated/70 text-text-secondary text-xs font-semibold">
                 <th className="py-2.5 px-3">Village / Priority</th>
                 <th className="py-2.5 px-3">Relocation Demand</th>
                 <th className="py-2.5 px-3">Assignment Status</th>
@@ -147,20 +147,20 @@ export const RelocationAssignmentTable: React.FC<RelocationAssignmentTableProps>
                 <th className="py-2.5 px-3 text-right">Audit</th>
               </tr>
             </thead>
-            <tbody className="divide-y divide-slate-800/60 font-sans">
+            <tbody className="divide-y divide-border-subtle font-sans">
               {filteredAssignments.map((assignment) => {
                 const isAssigned = assignment.status === "assigned";
 
                 return (
                   <tr
                     key={String(assignment.village_id)}
-                    className="hover:bg-slate-800/40 transition-colors group"
+                    className="hover:bg-surface-raised/80 dark:hover:bg-[#161b22]/50 transition-colors group"
                   >
                     {/* Village Name & Priority */}
                     <td className="py-3 px-3">
-                      <div className="font-semibold text-slate-100 flex items-center gap-2">
+                      <div className="font-semibold text-text-primary flex items-center gap-2">
                         <span>{assignment.village_name}</span>
-                        <span className="text-[11px] font-mono text-slate-500 font-normal">
+                        <span className="text-[11px] font-mono text-text-muted font-normal">
                           #{assignment.village_id}
                         </span>
                       </div>
@@ -170,11 +170,11 @@ export const RelocationAssignmentTable: React.FC<RelocationAssignmentTableProps>
                     </td>
 
                     {/* Relocation Demand */}
-                    <td className="py-3 px-3 font-mono">
-                      <div className="text-slate-200 font-medium">
+                    <td className="py-3 px-3 font-mono tabular-nums">
+                      <div className="text-text-primary font-medium">
                         {assignment.incoming_households} HH
                       </div>
-                      <div className="text-slate-400 text-[11px]">
+                      <div className="text-text-muted text-[11px]">
                         {assignment.incoming_population
                           ? `${assignment.incoming_population} people`
                           : "—"}
@@ -206,22 +206,22 @@ export const RelocationAssignmentTable: React.FC<RelocationAssignmentTableProps>
                                 ? assignment.assigned_site_id.replace(/\D/g, "") || assignment.assigned_site_id
                                 : assignment.assigned_site_id
                             }`}
-                            className="font-medium text-sky-300 hover:text-sky-200 hover:underline flex items-center gap-1 group/link"
+                            className="font-medium text-text-primary hover:underline flex items-center gap-1.5 group/link"
                             title="Inspect site infrastructure and suitability details"
                           >
-                            <Building2 className="h-3.5 w-3.5 text-sky-400 shrink-0" />
+                            <Building2 className="h-3.5 w-3.5 text-text-muted shrink-0" />
                             <span>{assignment.assigned_site_name}</span>
                           </Link>
-                          <div className="text-[11px] font-mono text-slate-500">
+                          <div className="text-xs text-text-muted">
                             Site ID: {assignment.assigned_site_id}
                           </div>
                         </div>
                       ) : (
                         <div>
-                          <span className="text-amber-300/90 font-mono text-[11px]">
+                          <span className="text-amber-800 dark:text-amber-300 font-mono text-[11px]">
                             Code: [{assignment.unassigned_code || "INSUFFICIENT_CAPACITY"}]
                           </span>
-                          <p className="text-[11px] text-slate-400 line-clamp-1 max-w-xs" title={assignment.unassigned_reason || ""}>
+                          <p className="text-[11px] text-text-secondary line-clamp-1 max-w-xs" title={assignment.unassigned_reason || ""}>
                             {assignment.unassigned_reason || "No feasible candidate site"}
                           </p>
                         </div>
@@ -229,42 +229,42 @@ export const RelocationAssignmentTable: React.FC<RelocationAssignmentTableProps>
                     </td>
 
                     {/* Distance Proximity */}
-                    <td className="py-3 px-3 font-mono text-slate-300">
+                    <td className="py-3 px-3 font-mono tabular-nums text-text-secondary">
                       {assignment.distance_km !== null && assignment.distance_km !== undefined ? (
                         <span className="flex items-center gap-1">
-                          <MapPin className="h-3 w-3 text-slate-400" />
+                          <MapPin className="h-3 w-3 text-text-muted" />
                           <span>{assignment.distance_km.toFixed(1)} km</span>
                         </span>
                       ) : (
-                        <span className="text-slate-500">—</span>
+                        <span className="text-text-muted">—</span>
                       )}
                     </td>
 
                     {/* Suitability Score */}
-                    <td className="py-3 px-3 font-mono">
+                    <td className="py-3 px-3 font-mono tabular-nums">
                       {assignment.suitability_score !== null && assignment.suitability_score !== undefined ? (
-                        <span className="text-emerald-400 font-medium">
+                        <span className="text-[#1a7f37] dark:text-[#3fb950] font-medium">
                           {assignment.suitability_score.toFixed(1)}
                         </span>
                       ) : (
-                        <span className="text-slate-500">—</span>
+                        <span className="text-text-muted">—</span>
                       )}
                     </td>
 
                     {/* Capacity Impact */}
-                    <td className="py-3 px-3 font-mono">
+                    <td className="py-3 px-3 font-mono tabular-nums">
                       {isAssigned &&
                       assignment.available_capacity_before !== null &&
                       assignment.available_capacity_after !== null ? (
-                        <div className="text-slate-300 text-[11px]">
+                        <div className="text-text-secondary text-[11px]">
                           <span>{assignment.available_capacity_before}</span>
-                          <span className="text-slate-500 mx-1">→</span>
-                          <span className="text-sky-400 font-semibold">
+                          <span className="text-text-muted mx-1">→</span>
+                          <span className="text-[#0969da] dark:text-[#2f81f7] font-semibold">
                             {assignment.available_capacity_after} HH
                           </span>
                         </div>
                       ) : (
-                        <span className="text-slate-500">—</span>
+                        <span className="text-text-muted">—</span>
                       )}
                     </td>
 

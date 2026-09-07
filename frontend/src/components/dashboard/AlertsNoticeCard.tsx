@@ -22,9 +22,9 @@ export const AlertsNoticeCard: React.FC = () => {
               Early warning thresholds and dynamic red zone event triggers under regional SOPs.
             </CardDescription>
           </div>
-          <Badge variant="outline" size="sm" className="font-mono text-[11px] text-sky-400">
-            Pipeline: M6-05 Real-Time
-          </Badge>
+          <span className="font-mono text-[11px] text-slate-400 bg-slate-900 border border-slate-800 px-2 py-0.5 rounded">
+            Early Warning Pipeline<span className="sr-only"> M6-05</span>
+          </span>
         </div>
       </CardHeader>
 

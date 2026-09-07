@@ -20,56 +20,56 @@ export const VillageIdentityHeader: React.FC<VillageIdentityHeaderProps> = ({
   const isRedZone = habitation.risk.is_red_zone_triggered;
 
   return (
-    <div className="bg-slate-900 border border-slate-800 rounded-lg p-6 mb-6 shadow-sm">
+    <div className="bg-surface-panel border border-border-subtle rounded-lg p-5 mb-5">
       <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-4">
         {/* Left: Settlement Identity */}
         <div>
           <div className="flex items-center gap-3 flex-wrap mb-2">
-            <h1 className="text-2xl font-bold tracking-tight text-slate-100 font-mono">
+            <h1 className="text-xl sm:text-2xl font-bold tracking-tight text-text-primary">
               {habitation.name}
             </h1>
-            <span className="text-xs font-mono px-2 py-0.5 rounded bg-slate-800 border border-slate-700 text-slate-300">
+            <span className="text-xs px-2 py-0.5 rounded bg-surface-elevated border border-border-subtle text-text-secondary">
               ID: {habitation.id}
             </span>
             {habitation.census_code && (
-              <span className="text-xs font-mono px-2 py-0.5 rounded bg-slate-800 border border-slate-700 text-slate-400">
+              <span className="text-xs px-2 py-0.5 rounded bg-surface-elevated border border-border-subtle text-text-muted">
                 Census: {habitation.census_code}
               </span>
             )}
             {/* Red Zone Status Pill */}
             {isRedZone ? (
               <Badge variant="danger" size="sm" aria-label="Red Zone Trigger Status: Active Trigger Proposal">
-                RED ZONE TRIGGER ACTIVE
+                Red Zone Trigger Active
               </Badge>
             ) : (
               <Badge variant="outline" size="sm" aria-label="Red Zone Trigger Status: Standard Monitoring">
-                STANDARD MONITORING
+                Standard Monitoring
               </Badge>
             )}
           </div>
 
           {/* Context Metadata */}
-          <div className="flex items-center gap-4 text-xs font-mono text-slate-400 flex-wrap">
+          <div className="flex items-center gap-4 text-xs text-text-muted flex-wrap">
             <span>
-              <strong className="text-slate-500">Region:</strong> {habitation.region_profile_id || "—"}
+              <strong className="text-text-secondary font-medium">Region:</strong> {habitation.region_profile_id || "—"}
             </span>
-            <span aria-hidden="true" className="text-slate-700">•</span>
+            <span aria-hidden="true" className="text-border-strong">•</span>
             <span>
-              <strong className="text-slate-500">District:</strong> {habitation.district || "—"}
+              <strong className="text-text-secondary font-medium">District:</strong> {habitation.district || "—"}
             </span>
-            <span aria-hidden="true" className="text-slate-700">•</span>
+            <span aria-hidden="true" className="text-border-strong">•</span>
             <span>
-              <strong className="text-slate-500">Block:</strong> {habitation.block || "—"}
+              <strong className="text-text-secondary font-medium">Block:</strong> {habitation.block || "—"}
             </span>
-            <span aria-hidden="true" className="text-slate-700">•</span>
+            <span aria-hidden="true" className="text-border-strong">•</span>
             <span>
-              <strong className="text-slate-500">Location:</strong> {coordsFormatted}
+              <strong className="text-text-secondary font-medium">Location:</strong> {coordsFormatted}
             </span>
             {habitation.elevation_m !== undefined && habitation.elevation_m !== null && (
               <>
-                <span aria-hidden="true" className="text-slate-700">•</span>
+                <span aria-hidden="true" className="text-border-strong">•</span>
                 <span>
-                  <strong className="text-slate-500">Elevation:</strong> {habitation.elevation_m} m
+                  <strong className="text-text-secondary font-medium">Elevation:</strong> {habitation.elevation_m} m
                 </span>
               </>
             )}
@@ -80,7 +80,7 @@ export const VillageIdentityHeader: React.FC<VillageIdentityHeaderProps> = ({
         <div className="flex items-center gap-3 self-start lg:self-center">
           <Link
             href="/gis"
-            className="inline-flex items-center gap-2 px-3 py-1.5 text-xs font-mono font-medium rounded border border-sky-700/60 bg-sky-950/40 text-sky-300 hover:bg-sky-900/60 transition-colors focus:outline-none focus:ring-1 focus:ring-sky-500"
+            className="inline-flex items-center gap-2 px-3 py-1.5 text-xs font-medium rounded-md border border-border-strong bg-surface-elevated text-text-primary hover:bg-surface-elevated/80 transition-colors focus:outline-none focus:ring-1 focus:ring-focus-ring"
             aria-label={`View ${habitation.name} on GIS Interactive Map`}
           >
             <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">

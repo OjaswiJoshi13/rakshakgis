@@ -18,16 +18,16 @@ export const Alert: React.FC<AlertProps> = ({
   ...props
 }) => {
   const severityStyles = {
-    info: "bg-sky-950/60 border-sky-800 text-sky-200",
-    warning: "bg-amber-950/60 border-amber-800 text-amber-200",
-    danger: "bg-red-950/80 border-red-700 text-red-200",
-    success: "bg-emerald-950/60 border-emerald-800 text-emerald-200",
+    info: "bg-sky-50 border-sky-200 text-sky-900 dark:bg-sky-950/50 dark:border-sky-800 dark:text-sky-200",
+    warning: "bg-amber-50 border-amber-200 text-amber-900 dark:bg-amber-950/50 dark:border-amber-800 dark:text-amber-200",
+    danger: "bg-red-50 border-red-200 text-red-900 dark:bg-red-950/60 dark:border-red-800 dark:text-red-200",
+    success: "bg-emerald-50 border-emerald-200 text-emerald-900 dark:bg-emerald-950/50 dark:border-emerald-800 dark:text-emerald-200",
   };
 
   const defaultIcons = {
     info: (
       <svg
-        className="w-4 h-4 text-sky-400 shrink-0"
+        className="w-4 h-4 text-sky-600 dark:text-sky-400 shrink-0"
         fill="none"
         viewBox="0 0 24 24"
         stroke="currentColor"
@@ -43,7 +43,7 @@ export const Alert: React.FC<AlertProps> = ({
     ),
     warning: (
       <svg
-        className="w-4 h-4 text-amber-400 shrink-0"
+        className="w-4 h-4 text-amber-600 dark:text-amber-400 shrink-0"
         fill="none"
         viewBox="0 0 24 24"
         stroke="currentColor"
@@ -59,7 +59,7 @@ export const Alert: React.FC<AlertProps> = ({
     ),
     danger: (
       <svg
-        className="w-4 h-4 text-red-400 shrink-0"
+        className="w-4 h-4 text-red-600 dark:text-red-400 shrink-0"
         fill="none"
         viewBox="0 0 24 24"
         stroke="currentColor"
@@ -75,7 +75,7 @@ export const Alert: React.FC<AlertProps> = ({
     ),
     success: (
       <svg
-        className="w-4 h-4 text-emerald-400 shrink-0"
+        className="w-4 h-4 text-emerald-600 dark:text-emerald-400 shrink-0"
         fill="none"
         viewBox="0 0 24 24"
         stroke="currentColor"
@@ -104,18 +104,18 @@ export const Alert: React.FC<AlertProps> = ({
       <div className="pt-0.5">{icon || defaultIcons[severity]}</div>
       <div className="flex-1 min-w-0">
         {title && (
-          <h4 className="font-semibold leading-tight text-slate-100 text-sm mb-1">
+          <h4 className="font-semibold leading-tight text-current text-sm mb-1">
             {title}
           </h4>
         )}
-        <div className="text-xs text-slate-300 leading-relaxed">{children}</div>
+        <div className="text-xs text-current leading-relaxed">{children}</div>
       </div>
       {onClose && (
         <button
           type="button"
           onClick={onClose}
           aria-label="Dismiss alert"
-          className="text-slate-400 hover:text-slate-100 p-1 -mr-1 -mt-1 rounded hover:bg-slate-800/60 focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-slate-400"
+          className="text-current opacity-60 hover:opacity-100 p-1 -mr-1 -mt-1 rounded hover:bg-black/5 dark:hover:bg-white/10 focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-current"
         >
           <svg
             className="w-4 h-4"

@@ -6,6 +6,8 @@ import { DATA_MODE_CONFIG, DataMode } from "@/design-system/tokens";
 import { StatusIndicator } from "@/components/ui/StatusIndicator";
 import { Badge } from "@/components/ui/Badge";
 import { useAuth } from "@/context/AuthContext";
+import { useTheme } from "@/context/ThemeContext";
+import { Sun, Moon } from "lucide-react";
 
 export interface CommandHeaderProps {
   onToggleSidebar?: () => void;
@@ -18,12 +20,12 @@ export const CommandHeader: React.FC<CommandHeaderProps> = ({
 }) => {
   const router = useRouter();
   const { user, isAuthenticated, logout } = useAuth();
+  const { resolvedTheme, toggleTheme } = useTheme();
   const [currentTime, setCurrentTime] = useState<string>("");
 
   useEffect(() => {
     const updateTime = () => {
       const now = new Date();
-      // Format in IST / UTC standard for disaster operations
       const timeStr = now.toLocaleTimeString("en-IN", {
         timeZone: "Asia/Kolkata",
         hour12: false,
@@ -68,14 +70,14 @@ export const CommandHeader: React.FC<CommandHeaderProps> = ({
   };
 
   return (
-    <header className="sticky top-0 z-40 flex h-14 w-full items-center justify-between border-b border-slate-800 bg-slate-950/90 px-4 backdrop-blur transition-all">
+    <header className="sticky top-0 z-40 flex h-14 w-full items-center justify-between border-b border-border-subtle bg-surface-panel/95 px-4 backdrop-blur transition-colors">
       <div className="flex items-center gap-3">
         {onToggleSidebar && (
           <button
             type="button"
             onClick={onToggleSidebar}
             aria-label={isSidebarOpen ? "Collapse navigation sidebar" : "Expand navigation sidebar"}
-            className="rounded p-1.5 text-slate-400 hover:bg-slate-800 hover:text-slate-100 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-sky-500 lg:hidden"
+            className="rounded p-1.5 text-text-muted hover:bg-black/5 dark:hover:bg-white/10 hover:text-text-primary focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-sky-500 lg:hidden"
           >
             <svg
               className="h-5 w-5"
@@ -87,73 +89,82 @@ export const CommandHeader: React.FC<CommandHeaderProps> = ({
                 strokeLinecap="round"
                 strokeLinejoin="round"
                 strokeWidth={2}
-                d={isSidebarOpen ? "M4 6h16M4 12h16M4 18h16" : "M4 6h16M4 12h16M4 18h16"}
+                d="M4 6h16M4 12h16M4 18h16"
               />
             </svg>
           </button>
         )}
 
         <div className="flex items-center gap-2.5">
-          <div className="flex h-8 w-8 items-center justify-center rounded bg-sky-950 border border-sky-600 text-sky-400 font-bold font-mono text-sm tracking-tighter">
+          <div className="flex h-7 w-7 items-center justify-center rounded bg-slate-900 text-slate-100 dark:bg-slate-800 border border-border-strong font-bold font-mono text-xs tracking-wider shadow-xs">
             RG
           </div>
           <div className="flex flex-col">
-            <div className="flex items-center gap-2">
-              <span className="font-bold tracking-tight text-slate-100 text-sm sm:text-base">
+            <div className="flex items-center gap-1.5">
+              <span className="font-semibold tracking-tight text-text-primary text-sm">
                 RakshakGIS
               </span>
-              <span className="hidden sm:inline-flex rounded bg-slate-800 px-1.5 py-0.2 text-[10px] font-mono text-slate-400 uppercase tracking-widest border border-slate-700">
-                SIH 26191
-              </span>
             </div>
-            <span className="text-[10px] text-slate-400 hidden md:block">
-              Multi-Hazard Risk & Relocation Decision Support
+            <span className="text-[10px] text-text-muted hidden md:block leading-none">
+              Disaster Management Decision Support System
             </span>
           </div>
         </div>
       </div>
 
-      <div className="flex items-center gap-2 sm:gap-4">
-        {/* Active Region & Mode Badge */}
-        <div className="hidden lg:flex items-center gap-2">
-          <span className="text-xs text-slate-400 font-mono">Region:</span>
-          <Badge variant="outline" size="sm" className="normal-case font-sans">
-            Himalayan Pilot (Chamoli)
-          </Badge>
-        </div>
-
-        <span
-          className={`inline-flex items-center rounded border px-2 py-0.5 text-xs font-mono font-semibold tracking-wider uppercase ${modeConfig.badgeClass}`}
-        >
-          {modeConfig.label}
-        </span>
-
-        {/* Operational Clock */}
-        <div className="hidden sm:flex items-center gap-1.5 font-mono text-xs text-slate-300 bg-slate-900 border border-slate-800 rounded px-2.5 py-1 tabular-nums">
-          <span className="w-1.5 h-1.5 rounded-full bg-sky-400" />
-          <span>{currentTime || "00:00:00 IST"}</span>
+      <div className="flex items-center gap-2 sm:gap-3">
+        {/* Unified Sector, Mode & Clock Strip */}
+        <div className="hidden lg:flex items-center divide-x divide-border-subtle bg-surface-elevated/70 border border-border-subtle rounded-md text-xs py-0.5">
+          <div className="flex items-center gap-1.5 px-2.5">
+            <span className="text-[11px] text-text-muted">Sector:</span>
+            <span className="font-medium text-text-primary text-xs">Himalayan Pilot Sector</span>
+          </div>
+          <div className="px-2">
+            <span className={`text-[11px] font-medium ${modeConfig.badgeClass}`}>
+              {modeConfig.label}
+            </span>
+          </div>
+          <div className="flex items-center gap-1.5 px-2.5 text-xs text-text-muted tabular-nums">
+            <span className="w-1.5 h-1.5 rounded-full bg-emerald-600 dark:bg-emerald-400 inline-block" />
+            <span>{currentTime || "00:00:00 IST"}</span>
+          </div>
         </div>
 
         {/* System Health State */}
-        <div className="hidden md:flex items-center border-l border-slate-800 pl-3">
+        <div className="hidden md:flex items-center">
           <StatusIndicator status="normal" label="Operational" />
         </div>
 
+        {/* Theme Toggle Button */}
+        <button
+          type="button"
+          onClick={toggleTheme}
+          title={`Switch to ${resolvedTheme === "dark" ? "light" : "dark"} mode`}
+          aria-label="Toggle visual theme"
+          className="flex h-8 w-8 items-center justify-center rounded-md border border-border-strong bg-surface-elevated text-text-secondary hover:text-text-primary hover:bg-black/5 dark:hover:bg-white/10 transition-colors"
+        >
+          {resolvedTheme === "dark" ? (
+            <Sun className="h-4 w-4 text-amber-400" />
+          ) : (
+            <Moon className="h-4 w-4 text-slate-700" />
+          )}
+        </button>
+
         {/* User / Session Information */}
-        <div className="flex items-center gap-2.5 border-l border-slate-800 pl-3">
+        <div className="flex items-center gap-2 border-l border-border-subtle pl-2.5">
           {isAuthenticated && user ? (
             <div className="flex items-center gap-2">
               <div
-                className="flex h-7 w-7 items-center justify-center rounded-full bg-sky-950 border border-sky-600 text-xs font-mono font-bold text-sky-300"
+                className="flex h-7 w-7 items-center justify-center rounded-full bg-slate-200 text-slate-800 dark:bg-slate-800 dark:text-slate-200 border border-border-strong text-xs font-semibold"
                 title={`${user.full_name} (${user.email})${user.department ? ` • ${user.department}` : ""}`}
               >
                 {getInitials()}
               </div>
               <div className="hidden xl:flex flex-col text-left">
-                <span className="text-xs font-semibold text-slate-200 leading-tight truncate max-w-[140px]">
+                <span className="text-xs font-medium text-text-primary leading-tight truncate max-w-[140px]">
                   {user.full_name || user.username}
                 </span>
-                <span className="text-[10px] text-slate-400 font-mono">
+                <span className="text-[11px] text-text-muted">
                   {roleLabels[user.role] || user.role}
                 </span>
               </div>
@@ -162,7 +173,7 @@ export const CommandHeader: React.FC<CommandHeaderProps> = ({
                 onClick={handleLogout}
                 title="Sign out of command center"
                 aria-label="Sign out"
-                className="rounded px-2 py-1 text-xs text-slate-400 hover:bg-slate-800 hover:text-slate-100 focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-sky-500 font-mono transition-colors"
+                className="rounded px-2 py-1 text-xs text-text-muted hover:bg-surface-elevated hover:text-text-primary focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-sky-500 font-medium transition-colors"
               >
                 Sign Out
               </button>
@@ -171,7 +182,7 @@ export const CommandHeader: React.FC<CommandHeaderProps> = ({
             <button
               type="button"
               onClick={() => router.push("/login")}
-              className="rounded bg-sky-600/20 border border-sky-500/40 px-2.5 py-1 text-xs font-medium text-sky-300 hover:bg-sky-600/30 hover:text-white focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-sky-400 transition-colors"
+              className="rounded bg-surface-elevated border border-border-strong px-2.5 py-1 text-xs font-medium text-text-primary hover:bg-surface-panel transition-colors"
             >
               Sign In
             </button>

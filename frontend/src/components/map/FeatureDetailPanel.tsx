@@ -60,10 +60,10 @@ export const FeatureDetailPanel: React.FC<FeatureDetailPanelProps> = ({
     <div className="space-y-3">
       <div className="flex items-start justify-between gap-2">
         <div>
-          <span className="text-[10px] font-mono uppercase tracking-wider text-sky-400">
+          <span className="text-[10px] font-mono uppercase tracking-wider text-sky-600 dark:text-sky-400">
             Candidate Safe Haven #{feature.id}
           </span>
-          <h3 className="text-sm font-bold text-slate-100 leading-snug">
+          <h3 className="text-sm font-bold text-text-primary leading-snug">
             {String(props.name || `Site #${feature.id}`)}
           </h3>
         </div>
@@ -84,41 +84,41 @@ export const FeatureDetailPanel: React.FC<FeatureDetailPanelProps> = ({
         </Badge>
       </div>
 
-      <div className="grid grid-cols-2 gap-2 text-[11px] font-mono bg-slate-900/80 p-2.5 rounded border border-slate-800">
+      <div className="grid grid-cols-2 gap-2 text-[11px] font-mono bg-surface-elevated p-2.5 rounded border border-border-subtle">
         <div>
-          <span className="text-slate-400 block text-[10px]">Elevation</span>
-          <span className="font-semibold text-slate-200">
+          <span className="text-text-muted block text-[10px]">Elevation</span>
+          <span className="font-semibold text-text-primary">
             {props.elevation_m !== null && props.elevation_m !== undefined
               ? `${props.elevation_m} m`
               : "—"}
           </span>
         </div>
         <div>
-          <span className="text-slate-400 block text-[10px]">Terrain Slope</span>
-          <span className="font-semibold text-slate-200">
+          <span className="text-text-muted block text-[10px]">Terrain Slope</span>
+          <span className="font-semibold text-text-primary">
             {props.terrain_slope_deg !== null && props.terrain_slope_deg !== undefined
               ? `${props.terrain_slope_deg}°`
               : "—"}
           </span>
         </div>
         <div>
-          <span className="text-slate-400 block text-[10px]">Surveyed Area</span>
-          <span className="font-semibold text-slate-200">
+          <span className="text-text-muted block text-[10px]">Surveyed Area</span>
+          <span className="font-semibold text-text-primary">
             {props.area_sq_m !== null && props.area_sq_m !== undefined
               ? `${Number(props.area_sq_m).toLocaleString()} m²`
               : "—"}
           </span>
         </div>
         <div>
-          <span className="text-slate-400 block text-[10px]">District Code</span>
-          <span className="font-semibold text-slate-200">
+          <span className="text-text-muted block text-[10px]">District Code</span>
+          <span className="font-semibold text-text-primary">
             {props.district_id !== undefined ? `DIST-${props.district_id}` : "—"}
           </span>
         </div>
       </div>
 
       {feature.coordinates && (
-        <div className="text-[10px] font-mono text-slate-400">
+        <div className="text-[10px] font-mono text-text-muted">
           Location: {feature.coordinates[0].toFixed(5)}, {feature.coordinates[1].toFixed(5)} (WGS84)
         </div>
       )}
@@ -129,10 +129,10 @@ export const FeatureDetailPanel: React.FC<FeatureDetailPanelProps> = ({
     <div className="space-y-3">
       <div className="flex items-start justify-between gap-2">
         <div>
-          <span className="text-[10px] font-mono uppercase tracking-wider text-emerald-400">
+          <span className="text-[10px] font-mono uppercase tracking-wider text-emerald-600 dark:text-emerald-400">
             Evacuation Corridor #{feature.id}
           </span>
-          <h3 className="text-sm font-bold text-slate-100 leading-snug">
+          <h3 className="text-sm font-bold text-text-primary leading-snug">
             {String(props.name || `Route #${feature.id}`)}
           </h3>
         </div>
@@ -145,30 +145,30 @@ export const FeatureDetailPanel: React.FC<FeatureDetailPanelProps> = ({
         </Badge>
       </div>
 
-      <div className="grid grid-cols-2 gap-2 text-[11px] font-mono bg-slate-900/80 p-2.5 rounded border border-slate-800">
+      <div className="grid grid-cols-2 gap-2 text-[11px] font-mono bg-surface-elevated p-2.5 rounded border border-border-subtle">
         <div>
-          <span className="text-slate-400 block text-[10px]">Distance</span>
-          <span className="font-semibold text-slate-200">
+          <span className="text-text-muted block text-[10px]">Distance</span>
+          <span className="font-semibold text-text-primary">
             {props.distance_km !== undefined ? `${props.distance_km} km` : "—"}
           </span>
         </div>
         <div>
-          <span className="text-slate-400 block text-[10px]">Estimated Transit</span>
-          <span className="font-semibold text-slate-200">
+          <span className="text-text-muted block text-[10px]">Estimated Transit</span>
+          <span className="font-semibold text-text-primary">
             {props.estimated_travel_time_min !== null && props.estimated_travel_time_min !== undefined
               ? `${props.estimated_travel_time_min} min`
               : "—"}
           </span>
         </div>
         <div>
-          <span className="text-slate-400 block text-[10px]">Route Classification</span>
-          <span className="font-semibold text-slate-200 capitalize">
+          <span className="text-text-muted block text-[10px]">Route Classification</span>
+          <span className="font-semibold text-text-primary capitalize">
             {String(props.route_type || "Standard")}
           </span>
         </div>
         <div>
-          <span className="text-slate-400 block text-[10px]">Max Incline</span>
-          <span className="font-semibold text-slate-200">
+          <span className="text-text-muted block text-[10px]">Max Incline</span>
+          <span className="font-semibold text-text-primary">
             {props.max_slope_deg !== null && props.max_slope_deg !== undefined
               ? `${props.max_slope_deg}°`
               : "—"}
@@ -177,18 +177,18 @@ export const FeatureDetailPanel: React.FC<FeatureDetailPanelProps> = ({
       </div>
 
       {Boolean(props.origin_village_name || props.destination_site_name) && (
-        <div className="text-[11px] bg-slate-900/50 p-2 rounded border border-slate-800/80 space-y-1">
-          <div className="text-slate-400">
-            From: <strong className="text-slate-200">{String(props.origin_village_name || "—")}</strong>
+        <div className="text-[11px] bg-surface-elevated/70 p-2 rounded border border-border-subtle space-y-1">
+          <div className="text-text-muted">
+            From: <strong className="text-text-primary">{String(props.origin_village_name || "—")}</strong>
           </div>
-          <div className="text-slate-400">
-            To: <strong className="text-slate-200">{String(props.destination_site_name || "—")}</strong>
+          <div className="text-text-muted">
+            To: <strong className="text-text-primary">{String(props.destination_site_name || "—")}</strong>
           </div>
         </div>
       )}
 
       {Boolean(props.is_blocked && props.blockage_reason) && (
-        <div className="text-[11px] text-red-300 bg-red-950/50 border border-red-900/80 p-2 rounded font-mono">
+        <div className="text-[11px] text-red-700 dark:text-red-300 bg-red-500/10 border border-red-500/30 p-2 rounded font-mono">
           Hazard Notice: {String(props.blockage_reason)}
         </div>
       )}
@@ -214,10 +214,10 @@ export const FeatureDetailPanel: React.FC<FeatureDetailPanelProps> = ({
       <div className="space-y-3" data-testid="red-zone-detail-card">
         <div className="flex items-start justify-between gap-2">
           <div>
-            <span className="text-[10px] font-mono uppercase tracking-wider text-rose-400">
+            <span className="text-[10px] font-mono uppercase tracking-wider text-rose-600 dark:text-rose-400">
               Red Zone #{feature.id}
             </span>
-            <h3 className="text-sm font-bold text-slate-100 leading-snug">
+            <h3 className="text-sm font-bold text-text-primary leading-snug">
               {String(props.name || `Red Zone #${feature.id}`)}
             </h3>
           </div>
@@ -236,41 +236,41 @@ export const FeatureDetailPanel: React.FC<FeatureDetailPanelProps> = ({
           </Badge>
         </div>
 
-        <div className="grid grid-cols-2 gap-2 text-[11px] font-mono bg-slate-900/80 p-2.5 rounded border border-slate-800">
+        <div className="grid grid-cols-2 gap-2 text-[11px] font-mono bg-surface-elevated p-2.5 rounded border border-border-subtle">
           <div>
-            <span className="text-slate-400 block text-[10px]">Threat Type</span>
-            <span className="font-semibold text-slate-200 capitalize">
+            <span className="text-text-muted block text-[10px]">Threat Type</span>
+            <span className="font-semibold text-text-primary capitalize">
               {zoneType}
             </span>
           </div>
           <div>
-            <span className="text-slate-400 block text-[10px]">Demarcated Area</span>
-            <span className="font-semibold text-slate-200">
+            <span className="text-text-muted block text-[10px]">Demarcated Area</span>
+            <span className="font-semibold text-text-primary">
               {area}
             </span>
           </div>
           <div>
-            <span className="text-slate-400 block text-[10px]">Status</span>
-            <span className="font-semibold text-amber-400">
+            <span className="text-text-muted block text-[10px]">Status</span>
+            <span className="font-semibold text-amber-600 dark:text-amber-400">
               {props.is_active ? "Active Statutory" : "Proposed Candidate"}
             </span>
           </div>
           <div>
-            <span className="text-slate-400 block text-[10px]">Contributing Settlements</span>
-            <span className="font-semibold text-slate-200">
+            <span className="text-text-muted block text-[10px]">Contributing Settlements</span>
+            <span className="font-semibold text-text-primary">
               {contributingCount > 0 ? `${contributingCount} Habitations` : "None recorded"}
             </span>
           </div>
         </div>
 
         {Array.isArray(props.contributing_village_ids) && props.contributing_village_ids.length > 0 && (
-          <div className="text-[10px] font-mono text-slate-400 bg-slate-900/40 p-2 rounded border border-slate-800/60">
+          <div className="text-[10px] font-mono text-text-muted bg-surface-elevated/70 p-2 rounded border border-border-subtle">
             Village IDs: {props.contributing_village_ids.join(", ")}
           </div>
         )}
 
-        <div className="text-[10px] text-amber-300 bg-amber-950/40 border border-amber-800/60 p-2 rounded font-mono leading-relaxed">
-          <strong className="text-amber-400 block mb-0.5">RULE 12 GOVERNANCE INVARIANT:</strong>
+        <div className="text-[10px] text-amber-800 dark:text-amber-300 bg-amber-500/10 border border-amber-500/30 p-2 rounded font-mono leading-relaxed">
+          <strong className="text-amber-700 dark:text-amber-400 block mb-0.5">RULE 12 GOVERNANCE INVARIANT:</strong>
           {governanceNotice}
         </div>
       </div>
@@ -281,29 +281,29 @@ export const FeatureDetailPanel: React.FC<FeatureDetailPanelProps> = ({
     <div className="space-y-3" data-testid="habitation-detail-card">
       <div className="flex items-start justify-between gap-2">
         <div>
-          <span className="text-[10px] font-mono uppercase tracking-wider text-amber-400">
+          <span className="text-[10px] font-mono uppercase tracking-wider text-amber-600 dark:text-amber-400">
             Habitation Settlement #{feature.id}
           </span>
-          <h3 className="text-sm font-bold text-slate-100 leading-snug">
+          <h3 className="text-sm font-bold text-text-primary leading-snug">
             {String(props.name || `Village #${feature.id}`)}
           </h3>
         </div>
-        <Badge variant="outline" size="sm" className="font-mono">
+        <Badge variant="outline" size="sm" className="font-mono text-text-secondary border-border-strong">
           {props.census_code ? `Census: ${props.census_code}` : "Settlement"}
         </Badge>
       </div>
 
       {isLoadingAuthoritative && (
-        <div className="text-[10px] text-sky-400 font-mono animate-pulse">
+        <div className="text-[10px] text-sky-600 dark:text-sky-400 font-mono animate-pulse">
           Querying authoritative backend entity records...
         </div>
       )}
 
       {/* Authoritative Population & Demographics (Census 2011) */}
-      <div className="grid grid-cols-2 gap-2 text-[11px] font-mono bg-slate-900/80 p-2.5 rounded border border-slate-800">
+      <div className="grid grid-cols-2 gap-2 text-[11px] font-mono bg-surface-elevated p-2.5 rounded border border-border-subtle">
         <div>
-          <span className="text-slate-400 block text-[10px]">Population (Census)</span>
-          <span className="font-semibold text-slate-200">
+          <span className="text-text-muted block text-[10px]">Population (Census)</span>
+          <span className="font-semibold text-text-primary">
             {authoritativeData?.population?.total !== null && authoritativeData?.population?.total !== undefined
               ? `${Number(authoritativeData.population.total).toLocaleString()} persons`
               : props.population !== undefined && props.population !== null
@@ -312,22 +312,22 @@ export const FeatureDetailPanel: React.FC<FeatureDetailPanelProps> = ({
           </span>
         </div>
         <div>
-          <span className="text-slate-400 block text-[10px]">Households</span>
-          <span className="font-semibold text-slate-200">
+          <span className="text-text-muted block text-[10px]">Households</span>
+          <span className="font-semibold text-text-primary">
             {authoritativeData?.population?.households !== null && authoritativeData?.population?.households !== undefined
               ? `${Number(authoritativeData.population.households).toLocaleString()} HH`
               : "—"}
           </span>
         </div>
         <div>
-          <span className="text-slate-400 block text-[10px]">Elevation</span>
-          <span className="font-semibold text-slate-200">
+          <span className="text-text-muted block text-[10px]">Elevation</span>
+          <span className="font-semibold text-text-primary">
             {props.elevation_m !== null && props.elevation_m !== undefined ? `${props.elevation_m} m` : "—"}
           </span>
         </div>
         <div>
-          <span className="text-slate-400 block text-[10px]">Slope Angle</span>
-          <span className="font-semibold text-slate-200">
+          <span className="text-text-muted block text-[10px]">Slope Angle</span>
+          <span className="font-semibold text-text-primary">
             {props.slope_deg !== null && props.slope_deg !== undefined ? `${props.slope_deg}°` : "—"}
           </span>
         </div>
@@ -335,9 +335,9 @@ export const FeatureDetailPanel: React.FC<FeatureDetailPanelProps> = ({
 
       {/* Authoritative Risk Assessment */}
       {(authoritativeData?.risk?.score !== null && authoritativeData?.risk?.score !== undefined || props.risk_score !== undefined) && (
-        <div className="bg-slate-900/90 border border-slate-800 rounded p-2.5 space-y-1.5 font-mono text-[11px]">
+        <div className="bg-surface-elevated border border-border-subtle rounded p-2.5 space-y-1.5 font-mono text-[11px]">
           <div className="flex items-center justify-between">
-            <span className="text-slate-400 text-[10px] uppercase">Composite Risk</span>
+            <span className="text-text-muted text-[10px] uppercase">Composite Risk</span>
             <Badge
               variant={
                 (authoritativeData?.risk?.band || props.risk_band) === "CRITICAL"
@@ -353,15 +353,15 @@ export const FeatureDetailPanel: React.FC<FeatureDetailPanelProps> = ({
           </div>
 
           {authoritativeData?.red_zone?.is_in_red_zone && (
-            <div className="text-[10px] text-red-300 bg-red-950/40 border border-red-800/60 p-1.5 rounded">
-              <strong>RED ZONE WARNING:</strong> Habitation located within declared Red Zone perimeter ({authoritativeData.red_zone.details?.danger_level?.toUpperCase()}).
+            <div className="text-[10px] text-red-700 dark:text-red-300 bg-red-500/10 border border-red-500/30 p-1.5 rounded">
+              <strong className="text-red-700 dark:text-red-400">RED ZONE WARNING:</strong> Habitation located within declared Red Zone perimeter ({authoritativeData.red_zone.details?.danger_level?.toUpperCase()}).
             </div>
           )}
         </div>
       )}
 
       {feature.coordinates && (
-        <div className="text-[10px] font-mono text-slate-400">
+        <div className="text-[10px] font-mono text-text-muted">
           Coords: {feature.coordinates[0].toFixed(5)}, {feature.coordinates[1].toFixed(5)}
         </div>
       )}
@@ -370,14 +370,14 @@ export const FeatureDetailPanel: React.FC<FeatureDetailPanelProps> = ({
 
   const renderGenericDetails = () => (
     <div className="space-y-2">
-      <h3 className="text-sm font-bold text-slate-100">
+      <h3 className="text-sm font-bold text-text-primary">
         Feature #{feature.id} ({feature.geometryType})
       </h3>
       <div className="max-h-48 overflow-y-auto space-y-1 text-xs font-mono">
         {Object.entries(props).map(([key, value]) => (
-          <div key={key} className="flex items-center justify-between border-b border-slate-800/40 py-1">
-            <span className="text-slate-400 capitalize">{key.replace(/_/g, " ")}:</span>
-            <span className="text-slate-200 font-semibold">{String(value ?? "—")}</span>
+          <div key={key} className="flex items-center justify-between border-b border-border-subtle py-1">
+            <span className="text-text-muted capitalize">{key.replace(/_/g, " ")}:</span>
+            <span className="text-text-primary font-semibold">{String(value ?? "—")}</span>
           </div>
         ))}
       </div>
@@ -386,15 +386,15 @@ export const FeatureDetailPanel: React.FC<FeatureDetailPanelProps> = ({
 
   return (
     <div
-      className={`bg-slate-950/95 backdrop-blur-md border border-slate-800 rounded-xl shadow-2xl p-4 text-xs z-20 max-w-sm w-full ${className}`}
+      className={`bg-surface-panel/95 backdrop-blur-md border border-border-subtle rounded-xl shadow-2xl p-4 text-xs z-20 max-w-sm w-full ${className}`}
       data-testid="feature-detail-panel"
       role="dialog"
       aria-labelledby="feature-detail-title"
     >
-      <div className="flex items-center justify-between border-b border-slate-800/80 pb-2 mb-3">
+      <div className="flex items-center justify-between border-b border-border-subtle pb-2 mb-3">
         <span
           id="feature-detail-title"
-          className="font-mono text-[11px] uppercase tracking-wider text-slate-400 font-semibold"
+          className="font-mono text-[11px] uppercase tracking-wider text-text-muted font-semibold"
         >
           Spatial Feature Inspector
         </span>
@@ -402,7 +402,7 @@ export const FeatureDetailPanel: React.FC<FeatureDetailPanelProps> = ({
           variant="secondary"
           size="sm"
           onClick={onClose}
-          className="h-6 w-6 p-0 text-slate-400 hover:text-slate-100"
+          className="h-6 w-6 p-0 text-text-muted hover:text-text-primary"
           aria-label="Close feature details"
         >
           &times;

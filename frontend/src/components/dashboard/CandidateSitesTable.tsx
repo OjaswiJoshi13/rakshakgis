@@ -72,7 +72,7 @@ export const CandidateSitesTable: React.FC<CandidateSitesTableProps> = ({
             </CardDescription>
           </div>
           {totalCount !== undefined && (
-            <span className="text-xs font-mono font-medium text-slate-400 bg-slate-900 border border-slate-800 px-2 py-1 rounded">
+            <span className="text-xs font-mono font-medium text-text-secondary bg-surface-elevated border border-border-subtle px-2 py-1 rounded">
               {totalCount} Total Registered Sites
             </span>
           )}
@@ -81,24 +81,24 @@ export const CandidateSitesTable: React.FC<CandidateSitesTableProps> = ({
 
       <CardContent>
         {isLoading ? (
-          <div className="py-8 text-center text-slate-400 font-mono text-sm animate-pulse">
+          <div className="py-8 text-center text-text-muted font-mono text-sm animate-pulse">
             Loading candidate relocation safe havens...
           </div>
         ) : isError ? (
-          <div className="rounded-lg border border-red-900/60 bg-red-950/30 p-4 text-sm text-red-300">
+          <div className="rounded-lg border border-red-500/30 bg-red-500/10 p-4 text-sm text-red-600 dark:text-red-400">
             <div className="font-semibold mb-1">Failed to Load Candidate Sites</div>
-            <p className="text-xs text-red-400">
+            <p className="text-xs text-red-600/80 dark:text-red-400/80">
               {errorMessage || "Unable to retrieve relocation sites from backend."}
             </p>
           </div>
         ) : !sites || sites.length === 0 ? (
-          <div className="py-8 text-center text-slate-500 text-sm font-mono">
+          <div className="py-8 text-center text-text-muted text-sm font-mono">
             No candidate relocation sites found for the active region.
           </div>
         ) : (
-          <div className="overflow-x-auto rounded-lg border border-slate-800">
-            <table className="w-full text-left text-xs text-slate-300">
-              <thead className="bg-slate-950 text-[11px] font-mono text-slate-400 uppercase tracking-wider border-b border-slate-800">
+          <div className="overflow-x-auto rounded-lg border border-border-subtle">
+            <table className="w-full text-left text-xs text-text-secondary">
+              <thead className="bg-surface-elevated/80 text-[11px] font-mono text-text-muted uppercase tracking-wider border-b border-border-subtle">
                 <tr>
                   <th className="px-3 py-2.5">Site ID</th>
                   <th className="px-3 py-2.5">Site Name</th>
@@ -108,23 +108,23 @@ export const CandidateSitesTable: React.FC<CandidateSitesTableProps> = ({
                   <th className="px-3 py-2.5">Coordinates (Lon, Lat)</th>
                 </tr>
               </thead>
-              <tbody className="divide-y divide-slate-800/60 bg-slate-900/40">
+              <tbody className="divide-y divide-border-subtle bg-surface-panel">
                 {sites.map((site) => {
                   const [lon, lat] = site.location?.coordinates || [0, 0];
                   return (
-                    <tr key={site.id} className="hover:bg-slate-800/40 transition-colors">
-                      <td className="px-3 py-2 font-mono text-slate-400">#{site.id}</td>
-                      <td className="px-3 py-2 font-medium text-slate-200">{site.name}</td>
+                    <tr key={site.id} className="hover:bg-surface-elevated/60 transition-colors">
+                      <td className="px-3 py-2 font-mono text-text-muted">#{site.id}</td>
+                      <td className="px-3 py-2 font-medium text-text-primary">{site.name}</td>
                       <td className="px-3 py-2">{getStatusBadge(site.status)}</td>
-                      <td className="px-3 py-2 text-right font-mono text-slate-300">
+                      <td className="px-3 py-2 text-right font-mono text-text-secondary">
                         {site.elevation_m !== null ? `${site.elevation_m}m` : "—"}
                       </td>
-                      <td className="px-3 py-2 text-right font-mono text-slate-300">
+                      <td className="px-3 py-2 text-right font-mono text-text-secondary">
                         {site.area_sq_m !== null
                           ? `${Math.round(site.area_sq_m).toLocaleString()} m²`
                           : "—"}
                       </td>
-                      <td className="px-3 py-2 font-mono text-[11px] text-slate-400">
+                      <td className="px-3 py-2 font-mono text-[11px] text-text-muted">
                         {lon.toFixed(4)}, {lat.toFixed(4)}
                       </td>
                     </tr>

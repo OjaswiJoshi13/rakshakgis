@@ -8,7 +8,7 @@ import { cn } from "@/lib/utils";
 export interface NavItem {
   name: string;
   href: string;
-  chunkId: string;
+  chunkId?: string;
   status: "active" | "planned";
   icon: React.ReactNode;
 }
@@ -21,33 +21,20 @@ export interface SidebarProps {
 export const Sidebar: React.FC<SidebarProps> = ({ isOpen = true, onClose }) => {
   const pathname = usePathname();
 
-  const platformItems: NavItem[] = [
+  const primaryNavigation: NavItem[] = [
     {
-      name: "System Foundation",
-      href: "/",
-      chunkId: "M5-01",
-      status: "active",
-      icon: (
-        <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2V6zM14 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2V6zM4 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2v-2zM14 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2v-2z" />
-        </svg>
-      ),
-    },
-    {
-      name: "Executive Dashboard",
+      name: "Command Overview",
       href: "/dashboard",
-      chunkId: "M5-04",
       status: "active",
       icon: (
         <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z" />
+          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6" />
         </svg>
       ),
     },
     {
-      name: "MapLibre GIS Canvas",
+      name: "GIS Map Canvas",
       href: "/gis",
-      chunkId: "M5-05",
       status: "active",
       icon: (
         <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -56,9 +43,8 @@ export const Sidebar: React.FC<SidebarProps> = ({ isOpen = true, onClose }) => {
       ),
     },
     {
-      name: "Village Vulnerability",
+      name: "Settlement Analysis",
       href: "/villages",
-      chunkId: "M5-06",
       status: "active",
       icon: (
         <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -66,24 +52,9 @@ export const Sidebar: React.FC<SidebarProps> = ({ isOpen = true, onClose }) => {
         </svg>
       ),
     },
-  ];
-
-  const operationsItems: NavItem[] = [
-    {
-      name: "Operations Hub",
-      href: "/operations",
-      chunkId: "M6-01",
-      status: "active",
-      icon: (
-        <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z" />
-        </svg>
-      ),
-    },
     {
       name: "Relocation Planner",
       href: "/operations/relocation",
-      chunkId: "M6-02",
       status: "active",
       icon: (
         <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -94,7 +65,6 @@ export const Sidebar: React.FC<SidebarProps> = ({ isOpen = true, onClose }) => {
     {
       name: "Relocation Sites",
       href: "/operations/sites",
-      chunkId: "M6-03",
       status: "active",
       icon: (
         <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -106,7 +76,6 @@ export const Sidebar: React.FC<SidebarProps> = ({ isOpen = true, onClose }) => {
     {
       name: "Scenario Simulator",
       href: "/operations/scenarios",
-      chunkId: "M6-04",
       status: "active",
       icon: (
         <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -117,7 +86,6 @@ export const Sidebar: React.FC<SidebarProps> = ({ isOpen = true, onClose }) => {
     {
       name: "Threshold Warnings",
       href: "/operations/alerts",
-      chunkId: "M6-05",
       status: "active",
       icon: (
         <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -126,20 +94,8 @@ export const Sidebar: React.FC<SidebarProps> = ({ isOpen = true, onClose }) => {
       ),
     },
     {
-      name: "Data Sources",
-      href: "/operations/sources",
-      chunkId: "M6-06",
-      status: "active",
-      icon: (
-        <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 7v10c0 2.21 3.582 4 8 4s8-1.79 8-4V7M4 7c0 2.21 3.582 4 8 4s8-1.79 8-4M4 7c0-2.21 3.582-4 8-4s8 1.79 8 4m0 5c0 2.21-3.582 4-8 4s-8-1.79-8-4" />
-        </svg>
-      ),
-    },
-    {
-      name: "Reports & Export",
+      name: "Reports & Dossiers",
       href: "/operations/reports",
-      chunkId: "M6-07",
       status: "active",
       icon: (
         <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -150,7 +106,6 @@ export const Sidebar: React.FC<SidebarProps> = ({ isOpen = true, onClose }) => {
     {
       name: "Officer Sign-Off",
       href: "/operations/review",
-      chunkId: "M6-08",
       status: "active",
       icon: (
         <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -161,7 +116,6 @@ export const Sidebar: React.FC<SidebarProps> = ({ isOpen = true, onClose }) => {
     {
       name: "Audit & Traceability",
       href: "/operations/audit",
-      chunkId: "M6-09",
       status: "active",
       icon: (
         <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -171,13 +125,12 @@ export const Sidebar: React.FC<SidebarProps> = ({ isOpen = true, onClose }) => {
     },
   ];
 
-
   return (
     <>
       {/* Mobile backdrop */}
       {isOpen && (
         <div
-          className="fixed inset-0 z-30 bg-black/60 backdrop-blur-sm lg:hidden"
+          className="fixed inset-0 z-30 bg-black/50 backdrop-blur-sm lg:hidden"
           onClick={onClose}
           aria-hidden="true"
         />
@@ -185,126 +138,50 @@ export const Sidebar: React.FC<SidebarProps> = ({ isOpen = true, onClose }) => {
 
       <aside
         className={cn(
-          "fixed top-14 bottom-8 left-0 z-30 flex w-64 flex-col border-r border-slate-800 bg-slate-950 transition-transform duration-200 ease-in-out lg:static lg:translate-x-0",
+          "fixed top-14 bottom-8 left-0 z-30 flex w-60 flex-col border-r border-border-subtle bg-surface-panel transition-transform duration-200 ease-in-out lg:static lg:translate-x-0",
           isOpen ? "translate-x-0" : "-translate-x-full"
         )}
-        aria-label="Platform Modules Navigation"
+        aria-label="Platform Operations Navigation"
       >
-        <div className="p-3 border-b border-slate-800/80">
-          <span className="text-[11px] font-mono font-semibold uppercase tracking-wider text-slate-400">
-            Platform Modules
+        <div className="px-3.5 py-3 border-b border-border-subtle">
+          <span className="text-xs font-semibold text-text-muted">
+            Decision Instruments
           </span>
         </div>
 
-        <nav className="flex-1 space-y-3 p-2 overflow-y-auto">
-          {/* Platform Core Modules */}
-          <div className="space-y-1">
-            <div className="px-2 pt-1 pb-0.5">
-              <span className="text-[10px] font-mono font-semibold uppercase tracking-wider text-slate-400">
-                Platform Core
-              </span>
-            </div>
-            {platformItems.map((item) => {
-              const isActive =
-                item.href === "/"
-                  ? pathname === "/"
-                  : pathname === item.href || pathname?.startsWith(`${item.href}/`);
-              return (
-                <div key={item.chunkId}>
-                  {item.status === "active" ? (
-                    <Link
-                      href={item.href}
-                      onClick={onClose}
-                      aria-current={isActive ? "page" : undefined}
-                      className={cn(
-                        "flex items-center justify-between rounded-md px-3 py-2 text-xs font-medium transition-colors group",
-                        isActive
-                          ? "bg-sky-950/80 text-sky-200 border border-sky-800/60 font-semibold"
-                          : "text-slate-300 hover:bg-slate-900 hover:text-slate-100"
-                      )}
-                    >
-                      <div className="flex items-center gap-2.5">
-                        <span className={cn(isActive ? "text-sky-400" : "text-slate-400 group-hover:text-slate-200")}>
-                          {item.icon}
-                        </span>
-                        <span>{item.name}</span>
-                      </div>
-                      <span className="rounded bg-sky-900/60 border border-sky-700/50 px-1 py-0.5 text-[10px] font-mono text-sky-300">
-                        {item.chunkId}
-                      </span>
-                    </Link>
-                  ) : (
-                    <div
-                      className="flex items-center justify-between rounded-md px-3 py-2 text-xs font-medium text-slate-500 hover:text-slate-400 transition-colors select-none cursor-not-allowed"
-                      title={`Scheduled for Chunk ${item.chunkId}`}
-                    >
-                      <div className="flex items-center gap-2.5">
-                        <span className="text-slate-600">{item.icon}</span>
-                        <span>{item.name}</span>
-                      </div>
-                      <span className="rounded bg-slate-900 border border-slate-800 px-1 py-0.5 text-[9px] font-mono text-slate-500">
-                        {item.chunkId}
-                      </span>
-                    </div>
-                  )}
-                </div>
-              );
-            })}
-          </div>
-
-          {/* Officer Operations Modules (M6) */}
-          <div className="space-y-1 pt-1 border-t border-slate-800/80">
-            <div className="px-2 pt-1 pb-0.5 flex items-center justify-between">
-              <span className="text-[10px] font-mono font-semibold uppercase tracking-wider text-sky-400">
-                Officer Operations
-              </span>
-              <span className="rounded bg-sky-950/80 border border-sky-700/50 px-1 py-0.2 text-[9px] font-mono text-sky-400">
-                M6
-              </span>
-            </div>
-            {operationsItems.map((item) => {
-              const isActive =
-                item.href === "/operations"
-                  ? pathname === "/operations"
-                  : pathname === item.href || pathname?.startsWith(`${item.href}/`);
-              return (
-                <div key={item.chunkId}>
-                  <Link
-                    href={item.href}
-                    onClick={onClose}
-                    aria-current={isActive ? "page" : undefined}
-                    className={cn(
-                      "flex items-center justify-between rounded-md px-3 py-2 text-xs font-medium transition-colors group",
-                      isActive
-                        ? "bg-sky-950/80 text-sky-200 border border-sky-800/60 font-semibold"
-                        : "text-slate-300 hover:bg-slate-900 hover:text-slate-100"
-                    )}
-                  >
-                    <div className="flex items-center gap-2.5">
-                      <span className={cn(isActive ? "text-sky-400" : "text-slate-400 group-hover:text-slate-200")}>
-                        {item.icon}
-                      </span>
-                      <span>{item.name}</span>
-                    </div>
-                    <span className="rounded bg-sky-900/60 border border-sky-700/50 px-1 py-0.5 text-[10px] font-mono text-sky-300">
-                      {item.chunkId}
-                    </span>
-                  </Link>
-                </div>
-              );
-            })}
-          </div>
+        <nav className="flex-1 space-y-0.5 p-2 overflow-y-auto">
+          {primaryNavigation.map((item) => {
+            const isActive =
+              item.href === "/" || item.href === "/dashboard"
+                ? pathname === "/" || pathname === "/dashboard"
+                : pathname === item.href || pathname?.startsWith(`${item.href}/`);
+            return (
+              <Link
+                key={item.href}
+                href={item.href}
+                onClick={onClose}
+                aria-current={isActive ? "page" : undefined}
+                className={cn(
+                  "flex items-center gap-2.5 rounded-md px-3 py-2 text-xs font-medium transition-all group",
+                  isActive
+                    ? "bg-surface-elevated text-text-primary font-semibold"
+                    : "text-text-secondary hover:bg-surface-elevated/60 hover:text-text-primary"
+                )}
+              >
+                <span className={cn(isActive ? "text-text-primary" : "text-text-muted group-hover:text-text-secondary transition-colors")}>
+                  {item.icon}
+                </span>
+                <span>{item.name}</span>
+              </Link>
+            );
+          })}
         </nav>
 
-        {/* Status Footer within Sidebar */}
-        <div className="border-t border-slate-800/80 p-3 bg-slate-950/50 text-[11px] font-mono text-slate-400 space-y-1.5">
+        {/* Operational Footer within Sidebar */}
+        <div className="border-t border-border-subtle px-3.5 py-2.5 bg-surface-subtle text-xs text-text-muted">
           <div className="flex items-center justify-between">
-            <span>Core Foundation</span>
-            <span className="text-emerald-400">M5-01 READY</span>
-          </div>
-          <div className="flex items-center justify-between">
-            <span>Operations Shell</span>
-            <span className="text-sky-400">M6-01 READY</span>
+            <span>Platform Core</span>
+            <span className="text-emerald-700 dark:text-emerald-400 font-medium">OPERATIONAL</span>
           </div>
         </div>
       </aside>

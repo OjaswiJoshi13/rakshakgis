@@ -18,10 +18,12 @@ export const Card = forwardRef<HTMLDivElement, CardProps>(
     ref
   ) => {
     const variantStyles = {
-      default: "bg-slate-900 border border-slate-800 text-slate-100",
+      default:
+        "bg-surface-panel border border-border-subtle text-text-primary",
       elevated:
-        "bg-slate-900/90 border border-slate-700/80 shadow-md shadow-black/40 text-slate-100",
-      bordered: "bg-transparent border border-slate-800 text-slate-100",
+        "bg-surface-panel border border-border-strong shadow-md text-text-primary",
+      bordered:
+        "bg-transparent border border-border-subtle text-text-primary",
     };
 
     const densityStyles = {
@@ -54,7 +56,10 @@ export const CardHeader = forwardRef<
 >(({ className, ...props }, ref) => (
   <div
     ref={ref}
-    className={cn("flex flex-col space-y-1.5 pb-3 border-b border-slate-800/80", className)}
+    className={cn(
+      "flex flex-col space-y-1.5 pb-3 border-b border-border-subtle",
+      className
+    )}
     {...props}
   />
 ));
@@ -67,7 +72,7 @@ export const CardTitle = forwardRef<
   <h3
     ref={ref}
     className={cn(
-      "text-base font-semibold leading-none tracking-tight text-slate-100",
+      "text-base font-semibold leading-none tracking-tight text-text-primary",
       className
     )}
     {...props}
@@ -81,7 +86,7 @@ export const CardDescription = forwardRef<
 >(({ className, ...props }, ref) => (
   <p
     ref={ref}
-    className={cn("text-xs text-slate-400 mt-1", className)}
+    className={cn("text-xs text-text-muted mt-1", className)}
     {...props}
   />
 ));
@@ -101,7 +106,10 @@ export const CardFooter = forwardRef<
 >(({ className, ...props }, ref) => (
   <div
     ref={ref}
-    className={cn("flex items-center pt-3 mt-3 border-t border-slate-800/80 text-xs text-slate-400", className)}
+    className={cn(
+      "flex items-center pt-3 mt-3 border-t border-border-subtle text-xs text-text-muted",
+      className
+    )}
     {...props}
   />
 ));

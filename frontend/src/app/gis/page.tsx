@@ -252,10 +252,10 @@ export default function GisMapPage() {
           {hasMapErrors && (
             <div
               data-testid="gis-error-banner"
-              className="rounded-lg border border-amber-800/80 bg-amber-950/40 p-3 text-xs text-amber-200 flex items-center justify-between font-mono"
+              className="rounded-lg border border-amber-500/30 bg-amber-500/10 p-3 text-xs text-amber-800 dark:text-amber-200 flex items-center justify-between font-mono"
             >
               <div>
-                <strong className="text-amber-400">Layer Notice:</strong> Some spatial layers could
+                <strong className="text-amber-700 dark:text-amber-400">Layer Notice:</strong> Some spatial layers could
                 not be retrieved from backend (
                 {[
                   sitesError && `Sites: ${sitesErrObj?.message || "Unavailable"}`,
@@ -271,7 +271,7 @@ export default function GisMapPage() {
           )}
 
           {/* Map Viewport Area */}
-          <div className="relative w-full h-[calc(100vh-210px)] min-h-[580px] rounded-xl overflow-hidden shadow-2xl border border-slate-800">
+          <div className="relative w-full h-[calc(100vh-210px)] min-h-[580px] rounded-xl overflow-hidden shadow-lg border border-border-subtle">
             {/* Interactive Map Canvas */}
             <MapCanvas
               layers={GIS_ACTIVE_MAP_LAYERS}

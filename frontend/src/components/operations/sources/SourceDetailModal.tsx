@@ -118,37 +118,37 @@ export const SourceDetailModal: React.FC<SourceDetailModalProps> = ({
       role="dialog"
       aria-modal="true"
       aria-labelledby="source-modal-title"
-      className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-950/80 backdrop-blur-sm overflow-y-auto"
+      className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/60 backdrop-blur-xs overflow-y-auto"
     >
-      <div className="relative w-full max-w-4xl max-h-[90vh] flex flex-col rounded-xl border border-slate-800 bg-slate-900 shadow-2xl overflow-hidden my-auto">
+      <div className="relative w-full max-w-4xl max-h-[90vh] flex flex-col rounded-xl border border-border-subtle bg-surface-panel shadow-2xl overflow-hidden my-auto">
         {/* Modal Header */}
-        <div className="flex items-center justify-between border-b border-slate-800 p-5 bg-slate-950/60">
+        <div className="flex items-center justify-between border-b border-border-subtle p-5 bg-surface-elevated/40">
           <div className="space-y-1">
             <div className="flex items-center gap-2 flex-wrap">
-              <span className="text-xs font-mono text-sky-400">
+              <span className="text-xs font-mono text-sky-600 dark:text-sky-400 font-semibold">
                 Source #{activeSource.source_id}
               </span>
-              <span className="text-slate-600">•</span>
-              <Badge variant="outline" size="sm" className="capitalize font-mono text-slate-300 border-slate-700">
+              <span className="text-text-muted">•</span>
+              <Badge variant="outline" size="sm" className="capitalize font-mono text-text-secondary border-border-subtle">
                 {activeSource.category?.replace("_", " ") || "Other"}
               </Badge>
-              <Badge variant="outline" size="sm" className="font-mono text-[10px] uppercase text-sky-400 border-sky-800">
+              <Badge variant="outline" size="sm" className="font-mono text-[10px] uppercase text-sky-700 dark:text-sky-400 border-sky-400/40">
                 {activeSource.provider_mode}
               </Badge>
               {activeSource.is_synthetic && (
-                <Badge variant="outline" size="sm" className="font-mono text-[10px] text-purple-400 border-purple-800 bg-purple-950/40">
+                <Badge variant="outline" size="sm" className="font-mono text-[10px] text-purple-700 dark:text-purple-400 border-purple-400/40 bg-purple-50 dark:bg-purple-950/40">
                   SYNTHETIC
                 </Badge>
               )}
             </div>
             <h2
               id="source-modal-title"
-              className="text-lg sm:text-xl font-bold text-slate-100"
+              className="text-lg sm:text-xl font-bold text-text-primary"
             >
               {activeSource.name}
             </h2>
-            <div className="text-xs text-slate-400 font-mono">
-              Provider: <span className="text-slate-300">{activeSource.provider}</span> ({activeSource.provider_id})
+            <div className="text-xs text-text-muted font-mono">
+              Provider: <span className="text-text-secondary font-medium">{activeSource.provider}</span> ({activeSource.provider_id})
             </div>
           </div>
 
@@ -156,7 +156,7 @@ export const SourceDetailModal: React.FC<SourceDetailModalProps> = ({
             type="button"
             onClick={onClose}
             aria-label="Close modal"
-            className="rounded-lg p-1.5 text-slate-400 hover:text-slate-200 hover:bg-slate-800 transition-colors"
+            className="rounded-lg p-1.5 text-text-muted hover:text-text-primary hover:bg-surface-elevated transition-colors"
           >
             <X className="h-5 w-5" />
           </button>
@@ -165,11 +165,11 @@ export const SourceDetailModal: React.FC<SourceDetailModalProps> = ({
         {/* Modal Body */}
         <div className="p-5 space-y-5 overflow-y-auto flex-1">
           {/* 1. Freshness Diagnostics Block */}
-          <div className="rounded-lg border border-slate-800 bg-slate-950/70 p-4 space-y-3">
-            <div className="flex items-center justify-between border-b border-slate-800/80 pb-2">
+          <div className="rounded-lg border border-border-subtle bg-surface-elevated/30 p-4 space-y-3">
+            <div className="flex items-center justify-between border-b border-border-subtle pb-2">
               <div className="flex items-center gap-2">
-                <Clock className="h-4 w-4 text-sky-400" />
-                <h3 className="text-sm font-semibold text-slate-200">
+                <Clock className="h-4 w-4 text-sky-600 dark:text-sky-400" />
+                <h3 className="text-sm font-semibold text-text-primary">
                   Deterministic Freshness Evaluation
                 </h3>
               </div>
@@ -183,68 +183,68 @@ export const SourceDetailModal: React.FC<SourceDetailModalProps> = ({
             </div>
 
             <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 text-xs font-mono">
-              <div className="rounded border border-slate-800 bg-slate-900/50 p-2.5 space-y-1">
-                <span className="text-[10px] text-slate-500 uppercase block">Observed Age</span>
-                <span className="text-slate-200 font-bold">
+              <div className="rounded border border-border-subtle bg-surface-panel p-2.5 space-y-1">
+                <span className="text-[10px] text-text-muted uppercase block">Observed Age</span>
+                <span className="text-text-primary font-bold">
                   {freshness.age_seconds !== null ? `${Math.round(freshness.age_seconds)}s (${(freshness.age_seconds / 60).toFixed(1)}m)` : "No timestamp"}
                 </span>
               </div>
-              <div className="rounded border border-slate-800 bg-slate-900/50 p-2.5 space-y-1">
-                <span className="text-[10px] text-slate-500 uppercase block">Category Cutoff</span>
-                <span className="text-slate-200 font-bold">
+              <div className="rounded border border-border-subtle bg-surface-panel p-2.5 space-y-1">
+                <span className="text-[10px] text-text-muted uppercase block">Category Cutoff</span>
+                <span className="text-text-primary font-bold">
                   {freshness.threshold_seconds}s ({(freshness.threshold_seconds / 3600).toFixed(1)}h)
                 </span>
               </div>
-              <div className="rounded border border-slate-800 bg-slate-900/50 p-2.5 space-y-1">
-                <span className="text-[10px] text-slate-500 uppercase block">Usable for Decision Support</span>
-                <span className={freshness.is_usable ? "text-emerald-400 font-bold" : "text-amber-400 font-bold"}>
+              <div className="rounded border border-border-subtle bg-surface-panel p-2.5 space-y-1">
+                <span className="text-[10px] text-text-muted uppercase block">Usable for Decision Support</span>
+                <span className={freshness.is_usable ? "text-emerald-700 dark:text-emerald-400 font-bold" : "text-amber-700 dark:text-amber-400 font-bold"}>
                   {freshness.is_usable ? "YES (USABLE)" : "NO (STALE / INSUFFICIENT)"}
                 </span>
               </div>
             </div>
 
-            <div className="text-xs text-slate-300 font-mono bg-slate-900/40 p-2.5 rounded border border-slate-800/60">
-              <span className="text-slate-500">Evaluation Reason: </span>
+            <div className="text-xs text-text-secondary font-mono bg-surface-panel p-2.5 rounded border border-border-subtle">
+              <span className="text-text-muted">Evaluation Reason: </span>
               {freshness.reason}
             </div>
           </div>
 
           {/* 2. Source Configuration & Endpoint Metadata */}
-          <div className="rounded-lg border border-slate-800 bg-slate-950/70 p-4 space-y-3">
-            <h3 className="text-sm font-semibold text-slate-200 flex items-center gap-2">
-              <Server className="h-4 w-4 text-emerald-400" />
+          <div className="rounded-lg border border-border-subtle bg-surface-elevated/30 p-4 space-y-3">
+            <h3 className="text-sm font-semibold text-text-primary flex items-center gap-2">
+              <Server className="h-4 w-4 text-emerald-600 dark:text-emerald-400" />
               Adapter Configuration & Telemetry Parameters
             </h3>
 
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3 text-xs font-mono">
-              <div className="p-2 rounded bg-slate-900/40 border border-slate-800/60 space-y-1">
-                <span className="text-[10px] text-slate-500 uppercase block">Polling Cadence</span>
-                <span className="text-slate-200">
+              <div className="p-2 rounded bg-surface-panel border border-border-subtle space-y-1">
+                <span className="text-[10px] text-text-muted uppercase block">Polling Cadence</span>
+                <span className="text-text-primary">
                   {activeSource.polling_interval_seconds ? `${activeSource.polling_interval_seconds}s` : "Event-driven"}
                 </span>
               </div>
-              <div className="p-2 rounded bg-slate-900/40 border border-slate-800/60 space-y-1">
-                <span className="text-[10px] text-slate-500 uppercase block">Region Identifier</span>
-                <span className="text-slate-200">{activeSource.region_id || "All Regions"}</span>
+              <div className="p-2 rounded bg-surface-panel border border-border-subtle space-y-1">
+                <span className="text-[10px] text-text-muted uppercase block">Region Identifier</span>
+                <span className="text-text-primary">{activeSource.region_id || "All Regions"}</span>
               </div>
-              <div className="p-2 rounded bg-slate-900/40 border border-slate-800/60 space-y-1">
-                <span className="text-[10px] text-slate-500 uppercase block">Records Ingested</span>
-                <span className="text-emerald-400 font-bold">
+              <div className="p-2 rounded bg-surface-panel border border-border-subtle space-y-1">
+                <span className="text-[10px] text-text-muted uppercase block">Records Ingested</span>
+                <span className="text-emerald-700 dark:text-emerald-400 font-bold">
                   {activeSource.records_ingested_total.toLocaleString()}
                 </span>
               </div>
-              <div className="p-2 rounded bg-slate-900/40 border border-slate-800/60 space-y-1">
-                <span className="text-[10px] text-slate-500 uppercase block">Records Failed</span>
-                <span className={activeSource.records_failed_total > 0 ? "text-red-400 font-bold" : "text-slate-500"}>
+              <div className="p-2 rounded bg-surface-panel border border-border-subtle space-y-1">
+                <span className="text-[10px] text-text-muted uppercase block">Records Failed</span>
+                <span className={activeSource.records_failed_total > 0 ? "text-red-700 dark:text-red-400 font-bold" : "text-text-muted"}>
                   {activeSource.records_failed_total.toLocaleString()}
                 </span>
               </div>
             </div>
 
             {activeSource.endpoint_url && (
-              <div className="text-xs font-mono bg-slate-900/40 p-2 rounded border border-slate-800/60 flex items-center justify-between gap-2 overflow-hidden">
-                <span className="text-slate-500 shrink-0">Endpoint URL:</span>
-                <span className="text-sky-300 truncate">{activeSource.endpoint_url}</span>
+              <div className="text-xs font-mono bg-surface-panel p-2 rounded border border-border-subtle flex items-center justify-between gap-2 overflow-hidden">
+                <span className="text-text-muted shrink-0">Endpoint URL:</span>
+                <span className="text-sky-700 dark:text-sky-300 truncate">{activeSource.endpoint_url}</span>
               </div>
             )}
           </div>
@@ -252,23 +252,23 @@ export const SourceDetailModal: React.FC<SourceDetailModalProps> = ({
           {/* 3. Ingestion Runs History Table */}
           <div className="space-y-2">
             <div className="flex items-center justify-between">
-              <h3 className="text-sm font-semibold text-slate-200 flex items-center gap-2">
-                <History className="h-4 w-4 text-sky-400" />
+              <h3 className="text-sm font-semibold text-text-primary flex items-center gap-2">
+                <History className="h-4 w-4 text-sky-600 dark:text-sky-400" />
                 Recent Ingestion Execution Runs
               </h3>
-              <span className="text-xs text-slate-500 font-mono">
+              <span className="text-xs text-text-muted font-mono">
                 {runs.length} recent executions
               </span>
             </div>
 
             {runs.length === 0 ? (
-              <div className="rounded border border-slate-800 p-6 text-center text-xs text-slate-500 font-mono">
+              <div className="rounded border border-border-subtle p-6 text-center text-xs text-text-muted font-mono">
                 No ingestion runs recorded for this data source yet.
               </div>
             ) : (
-              <div className="rounded-lg border border-slate-800 bg-slate-950/60 overflow-hidden">
+              <div className="rounded-lg border border-border-subtle bg-surface-panel overflow-hidden">
                 <table className="w-full text-left text-xs">
-                  <thead className="bg-slate-900 text-slate-400 font-mono border-b border-slate-800 uppercase text-[10px]">
+                  <thead className="bg-surface-elevated text-text-secondary font-mono border-b border-border-subtle uppercase text-[10px]">
                     <tr>
                       <th className="py-2.5 px-3">Run ID</th>
                       <th className="py-2.5 px-3">Status</th>
@@ -277,22 +277,22 @@ export const SourceDetailModal: React.FC<SourceDetailModalProps> = ({
                       <th className="py-2.5 px-3">Diagnostic Log</th>
                     </tr>
                   </thead>
-                  <tbody className="divide-y divide-slate-800/60 font-mono text-[11px]">
+                  <tbody className="divide-y divide-border-subtle font-mono text-[11px]">
                     {runs.map((run) => (
-                      <tr key={run.id} className="hover:bg-slate-800/30">
-                        <td className="py-2.5 px-3 text-slate-300">#{run.id}</td>
+                      <tr key={run.id} className="hover:bg-surface-elevated/50 transition-colors">
+                        <td className="py-2.5 px-3 text-text-primary font-medium">#{run.id}</td>
                         <td className="py-2.5 px-3">{getStatusBadge(run.status)}</td>
                         <td className="py-2.5 px-3">
-                          <span className="text-emerald-400">{run.records_ingested}</span>
+                          <span className="text-emerald-700 dark:text-emerald-400 font-semibold">{run.records_ingested}</span>
                           {" / "}
-                          <span className={run.records_failed > 0 ? "text-red-400" : "text-slate-500"}>
+                          <span className={run.records_failed > 0 ? "text-red-700 dark:text-red-400 font-semibold" : "text-text-muted"}>
                             {run.records_failed}
                           </span>
                         </td>
-                        <td className="py-2.5 px-3 text-slate-400 text-[10px]">
+                        <td className="py-2.5 px-3 text-text-secondary text-[10px]">
                           {run.started_at ? new Date(run.started_at).toLocaleTimeString() : "—"}
                         </td>
-                        <td className="py-2.5 px-3 text-slate-400 max-w-xs truncate text-[10px]">
+                        <td className="py-2.5 px-3 text-text-muted max-w-xs truncate text-[10px]">
                           {run.log_details || "—"}
                         </td>
                       </tr>
@@ -312,7 +312,7 @@ export const SourceDetailModal: React.FC<SourceDetailModalProps> = ({
         </div>
 
         {/* Modal Footer */}
-        <div className="flex items-center justify-between border-t border-slate-800 p-4 bg-slate-950/60">
+        <div className="flex items-center justify-between border-t border-border-subtle p-4 bg-surface-elevated/40">
           <Button
             type="button"
             variant="outline"
@@ -320,7 +320,7 @@ export const SourceDetailModal: React.FC<SourceDetailModalProps> = ({
             onClick={() => onProbeSource(activeSource)}
             isLoading={isProbing}
             leftIcon={<Radio className="h-3.5 w-3.5" />}
-            className="text-xs text-sky-400 border-sky-700/60 hover:bg-sky-950/40"
+            className="text-xs text-sky-700 dark:text-sky-300 border-sky-400/40 hover:bg-sky-50 dark:hover:bg-sky-950/40"
           >
             <span>Trigger Health Probe</span>
           </Button>

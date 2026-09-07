@@ -164,20 +164,20 @@ function AuditOperationsContent() {
     >
       <div className="space-y-6">
         {/* Statutory Governance & Audit Trail Posture Header */}
-        <div className="flex flex-wrap items-center justify-between gap-3 rounded-lg border border-slate-800/80 bg-slate-900/40 px-3.5 py-2.5 text-xs text-slate-300 font-mono">
+        <div className="flex flex-wrap items-center justify-between gap-3 rounded-md border border-border-base bg-surface-raised px-3.5 py-2.5 text-xs text-text-secondary font-mono shadow-2xs">
           <div className="flex items-center gap-2">
-            <Lock className="h-4 w-4 text-sky-400 shrink-0" />
+            <Lock className="h-4 w-4 text-[#0969da] dark:text-[#2f81f7] shrink-0" />
             <span>
-              Protocol: <strong className="text-slate-200">Statutory Governance & Compliance Ledger</strong>
+              Protocol: <strong className="text-text-primary">Statutory Governance & Compliance Ledger</strong>
             </span>
           </div>
           <div className="flex items-center gap-3">
-            <div className="flex items-center gap-1.5 text-emerald-400">
-              <span className="h-2 w-2 rounded-full bg-emerald-400 animate-pulse" />
+            <div className="flex items-center gap-1.5 text-[#1a7f37] dark:text-[#3fb950] font-medium">
+              <span className="h-2 w-2 rounded-full bg-[#1a7f37] dark:bg-[#3fb950] animate-pulse" />
               <span>Tamper-Evident SHA-256 Ledger</span>
             </div>
-            <span className="text-slate-600">|</span>
-            <span className="text-slate-400">Read-Only Statutory Archive</span>
+            <span className="text-border-base">|</span>
+            <span className="text-text-muted">Read-Only Statutory Archive</span>
           </div>
         </div>
 

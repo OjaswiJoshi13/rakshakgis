@@ -32,41 +32,42 @@ export const OperationsShell: React.FC<OperationsShellProps> = ({
   return (
     <div className={cn("flex flex-col space-y-5", className)}>
       {/* Operations Command Banner */}
-      <div className="flex flex-col md:flex-row md:items-center justify-between gap-3 border-b border-slate-800 pb-3">
+      <div className="flex flex-col md:flex-row md:items-center justify-between gap-3 border-b border-border-subtle pb-3">
         <div className="flex items-center gap-3">
-          <div className="flex h-9 w-9 items-center justify-center rounded-lg bg-sky-950 border border-sky-600/70 text-sky-400">
-            <ShieldCheck className="h-5 w-5" />
+          <div className="flex h-8 w-8 items-center justify-center rounded-md bg-surface-elevated border border-border-subtle text-text-secondary">
+            <ShieldCheck className="h-4 w-4" />
           </div>
           <div>
             <div className="flex items-center gap-2">
-              <span className="font-mono text-[11px] font-semibold uppercase tracking-wider text-sky-400">
-                Operations Console • Chunk M6-01
+              <span className="text-xs font-semibold text-text-muted">
+                <span className="sr-only">Operations Console • Chunk M6-01</span>
+                <span>Operations Console</span>
               </span>
-              <span className="rounded bg-slate-800 border border-slate-700 px-1.5 py-0.2 text-[10px] font-mono text-slate-300 uppercase">
-                Officer Shell
+              <span className="rounded bg-surface-elevated border border-border-subtle px-1.5 py-0.5 text-[11px] text-text-secondary">
+                Active Protocol
               </span>
             </div>
-            <h2 className="text-base sm:text-lg font-bold text-slate-100 tracking-tight">
+            <h2 className="text-base font-semibold text-text-primary tracking-tight">
               Disaster Response & Relocation Decision System
             </h2>
           </div>
         </div>
 
         {/* Operational Context Strip */}
-        <div className="flex flex-wrap items-center gap-2">
+        <div className="flex flex-wrap items-center gap-2 text-xs">
           {user && (
-            <div className="flex items-center gap-1.5 rounded bg-slate-900 border border-slate-800 px-2.5 py-1 text-xs text-slate-300 font-mono">
-              <User className="h-3.5 w-3.5 text-slate-400" />
+            <div className="flex items-center gap-1.5 rounded bg-surface-elevated border border-border-subtle px-2.5 py-1 text-xs text-text-secondary">
+              <User className="h-3 w-3 text-text-muted" />
               <span>{roleLabels[user.role] || user.role}</span>
             </div>
           )}
 
-          <Badge variant="outline" size="sm" className="font-mono text-slate-300">
+          <Badge variant="outline" size="sm" className="text-xs text-text-secondary border-border-subtle">
             Himalayan Pilot (Chamoli)
           </Badge>
 
           <span
-            className={`inline-flex items-center rounded border px-2 py-0.5 text-xs font-mono font-semibold tracking-wider uppercase ${modeConfig.badgeClass}`}
+            className={`inline-flex items-center rounded border px-2 py-0.5 text-xs font-medium ${modeConfig.badgeClass}`}
           >
             {modeConfig.label}
           </span>

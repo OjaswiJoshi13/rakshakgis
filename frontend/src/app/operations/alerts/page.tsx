@@ -232,14 +232,14 @@ function AlertsOperationsContent() {
             ))}
           </div>
         ) : alerts.length === 0 ? (
-          <Card className="p-12 text-center border-dashed border-slate-800 bg-slate-900/30">
-            <div className="mx-auto flex h-12 w-12 items-center justify-center rounded-full bg-slate-800/80 text-slate-400 mb-3">
+          <Card className="p-12 text-center border-dashed border-border-base bg-surface-raised">
+            <div className="mx-auto flex h-12 w-12 items-center justify-center rounded-full bg-surface-base border border-border-base text-text-muted mb-3">
               <Inbox className="h-6 w-6" />
             </div>
-            <h4 className="text-base font-semibold text-slate-200">
+            <h4 className="text-base font-semibold text-text-primary">
               No Alerts Match Current Filter Criteria
             </h4>
-            <p className="text-xs sm:text-sm text-slate-400 max-w-md mx-auto mt-1">
+            <p className="text-xs sm:text-sm text-text-secondary max-w-md mx-auto mt-1">
               Adjust your filter criteria or reset the search query to view all regional telemetry feeds.
             </p>
             <div className="mt-4">

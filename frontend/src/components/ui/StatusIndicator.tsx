@@ -35,7 +35,7 @@ export const StatusIndicator: React.FC<StatusIndicatorProps> = ({
           )}
         />
       </span>
-      <span className="text-slate-300 font-medium tracking-wide uppercase">
+      <span className="text-text-secondary font-medium tracking-wide uppercase">
         {displayLabel}
       </span>
     </div>

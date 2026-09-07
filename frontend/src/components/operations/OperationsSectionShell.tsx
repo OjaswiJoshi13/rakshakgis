@@ -30,37 +30,33 @@ export const OperationsSectionShell: React.FC<OperationsSectionShellProps> = ({
   return (
     <div className={cn("space-y-6", className)}>
       {/* Breadcrumbs & Section Hierarchy */}
-      <div className="flex flex-wrap items-center justify-between gap-3 border-b border-slate-800 pb-4">
+      <div className="flex flex-wrap items-center justify-between gap-3 border-b border-border-subtle pb-4">
         <div>
-          <nav aria-label="Breadcrumb" className="flex items-center gap-1.5 text-xs text-slate-400 font-mono mb-1.5">
+          <nav aria-label="Breadcrumb" className="flex items-center gap-1.5 text-xs text-text-muted font-mono mb-1.5">
             <Link
               href="/operations"
-              className="hover:text-slate-200 transition-colors"
+              className="text-text-secondary hover:text-text-primary transition-colors"
             >
               Operations
             </Link>
-            <ChevronRight className="h-3 w-3 text-slate-400" />
-            <span className="text-sky-400 font-semibold">{title}</span>
+            <ChevronRight className="h-3 w-3 text-text-muted" />
+            <span className="text-text-primary font-medium">{title}</span>
           </nav>
 
           <div className="flex flex-wrap items-center gap-2.5">
-            <h1 className="text-xl sm:text-2xl font-bold tracking-tight text-slate-100">
+            <h1 className="text-xl sm:text-2xl font-bold tracking-tight text-text-primary">
               {title}
             </h1>
-            <Badge variant="outline" size="sm" className="font-mono text-sky-300 border-sky-600/50">
-              {chunkId}
-            </Badge>
-            <span className="text-xs font-mono text-slate-400 hidden sm:inline-block">
-              {chunkTitle}
-            </span>
+            <span className="sr-only" data-testid="dev-chunk-id">{chunkId}</span>
+            <span className="sr-only" data-testid="dev-chunk-title">{chunkTitle}</span>
           </div>
 
-          <p className="text-xs sm:text-sm text-slate-400 mt-1 max-w-3xl">
+          <p className="text-xs sm:text-sm text-text-secondary mt-1 max-w-3xl">
             {description}
           </p>
         </div>
 
-        {/* Action Toolbar slot for future chunk workflows */}
+        {/* Action Toolbar slot for operational workflows */}
         {actionToolbar && (
           <div className="flex items-center gap-2 self-start sm:self-auto">
             {actionToolbar}
@@ -68,22 +64,19 @@ export const OperationsSectionShell: React.FC<OperationsSectionShellProps> = ({
         )}
       </div>
 
-      {/* Operational Protocol & Dependency Context Strip */}
-      <div className="flex flex-wrap items-center justify-between gap-3 rounded-lg border border-slate-800/80 bg-slate-900/40 px-3.5 py-2.5 text-xs text-slate-300 font-mono">
+      {/* Operational Protocol Context Strip */}
+      <div className="flex flex-wrap items-center justify-between gap-3 rounded-md border border-border-subtle bg-surface-raised/60 px-3.5 py-2 text-xs text-text-secondary font-mono">
         <div className="flex items-center gap-2">
-          <Shield className="h-4 w-4 text-sky-400 shrink-0" />
+          <Shield className="h-4 w-4 text-[#0969da] dark:text-[#2f81f7] shrink-0" />
           <span>
-            Protocol: <strong className="text-slate-200">Rule 12 Mandate</strong> — Officer Review & Statutory Approval Required
+            Protocol: <strong className="text-text-primary font-semibold">Rule 12 Mandate</strong> — Officer Review &amp; Statutory Approval Required
           </span>
         </div>
 
         {prerequisiteChunk && (
-          <div className="flex items-center gap-2 text-slate-400">
-            <Layers className="h-3.5 w-3.5 text-slate-400 shrink-0" />
-            <span>
-              Engine Binding: <span className="text-emerald-400">{prerequisiteChunk}</span>
-            </span>
-          </div>
+          <span className="sr-only" data-testid="dev-engine-binding">
+            Engine Binding: {prerequisiteChunk}
+          </span>
         )}
       </div>
 

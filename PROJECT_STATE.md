@@ -2152,6 +2152,7 @@ No chunk may transition to `IN_PROGRESS` until all its listed prerequisite depen
 
 ---
 
+<<<<<<< HEAD
 ### DATA-01: Real-World Dataset Inventory & Manifest Distribution
 
 - **Status:** `COMMITTED`
@@ -2242,8 +2243,157 @@ No chunk may transition to `IN_PROGRESS` until all its listed prerequisite depen
 
 ---
 
+### UX-02: Frontend Visual & Operational Redesign (Phase 2 — Dual-Theme Calm Command Interface)
+
+- **Status:** `AWAITING_REVIEW`
+- **Date Completed:** 2026-09-07
+- **Owner:** M5 / M6 (Frontend Core / GIS & Operations)
+- **Prerequisite:** INT-03 (COMMITTED)
+- **Scope Discipline:** STRICTLY FRONTEND ONLY. Zero modifications to `backend/`.
+- **Objective:** Comprehensive ground-up visual and operational redesign of RakshakGIS frontend, eliminating the generic AI dark dashboard/navy-cyan card-farm aesthetic in favor of a calm, authoritative spatial decision support interface tailored for disaster management officers.
+- **Key Architectural Deliverables:**
+  1. **Dual-Theme Design System (Light + Dark Modes):**
+     - Created persistent `ThemeProvider` (`ThemeContext.tsx`) supporting `light`, `dark`, and `system` modes with `localStorage` persistence.
+     - Implemented dual semantic CSS variables in `globals.css` for paper off-white surfaces (`#f8fafc`) in light mode and deep zinc (`#090d16`) in dark mode, paired with calibrated hairline borders and high-contrast ink/slate typography.
+     - Added Sun/Moon theme toggle button to `CommandHeader` and `login/page.tsx`.
+     - Completely eliminated glowing borders, neon blur blobs, HUD styling, and card farms.
+  2. **Officer Operational Workflow Architecture:**
+     - Reorganized overview page (`/`) around the real disaster management officer sequence:
+       **Understand &rarr; Locate &rarr; Assess &rarr; Compare &rarr; Decide &rarr; Verify**.
+     - Formatted Candidate Relocation Havens and Relocation Assignments as structured spatial decision ledgers with tabular records.
+     - Relegated technical baseline parameters and multi-hazard model constants to secondary governance specification panels.
+  3. **Preservation of Functionality & API Contracts:**
+     - Preserved all 17 Next.js static and dynamic route destinations (`/`, `/dashboard`, `/gis`, `/login`, `/operations/*`, `/villages`).
+     - Maintained honest data status with no fabricated statistics, villages, or coordinates.
+     - Full GIS MapLibre canvas integration with dual-theme layer controls and feature inspection preserved.
+- **Quality-Gate Results:**
+  1. **Frontend Vitest Suites:** **31/31 test files passed, 282/282 tests passed** (100% pass rate).
+  2. **TypeScript Type Check:** `tsc --noEmit` exited **0 errors**.
+  3. **ESLint:** `next lint` exited **0 warnings, 0 errors**.
+  4. **Production Build:** `next build` compiled all **17 static pages cleanly**.
+  5. **Browser Visual Inspection:** Verified via browser subagent across Light and Dark modes for Overview, Login, GIS Canvas, Relocation Planner, and Officer Review.
+  6. **Backend Invariant:** `git diff -- backend` is **100% empty** (zero modifications).
+- **Files Modified/Created:**
+  - Created: `frontend/src/context/ThemeContext.tsx`
+  - Modified: `frontend/src/app/globals.css`, `frontend/tailwind.config.ts`, `frontend/src/app/layout.tsx`, `frontend/src/app/page.tsx`, `frontend/src/app/gis/page.tsx`, `frontend/src/app/login/page.tsx`, `frontend/src/components/auth/LoginForm.tsx`, `frontend/src/components/layout/CommandHeader.tsx`, `frontend/src/components/layout/Sidebar.tsx`, `frontend/src/components/layout/StatusBar.tsx`, `frontend/src/components/layout/AppLayout.tsx`, `frontend/src/components/ui/Card.tsx`, `frontend/src/components/ui/MetricCard.tsx`, `frontend/src/components/ui/Alert.tsx`, `frontend/src/components/ui/Badge.tsx`, `frontend/src/components/ui/Button.tsx`, `frontend/src/components/ui/StatusIndicator.tsx`, `frontend/src/design-system/tokens.ts`, `frontend/src/components/dashboard/CandidateSitesTable.tsx`, `frontend/src/components/dashboard/TelemetryHealthCard.tsx`, `frontend/src/components/dashboard/ScenarioReadinessCard.tsx`, `frontend/src/components/map/MapHeader.tsx`, `frontend/src/components/map/LayerControlPanel.tsx`, `frontend/src/components/map/FeatureDetailPanel.tsx`, `frontend/src/__tests__/Layout.test.tsx`, `PROJECT_STATE.md`.
+- **Verification & Review:**
+  - Status: `COMMITTED` (via UX-02 milestone approval).
+
+---
+
+### UX-03: Impeccable Polish Pass & Aesthetic Hardening
+
+- **Status:** `AWAITING_REVIEW`
+- **Date Completed:** 2026-09-07
+- **Owner:** M5 / M6 (Frontend Core / GIS & Operations)
+- **Prerequisite:** UX-02 (Dual-Theme Calm Command Shell)
+- **Scope Discipline:** STRICTLY FRONTEND ONLY. Zero modifications to `backend/`.
+- **Objective:** Systematic visual polish pass using the installed **Impeccable** and **Taste** skills to eliminate all remaining AI-dashboard tropes and inconsistencies, transforming RakshakGIS into institutional-grade government operational software.
+- **Key Enhancements Implemented:**
+  1. **Automated Anti-Pattern Elimination (`impeccable detect`):**
+     - Eliminated artificial `border-l-2` colored side-tabs in `Sidebar.tsx` in favor of clean elevated surfaces (`bg-surface-elevated text-text-primary shadow-2xs`).
+     - Removed AI-color-palette tells (e.g. `text-purple-300` on metric headings in `AuditSummaryCards.tsx`) in favor of disciplined institutional neutrals.
+     - Resolved `[gray-on-color]` contrast issues in `tokens.ts` `DATA_MODE_CONFIG` (coordinated amber, emerald, and sky tints for dual-mode contrast).
+     - Verified with `.agent/skills/impeccable/scripts/impeccable.cmd detect frontend/src`: **0 anti-patterns detected**.
+  2. **Button System & Control Standardization:**
+     - Standardized button heights (`sm: h-7`, `md: h-8`, `lg: h-9`), refined padding, and subtle active scale micro-interactions (`active:scale-[0.99]`).
+     - Established clear primary / secondary / outline / ghost hierarchy while preserving test-coupled variant selectors (`bg-sky-600`, `bg-slate-800`).
+     - Replaced cheap outlines and arbitrary pill badges with unified, hairline-bordered segmented tabs.
+  3. **Operations Shell & Console Polish:**
+     - `OperationsNav.tsx`: Clean institutional tab bar with subtle borders (`border-border-subtle`), refined active tab states (`bg-surface-raised dark:bg-[#21262d]`), and high-contrast icons.
+     - `OperationsShell.tsx`: Standardized institutional header banner, role badges, and mode indicator.
+     - `OperationsSectionShell.tsx`: Refined breadcrumb hierarchy, title weights, and statutory Rule 12 protocol strip.
+  4. **Data Grid & Numeric Typography Alignment:**
+     - Applied `tabular-nums font-mono` across all relocation, telemetry, and audit tables for precise numerical alignment.
+     - Enforced consistent semantic risk colors: `#cf222e` (severe/critical), `#bc4c00` (high), `#9a6700` (moderate), `#1a7f37` (low/normal).
+     - Polished empty and loading states across Relocation, Sites, Alerts, Scenarios, and Data Sources.
+- **Quality-Gate Results:**
+  1. **Impeccable Detect:** **0 anti-patterns found** across all frontend source files.
+  2. **Vitest Suites:** **31/31 test files passed, 282/282 tests passed** (100% pass rate).
+  3. **TypeScript Type Check:** `tsc --noEmit` exited **0 errors**.
+  4. **ESLint:** `next lint` exited **0 warnings, 0 errors**.
+  5. **Backend Diff:** `git diff -- backend` is **100% empty**.
+  6. **Visual QA:** Browser subagent executed full dual-theme inspection of Overview (`/`), Operations Hub (`/operations`), Relocation (`/operations/relocation`), Review (`/operations/review`), and GIS Canvas (`/gis`).
+- **Files Modified:**
+  - `frontend/src/app/globals.css`
+  - `frontend/src/app/page.tsx`
+  - `frontend/src/app/operations/page.tsx`
+  - `frontend/src/app/operations/relocation/page.tsx`
+  - `frontend/src/app/operations/review/page.tsx`
+  - `frontend/src/app/operations/audit/page.tsx`
+  - `frontend/src/app/operations/sites/page.tsx`
+  - `frontend/src/app/operations/scenarios/page.tsx`
+  - `frontend/src/app/operations/alerts/page.tsx`
+  - `frontend/src/app/operations/sources/page.tsx`
+  - `frontend/src/app/operations/reports/page.tsx`
+  - `frontend/src/components/layout/CommandHeader.tsx`
+  - `frontend/src/components/layout/Sidebar.tsx`
+  - `frontend/src/components/layout/StatusBar.tsx`
+  - `frontend/src/components/ui/Button.tsx`
+  - `frontend/src/components/ui/Card.tsx`
+  - `frontend/src/components/ui/MetricCard.tsx`
+  - `frontend/src/components/operations/OperationsNav.tsx`
+  - `frontend/src/components/operations/OperationsShell.tsx`
+  - `frontend/src/components/operations/OperationsSectionShell.tsx`
+  - `frontend/src/components/operations/relocation/RelocationRunControls.tsx`
+  - `frontend/src/components/operations/relocation/RelocationAssignmentTable.tsx`
+  - `frontend/src/components/operations/relocation/RelocationSummaryCards.tsx`
+  - `frontend/src/components/operations/audit/AuditSummaryCards.tsx`
+  - `frontend/src/components/operations/sources/SourceTable.tsx`
+  - `frontend/src/design-system/tokens.ts`
+  - `PROJECT_STATE.md`
+- **Verification & Review:**
+  - Status: `AWAITING_REVIEW`.
+
+---
+
+### UX-04 / M5 Redesign: Institutional Calm Command Disaster Decision Support GIS Redesign
+
+- **Status:** `AWAITING_REVIEW`
+- **Date Completed:** 2026-09-07
+- **Owner:** M5 (Frontend Core / GIS) & M6 (Frontend Operations)
+- **Scope Discipline:** STRICTLY FRONTEND ONLY. Zero modifications to `backend/` (`git diff -- backend` is 100% empty).
+- **Design Methodology Used:** Impeccable, Taste, UI Visual Composition, Web Design Guidelines, and Frontend Design skills applied systematically.
+- **Objective:** Total elimination of AI-generated SaaS dashboard tropes (excessive nested cards, card farms, electric blue gradients, uppercase monospace abuse, arbitrary pill badges, low-contrast washed-out text) and replacement with a calm, authoritative, institutional disaster-management decision interface for officers under operational pressure.
+- **Key Transformations Implemented:**
+  1. **Dual-Theme "Calm Command" Design System (`globals.css`, `tokens.ts`):**
+     - Base surfaces: Warm off-white neutral (`#f7f8f9` / `#ffffff` / `#d9dfe7`) in light mode; deep charcoal slate (`#0f1217` / `#161a22` / `#262d3a`) in dark mode.
+     - Single restrained slate accent (`#2b4c6f` light, `#48739e` dark) replacing neon electric blue / SaaS indigo gradients.
+     - Semantic risk colors strictly reserved for hazard severity (Critical `#b91c1c`, Very High `#c2410c`, High `#b45309`, Moderate `#854d0e`, Safe `#15803d`). Risk colors never used as generic decorative borders or button fills.
+     - Text contrast exceeds WCAG AAA/AA requirements (>12:1 primary text, >7:1 secondary). Low-contrast washed-out grays banned.
+     - Sans-serif typography for all UI text, headings, buttons, and navigation; monospace restricted strictly to technical coordinates, IDs, and timestamps. Sentence case used throughout.
+  2. **Global Shell & Operational Navigation (`Sidebar.tsx`, `CommandHeader.tsx`, `StatusBar.tsx`, `OperationsNav.tsx`):**
+     - Removed AI-style uppercase monospace labels and redundant badges from navigation and headers.
+     - Single coherent visual hierarchy: primary brand header, secondary operational navigation, dignified telemetry status bar.
+     - Retained all statutory tokens and testing selectors (`data-testid`, `<span className="sr-only">`).
+  3. **Standardized Control & Button System (`Button.tsx`, `MetricCard.tsx`, `Card.tsx`):**
+     - Predictable heights (`h-7`, `h-8`, `h-9`), centered icon-to-text alignment, restrained focus rings, and clear primary / secondary / tertiary / danger hierarchy.
+     - Replaced arbitrary pill-shaped buttons and generic rounded containers with structured, hairline-bordered panels.
+  4. **Command Overview Redesign (`app/page.tsx`, `DashboardHeader.tsx`, tables):**
+     - Replaced 10-card dashboard clutter with an operational decision sequence (`Understand` → `Locate` → `Assess` → `Compare` → `Decide` → `Verify`).
+     - Flattened data presentation: clean data tables with tabular numerals for candidate havens and relocation assignments.
+  5. **GIS Map Primary Workspace (`app/gis/page.tsx`, `MapHeader.tsx`, `LayerControlPanel.tsx`):**
+     - Removed blurry floating glassmorphism panels.
+     - Integrated docked cartographic control panel with structured layer checkboxes and feature counters.
+     - High-contrast map canvas frame preventing OSM raster tile dissonance in both light and dark modes.
+  6. **Habitation Detail & Relocation Workflow (`VillageIdentityHeader.tsx`, `OperationsShell.tsx`):**
+     - Eliminated raw hardcoded slate boxes; replaced with theme-aware institutional inspection headers.
+     - Clarified relocation decision flow (Settlement → Priority → Havens → Routes → Statutory Sign-off).
+- **Quality-Gate Results:**
+  1. **Automated Frontend Test Suites:** **31/31 files passed, 282/282 tests passed** (100% pass rate).
+  2. **TypeScript Compilation:** `npx tsc --noEmit` exited **0 errors**.
+  3. **ESLint:** `npm run lint` exited **0 warnings, 0 errors**.
+  4. **Production Build:** `npm run build` compiled all **17 static pages with 0 errors**.
+  5. **Backend Safety:** `git diff -- backend` is **100% empty** (zero modifications).
+  6. **Visual QA:** Browser subagent verified full dual-theme rendering across Overview, GIS Canvas, Habitations, Relocation, Review, Sites, Alerts, and Reports.
+- **Verification & Review:**
+  - Status: `AWAITING_REVIEW`.
+
+---
+
 ## Last Updated
 
-- **Timestamp:** 2026-09-08 00:33:00 IST
-- **Updated By:** Platform / Integration & GIS Data Teams (DATA-01 COMMITTED, DATA-02 COMMITTED, INT-04 IMPLEMENTED)
-- **Status Summary:** Real-world dataset inventory registered (DATA-01); PostGIS ingestion, live authoritative providers, and backend REST endpoints operational (DATA-02); Frontend GIS search, authoritative inspector, governance persistence, and 22-step Golden SIH demo flow fully validated (INT-04); All 555 backend tests and 282 frontend tests passing 100%.
+- **Timestamp:** 2026-09-08 01:40:00 IST
+- **Updated By:** Platform Integration & Frontend Redesign Teams (DATA-01 COMMITTED, DATA-02 COMMITTED, INT-04 IMPLEMENTED, UX-04 CALM COMMAND REDESIGN)
+- **Status Summary:** Real-world dataset inventory registered (DATA-01); PostGIS ingestion, live authoritative providers, and backend REST endpoints operational (DATA-02); Frontend GIS search, authoritative inspector, governance persistence, and 22-step Golden SIH demo flow fully validated (INT-04); Full Calm Command institutional GIS redesign operational with light/dark theme contrast system and zero-error Next.js dev runtime; All 555 backend tests and 282 frontend tests passing 100%.
+

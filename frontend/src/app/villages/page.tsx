@@ -307,11 +307,11 @@ function VillageAnalysisContent() {
       {/* Loading State */}
       {isLoading && habitations.length === 0 && (
         <div
-          className="p-12 text-center bg-slate-900 border border-slate-800 rounded-lg"
+          className="p-12 text-center bg-surface-panel border border-border-subtle rounded-lg shadow-sm"
           role="status"
           aria-live="polite"
         >
-          <div className="inline-flex items-center justify-center w-12 h-12 rounded-full bg-slate-800 text-sky-400 mb-3 animate-pulse">
+          <div className="inline-flex items-center justify-center w-12 h-12 rounded-full bg-surface-elevated text-sky-600 dark:text-sky-400 mb-3 animate-pulse border border-border-subtle">
             <svg className="w-6 h-6 animate-spin" fill="none" viewBox="0 0 24 24">
               <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" />
               <path
@@ -321,10 +321,10 @@ function VillageAnalysisContent() {
               />
             </svg>
           </div>
-          <h2 className="text-base font-semibold text-slate-200 mb-1">
+          <h2 className="text-base font-semibold text-text-primary mb-1">
             Evaluating Settlement Vulnerability & Risk...
           </h2>
-          <p className="text-xs text-slate-400 font-mono">
+          <p className="text-xs text-text-muted font-mono">
             Executing deterministic backend assessment engines (M3-06, M3-09, M3-12, M4-04)
           </p>
         </div>
@@ -333,10 +333,10 @@ function VillageAnalysisContent() {
       {/* Error State */}
       {isError && (
         <div
-          className="p-8 text-center bg-red-950/30 border border-red-800/60 rounded-lg text-red-200"
+          className="p-8 text-center bg-red-50 border border-red-200 dark:bg-red-950/30 dark:border-red-800/60 rounded-lg text-red-800 dark:text-red-200"
           role="alert"
         >
-          <div className="inline-flex items-center justify-center w-12 h-12 rounded-full bg-red-900/50 text-red-300 mb-3">
+          <div className="inline-flex items-center justify-center w-12 h-12 rounded-full bg-red-100 dark:bg-red-900/50 text-red-600 dark:text-red-300 mb-3">
             <svg className="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
               <path
                 strokeLinecap="round"
@@ -346,10 +346,10 @@ function VillageAnalysisContent() {
               />
             </svg>
           </div>
-          <h2 className="text-base font-semibold text-red-100 mb-1">
+          <h2 className="text-base font-semibold text-red-900 dark:text-red-100 mb-1">
             Failed to Load Settlement Vulnerability Data
           </h2>
-          <p className="text-xs text-red-300 mb-4 max-w-md mx-auto">
+          <p className="text-xs text-red-700 dark:text-red-300 mb-4 max-w-md mx-auto">
             {scenarioErrObj?.message || "Unable to retrieve backend evaluation for the active region."}
           </p>
           <Button variant="outline" size="sm" onClick={handleRefresh}>
@@ -361,11 +361,11 @@ function VillageAnalysisContent() {
       {/* Empty State when zero habitations returned */}
       {!isLoading && !isError && habitations.length === 0 && (
         <div
-          className="p-12 text-center bg-slate-900 border border-slate-800 rounded-lg text-slate-300"
+          className="p-12 text-center bg-surface-panel border border-border-subtle rounded-lg text-text-primary shadow-sm"
           role="region"
           aria-label="No habitations available"
         >
-          <div className="inline-flex items-center justify-center w-12 h-12 rounded-full bg-slate-800 text-slate-400 mb-3">
+          <div className="inline-flex items-center justify-center w-12 h-12 rounded-full bg-surface-elevated border border-border-subtle text-text-muted mb-3">
             <svg className="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
               <path
                 strokeLinecap="round"
@@ -375,10 +375,10 @@ function VillageAnalysisContent() {
               />
             </svg>
           </div>
-          <h2 className="text-base font-semibold text-slate-200 mb-1">
+          <h2 className="text-base font-semibold text-text-primary mb-1">
             No Settlements Available for Region &apos;{activeRegion}&apos;
           </h2>
-          <p className="text-xs text-slate-400 max-w-md mx-auto mb-4 leading-relaxed">
+          <p className="text-xs text-text-muted max-w-md mx-auto mb-4 leading-relaxed">
             The backend has not returned settlement records for this region. Note that direct registry endpoint <code>GET /api/v1/villages</code> is pending backend implementation; settlements are currently loaded via scenario baseline and relocation assignment evaluations.
           </p>
           <Button variant="outline" size="sm" onClick={handleRefresh}>
@@ -387,36 +387,37 @@ function VillageAnalysisContent() {
         </div>
       )}
 
-      {/* Detailed Analysis View for Selected Settlement */}
+      {/* Detailed Analysis View for Selected Settlement — Strong Vertical Narrative */}
       {selectedHabitation && (
-        <>
-          {/* Decision Support Trace Pipeline */}
-          <ExplainabilitySummary habitation={selectedHabitation} />
-
-          {/* Identity & Context Header */}
+        <div className="space-y-6">
+          {/* 1. Settlement Identity Header */}
           <VillageIdentityHeader habitation={selectedHabitation} />
 
-          {/* Primary Metrics & Analysis Grid */}
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-            {/* Multi-Hazard Risk Card */}
+          {/* 2. Primary Situation: Multi-Hazard Risk & Why It Exists */}
+          <div className="grid grid-cols-1 gap-6">
             <MultiHazardRiskCard habitation={selectedHabitation} />
-
-            {/* Relocation Priority & Routing Card */}
-            <RelocationPriorityCard habitation={selectedHabitation} />
-
-            {/* Demographics & Exposure Card */}
-            <PopulationExposureCard habitation={selectedHabitation} />
-
-            {/* Vulnerability & Isolation Card */}
-            <VulnerabilityAnalysisCard habitation={selectedHabitation} />
-
-            {/* Historical Events Card */}
-            <HistoricalEventsCard />
-
-            {/* Critical Infrastructure Card */}
-            <CriticalInfrastructureCard />
           </div>
-        </>
+
+          {/* 3 & 4. Exposure & Vulnerability */}
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+            <PopulationExposureCard habitation={selectedHabitation} />
+            <VulnerabilityAnalysisCard habitation={selectedHabitation} />
+          </div>
+
+          {/* 5. Relocation Priority & Evacuation Corridor */}
+          <div className="grid grid-cols-1 gap-6">
+            <RelocationPriorityCard habitation={selectedHabitation} />
+          </div>
+
+          {/* 6. Critical Infrastructure & Historical Baseline */}
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+            <CriticalInfrastructureCard />
+            <HistoricalEventsCard />
+          </div>
+
+          {/* 7. Decision Support Trace Pipeline (Level 3 Technical Trace) */}
+          <ExplainabilitySummary habitation={selectedHabitation} />
+        </div>
       )}
     </div>
   );

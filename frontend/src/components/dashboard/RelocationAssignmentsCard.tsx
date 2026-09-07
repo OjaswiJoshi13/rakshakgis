@@ -60,7 +60,7 @@ export const RelocationAssignmentsCard: React.FC<RelocationAssignmentsCardProps>
           <div className="py-8 text-center text-slate-500 text-sm font-mono space-y-1">
             <p>No active settlement relocation assignments found.</p>
             <p className="text-xs text-slate-600">
-              Assignments are generated via deterministic matching in Relocation Planner (M6-02).
+              Assignments are generated via deterministic matching in Relocation Planner<span className="sr-only"> (M6-02)</span>.
             </p>
           </div>
         ) : (

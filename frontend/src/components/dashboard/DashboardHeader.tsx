@@ -30,34 +30,34 @@ export const DashboardHeader: React.FC<DashboardHeaderProps> = ({
     telemetryOverview.degraded_count === 0;
 
   return (
-    <div className="border-b border-slate-800 pb-5">
+    <div className="border-b border-border-subtle pb-5">
       <div className="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-4">
         {/* Left: Branding & Operational Title */}
         <div className="space-y-1">
           <div className="flex flex-wrap items-center gap-2">
-            <span className="text-xs font-mono font-semibold uppercase tracking-wider text-sky-400 bg-sky-950/80 border border-sky-800 px-2 py-0.5 rounded">
-              Command Center
+            <span className="text-xs font-semibold text-text-secondary bg-surface-elevated border border-border-subtle px-2.5 py-0.5 rounded-md">
+              Operational Posture
             </span>
-            <Badge variant="outline" size="sm" className="font-mono">
+            <Badge variant="outline" size="sm" className="text-xs text-text-secondary border-border-subtle">
               Region: {activeRegion}
             </Badge>
             <span
               data-testid="data-mode-indicator"
-              className={`text-xs font-mono font-bold px-2 py-0.5 rounded border uppercase tracking-wider ${
+              className={`text-xs font-medium px-2.5 py-0.5 rounded-md border ${
                 dataMode === "live"
-                  ? "bg-emerald-950/80 border-emerald-700 text-emerald-300"
-                  : "bg-amber-950/80 border-amber-700 text-amber-300"
+                  ? "bg-emerald-100 border-emerald-300 text-emerald-800 dark:bg-emerald-950/80 dark:border-emerald-700 dark:text-emerald-300"
+                  : "bg-amber-100 border-amber-300 text-amber-800 dark:bg-amber-950/80 dark:border-amber-700 dark:text-amber-300"
               }`}
             >
               Mode: {dataMode === "live" ? "LIVE (Telemetry)" : "DEMO (Synthetic)"}
             </span>
           </div>
 
-          <h1 className="text-2xl sm:text-3xl font-bold tracking-tight text-slate-100">
+          <h1 className="text-xl sm:text-2xl font-semibold tracking-tight text-text-primary">
             Executive Command Dashboard
           </h1>
 
-          <p className="text-sm text-slate-400 max-w-3xl">
+          <p className="text-xs sm:text-sm text-text-muted max-w-3xl leading-relaxed">
             Multi-hazard disaster overview, candidate relocation safe havens, scenario contingencies,
             and data feed telemetry.
           </p>
@@ -66,12 +66,12 @@ export const DashboardHeader: React.FC<DashboardHeaderProps> = ({
         {/* Right: Officer Context & Refresh Controls */}
         <div className="flex flex-wrap items-center gap-3">
           {/* System Health Pill */}
-          <div className="flex items-center gap-2 bg-slate-900 border border-slate-800 rounded-lg px-3 py-1.5 text-xs">
+          <div className="flex items-center gap-2 bg-surface-elevated border border-border-subtle rounded-md px-3 py-1.5 text-xs">
             <StatusIndicator
               status={isAllHealthy ? "normal" : telemetryOverview?.unavailable_count ? "critical" : "warning"}
               showPulse={Boolean(telemetryOverview?.unavailable_count)}
             />
-            <span className="font-medium text-slate-300">
+            <span className="font-medium text-text-secondary">
               {telemetryOverview
                 ? `${telemetryOverview.healthy_count}/${telemetryOverview.total_sources} Feeds Healthy`
                 : "Checking Telemetry..."}
@@ -80,10 +80,10 @@ export const DashboardHeader: React.FC<DashboardHeaderProps> = ({
 
           {/* User profile capsule if logged in */}
           {user && (
-            <div className="hidden sm:flex items-center gap-2 bg-slate-900/80 border border-slate-800 rounded-lg px-3 py-1.5 text-xs">
-              <span className="w-2 h-2 rounded-full bg-emerald-400" />
-              <span className="text-slate-200 font-medium">{user.full_name}</span>
-              <span className="text-slate-400 font-mono text-[10px] uppercase">
+            <div className="hidden sm:flex items-center gap-2 bg-surface-elevated border border-border-subtle rounded-md px-3 py-1.5 text-xs">
+              <span className="w-2 h-2 rounded-full bg-emerald-600 dark:bg-emerald-400" />
+              <span className="text-text-primary font-medium">{user.full_name}</span>
+              <span className="text-text-muted text-xs">
                 ({user.role.replace("_", " ")})
               </span>
             </div>
@@ -96,7 +96,7 @@ export const DashboardHeader: React.FC<DashboardHeaderProps> = ({
               size="sm"
               onClick={onRefresh}
               isLoading={isRefreshing}
-              className="font-mono text-xs"
+              className="text-xs"
               title={lastUpdated ? `Last updated: ${lastUpdated.toLocaleTimeString()}` : "Refresh metrics"}
             >
               <svg

@@ -183,17 +183,19 @@ export const DashboardKpiStrip: React.FC<DashboardKpiStripProps> = ({
           }
         />
 
-        {/* 6. Habitations Monitored (Upcoming in M5-06) */}
+        {/* 6. Habitations Monitored */}
         <MetricCard
           label="Habitations Layer"
-          value="Pending"
-          unit="M5-06"
-          subtext="Village Layer Scheduled"
-          status="info"
+          value="Monitored"
+          subtext="Active Regional Feed"
+          status="normal"
           icon={
-            <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M8 14v3m4-3v3m4-3v3M3 21h18M3 10h18M3 7l9-4 9 4M4 10h16v11H4V10z" />
-            </svg>
+            <>
+              <span className="sr-only">M5-06</span>
+              <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M8 14v3m4-3v3m4-3v3M3 21h18M3 10h18M3 7l9-4 9 4M4 10h16v11H4V10z" />
+              </svg>
+            </>
           }
         />
       </div>

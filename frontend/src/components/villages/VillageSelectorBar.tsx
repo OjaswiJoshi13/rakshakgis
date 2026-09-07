@@ -37,7 +37,7 @@ export const VillageSelectorBar: React.FC<VillageSelectorBarProps> = ({
 
   return (
     <div
-      className="bg-slate-900 border border-slate-800 rounded-lg p-4 mb-6 shadow-sm"
+      className="bg-surface-panel border border-border-subtle rounded-lg p-4 mb-6 shadow-sm"
       role="region"
       aria-label="Habitation Selector"
     >
@@ -46,7 +46,7 @@ export const VillageSelectorBar: React.FC<VillageSelectorBarProps> = ({
         <div className="flex-1 flex flex-col sm:flex-row items-stretch sm:items-center gap-3">
           <div className="relative flex-1 max-w-md">
             <span
-              className="absolute inset-y-0 left-0 flex items-center pl-3 pointer-events-none text-slate-500"
+              className="absolute inset-y-0 left-0 flex items-center pl-3 pointer-events-none text-text-muted"
               aria-hidden="true"
             >
               <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -65,13 +65,13 @@ export const VillageSelectorBar: React.FC<VillageSelectorBarProps> = ({
               placeholder="Search settlements by name or ID..."
               value={searchQuery}
               onChange={(e) => onSearchChange(e.target.value)}
-              className="w-full pl-9 pr-3 py-1.5 bg-slate-950 border border-slate-700 rounded text-sm text-slate-200 placeholder-slate-500 focus:outline-none focus:ring-1 focus:ring-sky-500 focus:border-sky-500"
+              className="w-full pl-9 pr-3 py-1.5 bg-surface-elevated border border-border-subtle rounded-md text-sm text-text-primary placeholder:text-text-muted focus:outline-none focus:ring-1 focus:ring-sky-500 focus:border-sky-500"
             />
           </div>
 
           {/* Quick Dropdown / Selector */}
           <div className="flex items-center gap-2">
-            <label htmlFor="habitation-dropdown" className="text-xs text-slate-400 font-mono shrink-0">
+            <label htmlFor="habitation-dropdown" className="text-xs text-text-muted shrink-0">
               Select:
             </label>
             <select
@@ -80,7 +80,7 @@ export const VillageSelectorBar: React.FC<VillageSelectorBarProps> = ({
               value={selectedVillageId || ""}
               onChange={(e) => onSelectVillage(e.target.value)}
               disabled={isLoading || villages.length === 0}
-              className="bg-slate-950 border border-slate-700 rounded text-sm text-slate-200 py-1.5 px-3 focus:outline-none focus:ring-1 focus:ring-sky-500"
+              className="bg-surface-elevated border border-border-subtle rounded-md text-sm text-text-primary py-1.5 px-3 focus:outline-none focus:ring-1 focus:ring-sky-500"
             >
               {villages.length === 0 ? (
                 <option value="">No habitations available</option>
@@ -107,12 +107,12 @@ export const VillageSelectorBar: React.FC<VillageSelectorBarProps> = ({
           </Badge>
 
           {/* Active Region Indicator */}
-          <span className="text-xs font-mono text-slate-400 px-2 py-0.5 rounded bg-slate-800 border border-slate-700">
+          <span className="text-xs px-2 py-0.5 rounded bg-surface-elevated border border-border-subtle text-text-secondary">
             Region: {activeRegion}
           </span>
 
           {/* Habitations Count */}
-          <span className="text-xs font-mono text-slate-300" aria-live="polite">
+          <span className="text-xs text-text-muted" aria-live="polite">
             {villages.length} Baseline {villages.length === 1 ? "Settlement" : "Settlements"}
           </span>
 
@@ -129,7 +129,7 @@ export const VillageSelectorBar: React.FC<VillageSelectorBarProps> = ({
               {isRefreshing ? (
                 <>
                   <svg
-                    className="w-3.5 h-3.5 mr-1.5 animate-spin text-slate-400"
+                    className="w-3.5 h-3.5 mr-1.5 animate-spin text-text-muted"
                     fill="none"
                     viewBox="0 0 24 24"
                   >

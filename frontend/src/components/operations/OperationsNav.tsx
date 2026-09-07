@@ -111,7 +111,7 @@ export const OperationsNav: React.FC<OperationsNavProps> = ({ className }) => {
     <nav
       aria-label="Operations Navigation"
       className={cn(
-        "flex w-full items-center gap-1.5 overflow-x-auto py-1 border-b border-slate-800/80 pb-2 scrollbar-none",
+        "flex w-full items-center gap-1 overflow-x-auto border-b border-border-subtle pb-2 scrollbar-none",
         className
       )}
     >
@@ -129,29 +129,20 @@ export const OperationsNav: React.FC<OperationsNavProps> = ({ className }) => {
             aria-current={isActive ? "page" : undefined}
             title={`${item.label} (${item.chunkId}) — ${item.description}`}
             className={cn(
-              "flex shrink-0 items-center gap-2 rounded-md px-3 py-1.5 text-xs font-medium transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-sky-500",
+              "group flex shrink-0 items-center gap-2 rounded-md px-3 py-1.5 text-xs font-medium transition-all focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-focus-ring",
               isActive
-                ? "bg-sky-950/90 text-sky-200 border border-sky-700/70 shadow-sm shadow-sky-950 font-semibold"
-                : "text-slate-400 hover:bg-slate-900 hover:text-slate-200 border border-transparent"
+                ? "bg-surface-elevated text-text-primary font-semibold border border-border-strong"
+                : "text-text-secondary hover:text-text-primary hover:bg-surface-elevated/60 border border-transparent"
             )}
           >
             <Icon
               className={cn(
-                "h-3.5 w-3.5 shrink-0",
-                isActive ? "text-sky-400" : "text-slate-400"
+                "h-3.5 w-3.5 shrink-0 transition-colors",
+                isActive ? "text-text-primary" : "text-text-muted group-hover:text-text-secondary"
               )}
             />
             <span className="whitespace-nowrap">{item.label}</span>
-            <span
-              className={cn(
-                "rounded px-1 py-0.2 text-[9px] font-mono",
-                isActive
-                  ? "bg-sky-900/60 border border-sky-600/60 text-sky-300"
-                  : "bg-slate-900 border border-slate-800 text-slate-400"
-              )}
-            >
-              {item.chunkId}
-            </span>
+            <span className="sr-only" data-testid="nav-chunk-id">{item.chunkId}</span>
           </Link>
         );
       })}

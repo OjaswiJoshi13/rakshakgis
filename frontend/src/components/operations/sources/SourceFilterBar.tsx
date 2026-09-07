@@ -28,14 +28,14 @@ export const SourceFilterBar: React.FC<SourceFilterBarProps> = ({
     (criteria.mode && criteria.mode !== "all");
 
   return (
-    <div className="rounded-lg border border-slate-800 bg-slate-900/60 p-4 space-y-4">
+    <div className="rounded-lg border border-border-subtle bg-surface-panel p-4 space-y-4 shadow-sm">
       <div className="flex flex-col md:flex-row items-stretch md:items-center gap-3">
         {/* Search Input */}
         <div className="relative flex-1">
           <label htmlFor="sources-search-input" className="sr-only">
             Search Data Sources
           </label>
-          <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-slate-500" />
+          <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-text-muted" />
           <input
             id="sources-search-input"
             type="text"
@@ -44,7 +44,7 @@ export const SourceFilterBar: React.FC<SourceFilterBarProps> = ({
             onChange={(e) =>
               onCriteriaChange({ ...criteria, search: e.target.value })
             }
-            className="w-full bg-slate-950 border border-slate-800 rounded-md pl-9 pr-3 py-1.5 text-xs text-slate-200 placeholder-slate-500 focus:outline-none focus:border-sky-500 transition-colors"
+            className="w-full bg-surface-elevated border border-border-subtle rounded-md pl-9 pr-3 py-1.5 text-xs text-text-primary placeholder:text-text-muted focus:outline-none focus:ring-1 focus:ring-sky-500 transition-colors"
           />
         </div>
 
@@ -56,7 +56,7 @@ export const SourceFilterBar: React.FC<SourceFilterBarProps> = ({
             size="sm"
             onClick={onReset}
             leftIcon={<RotateCcw className="h-3.5 w-3.5" />}
-            className="text-xs text-slate-400 hover:text-slate-200 self-end md:self-auto"
+            className="text-xs text-text-muted hover:text-text-primary self-end md:self-auto"
           >
             <span>Reset Filters</span>
           </Button>
@@ -64,14 +64,14 @@ export const SourceFilterBar: React.FC<SourceFilterBarProps> = ({
       </div>
 
       {/* Filter Dropdowns Grid */}
-      <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 pt-2 border-t border-slate-800/60">
+      <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 pt-2 border-t border-border-subtle">
         {/* 1. Category */}
         <div className="space-y-1">
           <label
             htmlFor="sources-category-filter"
-            className="block text-[11px] font-medium text-slate-400 font-mono flex items-center gap-1"
+            className="block text-[11px] font-medium text-text-secondary font-mono flex items-center gap-1"
           >
-            <Filter className="h-3 w-3 text-slate-500" /> Category
+            <Filter className="h-3 w-3 text-text-muted" /> Category
           </label>
           <select
             id="sources-category-filter"
@@ -79,7 +79,7 @@ export const SourceFilterBar: React.FC<SourceFilterBarProps> = ({
             onChange={(e) =>
               onCriteriaChange({ ...criteria, category: e.target.value })
             }
-            className="w-full bg-slate-950 border border-slate-800 rounded-md px-2.5 py-1 text-xs text-slate-300 focus:outline-none focus:border-sky-500"
+            className="w-full bg-surface-elevated border border-border-subtle rounded-md px-2.5 py-1 text-xs text-text-primary focus:outline-none focus:ring-1 focus:ring-sky-500"
           >
             <option value="all">All Categories</option>
             <option value="rainfall">Rainfall (Meteorological)</option>
@@ -94,7 +94,7 @@ export const SourceFilterBar: React.FC<SourceFilterBarProps> = ({
         <div className="space-y-1">
           <label
             htmlFor="sources-health-filter"
-            className="block text-[11px] font-medium text-slate-400 font-mono"
+            className="block text-[11px] font-medium text-text-secondary font-mono"
           >
             Provider Health
           </label>
@@ -104,7 +104,7 @@ export const SourceFilterBar: React.FC<SourceFilterBarProps> = ({
             onChange={(e) =>
               onCriteriaChange({ ...criteria, health: e.target.value })
             }
-            className="w-full bg-slate-950 border border-slate-800 rounded-md px-2.5 py-1 text-xs text-slate-300 focus:outline-none focus:border-sky-500"
+            className="w-full bg-surface-elevated border border-border-subtle rounded-md px-2.5 py-1 text-xs text-text-primary focus:outline-none focus:ring-1 focus:ring-sky-500"
           >
             <option value="all">All Health States</option>
             <option value="healthy">Healthy (Operational)</option>
@@ -117,7 +117,7 @@ export const SourceFilterBar: React.FC<SourceFilterBarProps> = ({
         <div className="space-y-1">
           <label
             htmlFor="sources-freshness-filter"
-            className="block text-[11px] font-medium text-slate-400 font-mono"
+            className="block text-[11px] font-medium text-text-secondary font-mono"
           >
             Freshness Status
           </label>
@@ -127,7 +127,7 @@ export const SourceFilterBar: React.FC<SourceFilterBarProps> = ({
             onChange={(e) =>
               onCriteriaChange({ ...criteria, freshness: e.target.value })
             }
-            className="w-full bg-slate-950 border border-slate-800 rounded-md px-2.5 py-1 text-xs text-slate-300 focus:outline-none focus:border-sky-500"
+            className="w-full bg-surface-elevated border border-border-subtle rounded-md px-2.5 py-1 text-xs text-text-primary focus:outline-none focus:ring-1 focus:ring-sky-500"
           >
             <option value="all">All Freshness States</option>
             <option value="fresh">Fresh (Within Cutoff)</option>
@@ -142,7 +142,7 @@ export const SourceFilterBar: React.FC<SourceFilterBarProps> = ({
         <div className="space-y-1">
           <label
             htmlFor="sources-mode-filter"
-            className="block text-[11px] font-medium text-slate-400 font-mono"
+            className="block text-[11px] font-medium text-text-secondary font-mono"
           >
             Adapter Mode
           </label>
@@ -152,7 +152,7 @@ export const SourceFilterBar: React.FC<SourceFilterBarProps> = ({
             onChange={(e) =>
               onCriteriaChange({ ...criteria, mode: e.target.value })
             }
-            className="w-full bg-slate-950 border border-slate-800 rounded-md px-2.5 py-1 text-xs text-slate-300 focus:outline-none focus:border-sky-500"
+            className="w-full bg-surface-elevated border border-border-subtle rounded-md px-2.5 py-1 text-xs text-text-primary focus:outline-none focus:ring-1 focus:ring-sky-500"
           >
             <option value="all">All Modes</option>
             <option value="mock">Mock / Synthetic</option>
@@ -164,13 +164,13 @@ export const SourceFilterBar: React.FC<SourceFilterBarProps> = ({
       </div>
 
       {/* Result Counter */}
-      <div className="flex items-center justify-between text-[11px] font-mono text-slate-500 pt-1">
+      <div className="flex items-center justify-between text-[11px] font-mono text-text-muted pt-1">
         <span>
-          Showing <strong className="text-slate-300">{totalFiltered}</strong> of{" "}
-          <strong className="text-slate-300">{totalAvailable}</strong> registered data sources
+          Showing <strong className="text-text-primary">{totalFiltered}</strong> of{" "}
+          <strong className="text-text-primary">{totalAvailable}</strong> registered data sources
         </span>
         {hasActiveFilters && (
-          <span className="text-sky-400">Filters active</span>
+          <span className="text-sky-600 dark:text-sky-400 font-semibold">Filters active</span>
         )}
       </div>
     </div>

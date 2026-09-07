@@ -26,25 +26,25 @@ export const Button = forwardRef<HTMLButtonElement, ButtonProps>(
     ref
   ) => {
     const baseStyles =
-      "inline-flex items-center justify-center font-medium rounded-md transition-colors duration-150 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:ring-offset-slate-900 disabled:opacity-50 disabled:pointer-events-none select-none";
+      "inline-flex items-center justify-center font-medium rounded-md transition-all duration-150 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-offset-1 focus-visible:ring-offset-transparent disabled:opacity-50 disabled:pointer-events-none select-none";
 
     const variantStyles = {
       primary:
-        "bg-sky-600 hover:bg-sky-500 text-white shadow-sm border border-sky-500 focus-visible:ring-sky-400 active:bg-sky-700",
+        "bg-sky-600 hover:bg-sky-700 dark:bg-sky-600 dark:hover:bg-sky-500 text-white shadow-xs border border-sky-600/80 focus-visible:ring-sky-400 active:scale-[0.99]",
       secondary:
-        "bg-slate-800 hover:bg-slate-700 text-slate-100 border border-slate-700 focus-visible:ring-slate-400 active:bg-slate-900",
+        "bg-slate-100 hover:bg-slate-200 text-slate-800 border border-slate-300 dark:bg-slate-800 dark:hover:bg-slate-700 dark:text-slate-100 dark:border-slate-700 focus-visible:ring-slate-400 active:scale-[0.99]",
       outline:
-        "bg-transparent hover:bg-slate-800/60 text-slate-200 border border-slate-700 focus-visible:ring-slate-400 active:bg-slate-800",
+        "bg-transparent hover:bg-surface-elevated text-text-primary border border-border-strong focus-visible:ring-slate-400 active:scale-[0.99]",
       ghost:
-        "bg-transparent hover:bg-slate-800/50 text-slate-300 hover:text-white focus-visible:ring-slate-400 active:bg-slate-800",
+        "bg-transparent hover:bg-surface-elevated text-text-secondary hover:text-text-primary focus-visible:ring-slate-400",
       danger:
-        "bg-red-600 hover:bg-red-500 text-white shadow-sm border border-red-500 focus-visible:ring-red-400 active:bg-red-700",
+        "bg-red-600 hover:bg-red-700 text-white shadow-xs border border-red-600 focus-visible:ring-red-400 active:scale-[0.99]",
     };
 
     const sizeStyles = {
-      sm: "h-8 px-3 text-xs gap-1.5",
-      md: "h-9 px-4 text-sm gap-2",
-      lg: "h-11 px-5 text-base gap-2.5",
+      sm: "h-7 px-2.5 text-xs gap-1.5",
+      md: "h-8 px-3 text-xs gap-1.5",
+      lg: "h-9 px-3.5 text-sm gap-2",
     };
 
     return (

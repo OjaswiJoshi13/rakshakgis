@@ -13,7 +13,7 @@ export const AppLayout: React.FC<AppLayoutProps> = ({ children }) => {
   const [isSidebarOpen, setIsSidebarOpen] = useState<boolean>(true);
 
   return (
-    <div className="flex min-h-screen flex-col bg-slate-950 text-slate-100 antialiased font-sans">
+    <div className="flex min-h-screen flex-col bg-surface-bg text-text-primary antialiased font-sans transition-colors">
       {/* Accessible Skip Link */}
       <a
         href="#main-content"

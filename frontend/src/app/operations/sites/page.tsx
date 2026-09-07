@@ -224,8 +224,8 @@ function SitesOperationsContent() {
               )}
             </>
           ) : (
-            <div className="rounded-lg border border-dashed border-slate-800 p-12 text-center text-xs text-slate-400">
-              <MapPin className="h-8 w-8 mx-auto text-slate-600 mb-3" />
+            <div className="rounded-lg border border-dashed border-border-base p-12 text-center text-xs text-text-muted">
+              <MapPin className="h-8 w-8 mx-auto text-text-muted mb-3" />
               <p>Select a candidate relocation site to inspect its details and infrastructure.</p>
             </div>
           )}

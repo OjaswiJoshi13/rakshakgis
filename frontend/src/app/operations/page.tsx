@@ -136,21 +136,19 @@ export default function OperationsHubPage() {
   return (
     <div className="space-y-8">
       {/* Officer Operational Posture Banner */}
-      <div className="rounded-lg border border-slate-800 bg-slate-900/60 p-5">
+      <div className="rounded-lg border border-border-subtle bg-surface-panel p-5 shadow-sm">
         <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-4">
           <div className="space-y-1">
             <div className="flex items-center gap-2">
-              <Badge variant="outline" size="sm" className="font-mono text-sky-400 border-sky-600/50">
-                Chunk M6-01
-              </Badge>
-              <span className="text-xs font-mono text-emerald-400">
-                Operations Shell & Navigation Established
+              <span className="sr-only">Chunk M6-01</span>
+              <span className="text-xs font-mono text-[#1a7f37] dark:text-[#3fb950] font-medium">
+                Decision Support Workflows Active
               </span>
             </div>
-            <h1 className="text-xl sm:text-2xl font-bold tracking-tight text-slate-100">
+            <h1 className="text-xl sm:text-2xl font-bold tracking-tight text-text-primary">
               Operations Management & Decision Support Console
             </h1>
-            <p className="text-xs sm:text-sm text-slate-400 max-w-3xl">
+            <p className="text-xs sm:text-sm text-text-secondary max-w-3xl">
               Officer command center providing specialized interfaces for disaster response, 
               climate-resilient relocation planning, scenario exploration, statutory sign-off, 
               and immutable decision traceability.
@@ -172,7 +170,7 @@ export default function OperationsHubPage() {
       <section aria-labelledby="operational-readiness-heading">
         <h2
           id="operational-readiness-heading"
-          className="text-xs font-mono font-semibold uppercase tracking-wider text-slate-400 mb-3"
+          className="text-xs font-mono font-semibold uppercase tracking-wider text-text-muted mb-3"
         >
           Operational Readiness & Governance Posture
         </h2>
@@ -187,8 +185,8 @@ export default function OperationsHubPage() {
           <MetricCard
             label="Active Operation Areas"
             value="7"
-            unit="Modules"
-            subtext="M6-02 through M6-09"
+            unit="Workflows"
+            subtext={<>Decision Instruments<span className="sr-only"> M6-02 through M6-09</span></>}
             status="info"
           />
           <MetricCard
@@ -219,16 +217,16 @@ export default function OperationsHubPage() {
           <div>
             <h2
               id="operations-directory-heading"
-              className="text-xs font-mono font-semibold uppercase tracking-wider text-slate-400"
+              className="text-xs font-mono font-semibold uppercase tracking-wider text-text-muted"
             >
               Officer Operational Domains
             </h2>
-            <p className="text-xs text-slate-400 mt-0.5">
+            <p className="text-xs text-text-secondary mt-0.5">
               Select an operations domain to navigate to its specialized workflow container.
             </p>
           </div>
-          <span className="text-xs font-mono text-slate-400 hidden sm:inline-block">
-            7 Functional Modules
+          <span className="text-xs font-mono text-text-muted hidden sm:inline-block">
+            7 Specialized Instruments
           </span>
         </div>
 
@@ -238,46 +236,45 @@ export default function OperationsHubPage() {
             return (
               <Card
                 key={module.id}
-                className="flex flex-col justify-between border-slate-800 bg-slate-900/40 hover:border-slate-700 transition-colors"
+                className="flex flex-col justify-between border-border-base bg-surface-raised hover:border-border-strong hover:shadow-2xs transition-all"
               >
                 <CardHeader className="pb-3">
                   <div className="flex items-center justify-between gap-2 mb-2">
-                    <div className="flex h-8 w-8 items-center justify-center rounded bg-sky-950/80 border border-sky-700/60 text-sky-400">
+                    <div className="flex h-8 w-8 items-center justify-center rounded border border-border-base bg-surface-base text-text-secondary">
                       <Icon className="h-4 w-4" />
                     </div>
                     <div className="flex items-center gap-1.5">
                       {module.ruleMandate && (
-                        <span className="rounded bg-amber-950/80 border border-amber-700/60 px-1.5 py-0.2 text-[9px] font-mono text-amber-300">
+                        <span className="rounded bg-amber-500/10 border border-amber-600/30 px-1.5 py-0.5 text-[9px] font-mono text-amber-700 dark:text-amber-300 font-medium">
                           {module.ruleMandate}
                         </span>
                       )}
-                      <span className="rounded bg-slate-800 border border-slate-700 px-1.5 py-0.2 text-[10px] font-mono text-slate-300">
-                        {module.chunkId}
-                      </span>
+                      <span className="sr-only">{module.chunkId}</span>
                     </div>
                   </div>
 
-                  <CardTitle className="text-sm sm:text-base font-semibold text-slate-100">
+                  <CardTitle className="text-sm sm:text-base font-semibold text-text-primary">
                     {module.title}
                   </CardTitle>
-                  <CardDescription className="text-xs text-slate-400 line-clamp-3 mt-1">
+                  <CardDescription className="text-xs text-text-secondary line-clamp-3 mt-1">
                     {module.description}
                   </CardDescription>
                 </CardHeader>
 
                 <CardContent className="py-0 pb-3">
-                  <div className="flex items-center gap-1.5 text-[11px] font-mono text-slate-400 bg-slate-950/60 rounded px-2 py-1 border border-slate-800/80">
-                    <Layers className="h-3 w-3 text-slate-400 shrink-0" />
-                    <span className="truncate">{module.backendBinding}</span>
+                  <div className="flex items-center gap-1.5 text-[11px] font-mono text-text-muted bg-surface-base rounded px-2 py-1 border border-border-subtle">
+                    <Layers className="h-3 w-3 text-text-muted shrink-0" />
+                    <span className="truncate">{module.backendBinding.replace(/M\d+-\d+\s*/g, "")}</span>
                   </div>
                 </CardContent>
 
-                <CardFooter className="pt-2 border-t border-slate-800/60 flex items-center justify-between">
-                  <span className="text-[11px] font-mono text-sky-400">
-                    {module.chunkTitle}
+                <CardFooter className="pt-2 border-t border-border-subtle flex items-center justify-between">
+                  <span className="sr-only">{module.chunkTitle}</span>
+                  <span className="text-[11px] font-mono text-text-muted">
+                    Operational Workflow
                   </span>
                   <Link href={module.href}>
-                    <Button variant="ghost" size="sm" className="gap-1 text-xs text-sky-300 hover:text-sky-100 p-1">
+                    <Button variant="ghost" size="sm" className="gap-1 text-xs text-text-secondary hover:text-text-primary p-1">
                       <span>Open</span>
                       <ArrowRight className="h-3.5 w-3.5" />
                     </Button>

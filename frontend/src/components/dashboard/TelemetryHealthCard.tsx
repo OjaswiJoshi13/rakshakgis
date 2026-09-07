@@ -74,24 +74,24 @@ export const TelemetryHealthCard: React.FC<TelemetryHealthCardProps> = ({
             {/* Visual Health & Freshness Gauges */}
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               {/* Provider Health Distribution */}
-              <div className="bg-slate-950/70 border border-slate-800 rounded-lg p-3 space-y-2">
+              <div className="bg-surface-elevated/70 border border-border-subtle rounded-lg p-3 space-y-2">
                 <div className="flex items-center justify-between text-xs">
-                  <span className="font-semibold uppercase tracking-wider text-slate-400">
+                  <span className="font-semibold uppercase tracking-wider text-text-muted">
                     Provider Health
                   </span>
-                  <span className="font-mono text-slate-300">
+                  <span className="font-mono text-text-primary">
                     {overview?.healthy_count ?? 0} Healthy / {overview?.unavailable_count ?? 0} Down
                   </span>
                 </div>
 
                 {/* Progress bar */}
-                <div className="h-3 w-full bg-slate-800 rounded-full overflow-hidden flex" role="progressbar" aria-label="Provider Health Distribution">
+                <div className="h-3 w-full bg-border-strong rounded-full overflow-hidden flex" role="progressbar" aria-label="Provider Health Distribution">
                   <div style={{ width: `${healthyPct}%` }} className="bg-emerald-500 h-full" title={`Healthy: ${healthyPct}%`} />
                   <div style={{ width: `${degradedPct}%` }} className="bg-amber-500 h-full" title={`Degraded: ${degradedPct}%`} />
                   <div style={{ width: `${unavailablePct}%` }} className="bg-red-500 h-full" title={`Unavailable: ${unavailablePct}%`} />
                 </div>
 
-                <div className="flex items-center justify-between text-[11px] text-slate-400 pt-1 font-mono">
+                <div className="flex items-center justify-between text-[11px] text-text-muted pt-1 font-mono">
                   <span className="flex items-center gap-1.5">
                     <span className="w-2 h-2 rounded-full bg-emerald-500 inline-block" />
                     Healthy ({healthyPct}%)
@@ -108,24 +108,24 @@ export const TelemetryHealthCard: React.FC<TelemetryHealthCardProps> = ({
               </div>
 
               {/* Data Freshness Distribution */}
-              <div className="bg-slate-950/70 border border-slate-800 rounded-lg p-3 space-y-2">
+              <div className="bg-surface-elevated/70 border border-border-subtle rounded-lg p-3 space-y-2">
                 <div className="flex items-center justify-between text-xs">
-                  <span className="font-semibold uppercase tracking-wider text-slate-400">
+                  <span className="font-semibold uppercase tracking-wider text-text-muted">
                     Observation Freshness
                   </span>
-                  <span className="font-mono text-slate-300">
+                  <span className="font-mono text-text-primary">
                     {overview?.fresh_count ?? 0} Fresh / {overview?.stale_count ?? 0} Stale
                   </span>
                 </div>
 
                 {/* Progress bar */}
-                <div className="h-3 w-full bg-slate-800 rounded-full overflow-hidden flex" role="progressbar" aria-label="Data Freshness Distribution">
+                <div className="h-3 w-full bg-border-strong rounded-full overflow-hidden flex" role="progressbar" aria-label="Data Freshness Distribution">
                   <div style={{ width: `${freshPct}%` }} className="bg-sky-500 h-full" title={`Fresh: ${freshPct}%`} />
                   <div style={{ width: `${stalePct}%` }} className="bg-amber-500 h-full" title={`Stale: ${stalePct}%`} />
-                  <div style={{ width: `${unknownPct}%` }} className="bg-slate-600 h-full" title={`Unknown: ${unknownPct}%`} />
+                  <div style={{ width: `${unknownPct}%` }} className="bg-slate-400 dark:bg-slate-600 h-full" title={`Unknown: ${unknownPct}%`} />
                 </div>
 
-                <div className="flex items-center justify-between text-[11px] text-slate-400 pt-1 font-mono">
+                <div className="flex items-center justify-between text-[11px] text-text-muted pt-1 font-mono">
                   <span className="flex items-center gap-1.5">
                     <span className="w-2 h-2 rounded-full bg-sky-500 inline-block" />
                     Fresh ({freshPct}%)
@@ -135,7 +135,7 @@ export const TelemetryHealthCard: React.FC<TelemetryHealthCardProps> = ({
                     Stale ({stalePct}%)
                   </span>
                   <span className="flex items-center gap-1.5">
-                    <span className="w-2 h-2 rounded-full bg-slate-600 inline-block" />
+                    <span className="w-2 h-2 rounded-full bg-slate-400 dark:bg-slate-600 inline-block" />
                     Unknown ({unknownPct}%)
                   </span>
                 </div>
@@ -144,18 +144,18 @@ export const TelemetryHealthCard: React.FC<TelemetryHealthCardProps> = ({
 
             {/* Data Sources Table */}
             <div className="space-y-2">
-              <h3 className="text-xs font-mono font-semibold uppercase tracking-wider text-slate-400">
+              <h3 className="text-xs font-mono font-semibold uppercase tracking-wider text-text-muted">
                 Registered Ingestion Feeds
               </h3>
 
               {!sources || sources.length === 0 ? (
-                <div className="py-4 text-center text-slate-500 text-xs font-mono">
+                <div className="py-4 text-center text-text-muted text-xs font-mono">
                   No data sources registered on this platform.
                 </div>
               ) : (
-                <div className="overflow-x-auto rounded-lg border border-slate-800">
-                  <table className="w-full text-left text-xs text-slate-300">
-                    <thead className="bg-slate-950 text-[11px] font-mono text-slate-400 uppercase tracking-wider border-b border-slate-800">
+                <div className="overflow-x-auto rounded-lg border border-border-subtle">
+                  <table className="w-full text-left text-xs text-text-secondary">
+                    <thead className="bg-surface-elevated/80 text-[11px] font-mono text-text-muted uppercase tracking-wider border-b border-border-subtle">
                       <tr>
                         <th className="px-3 py-2.5">Source Name</th>
                         <th className="px-3 py-2.5">Category</th>
@@ -165,18 +165,18 @@ export const TelemetryHealthCard: React.FC<TelemetryHealthCardProps> = ({
                         <th className="px-3 py-2.5 text-right">Records</th>
                       </tr>
                     </thead>
-                    <tbody className="divide-y divide-slate-800/60 bg-slate-900/40">
+                    <tbody className="divide-y divide-border-subtle bg-surface-panel">
                       {sources.map((src) => (
-                        <tr key={src.source_id} className="hover:bg-slate-800/40 transition-colors">
-                          <td className="px-3 py-2 font-medium text-slate-200">
+                        <tr key={src.source_id} className="hover:bg-surface-elevated/60 transition-colors">
+                          <td className="px-3 py-2 font-medium text-text-primary">
                             {src.name}
                             {src.is_synthetic && (
-                              <span className="ml-1.5 text-[10px] font-mono text-amber-400 bg-amber-950/60 border border-amber-800/60 px-1 py-0.2 rounded">
+                              <span className="ml-1.5 text-[10px] font-mono text-amber-700 dark:text-amber-400 bg-amber-500/10 border border-amber-500/20 px-1 py-0.2 rounded">
                                 DEMO
                               </span>
                             )}
                           </td>
-                          <td className="px-3 py-2 text-slate-400 font-mono text-[11px] capitalize">
+                          <td className="px-3 py-2 text-text-muted font-mono text-[11px] capitalize">
                             {src.category || src.source_type}
                           </td>
                           <td className="px-3 py-2">
@@ -190,30 +190,30 @@ export const TelemetryHealthCard: React.FC<TelemetryHealthCardProps> = ({
                                     : "critical"
                                 }
                               />
-                              <span className="font-mono text-[11px] text-slate-300">
+                              <span className="font-mono text-[11px] text-text-secondary">
                                 {src.provider_health}
                               </span>
                             </span>
                           </td>
                           <td className="px-3 py-2">
                             <span
-                              className={`px-1.5 py-0.5 rounded text-[10px] font-mono font-semibold uppercase ${
+                              className={`px-1.5 py-0.5 rounded text-[10px] font-mono font-semibold uppercase border ${
                                 src.freshness?.status === "FRESH"
-                                  ? "bg-emerald-950/80 text-emerald-300 border border-emerald-800"
+                                  ? "bg-emerald-500/10 text-emerald-700 dark:text-emerald-300 border-emerald-500/30"
                                   : src.freshness?.status === "STALE"
-                                  ? "bg-amber-950/80 text-amber-300 border border-amber-800"
-                                  : "bg-slate-800 text-slate-400 border border-slate-700"
+                                  ? "bg-amber-500/10 text-amber-700 dark:text-amber-300 border-amber-500/30"
+                                  : "bg-surface-elevated text-text-muted border-border-strong"
                               }`}
                             >
                               {src.freshness?.status || "UNKNOWN"}
                             </span>
                           </td>
-                          <td className="px-3 py-2 text-slate-400 font-mono text-[11px]">
+                          <td className="px-3 py-2 text-text-muted font-mono text-[11px]">
                             {src.last_successful_update
                               ? new Date(src.last_successful_update).toLocaleTimeString()
                               : "Never"}
                           </td>
-                          <td className="px-3 py-2 text-right font-mono text-slate-300">
+                          <td className="px-3 py-2 text-right font-mono text-text-primary">
                             {src.records_ingested_total.toLocaleString()}
                           </td>
                         </tr>

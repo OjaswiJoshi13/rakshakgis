@@ -29,34 +29,34 @@ export const MapHeader: React.FC<MapHeaderProps> = ({
   const { activeRegion, dataMode } = useOperational();
 
   return (
-    <div className={`border-b border-slate-800 pb-4 ${className}`}>
+    <div className={`border-b border-border-subtle pb-4 ${className}`}>
       <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
         {/* Left: Branding & Operational Status */}
         <div className="space-y-1">
           <div className="flex flex-wrap items-center gap-2">
-            <span className="text-xs font-mono font-semibold uppercase tracking-wider text-sky-400 bg-sky-950/80 border border-sky-800 px-2 py-0.5 rounded">
+            <span className="text-xs font-semibold text-text-secondary bg-surface-elevated border border-border-subtle px-2.5 py-0.5 rounded-md">
               Spatial Decision Support
             </span>
-            <Badge variant="outline" size="sm" className="font-mono">
+            <Badge variant="outline" size="sm" className="text-xs text-text-secondary border-border-subtle">
               Region: {activeRegion}
             </Badge>
             <span
               data-testid="map-data-mode"
-              className={`text-xs font-mono font-bold px-2 py-0.5 rounded border uppercase tracking-wider ${
+              className={`text-xs font-medium px-2.5 py-0.5 rounded-md border ${
                 dataMode === "live"
-                  ? "bg-emerald-950/80 border-emerald-700 text-emerald-300"
-                  : "bg-amber-950/80 border-amber-700 text-amber-300"
+                  ? "bg-emerald-100 border-emerald-300 text-emerald-800 dark:bg-emerald-950/80 dark:border-emerald-700 dark:text-emerald-300"
+                  : "bg-amber-100 border-amber-300 text-amber-800 dark:bg-amber-950/80 dark:border-amber-700 dark:text-amber-300"
               }`}
             >
               Mode: {dataMode === "live" ? "LIVE (Telemetry)" : "DEMO (Synthetic)"}
             </span>
           </div>
 
-          <h1 className="text-2xl font-bold tracking-tight text-slate-100">
+          <h1 className="text-xl sm:text-2xl font-semibold tracking-tight text-text-primary">
             Command GIS Map Canvas
           </h1>
 
-          <p className="text-xs text-slate-400 max-w-2xl">
+          <p className="text-xs sm:text-sm text-text-muted max-w-2xl leading-relaxed">
             Interactive multi-hazard geospatial canvas visualizing candidate relocation safe havens,
             evacuation road corridors, and regional zoning bounds.
           </p>
@@ -65,8 +65,8 @@ export const MapHeader: React.FC<MapHeaderProps> = ({
         {/* Right: Metrics & Viewport Controls */}
         <div className="flex flex-wrap items-center gap-2.5">
           {/* Active Features Count Badge */}
-          <div className="flex items-center gap-2 bg-slate-900 border border-slate-800 rounded-lg px-3 py-1.5 text-xs font-mono text-slate-300">
-            <span className="w-2 h-2 rounded-full bg-sky-400" />
+          <div className="flex items-center gap-2 bg-surface-elevated border border-border-subtle rounded-md px-3 py-1.5 text-xs font-medium text-text-secondary tabular-nums">
+            <span className="w-2 h-2 rounded-full bg-slate-500" />
             <span>
               {totalSites} Havens &bull; {totalRoutes} Corridors
               {totalRedZones > 0 ? ` • ${totalRedZones} Red Zones` : ""}
@@ -80,7 +80,7 @@ export const MapHeader: React.FC<MapHeaderProps> = ({
               variant="secondary"
               size="sm"
               onClick={onResetView}
-              className="font-mono text-xs"
+              className="text-xs"
               title="Recenter and fit map to loaded features"
             >
               <svg className="w-3.5 h-3.5 mr-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -97,7 +97,7 @@ export const MapHeader: React.FC<MapHeaderProps> = ({
               size="sm"
               onClick={onRefresh}
               isLoading={isRefreshing}
-              className="font-mono text-xs"
+              className="text-xs"
               title="Refresh spatial layers from backend"
             >
               <svg
