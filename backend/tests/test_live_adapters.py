@@ -87,6 +87,19 @@ def test_usgs_earthquake_provider_metadata():
     assert provider.check_health() in (ProviderHealth.HEALTHY, ProviderHealth.DEGRADED, ProviderHealth.UNAVAILABLE)
 
 
+def test_usgs_earthquake_query_himalayan_pilot():
+    """Verify USGS query with himalayan_pilot safely resolves coordinates without crashing."""
+    provider = USGSEarthquakeProvider()
+    query = ProviderQuery(
+        category=SourceCategory.HAZARD_OBSERVATION,
+        region_id="himalayan_pilot",
+    )
+    # Must not raise AttributeError: 'ProviderQuery' object has no attribute 'filter_criteria'
+    lat, lon = provider._resolve_center_point(query)
+    assert 30.0 <= lat <= 31.0
+    assert 79.0 <= lon <= 80.5
+
+
 def test_ncs_earthquake_provider_metadata():
     """Verify NCSEarthquakeProvider properties and catalog loading."""
     provider = NCSEarthquakeProvider()

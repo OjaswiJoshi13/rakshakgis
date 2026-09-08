@@ -32,15 +32,14 @@ def list_villages(
 ):
     """Retrieve paginated habitations matching filter criteria."""
     from app.core.config import get_settings
+    from app.core.regions import resolve_region_scope, apply_region_scope_to_village_query
     from app.models.geographic import District, Region
 
     query = db.query(Village)
 
-    if region_id is not None:
-        if region_id.isdigit():
-            query = query.join(Village.block).join(Block.district).filter(District.region_id == int(region_id))
-        else:
-            query = query.join(Village.block).join(Block.district).join(District.region).filter(Region.code == region_id)
+    scope = resolve_region_scope(db, region_id) if region_id is not None else None
+    if scope is not None:
+        query = apply_region_scope_to_village_query(query, scope)
     elif district_id is None and block_id is None:
         if get_settings().DATA_MODE.lower() == "demo":
             # Isolate demo dataset in DEMO mode to preserve deterministic SIH demo behavior
@@ -50,7 +49,10 @@ def list_villages(
         query = query.filter(Village.block_id == block_id)
 
     if district_id is not None:
-        query = query.join(Village.block).filter(Block.district_id == district_id)
+        if scope is not None:
+            query = query.filter(Block.district_id == district_id)
+        else:
+            query = query.join(Village.block).filter(Block.district_id == district_id)
 
     if is_active is not None:
         query = query.filter(Village.is_active == is_active)

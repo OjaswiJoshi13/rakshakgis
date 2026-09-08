@@ -19,10 +19,10 @@ describe("Relocation Planner Workflow UI Suite (Chunk M6-02)", () => {
     vi.clearAllMocks();
   });
 
-  const renderWithAuth = () => {
+  const renderWithAuth = (props?: { defaultUseDatabase?: boolean }) => {
     return render(
       <AuthProvider>
-        <RelocationOperationsPage />
+        <RelocationOperationsPage defaultUseDatabase={props?.defaultUseDatabase ?? false} />
       </AuthProvider>
     );
   };
@@ -199,6 +199,31 @@ describe("Relocation Planner Workflow UI Suite (Chunk M6-02)", () => {
       expect(
         await screen.findByText(/Successfully persisted 3 relocation assignments/i)
       ).toBeInTheDocument();
+    });
+  });
+
+  describe("Live Database Default Mode", () => {
+    it("defaults to Live Database when rendered without props and queries backend on mount", async () => {
+      const matchSpy = vi
+        .spyOn(relocationApi, "evaluateRelocationMatching")
+        .mockResolvedValue({
+          success: true,
+          data: relocationApi.HIMALAYAN_PILOT_SAMPLE_MATCH_RESULT,
+        });
+
+      render(
+        <AuthProvider>
+          <RelocationOperationsPage />
+        </AuthProvider>
+      );
+
+      await waitFor(() => {
+        expect(matchSpy).toHaveBeenCalledWith({
+          use_database_villages: true,
+          use_database_sites: true,
+          region_profile_id: "himalayan_pilot",
+        });
+      });
     });
   });
 });

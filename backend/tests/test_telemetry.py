@@ -359,11 +359,17 @@ def test_11_synthetic_demo_provenance_preserved(db_session: Session):
     summaries = service.list_sources_telemetry(db_session)
 
     assert len(summaries) > 0
-    for s in summaries:
+    synthetic_sources = [s for s in summaries if s.provider and s.provider.startswith("mock_")]
+    assert len(synthetic_sources) >= 4
+    for s in synthetic_sources:
         assert s.is_synthetic is True
         assert s.metadata_json is not None
         assert "disclaimer" in s.metadata_json
         assert "DEMO / SYNTHETIC" in s.metadata_json["disclaimer"]
+
+    real_sources = [s for s in summaries if s.provider in ("ncs_official_seismology", "usgs_live_earthquake", "open_meteo_live_weather")]
+    for s in real_sources:
+        assert s.is_synthetic is False
 
 
 # =====================================================================

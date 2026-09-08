@@ -11,6 +11,7 @@ from sqlalchemy.orm import Session, joinedload
 from app.core.database import get_db
 from app.core.exceptions import NotFoundError
 from app.core.profiles import get_profile, list_profiles
+from app.core.regions import resolve_region_scope, apply_region_scope_to_village_query
 from app.data.providers.contracts import ProviderQuery, SourceCategory
 from app.data.providers.usgs_earthquake import USGSEarthquakeProvider
 from app.models.geographic import Block, District, Region, Village
@@ -147,6 +148,7 @@ def get_map_layers(
 ):
     """Retrieve GeoJSON map layers for interactive MapLibre visualization."""
     layers: Dict[str, Any] = {}
+    scope = resolve_region_scope(db, region_id)
 
     # 1. Villages Centroid Points Layer
     if layer_type in (None, "villages"):
@@ -154,11 +156,7 @@ def get_map_layers(
             joinedload(Village.population_profile),
             joinedload(Village.risk_scores),
         )
-        if region_id:
-            if region_id.isdigit():
-                v_query = v_query.join(Village.block).join(Block.district).filter(District.region_id == int(region_id))
-            else:
-                v_query = v_query.join(Village.block).join(Block.district).join(District.region).filter(Region.code == region_id)
+        v_query = apply_region_scope_to_village_query(v_query, scope)
 
         v_records = v_query.all()
         features = []
@@ -193,15 +191,11 @@ def get_map_layers(
 
     # 2. Village Boundaries Layer (Real Survey of India Cadastral Polygons)
     if layer_type in (None, "village_boundaries"):
-        vb_query = db.query(Village).filter(Village.boundary != None).options(
+        vb_query = db.query(Village).options(
             joinedload(Village.population_profile),
             joinedload(Village.risk_scores),
         )
-        if region_id:
-            if region_id.isdigit():
-                vb_query = vb_query.join(Village.block).join(Block.district).filter(District.region_id == int(region_id))
-            else:
-                vb_query = vb_query.join(Village.block).join(Block.district).join(District.region).filter(Region.code == region_id)
+        vb_query = apply_region_scope_to_village_query(vb_query, scope, is_boundary=True)
 
         vb_records = vb_query.all()
         vb_features = []
@@ -341,38 +335,40 @@ def get_map_layers(
     if layer_type in (None, "earthquakes_usgs"):
         usgs_features = []
         try:
-            provider = USGSEarthquakeProvider(timeout_sec=3.0)
+            provider = USGSEarthquakeProvider(timeout_sec=4.0)
             query = ProviderQuery(
                 category=SourceCategory.HAZARD_OBSERVATION,
-                region_id="himalayan_pilot",
-                filter_criteria={"latitude": 30.556, "longitude": 79.563},
+                region_id=region_id or "himalayan_pilot",
+                district_code="chamoli",
             )
             resp = provider.fetch_data(query)
             for rec in resp.records:
                 usgs_features.append(
                     {
                         "type": "Feature",
-                        "id": f"usgs-{rec.source_record_id}",
+                        "id": f"usgs-{rec.record_id}",
                         "geometry": {
                             "type": "Point",
-                            "coordinates": [rec.longitude, rec.latitude],
+                            "coordinates": [rec.location_coordinates[0], rec.location_coordinates[1]],
                         },
                         "properties": {
-                            "id": f"usgs-{rec.source_record_id}",
-                            "event_id": rec.source_record_id,
+                            "id": f"usgs-{rec.record_id}",
+                            "event_id": rec.record_id,
                             "entity_type": "earthquake_usgs",
                             "magnitude": rec.intensity_value,
-                            "depth_km": rec.metadata.get("depth_km", 10.0),
-                            "observed_at": rec.observed_at.isoformat(),
-                            "severity": rec.severity.value if hasattr(rec.severity, "value") else str(rec.severity),
-                            "description": rec.raw_payload.get("place", "Live Regional Seismic Event"),
-                            "source": "USGS Real-Time Earthquake Feed",
+                            "depth_km": 10.0,
+                            "observed_at": rec.observed_at,
+                            "severity": rec.severity,
+                            "description": rec.description or f"USGS Live Seismic Event M{rec.intensity_value}",
+                            "source": "USGS Earthquake Hazards Program (Live FDSN Feed)",
                             "provenance": "LIVE — USGS Real-Time Feed",
                         },
                     }
                 )
-        except Exception:
-            pass
+        except Exception as exc:
+            import logging
+            logging.getLogger("rakshakgis.map").warning("USGS live earthquake feed unavailable: %s", exc)
+
         layers["earthquakes_usgs"] = {
             "type": "FeatureCollection",
             "features": usgs_features,

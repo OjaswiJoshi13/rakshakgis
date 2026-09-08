@@ -103,16 +103,34 @@ class TelemetryService:
             cat_str = primary_cat.value if primary_cat else "unknown"
             default_polling = int(self.evaluator.thresholds.get_threshold_for_category(primary_cat))
 
+            # Verified real statutory & observational feeds vs synthetic simulation feeds
+            REAL_PROVIDERS = {
+                "ncs_official_seismology",
+                "usgs_live_earthquake",
+                "open_meteo_live_weather",
+                "cwc_live_flood_aff",
+                "survey_of_india_cadastral",
+                "census_pca_2011",
+            }
+            is_real = p.provider_id in REAL_PROVIDERS or p.mode.value == "live"
+            is_synth = not is_real
+
+            disclaimer = (
+                "Verified real observational / statutory data feed."
+                if is_real
+                else (
+                    "DEMO / SYNTHETIC DATASET for SIH Problem Statement 26191. "
+                    "Not official statutory or live operational government data."
+                )
+            )
+
             metadata = {
                 "provider_id": p.provider_id,
                 "mode": p.mode.value,
-                "is_synthetic": True,
+                "is_synthetic": is_synth,
                 "supported_categories": [c.value for c in p.supported_categories],
                 "supported_regions": list(p.supported_regions),
-                "disclaimer": (
-                    "DEMO / SYNTHETIC DATASET for SIH Problem Statement 26191. "
-                    "Not official statutory or live operational government data."
-                ),
+                "disclaimer": disclaimer,
             }
 
             if not source:
@@ -135,6 +153,66 @@ class TelemetryService:
                 source.provider = p.provider_id
 
             synced_sources.append(source)
+
+        # Ensure static statutory datasets are registered as verified non-synthetic sources
+        static_statutory_sources = [
+            {
+                "provider": "survey_of_india_cadastral",
+                "name": "Survey of India Cadastral Village Boundaries",
+                "source_type": "cadastral_geography",
+                "endpoint_url": "static://data/soi_uttarakhand_villages.geojson",
+                "metadata": {
+                    "provider_id": "survey_of_india_cadastral",
+                    "mode": "static_statutory",
+                    "is_synthetic": False,
+                    "supported_categories": ["cadastral_boundaries", "administrative_geography"],
+                    "supported_regions": ["himalayan_pilot", "uttarakhand", "chamoli"],
+                    "disclaimer": "Official Survey of India (SOI) administrative village boundary polygons.",
+                },
+            },
+            {
+                "provider": "census_pca_2011",
+                "name": "Census of India 2011 Primary Census Abstract",
+                "source_type": "demographic_exposure",
+                "endpoint_url": "static://data/census_2011_pca_chamoli.csv",
+                "metadata": {
+                    "provider_id": "census_pca_2011",
+                    "mode": "static_statutory",
+                    "is_synthetic": False,
+                    "supported_categories": ["demographics", "vulnerability"],
+                    "supported_regions": ["himalayan_pilot", "uttarakhand", "chamoli"],
+                    "disclaimer": "Official Ministry of Home Affairs / Office of Registrar General Census 2011 PCA demographics.",
+                },
+            },
+        ]
+
+        for s_def in static_statutory_sources:
+            src = (
+                db.query(DataSource)
+                .filter(
+                    (DataSource.provider == s_def["provider"])
+                    | (DataSource.name == s_def["name"])
+                )
+                .first()
+            )
+            if not src:
+                src = DataSource(
+                    name=s_def["name"],
+                    source_type=s_def["source_type"],
+                    provider=s_def["provider"],
+                    endpoint_url=s_def["endpoint_url"],
+                    is_active=True,
+                    polling_interval_seconds=86400 * 30,
+                    metadata_json=s_def["metadata"],
+                )
+                db.add(src)
+                db.flush()
+            else:
+                curr_meta = dict(src.metadata_json or {})
+                curr_meta.update(s_def["metadata"])
+                src.metadata_json = curr_meta
+                src.provider = s_def["provider"]
+            synced_sources.append(src)
 
         db.commit()
         return synced_sources

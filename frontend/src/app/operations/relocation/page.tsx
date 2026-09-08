@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState, useCallback } from "react";
+import React, { useState, useCallback, useEffect } from "react";
 import { OperationsSectionShell } from "@/components/operations/OperationsSectionShell";
 import {
   RelocationMatchingResult,
@@ -20,42 +20,71 @@ import {
   BatchCommitModal,
 } from "@/components/operations/relocation";
 import { Button } from "@/components/ui/Button";
-import { CheckCircle2, ArrowRightLeft, RefreshCw } from "lucide-react";
+import { CheckCircle2, AlertCircle, RefreshCw } from "lucide-react";
 
-export default function RelocationOperationsPage() {
+export interface RelocationOperationsPageProps {
+  defaultUseDatabase?: boolean;
+}
+
+export default function RelocationOperationsPage({
+  defaultUseDatabase = true,
+}: RelocationOperationsPageProps = {}) {
   const [activeView, setActiveView] = useState<RelocationWorkflowView>("matching");
-  const [matchingResult, setMatchingResult] =
-    useState<RelocationMatchingResult | null>(HIMALAYAN_PILOT_SAMPLE_MATCH_RESULT);
-  const [isExecuting, setIsExecuting] = useState<boolean>(false);
-  const [useDatabase, setUseDatabase] = useState<boolean>(false);
+  const [useDatabase, setUseDatabase] = useState<boolean>(defaultUseDatabase);
+  const [matchingResult, setMatchingResult] = useState<RelocationMatchingResult | null>(
+    defaultUseDatabase ? null : HIMALAYAN_PILOT_SAMPLE_MATCH_RESULT
+  );
+  const [isExecuting, setIsExecuting] = useState<boolean>(defaultUseDatabase);
+  const [errorMessage, setErrorMessage] = useState<string | null>(null);
   const [selectedAudit, setSelectedAudit] =
     useState<VillageAssignmentResult | null>(null);
   const [isCommitModalOpen, setIsCommitModalOpen] = useState<boolean>(false);
   const [successBanner, setSuccessBanner] = useState<string | null>(null);
 
-  const handleExecuteMatching = useCallback(async () => {
+  const handleExecuteMatching = useCallback(async (overrideUseDb?: boolean) => {
     setIsExecuting(true);
     setSuccessBanner(null);
+    setErrorMessage(null);
+
+    const useDb = overrideUseDb !== undefined ? overrideUseDb : useDatabase;
+
+    if (!useDb) {
+      setMatchingResult(HIMALAYAN_PILOT_SAMPLE_MATCH_RESULT);
+      setIsExecuting(false);
+      return;
+    }
 
     try {
       const response = await evaluateRelocationMatching({
-        use_database_villages: useDatabase,
-        use_database_sites: useDatabase,
+        use_database_villages: true,
+        use_database_sites: true,
         region_profile_id: "himalayan_pilot",
       });
 
       if (response && response.data && response.data.assignments) {
         setMatchingResult(response.data);
       } else {
-        setMatchingResult(HIMALAYAN_PILOT_SAMPLE_MATCH_RESULT);
+        setErrorMessage("Failed to load relocation matching results from operational database.");
       }
-    } catch {
-      // Graceful fallback to deterministic Himalayan Pilot sample dataset
-      setMatchingResult(HIMALAYAN_PILOT_SAMPLE_MATCH_RESULT);
+    } catch (err: any) {
+      setErrorMessage(
+        err?.message || "Failed to query database relocation matching endpoint."
+      );
     } finally {
       setIsExecuting(false);
     }
   }, [useDatabase]);
+
+  useEffect(() => {
+    if (defaultUseDatabase) {
+      handleExecuteMatching(true);
+    }
+  }, [defaultUseDatabase, handleExecuteMatching]);
+
+  const handleToggleDataSource = (useDb: boolean) => {
+    setUseDatabase(useDb);
+    handleExecuteMatching(useDb);
+  };
 
   const handleCommitSuccess = (count: number) => {
     setSuccessBanner(
@@ -83,7 +112,7 @@ export default function RelocationOperationsPage() {
               type="button"
               variant="secondary"
               size="sm"
-              onClick={handleExecuteMatching}
+              onClick={() => handleExecuteMatching()}
               isLoading={isExecuting}
               leftIcon={<RefreshCw className="h-3.5 w-3.5" />}
             >
@@ -98,10 +127,10 @@ export default function RelocationOperationsPage() {
         <RelocationRunControls
           activeView={activeView}
           onViewChange={setActiveView}
-          onExecuteMatching={handleExecuteMatching}
+          onExecuteMatching={() => handleExecuteMatching()}
           isExecuting={isExecuting}
           useDatabase={useDatabase}
-          onToggleDataSource={setUseDatabase}
+          onToggleDataSource={handleToggleDataSource}
           onOpenCommitDialog={() => setIsCommitModalOpen(true)}
           canCommit={Boolean(
             matchingResult &&
@@ -118,6 +147,22 @@ export default function RelocationOperationsPage() {
           <div className="flex items-center gap-2 rounded-lg border border-emerald-600 bg-emerald-950/60 p-3.5 text-xs text-emerald-200">
             <CheckCircle2 className="h-4 w-4 text-emerald-400 shrink-0" />
             <span>{successBanner}</span>
+          </div>
+        )}
+
+        {/* Error Banner */}
+        {errorMessage && (
+          <div className="flex items-center gap-2 rounded-lg border border-red-600 bg-red-950/60 p-3.5 text-xs text-red-200">
+            <AlertCircle className="h-4 w-4 text-red-400 shrink-0" />
+            <span>{errorMessage}</span>
+          </div>
+        )}
+
+        {/* Loading Indicator */}
+        {isExecuting && !matchingResult && (
+          <div className="flex flex-col items-center justify-center p-12 text-center text-xs text-text-muted border border-border-base rounded-lg bg-surface-raised">
+            <RefreshCw className="h-6 w-6 animate-spin mb-3 text-text-secondary" />
+            <span>Executing deterministic relocation matching against live database...</span>
           </div>
         )}
 

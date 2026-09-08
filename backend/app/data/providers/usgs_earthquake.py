@@ -123,10 +123,14 @@ class USGSEarthquakeProvider(BaseDataProvider):
         )
 
     def _resolve_center_point(self, query: ProviderQuery) -> Tuple[float, float]:
-        fc = query.filter_criteria or {}
-        if "latitude" in fc and "longitude" in fc:
+        fc = getattr(query, "filter_criteria", None) or {}
+        if isinstance(fc, dict) and "latitude" in fc and "longitude" in fc:
             return float(fc["latitude"]), float(fc["longitude"])
-        if query.region_id == "himalayan_pilot" or query.district_code == "chamoli":
+        if getattr(query, "latitude", None) is not None and getattr(query, "longitude", None) is not None:
+            return float(getattr(query, "latitude")), float(getattr(query, "longitude"))
+        r_id = (query.region_id or "").lower()
+        d_code = (query.district_code or "").lower()
+        if r_id in ("himalayan_pilot", "pilot_chamoli", "uttarakhand_himalayan", "uttarakhand") or d_code == "chamoli":
             return 30.556, 79.563
         return 28.6139, 77.2090
 

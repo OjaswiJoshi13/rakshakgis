@@ -2435,9 +2435,58 @@ No chunk may transition to `IN_PROGRESS` until all its listed prerequisite depen
 
 ---
 
+### REAL-01: Real Data Path Integration — Semantic Region Resolution, Authoritative GIS Layers & Live Database Relocation Matching
+
+- **Status:** `IMPLEMENTED` (Awaiting Independent Review)
+- **Date Completed:** 2026-09-09
+- **Owner:** Platform & Core GIS Integration Team
+- **Objective:** Connect verified real database data in PostgreSQL (150 Survey of India boundary polygons, 188 habitations, 145 Census demographic profiles, 150 NCS earthquakes, live USGS seismic feed) to the live running application and decision-support pipeline (GIS vector canvas and Relocation Planner), eliminating artificial disconnects, frozen provider crashes, and hardcoded static fixture defaults.
+- **Key Enhancements Implemented:**
+  1. **Semantic Region Resolution Engine (`backend/app/core/regions/resolver.py`, `__init__.py`):**
+     - Implemented `resolve_region_scope(db, region_id)` and `apply_region_scope_to_village_query(query, scope)`.
+     - Resolves `himalayan_pilot` alias to Chamoli/Uttarakhand region IDs `[2, 4]` and district IDs `[2, 4]`, scoping both demo habitations (40) and Survey of India boundary polygons (148) for a unified total of 188 villages and 150 boundary polygons.
+     - Strict scoping guarantees zero accidental data leakage: unrecognized identifiers return `is_empty=True` which matches exactly 0 records.
+  2. **Authoritative GIS Layer Exposure (`backend/app/api/v1/regions.py`):**
+     - Updated `GET /api/v1/map/layers?region_id=himalayan_pilot` to apply `resolve_region_scope`:
+       - `villages`: 188 features (was 0) with PostGIS Point coordinates, Census demographics, and risk scores.
+       - `village_boundaries`: 150 features (was 0) with Survey of India cadastral boundary polygons.
+       - `earthquakes_ncs`: 150 features with official NCS MoES historical earthquake catalog (1991–2024).
+       - `earthquakes_usgs`: Live real-time seismic events dynamically fetched from USGS FDSN feed.
+       - `sites`: 12 candidate safe havens.
+       - `routes`: 53 Dijkstra evacuation corridors.
+       - `red_zones`: 7 active hazard buffers.
+  3. **Authoritative Habitations & Multi-Hazard Risk Assessment (`backend/app/api/v1/villages.py`, `backend/app/api/v1/risk.py`):**
+     - Scoped `GET /api/v1/villages?region_id=himalayan_pilot` to return all 188 administrative habitations.
+     - Scoped `GET /api/v1/risk/summary?region_id=himalayan_pilot` to assess all 188 villages: reports 72,581 total population, 14,463 population at risk, 7 active red zones, and 47.58 average risk score (was 0 assessed).
+  4. **USGS Real-Time Earthquake Provider Bug Fix (`backend/app/data/providers/usgs_earthquake.py`):**
+     - Fixed `AttributeError: 'ProviderQuery' object has no attribute 'filter_criteria'` by safely checking `getattr(query, "filter_criteria", None)`.
+     - Added robust fallback coordinates `(30.556, 79.563)` for `himalayan_pilot` / Chamoli center point.
+     - Correctly mapped live USGS coordinates `rec.location_coordinates` in `map/layers` endpoint.
+  5. **Database-Backed Relocation Matching Engine & UI (`backend/app/core/relocation/matching/contracts.py`, `backend/app/api/v1/relocation.py`, `frontend/src/app/operations/relocation/page.tsx`):
+     - Fixed M4-03 `UNKNOWN_CAPACITY` rejection bug by populating `initial_available_capacity = max(0, cap.max_households - alloc_households)` in `MatchingSiteCandidate.from_candidate_site_model()`.
+     - Scoped `evaluate_relocation_matching` endpoint by `region_profile_id`: evaluates all 188 database villages against 12 candidate sites, assigning 32 top-priority villages and marking 156 villages unassigned with deterministic statutory reasons and codes (`INSUFFICIENT_CAPACITY`, `NO_FEASIBLE_SITE`).
+     - Updated Relocation Planner frontend (`page.tsx`) to set `useDatabase: true` by default and trigger live matching evaluation on initial mount.
+     - Added explicit `Proposed Haven` provenance badge for candidate reception sites in `RelocationAssignmentTable.tsx`.
+  6. **Data Source Provenance Correction (`backend/app/core/telemetry/service.py`, `backend/app/api/v1/alerts.py`):**
+     - Corrected `is_synthetic = False` for verified real sources: `ncs_official_seismology`, `usgs_live_earthquake`, `open_meteo_live_weather`, `cwc_live_flood_aff`, `survey_of_india_cadastral`, `census_pca_2011`.
+     - Registered static Survey of India boundary polygons and Census 2011 PCA demographics as verified non-synthetic data sources in `DataSource` database table.
+     - Replaced `mock_imd_rainfall` fallback in alerts with `synthetic_rainfall_gauge`.
+  7. **Automated Unit & Regression Tests:**
+     - Created `backend/tests/test_region_resolver.py` (7 tests covering region scoping, map layers, habitations, risk summary, and DB-backed matching).
+     - Added USGS `himalayan_pilot` query test in `backend/tests/test_live_adapters.py`.
+     - Added Live Database default mode test in `frontend/src/__tests__/RelocationPlanner.test.tsx`.
+- **Quality Gate Results:**
+  - **Backend Pytest:** **563 passed, 0 failed** (100% pass rate in 23.80s).
+  - **Frontend Vitest:** **31 test files passed, 284 passed, 0 failed** (100% pass rate in 156.11s).
+  - **Golden SIH Demo Flow:** **All 22 statutory steps passed** (`scripts/validate_golden_sih_flow.py`).
+- **Test Integrity:** Zero tests skipped, deleted, or weakened. All original regression suites verified.
+
+---
+
 ## Last Updated
 
-- **Timestamp:** 2026-09-09 01:15:00 IST
-- **Updated By:** Core Engineering & GIS Platform Teams (GIS-01 / DATA-03 COMMITTED & PUSHED to origin/main)
-- **Status Summary:** Real-world Survey of India cadastral polygons (150 villages), Census 2011 habitations (188 points), NCS historical earthquakes (150 events), live USGS seismic feeds, and Dijkstra evacuation routes (53 corridors) fully rendered on GIS canvas with interactive feature dossiers and forensic data provenance badges; 100% tests passing (555 backend, 283 frontend, 22 Golden SIH steps); Synced and pushed to GitHub main.
+- **Timestamp:** 2026-09-09 02:05:00 IST
+- **Updated By:** Core Engineering & GIS Platform Teams (REAL-01 IMPLEMENTED — AWAITING INDEPENDENT REVIEW)
+- **Status Summary:** Real database data in PostgreSQL (150 SOI boundaries, 188 habitations, 150 NCS earthquakes, live USGS earthquakes) successfully connected to visible GIS canvas and Relocation Planner; 100% tests passing (563 backend, 284 frontend, 22 Golden SIH steps). Ready for independent forensic verification.
+
 

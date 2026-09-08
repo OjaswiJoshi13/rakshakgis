@@ -61,6 +61,11 @@ def evaluate_relocation_matching(
     villages: List[VillageDemandInput] = []
     sites: List[MatchingSiteCandidate] = []
 
+    scope = None
+    if match_req.region_profile_id:
+        from app.core.regions import resolve_region_scope
+        scope = resolve_region_scope(db, match_req.region_profile_id)
+
     # 1. Resolve villages
     if match_req.villages:
         villages = match_req.villages
@@ -75,6 +80,9 @@ def evaluate_relocation_matching(
         )
         if match_req.district_id:
             query = query.join(Village.block).filter(Village.block.has(district_id=match_req.district_id))
+        elif scope is not None:
+            from app.core.regions import apply_region_scope_to_village_query
+            query = apply_region_scope_to_village_query(query, scope)
         db_villages = query.all()
         villages = [VillageDemandInput.from_village_model(v) for v in db_villages]
 
@@ -92,6 +100,8 @@ def evaluate_relocation_matching(
         )
         if match_req.district_id:
             s_query = s_query.filter(CandidateSite.district_id == match_req.district_id)
+        elif scope is not None and scope.district_ids:
+            s_query = s_query.filter(CandidateSite.district_id.in_(scope.district_ids))
         db_sites = s_query.all()
         sites = [MatchingSiteCandidate.from_candidate_site_model(s) for s in db_sites]
 

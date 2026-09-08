@@ -229,6 +229,17 @@ class MatchingSiteCandidate(BaseModel):
         suit_input = SiteSuitabilityInput.from_candidate_site_model(site)
         cap_input = SiteCapacityInput.from_candidate_site_model(site, incoming_households=0, overrides=overrides)
 
+        # Derive available capacity from site capacities relationship or capacity_households
+        avail_cap = None
+        if hasattr(site, "capacities") and site.capacities:
+            cap_rec = site.capacities[0]
+            max_hh = getattr(cap_rec, "max_households", None)
+            alloc_hh = getattr(cap_rec, "allocated_households", 0) or 0
+            if max_hh is not None:
+                avail_cap = max(0, max_hh - alloc_hh)
+        elif hasattr(site, "capacity_households") and site.capacity_households is not None:
+            avail_cap = site.capacity_households
+
         return cls(
             site_id=site.id,
             site_name=site.name,
@@ -236,6 +247,7 @@ class MatchingSiteCandidate(BaseModel):
             status=(site.status or "approved").lower(),
             suitability_input=suit_input,
             capacity_input=cap_input,
+            initial_available_capacity=avail_cap,
         )
 
     @classmethod

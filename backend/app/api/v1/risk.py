@@ -10,6 +10,7 @@ from app.core.profiles import get_profile
 from app.core.risk.classification.engine import RiskClassificationEngine
 from app.core.risk.computation.contracts import RiskFactorType
 from app.core.risk.computation.engine import MultiHazardRiskEngine
+from app.core.regions import resolve_region_scope, apply_region_scope_to_village_query
 from app.models.geographic import Block, District, Region, Village
 from app.models.risk import RedZone, RiskFactor, RiskScore
 from app.schemas.common import ResponseEnvelope
@@ -44,10 +45,9 @@ def get_risk_summary(
     )
 
     if region_id:
-        if region_id.isdigit():
-            v_query = v_query.join(Village.block).join(Block.district).filter(District.region_id == int(region_id))
-        else:
-            v_query = v_query.join(Village.block).join(Block.district).join(District.region).filter(Region.code == region_id)
+        scope = resolve_region_scope(db, region_id)
+        if scope is not None:
+            v_query = apply_region_scope_to_village_query(v_query, scope)
 
     villages = v_query.all()
     total_villages = len(villages)
@@ -118,12 +118,9 @@ def recalculate_risk(
     if req.village_ids:
         v_query = v_query.filter(Village.id.in_(req.village_ids))
     elif req.region_id:
-        if req.region_id.isdigit():
-            v_query = v_query.join(Village.block).join(Block.district).filter(District.region_id == int(req.region_id))
-        else:
-            v_query = v_query.join(Village.block).join(Block.district).join(District.region).filter(
-                (Region.code == req.region_id) | (Region.code == "uttarakhand_himalayan")
-            )
+        scope = resolve_region_scope(db, req.region_id)
+        if scope is not None:
+            v_query = apply_region_scope_to_village_query(v_query, scope)
 
     villages = v_query.all()
     if not villages:

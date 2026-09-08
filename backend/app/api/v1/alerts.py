@@ -55,7 +55,7 @@ def _db_alert_to_operational(alert: Alert) -> OperationalAlertRead:
         issued_at=alert.issued_at,
         expires_at=alert.expires_at,
         candidate_id=alert_meta.get("candidate_id"),
-        source_id=alert_meta.get("source_id", "mock_imd_rainfall"),
+        source_id=alert_meta.get("source_id", "synthetic_rainfall_gauge"),
         is_synthetic=True,
         explainability=alert_meta.get("explainability"),
     )
