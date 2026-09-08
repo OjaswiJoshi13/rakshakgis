@@ -61,10 +61,12 @@ describe("Operations UI Shell & Navigation Suite (Chunk M6-01)", () => {
         </AuthProvider>
       );
 
-      expect(screen.getByText(/Operations Console • Chunk M6-01/i)).toBeInTheDocument();
+      // The new OperationsShell renders 'Operations Console' label (no longer combined with Chunk M6-01 badge)
+      expect(screen.getByText("Operations Console")).toBeInTheDocument();
+      expect(screen.getByText("Active Protocol")).toBeInTheDocument();
       expect(screen.getByText("Disaster Response & Relocation Decision System")).toBeInTheDocument();
       expect(screen.getByText("Himalayan Pilot (Chamoli)")).toBeInTheDocument();
-      expect(screen.getByText(/DEMO MODE/i)).toBeInTheDocument();
+      expect(screen.getByText(/SIMULATION BASELINE/i)).toBeInTheDocument();
       expect(screen.getByTestId("test-ops-child")).toBeInTheDocument();
     });
   });
