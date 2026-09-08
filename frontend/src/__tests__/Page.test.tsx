@@ -1,42 +1,91 @@
 import React from "react";
-import { describe, it, expect } from "vitest";
+import { describe, it, expect, beforeEach, vi } from "vitest";
 import { render, screen } from "@testing-library/react";
 import HomePage from "@/app/page";
+import { AuthProvider } from "@/context/AuthContext";
+import { User } from "@/types/auth";
+import * as navigation from "next/navigation";
 
-describe("HomePage (Chunk M5-01 Foundation Landing)", () => {
-  it("renders main heading and hero section", () => {
-    render(<HomePage />);
-    expect(
-      screen.getByRole("heading", { name: /RakshakGIS Command Center Shell/i })
-    ).toBeInTheDocument();
-    expect(screen.getByText("Chunk M5-01")).toBeInTheDocument();
+const mockOfficerUser: User = {
+  id: 1,
+  username: "test_auth_officer",
+  email: "officer@rakshakgis.gov.in",
+  full_name: "Disaster Management Officer",
+  role: "district_officer",
+  is_active: true,
+  created_at: "2026-09-01T00:00:00Z",
+  updated_at: "2026-09-01T00:00:00Z",
+};
+
+describe("HomePage (/) Route Entry Flow", () => {
+  beforeEach(() => {
+    vi.restoreAllMocks();
   });
 
-  it("renders architecture parameter metric cards", () => {
-    render(<HomePage />);
-    expect(screen.getByText("Region Profile")).toBeInTheDocument();
-    expect(screen.getByText("Multi-Hazard Model")).toBeInTheDocument();
-    expect(screen.getByText("Relocation Priority")).toBeInTheDocument();
-    expect(screen.getByText("Coordinate System")).toBeInTheDocument();
-  });
+  it("1. Unauthenticated root access renders the Login page UI", () => {
+    render(
+      <AuthProvider initialState={{ isLoading: false, isAuthenticated: false }}>
+        <HomePage />
+      </AuthProvider>
+    );
 
-  it("renders authoritative risk band classifications", () => {
-    render(<HomePage />);
-    expect(screen.getByText("Composite Risk Score Classifications")).toBeInTheDocument();
-    expect(screen.getByText("0–25")).toBeInTheDocument();
-    expect(screen.getByText("25–50")).toBeInTheDocument();
-    expect(screen.getByText("50–70")).toBeInTheDocument();
-    expect(screen.getByText("70–85")).toBeInTheDocument();
-    expect(screen.getByText("85–100")).toBeInTheDocument();
-  });
-
-  it("renders operational alert banners", () => {
-    render(<HomePage />);
+    expect(screen.getByText("RakshakGIS")).toBeInTheDocument();
+    expect(screen.getByText("Authority Access")).toBeInTheDocument();
     expect(
-      screen.getByText(/CRITICAL: Dynamic Red Zone Threshold Exceeded/i)
+      screen.getByRole("heading", { name: /Authority Sign In/i })
     ).toBeInTheDocument();
     expect(
-      screen.getByText(/WEATHER WATCH: IMD Rainfall Warning/i)
+      screen.getByRole("button", { name: /Sign In to Command Center/i })
     ).toBeInTheDocument();
+
+    // Verify obsolete Command Center Shell is not rendered
+    expect(
+      screen.queryByText(/RakshakGIS Command Center Shell/i)
+    ).not.toBeInTheDocument();
+  });
+
+  it("2. Authenticated root access cleanly redirects to /dashboard", () => {
+    const replaceMock = vi.fn();
+    vi.spyOn(navigation, "useRouter").mockReturnValue({
+      push: vi.fn(),
+      replace: replaceMock,
+      back: vi.fn(),
+      forward: vi.fn(),
+      refresh: vi.fn(),
+      prefetch: vi.fn(),
+    });
+
+    render(
+      <AuthProvider
+        initialState={{
+          isLoading: false,
+          isAuthenticated: true,
+          user: mockOfficerUser,
+        }}
+      >
+        <HomePage />
+      </AuthProvider>
+    );
+
+    expect(replaceMock).toHaveBeenCalledWith("/dashboard");
+    expect(
+      screen.queryByText(/RakshakGIS Command Center Shell/i)
+    ).not.toBeInTheDocument();
+  });
+
+  it("3. Displays accessible session verification indicator while checking auth", () => {
+    render(
+      <AuthProvider initialState={{ isLoading: true, isAuthenticated: false }}>
+        <HomePage />
+      </AuthProvider>
+    );
+
+    expect(screen.getByText(/Verifying Authority Session/i)).toBeInTheDocument();
+    expect(
+      screen.queryByRole("heading", { name: /Authority Sign In/i })
+    ).not.toBeInTheDocument();
+    expect(
+      screen.queryByText(/RakshakGIS Command Center Shell/i)
+    ).not.toBeInTheDocument();
   });
 });

@@ -44,7 +44,7 @@ export const LoginForm: React.FC<LoginFormProps> = ({ onSuccess, className = "" 
       if (onSuccess) {
         onSuccess();
       } else {
-        router.push("/");
+        router.push("/dashboard");
       }
     }
   };
@@ -58,7 +58,7 @@ export const LoginForm: React.FC<LoginFormProps> = ({ onSuccess, className = "" 
       if (onSuccess) {
         onSuccess();
       } else {
-        router.push("/");
+        router.push("/dashboard");
       }
     }
   };

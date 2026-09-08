@@ -24,7 +24,7 @@ export default function NotFound() {
           </p>
         </div>
         <div className="pt-2">
-          <Link href="/">
+          <Link href="/dashboard">
             <Button variant="primary" size="sm" className="gap-2">
               <ArrowLeft className="h-4 w-4" />
               <span>Return to Command Overview</span>

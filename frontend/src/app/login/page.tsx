@@ -15,9 +15,36 @@ export default function LoginPage() {
 
   useEffect(() => {
     if (!isLoading && isAuthenticated) {
-      router.replace("/");
+      router.replace("/dashboard");
     }
   }, [isAuthenticated, isLoading, router]);
+
+  if (isLoading) {
+    return (
+      <div
+        role="status"
+        aria-live="polite"
+        className="flex min-h-screen flex-col items-center justify-center space-y-4 p-8 text-center bg-surface-bg text-text-primary"
+      >
+        <div className="relative flex h-12 w-12 items-center justify-center">
+          <div className="h-12 w-12 rounded-full border-2 border-border-strong border-t-sky-600 animate-spin" />
+          <span className="sr-only">Verifying credentials</span>
+        </div>
+        <div className="space-y-1">
+          <p className="text-sm font-semibold text-text-primary">
+            Verifying Authority Session
+          </p>
+          <p className="text-xs text-text-muted font-mono">
+            Validating disaster decision support credentials...
+          </p>
+        </div>
+      </div>
+    );
+  }
+
+  if (isAuthenticated) {
+    return null;
+  }
 
   return (
     <div className="flex min-h-screen flex-col justify-between bg-surface-bg text-text-primary transition-colors">

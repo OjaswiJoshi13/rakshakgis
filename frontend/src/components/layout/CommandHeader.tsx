@@ -1,6 +1,7 @@
 "use client";
 
 import React, { useState, useEffect } from "react";
+import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { DATA_MODE_CONFIG, DataMode } from "@/design-system/tokens";
 import { StatusIndicator } from "@/components/ui/StatusIndicator";
@@ -95,13 +96,17 @@ export const CommandHeader: React.FC<CommandHeaderProps> = ({
           </button>
         )}
 
-        <div className="flex items-center gap-2.5">
-          <div className="flex h-7 w-7 items-center justify-center rounded bg-slate-900 text-slate-100 dark:bg-slate-800 border border-border-strong font-bold font-mono text-xs tracking-wider shadow-xs">
+        <Link
+          href={isAuthenticated ? "/dashboard" : "/login"}
+          className="flex items-center gap-2.5 group focus:outline-none focus-visible:ring-2 focus-visible:ring-sky-500 rounded"
+          aria-label="RakshakGIS Home"
+        >
+          <div className="flex h-7 w-7 items-center justify-center rounded bg-slate-900 text-slate-100 dark:bg-slate-800 border border-border-strong font-bold font-mono text-xs tracking-wider shadow-xs group-hover:border-sky-500 transition-colors">
             RG
           </div>
           <div className="flex flex-col">
             <div className="flex items-center gap-1.5">
-              <span className="font-semibold tracking-tight text-text-primary text-sm">
+              <span className="font-semibold tracking-tight text-text-primary text-sm group-hover:text-sky-600 dark:group-hover:text-sky-400 transition-colors">
                 RakshakGIS
               </span>
             </div>
@@ -109,7 +114,7 @@ export const CommandHeader: React.FC<CommandHeaderProps> = ({
               Disaster Management Decision Support System
             </span>
           </div>
-        </div>
+        </Link>
       </div>
 
       <div className="flex items-center gap-2 sm:gap-3">

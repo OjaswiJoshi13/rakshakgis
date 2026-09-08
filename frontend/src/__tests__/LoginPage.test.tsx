@@ -43,7 +43,20 @@ describe("LoginPage (/login)", () => {
     ).toBeInTheDocument();
   });
 
-  it("redirects authenticated users away from the login page to root /", () => {
+  it("renders accessible loading indicator during initial session resolution", () => {
+    render(
+      <AuthProvider initialState={{ isLoading: true, isAuthenticated: false }}>
+        <LoginPage />
+      </AuthProvider>
+    );
+
+    expect(screen.getByText(/Verifying Authority Session/i)).toBeInTheDocument();
+    expect(
+      screen.queryByRole("heading", { name: /Authority Sign In/i })
+    ).not.toBeInTheDocument();
+  });
+
+  it("redirects authenticated users away from the login page to /dashboard", () => {
     const replaceMock = vi.fn();
     vi.spyOn(navigation, "useRouter").mockReturnValue({
       push: vi.fn(),
@@ -66,6 +79,6 @@ describe("LoginPage (/login)", () => {
       </AuthProvider>
     );
 
-    expect(replaceMock).toHaveBeenCalledWith("/");
+    expect(replaceMock).toHaveBeenCalledWith("/dashboard");
   });
 });
