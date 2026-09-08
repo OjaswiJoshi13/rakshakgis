@@ -43,9 +43,9 @@ export const AppLayout: React.FC<AppLayoutProps> = ({ children }) => {
         <main
           id="main-content"
           tabIndex={-1}
-          className="flex-1 overflow-y-auto pb-12 focus:outline-none lg:pl-60"
+          className="flex-1 overflow-y-auto pb-12 focus:outline-none lg:pl-60 print:pl-0 print:p-0 print:pb-0 print:overflow-visible"
         >
-          <div className="mx-auto max-w-7xl p-4 sm:p-6 lg:p-8">
+          <div className="mx-auto max-w-7xl p-4 sm:p-6 lg:p-8 print:p-0 print:max-w-none">
             {children}
           </div>
         </main>

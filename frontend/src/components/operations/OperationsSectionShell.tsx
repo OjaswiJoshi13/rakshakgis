@@ -30,7 +30,7 @@ export const OperationsSectionShell: React.FC<OperationsSectionShellProps> = ({
   return (
     <div className={cn("space-y-6", className)}>
       {/* Breadcrumbs & Section Hierarchy */}
-      <div className="flex flex-wrap items-center justify-between gap-3 border-b border-border-subtle pb-4">
+      <div className="flex flex-wrap items-center justify-between gap-3 border-b border-border-subtle pb-4 print:hidden">
         <div>
           <nav aria-label="Breadcrumb" className="flex items-center gap-1.5 text-xs text-text-muted font-mono mb-1.5">
             <Link
@@ -65,7 +65,7 @@ export const OperationsSectionShell: React.FC<OperationsSectionShellProps> = ({
       </div>
 
       {/* Operational Protocol Context Strip */}
-      <div className="flex flex-wrap items-center justify-between gap-3 rounded-md border border-border-subtle bg-surface-raised/60 px-3.5 py-2 text-xs text-text-secondary font-mono">
+      <div className="flex flex-wrap items-center justify-between gap-3 rounded-md border border-border-subtle bg-surface-raised/60 px-3.5 py-2 text-xs text-text-secondary font-mono print:hidden">
         <div className="flex items-center gap-2">
           <Shield className="h-4 w-4 text-[#0969da] dark:text-[#2f81f7] shrink-0" />
           <span>

@@ -21,7 +21,7 @@ describe("LoginForm Component", () => {
     expect(
       screen.getByLabelText(/Username or Official Email/i)
     ).toBeInTheDocument();
-    expect(screen.getByLabelText(/Password/i)).toBeInTheDocument();
+    expect(screen.getByLabelText(/^Password$/i)).toBeInTheDocument();
     expect(
       screen.getByRole("button", { name: /Sign In to Command Center/i })
     ).toBeInTheDocument();
@@ -97,7 +97,7 @@ describe("LoginForm Component", () => {
     fireEvent.change(screen.getByLabelText(/Username or Official Email/i), {
       target: { value: "officer@rakshakgis.gov.in" },
     });
-    fireEvent.change(screen.getByLabelText(/Password/i), {
+    fireEvent.change(screen.getByLabelText(/^Password$/i), {
       target: { value: "CorrectPassword123!" },
     });
     fireEvent.click(
@@ -123,7 +123,7 @@ describe("LoginForm Component", () => {
     fireEvent.change(screen.getByLabelText(/Username or Official Email/i), {
       target: { value: "bad_officer" },
     });
-    fireEvent.change(screen.getByLabelText(/Password/i), {
+    fireEvent.change(screen.getByLabelText(/^Password$/i), {
       target: { value: "wrong_password" },
     });
     fireEvent.click(
@@ -166,5 +166,36 @@ describe("LoginForm Component", () => {
     expect(window.localStorage.getItem(authService.TOKEN_STORAGE_KEY)).toBe(
       authService.DEMO_AUTH_TOKEN
     );
+  });
+
+  it("has password hidden by default, toggles visibility on button click, preserves password value, and updates accessible label", () => {
+    render(
+      <AuthProvider initialState={{ isLoading: false, isAuthenticated: false }}>
+        <LoginForm />
+      </AuthProvider>
+    );
+
+    const passwordInput = screen.getByLabelText(/^Password$/i) as HTMLInputElement;
+    expect(passwordInput.type).toBe("password");
+
+    const toggleButton = screen.getByRole("button", { name: /Show password/i });
+    expect(toggleButton).toBeInTheDocument();
+
+    // Type a password
+    fireEvent.change(passwordInput, { target: { value: "SecretPass987!" } });
+    expect(passwordInput.value).toBe("SecretPass987!");
+    expect(passwordInput.type).toBe("password");
+
+    // Click show password
+    fireEvent.click(toggleButton);
+    expect(passwordInput.type).toBe("text");
+    expect(passwordInput.value).toBe("SecretPass987!");
+    expect(screen.getByRole("button", { name: /Hide password/i })).toBeInTheDocument();
+
+    // Click hide password
+    fireEvent.click(screen.getByRole("button", { name: /Hide password/i }));
+    expect(passwordInput.type).toBe("password");
+    expect(passwordInput.value).toBe("SecretPass987!");
+    expect(screen.getByRole("button", { name: /Show password/i })).toBeInTheDocument();
   });
 });

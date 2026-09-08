@@ -224,7 +224,7 @@ function ReportsOperationsContent() {
       <div className="space-y-6">
         {/* Export Success Notification Banner */}
         {exportNotice && (
-          <div className="flex items-center gap-2 rounded-lg border border-[#1a7f37]/40 bg-[#1a7f37]/10 p-3.5 text-xs text-[#1a7f37] dark:text-[#3fb950] shadow-2xs">
+          <div className="flex items-center gap-2 rounded-lg border border-[#1a7f37]/40 bg-[#1a7f37]/10 p-3.5 text-xs text-[#1a7f37] dark:text-[#3fb950] shadow-2xs print:hidden">
             <CheckCircle2 className="h-4 w-4 text-[#1a7f37] dark:text-[#3fb950] shrink-0" />
             <span>{exportNotice}</span>
           </div>
@@ -232,40 +232,46 @@ function ReportsOperationsContent() {
 
         {/* Error Banner */}
         {error && (
-          <Alert
-            severity="danger"
-            title="Compilation Error"
-            icon={<AlertCircle className="h-4 w-4 text-red-400" />}
-          >
-            <div className="flex items-center justify-between">
-              <span>{error}</span>
-              <Button
-                type="button"
-                variant="outline"
-                size="sm"
-                onClick={handleCompile}
-                className="ml-4 text-xs"
-              >
-                Retry
-              </Button>
-            </div>
-          </Alert>
+          <div className="print:hidden">
+            <Alert
+              severity="danger"
+              title="Compilation Error"
+              icon={<AlertCircle className="h-4 w-4 text-red-400" />}
+            >
+              <div className="flex items-center justify-between">
+                <span>{error}</span>
+                <Button
+                  type="button"
+                  variant="outline"
+                  size="sm"
+                  onClick={handleCompile}
+                  className="ml-4 text-xs"
+                >
+                  Retry
+                </Button>
+              </div>
+            </Alert>
+          </div>
         )}
 
         {/* Configuration Panel */}
-        <ReportConfigPanel
-          config={config}
-          onConfigChange={setConfig}
-          sites={sites}
-          onCompile={handleCompile}
-          isCompiling={isCompiling}
-        />
+        <div className="print:hidden">
+          <ReportConfigPanel
+            config={config}
+            onConfigChange={setConfig}
+            sites={sites}
+            onCompile={handleCompile}
+            isCompiling={isCompiling}
+          />
+        </div>
 
         {/* Dynamic Display: Empty State or Compiled Dossier */}
         {dossier ? (
           <div className="space-y-6">
             {/* Dossier Summary Cards */}
-            <ReportSummaryCards metrics={dossier.metrics} />
+            <div className="print:hidden">
+              <ReportSummaryCards metrics={dossier.metrics} />
+            </div>
 
             {/* Comprehensive Dossier Document Viewer */}
             <DossierViewer
@@ -275,11 +281,13 @@ function ReportsOperationsContent() {
             />
           </div>
         ) : (
-          <ReportEmptyState
-            onSelectTemplate={handleSelectTemplate}
-            onGenerate={handleCompile}
-            isCompiling={isCompiling}
-          />
+          <div className="print:hidden">
+            <ReportEmptyState
+              onSelectTemplate={handleSelectTemplate}
+              onGenerate={handleCompile}
+              isCompiling={isCompiling}
+            />
+          </div>
         )}
       </div>
     </OperationsSectionShell>

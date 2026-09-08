@@ -134,6 +134,12 @@ export const Sidebar: React.FC<SidebarProps> = ({ isOpen = true, onClose }) => {
     },
   ];
 
+  const handleNavClick = () => {
+    if (typeof window !== "undefined" && window.innerWidth < 1024) {
+      onClose?.();
+    }
+  };
+
   return (
     <>
       {/* Mobile backdrop */}
@@ -148,13 +154,13 @@ export const Sidebar: React.FC<SidebarProps> = ({ isOpen = true, onClose }) => {
       {/*
         Sidebar — always fixed, never scrolls away with page content.
         top-14 aligns with the h-14 CommandHeader.
-        height: calc(100vh - 3.5rem) fills the remaining viewport.
+        bottom-8 aligns above the h-8 StatusBar.
+        On desktop (lg), it is persistently visible (lg:translate-x-0).
         The sidebar itself is overflow-y-auto so long nav lists scroll inside it.
       */}
       <aside
         className={cn(
-          "fixed top-14 left-0 z-30 flex w-60 flex-col border-r border-border-subtle bg-surface-panel transition-transform duration-200 ease-in-out",
-          "h-[calc(100vh-3.5rem)]",
+          "fixed top-14 bottom-8 left-0 z-30 flex w-60 flex-col border-r border-border-subtle bg-surface-panel transition-transform duration-200 ease-in-out lg:translate-x-0 print:hidden",
           isOpen ? "translate-x-0" : "-translate-x-full"
         )}
         aria-label="Platform Operations Navigation"
@@ -175,7 +181,7 @@ export const Sidebar: React.FC<SidebarProps> = ({ isOpen = true, onClose }) => {
               <Link
                 key={item.href}
                 href={item.href}
-                onClick={onClose}
+                onClick={handleNavClick}
                 aria-current={isActive ? "page" : undefined}
                 className={cn(
                   "flex items-center gap-2.5 rounded-md px-3 py-2 text-xs font-medium transition-all group",

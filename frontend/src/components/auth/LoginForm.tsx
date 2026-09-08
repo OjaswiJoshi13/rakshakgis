@@ -2,6 +2,7 @@
 
 import React, { useState } from "react";
 import { useRouter } from "next/navigation";
+import { Eye, EyeOff } from "lucide-react";
 import { useAuth } from "@/context/AuthContext";
 import { Button } from "@/components/ui/Button";
 import { Alert } from "@/components/ui/Alert";
@@ -17,6 +18,7 @@ export const LoginForm: React.FC<LoginFormProps> = ({ onSuccess, className = "" 
 
   const [username, setUsername] = useState<string>("");
   const [password, setPassword] = useState<string>("");
+  const [showPassword, setShowPassword] = useState<boolean>(false);
   const [clientError, setClientError] = useState<string | null>(null);
 
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
@@ -121,24 +123,39 @@ export const LoginForm: React.FC<LoginFormProps> = ({ onSuccess, className = "" 
             Password
           </label>
         </div>
-        <input
-          id="auth-password"
-          name="password"
-          type="password"
-          autoComplete="current-password"
-          value={password}
-          disabled={isLoading}
-          onChange={(e) => {
-            setPassword(e.target.value);
-            if (clientError) setClientError(null);
-            if (serverError) clearError();
-          }}
-          placeholder="••••••••••••"
-          required
-          aria-required="true"
-          aria-invalid={displayedError ? "true" : "false"}
-          className="w-full rounded-md border border-border-strong bg-surface-elevated px-3 py-2 text-sm text-text-primary placeholder-text-muted transition-colors focus:border-sky-500 focus:outline-none focus:ring-2 focus:ring-sky-500/30 disabled:opacity-50"
-        />
+        <div className="relative">
+          <input
+            id="auth-password"
+            name="password"
+            type={showPassword ? "text" : "password"}
+            autoComplete="current-password"
+            value={password}
+            disabled={isLoading}
+            onChange={(e) => {
+              setPassword(e.target.value);
+              if (clientError) setClientError(null);
+              if (serverError) clearError();
+            }}
+            placeholder="••••••••••••"
+            required
+            aria-required="true"
+            aria-invalid={displayedError ? "true" : "false"}
+            className="w-full rounded-md border border-border-strong bg-surface-elevated pl-3 pr-10 py-2 text-sm text-text-primary placeholder-text-muted transition-colors focus:border-sky-500 focus:outline-none focus:ring-2 focus:ring-sky-500/30 disabled:opacity-50"
+          />
+          <button
+            type="button"
+            onClick={() => setShowPassword((prev) => !prev)}
+            aria-label={showPassword ? "Hide password" : "Show password"}
+            disabled={isLoading}
+            className="absolute right-2.5 top-1/2 -translate-y-1/2 rounded p-1 text-text-muted hover:text-text-primary focus:outline-none focus-visible:ring-2 focus-visible:ring-sky-500 disabled:opacity-50 transition-colors"
+          >
+            {showPassword ? (
+              <EyeOff className="h-4 w-4" aria-hidden="true" />
+            ) : (
+              <Eye className="h-4 w-4" aria-hidden="true" />
+            )}
+          </button>
+        </div>
       </div>
 
       <div className="pt-2">

@@ -129,72 +129,92 @@ body {
    Activated when Print Dossier is triggered via window.print().
    ============================================================ */
 @media print {
-  /* Hide entire application shell */
-  body > *,
+  /* 1. Hide application chrome, nav, sidebar, footer, status bar, and flagged elements */
   header,
   aside,
-  nav,
   footer,
+  nav,
   [data-print-hide],
-  .status-bar {
+  .status-bar,
+  .print\:hidden {
     display: none !important;
   }
 
-  /* Show only the dossier document */
-  #operational-dossier-print-root,
-  #operational-dossier-print-root * {
-    display: revert !important;
-    visibility: visible !important;
-  }
-
-  /* Reset body for clean paper output */
+  /* 2. Reset html and body for clean paper output */
   html,
   body {
     background: #ffffff !important;
-    color: #000000 !important;
-    font-size: 11pt !important;
-    line-height: 1.5 !important;
+    color: #0f172a !important;
+    font-size: 10pt !important;
+    line-height: 1.4 !important;
     margin: 0 !important;
     padding: 0 !important;
+    overflow: visible !important;
+    height: auto !important;
+    width: 100% !important;
   }
 
-  /* Position the dossier at page origin */
-  #operational-dossier-print-root {
-    position: fixed !important;
-    top: 0 !important;
-    left: 0 !important;
+  /* 3. Reset ancestor containers so only print document occupies page */
+  body > div,
+  main,
+  #main-content,
+  #main-content > div {
+    margin: 0 !important;
+    padding: 0 !important;
     width: 100% !important;
+    max-width: 100% !important;
+    overflow: visible !important;
     height: auto !important;
-    padding: 1.5cm 2cm !important;
+    min-height: 0 !important;
+    border: none !important;
+    box-shadow: none !important;
+  }
+
+  /* 4. Official dossier print container styling */
+  #operational-dossier-print-root {
+    display: block !important;
+    visibility: visible !important;
+    position: static !important;
+    width: 100% !important;
+    margin: 0 !important;
+    padding: 0 !important;
     background: #ffffff !important;
-    color: #000000 !important;
+    color: #0f172a !important;
     box-shadow: none !important;
     border: none !important;
     border-radius: 0 !important;
+    overflow: visible !important;
   }
 
-  /* Page breaks */
-  h2, h3 {
+  /* 5. Page breaks */
+  h2, h3, .page-break-avoid {
     page-break-after: avoid;
+    break-after: avoid;
   }
 
-  table {
+  table, tr {
     page-break-inside: avoid;
+    break-inside: avoid;
   }
 
-  /* Remove dark-mode tinted backgrounds on print */
-  * {
-    background-color: transparent !important;
-    box-shadow: none !important;
-    text-shadow: none !important;
-  }
-
-  /* Keep borders for table structure */
+  /* 6. Clean borders and backgrounds for document tables */
   table, th, td {
     border-color: #cbd5e1 !important;
   }
 
   th {
     background-color: #f1f5f9 !important;
+    color: #0f172a !important;
+  }
+
+  /* 7. Ensure text contrast and clean white background */
+  #operational-dossier-print-root * {
+    color: #0f172a !important;
+    text-shadow: none !important;
+  }
+
+  #operational-dossier-print-root .bg-surface-panel,
+  #operational-dossier-print-root .bg-surface-elevated {
+    background-color: #ffffff !important;
   }
 }

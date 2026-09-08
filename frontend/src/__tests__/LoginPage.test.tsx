@@ -37,7 +37,7 @@ describe("LoginPage (/login)", () => {
     expect(
       screen.getByLabelText(/Username or Official Email/i)
     ).toBeInTheDocument();
-    expect(screen.getByLabelText(/Password/i)).toBeInTheDocument();
+    expect(screen.getByLabelText(/^Password$/i)).toBeInTheDocument();
     expect(
       screen.getByRole("button", { name: /Sign In to Command Center/i })
     ).toBeInTheDocument();
