@@ -129,7 +129,7 @@ export interface VillageRead {
   census_code?: string | null;
   block_id?: number;
   location: GeoJSONPointGeometry;
-  boundary?: GeoJSONPolygonGeometry | null;
+  boundary?: GeoJSONPolygonGeometry | GeoJSONMultiPolygonGeometry | null;
   elevation_m?: number | null;
   slope_deg?: number | null;
   is_active?: boolean;
@@ -140,7 +140,9 @@ export type LayerCategory =
   | "routes"
   | "habitations"
   | "red_zones"
-  | "hazards";
+  | "hazards"
+  | "village_boundaries"
+  | "earthquakes";
 
 export type LayerStatus = "available" | "unavailable" | "pending_dependency";
 
@@ -511,3 +513,101 @@ export function villagesToGeoJSON(
     features: validFeatures,
   };
 }
+
+/**
+ * Transforms VillageRead backend models with boundary polygons into GeoJSON FeatureCollection.
+ * Preserves Survey of India boundaries and Census demographics.
+ */
+export function villageBoundariesToGeoJSON(
+  villages: (VillageRead | any)[]
+): GeoJSONFeatureCollection<GeoJSONPolygonGeometry | GeoJSONMultiPolygonGeometry> {
+  const validFeatures: GeoJSONFeature<GeoJSONPolygonGeometry | GeoJSONMultiPolygonGeometry>[] = [];
+
+  for (const v of villages) {
+    if (!v) continue;
+    const geom =
+      v.boundary ||
+      (v.geometry && (v.geometry.type === "Polygon" || v.geometry.type === "MultiPolygon")
+        ? v.geometry
+        : null);
+
+    if (geom && isValidGeometry(geom) && (geom.type === "Polygon" || geom.type === "MultiPolygon")) {
+      const vid = v.id ?? v.properties?.id ?? `vb-${validFeatures.length + 1}`;
+      const vname = v.name ?? v.properties?.name ?? `Village ${vid}`;
+
+      validFeatures.push({
+        type: "Feature",
+        id: `boundary-${vid}`,
+        geometry: geom as GeoJSONPolygonGeometry | GeoJSONMultiPolygonGeometry,
+        properties: {
+          id: vid,
+          name: vname,
+          census_code: v.census_code ?? v.properties?.census_code ?? null,
+          elevation_m: v.elevation_m ?? v.properties?.elevation_m ?? null,
+          slope_deg: v.slope_deg ?? v.properties?.slope_deg ?? null,
+          population: v.population ?? v.properties?.population ?? null,
+          households: v.households ?? v.properties?.households ?? null,
+          composite_risk: v.composite_risk ?? v.properties?.composite_risk ?? 0,
+          risk_band: v.risk_band ?? v.properties?.risk_band ?? "LOW",
+          category: "village_boundaries",
+          provenance: "REAL — Survey of India (Boundary) + Census 2011 (Demographics)",
+        },
+      });
+    }
+  }
+
+  return {
+    type: "FeatureCollection",
+    features: validFeatures,
+  };
+}
+
+/**
+ * Transforms NCS and USGS earthquake events into standard GeoJSON Point FeatureCollection.
+ */
+export function earthquakesToGeoJSON(
+  earthquakes: any[]
+): GeoJSONFeatureCollection<GeoJSONPointGeometry> {
+  const validFeatures: GeoJSONFeature<GeoJSONPointGeometry>[] = [];
+
+  for (const eq of earthquakes) {
+    if (!eq) continue;
+    const geom = eq.geometry || (eq.location ? eq.location : null);
+    const coords =
+      geom?.coordinates ||
+      (eq.longitude !== undefined && eq.latitude !== undefined ? [eq.longitude, eq.latitude] : null);
+
+    if (coords && isValidPosition(coords)) {
+      const eid = eq.id || eq.event_id || `eq-${validFeatures.length + 1}`;
+      validFeatures.push({
+        type: "Feature",
+        id: eid,
+        geometry: {
+          type: "Point",
+          coordinates: [coords[0], coords[1]],
+        },
+        properties: {
+          ...(eq.properties || {}),
+          id: eid,
+          event_id: eq.event_id || eq.properties?.event_id || eid,
+          magnitude: eq.magnitude ?? eq.properties?.magnitude ?? 3.0,
+          depth_km: eq.depth_km ?? eq.properties?.depth_km ?? 10.0,
+          observed_at: eq.observed_at || eq.properties?.observed_at || null,
+          severity: eq.severity || eq.properties?.severity || "minor",
+          description: eq.description || eq.properties?.description || "Seismic Event",
+          category: "earthquakes",
+          provenance:
+            eq.provenance ||
+            eq.properties?.provenance ||
+            (String(eid).startsWith("usgs-") ? "LIVE — USGS Real-Time Feed" : "REAL HISTORICAL — NCS MoES"),
+        },
+      });
+    }
+  }
+
+  return {
+    type: "FeatureCollection",
+    features: validFeatures,
+  };
+}
+

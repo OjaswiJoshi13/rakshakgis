@@ -9,9 +9,10 @@ import {
   fetchRoutes,
   fetchRedZones,
   fetchVillages,
+  fetchMapLayers,
 } from "@/lib/api";
 import { useOperational } from "@/context/OperationalContext";
-import { PaginatedResponse } from "@/types/api";
+import { PaginatedResponse, ResponseEnvelope } from "@/types/api";
 import { CandidateSiteRead } from "@/types/dashboard";
 import {
   GeoJSONFeatureCollection,
@@ -22,8 +23,10 @@ import {
   calculateBounds,
   candidateSiteBoundariesToGeoJSON,
   candidateSitesToGeoJSON,
+  earthquakesToGeoJSON,
   redZonesToGeoJSON,
   routesToGeoJSON,
+  villageBoundariesToGeoJSON,
   villagesToGeoJSON,
 } from "@/types/gis";
 import {
@@ -45,11 +48,14 @@ export default function GisMapPage() {
     null
   );
   const [layerVisibility, setLayerVisibility] = useState<Record<string, boolean>>({
+    "village-boundaries-polygons": true,
+    "habitations-points": true,
+    "earthquakes-ncs": true,
+    "earthquakes-usgs": true,
     "candidate-sites-points": true,
     "candidate-sites-boundaries": true,
     "routes-lines": true,
     "red-zones-polygons": true,
-    "habitations-points": true,
     "hazards-extents": false,
   });
 
@@ -111,48 +117,120 @@ export default function GisMapPage() {
     { cacheTtlMs: 60000 }
   );
 
+  // 5. Fetch Real Vector Map Layers via GET /map/layers
+  // (Survey of India cadastral boundaries, Census habitations, NCS earthquakes, USGS live feed)
+  const {
+    data: mapLayersEnvelope,
+    isLoading: mapLayersLoading,
+    refetch: refetchMapLayers,
+  } = useApiQuery<ResponseEnvelope<Record<string, any>>>(
+    `gis-map-layers-${activeRegion}`,
+    (signal) => fetchMapLayers(undefined, activeRegion, signal),
+    { cacheTtlMs: 60000 }
+  );
+
   // Transform backend models to standard GeoJSON FeatureCollections
   const sitesGeoJSON = useMemo(() => {
+    if (mapLayersEnvelope?.data?.candidate_sites?.features?.length) {
+      return mapLayersEnvelope.data.candidate_sites as GeoJSONFeatureCollection;
+    }
     return candidateSitesToGeoJSON(sitesEnvelope?.data || []);
-  }, [sitesEnvelope?.data]);
+  }, [mapLayersEnvelope?.data?.candidate_sites, sitesEnvelope?.data]);
 
   const siteBoundariesGeoJSON = useMemo(() => {
+    if (mapLayersEnvelope?.data?.candidate_site_boundaries?.features?.length) {
+      return mapLayersEnvelope.data.candidate_site_boundaries as GeoJSONFeatureCollection;
+    }
     return candidateSiteBoundariesToGeoJSON(sitesEnvelope?.data || []);
-  }, [sitesEnvelope?.data]);
+  }, [mapLayersEnvelope?.data?.candidate_site_boundaries, sitesEnvelope?.data]);
 
   const routesGeoJSON = useMemo(() => {
+    if (mapLayersEnvelope?.data?.routes?.features?.length) {
+      return mapLayersEnvelope.data.routes as GeoJSONFeatureCollection;
+    }
     return routesToGeoJSON(routesEnvelope?.data || []);
-  }, [routesEnvelope?.data]);
+  }, [mapLayersEnvelope?.data?.routes, routesEnvelope?.data]);
 
   const redZonesGeoJSON = useMemo(() => {
+    if (mapLayersEnvelope?.data?.red_zones?.features?.length) {
+      return mapLayersEnvelope.data.red_zones as GeoJSONFeatureCollection;
+    }
     return redZonesToGeoJSON(redZonesEnvelope?.data || []);
-  }, [redZonesEnvelope?.data]);
+  }, [mapLayersEnvelope?.data?.red_zones, redZonesEnvelope?.data]);
 
   const villagesGeoJSON = useMemo(() => {
+    if (mapLayersEnvelope?.data?.villages?.features?.length) {
+      return mapLayersEnvelope.data.villages as GeoJSONFeatureCollection;
+    }
     return villagesToGeoJSON(villagesEnvelope?.data || []);
-  }, [villagesEnvelope?.data]);
+  }, [mapLayersEnvelope?.data?.villages, villagesEnvelope?.data]);
+
+  const villageBoundariesGeoJSON = useMemo(() => {
+    if (mapLayersEnvelope?.data?.village_boundaries?.features?.length) {
+      return mapLayersEnvelope.data.village_boundaries as GeoJSONFeatureCollection;
+    }
+    return villageBoundariesToGeoJSON(villagesEnvelope?.data || []);
+  }, [mapLayersEnvelope?.data?.village_boundaries, villagesEnvelope?.data]);
+
+  const earthquakesNcsGeoJSON = useMemo(() => {
+    if (mapLayersEnvelope?.data?.earthquakes_ncs?.features?.length) {
+      return mapLayersEnvelope.data.earthquakes_ncs as GeoJSONFeatureCollection;
+    }
+    return { type: "FeatureCollection" as const, features: [] };
+  }, [mapLayersEnvelope?.data?.earthquakes_ncs]);
+
+  const earthquakesUsgsGeoJSON = useMemo(() => {
+    if (mapLayersEnvelope?.data?.earthquakes_usgs?.features?.length) {
+      return mapLayersEnvelope.data.earthquakes_usgs as GeoJSONFeatureCollection;
+    }
+    return { type: "FeatureCollection" as const, features: [] };
+  }, [mapLayersEnvelope?.data?.earthquakes_usgs]);
 
   // Dictionary of GeoJSON sources fed to MapLibre
   const sourcesData: Record<string, GeoJSONFeatureCollection> = useMemo(() => {
     return {
+      "village-boundaries-source": villageBoundariesGeoJSON,
+      "habitations-source": villagesGeoJSON,
+      "earthquakes-ncs-source": earthquakesNcsGeoJSON,
+      "earthquakes-usgs-source": earthquakesUsgsGeoJSON,
       "candidate-sites-source": sitesGeoJSON,
       "candidate-site-boundaries-source": siteBoundariesGeoJSON,
       "routes-source": routesGeoJSON,
       "red-zones-source": redZonesGeoJSON,
-      "habitations-source": villagesGeoJSON,
     };
-  }, [sitesGeoJSON, siteBoundariesGeoJSON, routesGeoJSON, redZonesGeoJSON, villagesGeoJSON]);
+  }, [
+    villageBoundariesGeoJSON,
+    villagesGeoJSON,
+    earthquakesNcsGeoJSON,
+    earthquakesUsgsGeoJSON,
+    sitesGeoJSON,
+    siteBoundariesGeoJSON,
+    routesGeoJSON,
+    redZonesGeoJSON,
+  ]);
 
   // Dynamic feature counts for layer controls
   const featureCounts = useMemo(() => {
     return {
+      "village-boundaries-polygons": villageBoundariesGeoJSON.features.length,
+      "habitations-points": villagesGeoJSON.features.length,
+      "earthquakes-ncs": earthquakesNcsGeoJSON.features.length,
+      "earthquakes-usgs": earthquakesUsgsGeoJSON.features.length,
       "candidate-sites-points": sitesGeoJSON.features.length,
       "candidate-sites-boundaries": siteBoundariesGeoJSON.features.length,
       "routes-lines": routesGeoJSON.features.length,
       "red-zones-polygons": redZonesGeoJSON.features.length,
-      "habitations-points": villagesGeoJSON.features.length,
     };
-  }, [sitesGeoJSON, siteBoundariesGeoJSON, routesGeoJSON, redZonesGeoJSON, villagesGeoJSON]);
+  }, [
+    villageBoundariesGeoJSON,
+    villagesGeoJSON,
+    earthquakesNcsGeoJSON,
+    earthquakesUsgsGeoJSON,
+    sitesGeoJSON,
+    siteBoundariesGeoJSON,
+    routesGeoJSON,
+    redZonesGeoJSON,
+  ]);
 
   // Toggle individual layer visibility
   const handleToggleLayer = (layerId: string) => {
@@ -171,6 +249,7 @@ export default function GisMapPage() {
         refetchRoutes(),
         refetchRedZones(),
         refetchVillages(),
+        refetchMapLayers?.(),
       ]);
     } finally {
       setIsRefreshing(false);
@@ -179,7 +258,11 @@ export default function GisMapPage() {
 
   // Compute bounding box across all active features
   const computedBounds = useMemo(() => {
+    if (mapLayersEnvelope?.data?.bounds && Array.isArray(mapLayersEnvelope.data.bounds)) {
+      return mapLayersEnvelope.data.bounds as [[number, number], [number, number]];
+    }
     const allFeatures = [
+      ...villageBoundariesGeoJSON.features,
       ...sitesGeoJSON.features,
       ...siteBoundariesGeoJSON.features,
       ...routesGeoJSON.features,
@@ -187,7 +270,15 @@ export default function GisMapPage() {
       ...villagesGeoJSON.features,
     ];
     return calculateBounds(allFeatures);
-  }, [sitesGeoJSON, siteBoundariesGeoJSON, routesGeoJSON, redZonesGeoJSON, villagesGeoJSON]);
+  }, [
+    mapLayersEnvelope?.data?.bounds,
+    villageBoundariesGeoJSON,
+    sitesGeoJSON,
+    siteBoundariesGeoJSON,
+    routesGeoJSON,
+    redZonesGeoJSON,
+    villagesGeoJSON,
+  ]);
 
   const handleResetView = () => {
     if (computedBounds) {
@@ -279,6 +370,8 @@ export default function GisMapPage() {
               sourcesData={sourcesData}
               onFeatureSelect={setSelectedFeature}
               selectedFeature={selectedFeature}
+              initialCenter={[79.5, 30.4]}
+              initialZoom={10}
               bounds={viewportBounds}
               isLoading={isMapLoading}
               className="w-full h-full"

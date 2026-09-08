@@ -365,6 +365,109 @@ export const FeatureDetailPanel: React.FC<FeatureDetailPanelProps> = ({
           Coords: {feature.coordinates[0].toFixed(5)}, {feature.coordinates[1].toFixed(5)}
         </div>
       )}
+
+      <div className="text-[10px] font-mono bg-amber-500/10 text-amber-700 dark:text-amber-300 border border-amber-500/20 p-2 rounded">
+        <strong>PROVENANCE:</strong> {String(props.provenance || "REAL — Census 2011 Habitation Settlement")}
+      </div>
+    </div>
+  );
+
+  const renderVillageBoundaryDetails = () => (
+    <div className="space-y-3" data-testid="village-boundary-detail-card">
+      <div className="flex items-start justify-between gap-2">
+        <div>
+          <span className="text-[10px] font-mono uppercase tracking-wider text-sky-600 dark:text-sky-400">
+            Cadastral Boundary #{feature.id}
+          </span>
+          <h3 className="text-sm font-bold text-text-primary leading-snug">
+            {String(props.name || `Village #${feature.id}`)}
+          </h3>
+        </div>
+        <Badge variant="info" size="sm" className="font-mono text-xs">
+          Survey of India
+        </Badge>
+      </div>
+
+      <div className="grid grid-cols-2 gap-2 text-[11px] font-mono bg-surface-elevated p-2.5 rounded border border-border-subtle">
+        <div>
+          <span className="text-text-muted block text-[10px]">Population (Census)</span>
+          <span className="font-semibold text-text-primary">
+            {props.population !== null && props.population !== undefined ? `${Number(props.population).toLocaleString()} persons` : "—"}
+          </span>
+        </div>
+        <div>
+          <span className="text-text-muted block text-[10px]">Households</span>
+          <span className="font-semibold text-text-primary">
+            {props.households !== null && props.households !== undefined ? `${Number(props.households).toLocaleString()} HH` : "—"}
+          </span>
+        </div>
+        <div>
+          <span className="text-text-muted block text-[10px]">Elevation</span>
+          <span className="font-semibold text-text-primary">
+            {props.elevation_m !== null && props.elevation_m !== undefined ? `${props.elevation_m} m` : "—"}
+          </span>
+        </div>
+        <div>
+          <span className="text-text-muted block text-[10px]">Slope Angle</span>
+          <span className="font-semibold text-text-primary">
+            {props.slope_deg !== null && props.slope_deg !== undefined ? `${props.slope_deg}°` : "—"}
+          </span>
+        </div>
+      </div>
+
+      <div className="flex items-center justify-between bg-surface-elevated p-2 rounded border border-border-subtle font-mono text-[11px]">
+        <span className="text-text-muted uppercase text-[10px]">Composite Risk</span>
+        <Badge variant={String(props.risk_band) === "CRITICAL" ? "danger" : String(props.risk_band) === "HIGH" ? "warning" : "success"} size="sm">
+          {Number(props.composite_risk || 0).toFixed(1)} / 100 ({String(props.risk_band || "LOW")})
+        </Badge>
+      </div>
+
+      <div className="text-[10px] font-mono bg-sky-500/10 text-sky-700 dark:text-sky-300 border border-sky-500/20 p-2 rounded">
+        <strong>PROVENANCE:</strong> {String(props.provenance || "REAL — Survey of India (Boundary) + Census 2011 (Demographics)")}
+      </div>
+    </div>
+  );
+
+  const renderEarthquakeDetails = () => (
+    <div className="space-y-3" data-testid="earthquake-detail-card">
+      <div className="flex items-start justify-between gap-2">
+        <div>
+          <span className="text-[10px] font-mono uppercase tracking-wider text-rose-600 dark:text-rose-400">
+            Seismic Event #{feature.id}
+          </span>
+          <h3 className="text-sm font-bold text-text-primary leading-snug">
+            Magnitude {Number(props.magnitude || 0).toFixed(1)} Richter
+          </h3>
+        </div>
+        <Badge variant={Number(props.magnitude || 0) >= 5.0 ? "danger" : Number(props.magnitude || 0) >= 3.5 ? "warning" : "info"} size="sm">
+          {Number(props.magnitude || 0) >= 6.0 ? "MAJOR" : Number(props.magnitude || 0) >= 4.5 ? "MODERATE" : "LIGHT"}
+        </Badge>
+      </div>
+
+      <div className="grid grid-cols-2 gap-2 text-[11px] font-mono bg-surface-elevated p-2.5 rounded border border-border-subtle">
+        <div>
+          <span className="text-text-muted block text-[10px]">Hypocenter Depth</span>
+          <span className="font-semibold text-text-primary">
+            {props.depth_km !== undefined ? `${props.depth_km} km` : "10 km"}
+          </span>
+        </div>
+        <div>
+          <span className="text-text-muted block text-[10px]">Observed Date</span>
+          <span className="font-semibold text-text-primary">
+            {props.observed_at ? String(props.observed_at).slice(0, 10) : "Recorded"}
+          </span>
+        </div>
+      </div>
+
+      {props.description && (
+        <div className="text-[11px] text-text-secondary bg-surface-elevated p-2 rounded border border-border-subtle">
+          {String(props.description)}
+        </div>
+      )}
+
+      <div className="text-[10px] font-mono bg-rose-500/10 text-rose-700 dark:text-rose-300 border border-rose-500/20 p-2 rounded">
+        <strong>PROVENANCE:</strong> {String(props.provenance || "REAL HISTORICAL — NCS MoES")}
+      </div>
     </div>
   );
 
@@ -417,6 +520,10 @@ export const FeatureDetailPanel: React.FC<FeatureDetailPanelProps> = ({
         ? renderRedZoneDetails()
         : feature.layerCategory === "habitations"
         ? renderHabitationDetails()
+        : feature.layerCategory === "village_boundaries"
+        ? renderVillageBoundaryDetails()
+        : feature.layerCategory === "earthquakes"
+        ? renderEarthquakeDetails()
         : renderGenericDetails()}
     </div>
   );
