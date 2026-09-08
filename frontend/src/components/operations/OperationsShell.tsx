@@ -1,7 +1,6 @@
 "use client";
 
 import React from "react";
-import { OperationsNav } from "./OperationsNav";
 import { useAuth } from "@/context/AuthContext";
 import { Badge } from "@/components/ui/Badge";
 import { DATA_MODE_CONFIG, DataMode } from "@/design-system/tokens";
@@ -40,7 +39,7 @@ export const OperationsShell: React.FC<OperationsShellProps> = ({
           <div>
             <div className="flex items-center gap-2">
               <span className="text-xs font-semibold text-text-muted">
-                <span className="sr-only">Operations Console • Chunk M6-01</span>
+                <span className="sr-only">Operations Console</span>
                 <span>Operations Console</span>
               </span>
               <span className="rounded bg-surface-elevated border border-border-subtle px-1.5 py-0.5 text-[11px] text-text-secondary">
@@ -75,8 +74,12 @@ export const OperationsShell: React.FC<OperationsShellProps> = ({
         </div>
       </div>
 
-      {/* Persistent Operations Sub-Navigation */}
-      <OperationsNav />
+      {/*
+        Horizontal Operations sub-navigation has been intentionally removed.
+        The left Decision Instruments sidebar (Sidebar.tsx) is now the
+        sole primary navigation for all operations routes.
+        All routes remain fully accessible via the sidebar and direct URL.
+      */}
 
       {/* Operational Workspace Viewport */}
       <section

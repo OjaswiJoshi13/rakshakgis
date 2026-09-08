@@ -22,14 +22,19 @@ export const AppLayout: React.FC<AppLayoutProps> = ({ children }) => {
         Skip to main content
       </a>
 
-      {/* Primary Platform Header */}
+      {/* Primary Platform Header — sticky at top */}
       <CommandHeader
         isSidebarOpen={isSidebarOpen}
         onToggleSidebar={() => setIsSidebarOpen((prev) => !prev)}
       />
 
       {/* Main Command Center Canvas */}
-      <div className="flex flex-1 overflow-hidden">
+      {/*
+        The sidebar is always `position: fixed` (width 240px = w-60).
+        We offset the main content area with pl-60 on large screens so content
+        is not hidden under the sidebar. On mobile the sidebar overlays.
+      */}
+      <div className="flex flex-1">
         <Sidebar
           isOpen={isSidebarOpen}
           onClose={() => setIsSidebarOpen(false)}
@@ -38,7 +43,7 @@ export const AppLayout: React.FC<AppLayoutProps> = ({ children }) => {
         <main
           id="main-content"
           tabIndex={-1}
-          className="flex-1 overflow-y-auto pb-12 focus:outline-none"
+          className="flex-1 overflow-y-auto pb-12 focus:outline-none lg:pl-60"
         >
           <div className="mx-auto max-w-7xl p-4 sm:p-6 lg:p-8">
             {children}

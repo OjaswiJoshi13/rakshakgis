@@ -225,11 +225,10 @@ export const AuditTable: React.FC<AuditTableProps> = ({
                       variant="secondary"
                       size="sm"
                       onClick={() => onSelectRecord(record)}
-                      className="text-xs h-7 gap-1"
+                      leftIcon={<Eye className="h-3 w-3" />}
                       data-testid={`inspect-audit-${record.id}`}
                     >
-                      <Eye className="h-3 w-3" />
-                      <span>Inspect</span>
+                      Inspect
                     </Button>
                   </td>
                 </tr>

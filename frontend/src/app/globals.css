@@ -17,6 +17,7 @@ html[data-theme="light"] {
   --surface-3: #e2e8f0;
   
   --border-subtle: #e2e8f0;
+  --border-base: #e2e8f0;
   --border-strong: #cbd5e1;
   --surface-border: #e2e8f0;
   --surface-border-subtle: #edf0f4;
@@ -52,6 +53,7 @@ html[data-theme="dark"] {
   --surface-3: #2b3240;
 
   --border-subtle: #30363d;
+  --border-base: #30363d;
   --border-strong: #484f58;
   --surface-border: #30363d;
   --surface-border-subtle: #21262d;
@@ -119,4 +121,80 @@ body {
 
 ::-webkit-scrollbar-thumb:hover {
   background: var(--text-muted);
+}
+
+/* ============================================================
+   PRINT DOSSIER — Professional Report Output
+   Hides all application chrome; shows only the compiled dossier.
+   Activated when Print Dossier is triggered via window.print().
+   ============================================================ */
+@media print {
+  /* Hide entire application shell */
+  body > *,
+  header,
+  aside,
+  nav,
+  footer,
+  [data-print-hide],
+  .status-bar {
+    display: none !important;
+  }
+
+  /* Show only the dossier document */
+  #operational-dossier-print-root,
+  #operational-dossier-print-root * {
+    display: revert !important;
+    visibility: visible !important;
+  }
+
+  /* Reset body for clean paper output */
+  html,
+  body {
+    background: #ffffff !important;
+    color: #000000 !important;
+    font-size: 11pt !important;
+    line-height: 1.5 !important;
+    margin: 0 !important;
+    padding: 0 !important;
+  }
+
+  /* Position the dossier at page origin */
+  #operational-dossier-print-root {
+    position: fixed !important;
+    top: 0 !important;
+    left: 0 !important;
+    width: 100% !important;
+    height: auto !important;
+    padding: 1.5cm 2cm !important;
+    background: #ffffff !important;
+    color: #000000 !important;
+    box-shadow: none !important;
+    border: none !important;
+    border-radius: 0 !important;
+  }
+
+  /* Page breaks */
+  h2, h3 {
+    page-break-after: avoid;
+  }
+
+  table {
+    page-break-inside: avoid;
+  }
+
+  /* Remove dark-mode tinted backgrounds on print */
+  * {
+    background-color: transparent !important;
+    box-shadow: none !important;
+    text-shadow: none !important;
+  }
+
+  /* Keep borders for table structure */
+  table, th, td {
+    border-color: #cbd5e1 !important;
+  }
+
+  th {
+    background-color: #f1f5f9 !important;
+  }
 }

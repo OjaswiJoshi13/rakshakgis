@@ -8,7 +8,6 @@ import { cn } from "@/lib/utils";
 export interface NavItem {
   name: string;
   href: string;
-  chunkId?: string;
   status: "active" | "planned";
   icon: React.ReactNode;
 }
@@ -123,6 +122,16 @@ export const Sidebar: React.FC<SidebarProps> = ({ isOpen = true, onClose }) => {
         </svg>
       ),
     },
+    {
+      name: "Data Sources",
+      href: "/operations/sources",
+      status: "active",
+      icon: (
+        <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 7v10c0 2.21 3.582 4 8 4s8-1.79 8-4V7M4 7c0 2.21 3.582 4 8 4s8-1.79 8-4M4 7c0-2.21 3.582-4 8-4s8 1.79 8 4m0 5c0 2.21-3.582 4-8 4s-8-1.79-8-4" />
+        </svg>
+      ),
+    },
   ];
 
   return (
@@ -136,14 +145,21 @@ export const Sidebar: React.FC<SidebarProps> = ({ isOpen = true, onClose }) => {
         />
       )}
 
+      {/*
+        Sidebar — always fixed, never scrolls away with page content.
+        top-14 aligns with the h-14 CommandHeader.
+        height: calc(100vh - 3.5rem) fills the remaining viewport.
+        The sidebar itself is overflow-y-auto so long nav lists scroll inside it.
+      */}
       <aside
         className={cn(
-          "fixed top-14 bottom-8 left-0 z-30 flex w-60 flex-col border-r border-border-subtle bg-surface-panel transition-transform duration-200 ease-in-out lg:static lg:translate-x-0",
+          "fixed top-14 left-0 z-30 flex w-60 flex-col border-r border-border-subtle bg-surface-panel transition-transform duration-200 ease-in-out",
+          "h-[calc(100vh-3.5rem)]",
           isOpen ? "translate-x-0" : "-translate-x-full"
         )}
         aria-label="Platform Operations Navigation"
       >
-        <div className="px-3.5 py-3 border-b border-border-subtle">
+        <div className="px-3.5 py-3 border-b border-border-subtle shrink-0">
           <span className="text-xs font-semibold text-text-muted">
             Decision Instruments
           </span>
@@ -178,7 +194,7 @@ export const Sidebar: React.FC<SidebarProps> = ({ isOpen = true, onClose }) => {
         </nav>
 
         {/* Operational Footer within Sidebar */}
-        <div className="border-t border-border-subtle px-3.5 py-2.5 bg-surface-subtle text-xs text-text-muted">
+        <div className="shrink-0 border-t border-border-subtle px-3.5 py-2.5 bg-surface-subtle text-xs text-text-muted">
           <div className="flex items-center justify-between">
             <span>Platform Core</span>
             <span className="text-emerald-700 dark:text-emerald-400 font-medium">OPERATIONAL</span>

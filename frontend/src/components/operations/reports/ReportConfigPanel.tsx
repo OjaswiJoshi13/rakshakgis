@@ -98,7 +98,7 @@ export const ReportConfigPanel: React.FC<ReportConfigPanelProps> = ({
         <div>
           <div className="flex items-center justify-between mb-3">
             <h3 className="text-xs font-semibold uppercase tracking-wider text-text-muted flex items-center gap-1.5">
-              <FileText className="h-3.5 w-3.5 text-primary-600 dark:text-primary-400" />
+              <FileText className="h-3.5 w-3.5 text-sky-600 dark:text-sky-400" />
               <span>Select Report Template & Scope</span>
             </h3>
             <span className="text-[11px] font-mono text-text-muted">
@@ -122,7 +122,7 @@ export const ReportConfigPanel: React.FC<ReportConfigPanelProps> = ({
                   onClick={() => handleTemplateSelect(tmpl.id)}
                   className={`flex flex-col text-left p-3.5 rounded-lg border transition-all ${
                     isSelected
-                      ? "border-primary-500 bg-primary-50 dark:bg-primary-950/40 text-text-primary shadow-xs ring-1 ring-primary-500"
+                      ? "border-sky-500 bg-sky-50 dark:bg-sky-950/40 text-text-primary shadow-xs ring-1 ring-sky-500"
                       : "border-border-subtle bg-surface-elevated text-text-secondary hover:border-border-strong hover:bg-surface-raised"
                   }`}
                 >
@@ -130,14 +130,14 @@ export const ReportConfigPanel: React.FC<ReportConfigPanelProps> = ({
                     <div
                       className={`p-1.5 rounded-md ${
                         isSelected
-                          ? "bg-primary-100 dark:bg-primary-900/60 text-primary-600 dark:text-primary-400"
+                          ? "bg-sky-100 dark:bg-sky-900/60 text-sky-600 dark:text-sky-400"
                           : "bg-surface-panel text-text-muted"
                       }`}
                     >
                       <Icon className="h-4 w-4" />
                     </div>
                     {isSelected && (
-                      <CheckCircle2 className="h-4 w-4 text-primary-600 dark:text-primary-400" />
+                      <CheckCircle2 className="h-4 w-4 text-sky-600 dark:text-sky-400" />
                     )}
                   </div>
                   <div className="font-medium text-xs sm:text-sm text-text-primary mb-1">
@@ -165,7 +165,7 @@ export const ReportConfigPanel: React.FC<ReportConfigPanelProps> = ({
         {/* Configuration Filters & Options */}
         <div className="p-4 rounded-lg bg-surface-elevated border border-border-subtle space-y-4">
           <div className="flex items-center gap-2 text-xs font-semibold uppercase tracking-wider text-text-muted">
-            <Filter className="h-3.5 w-3.5 text-primary-600 dark:text-primary-400" />
+            <Filter className="h-3.5 w-3.5 text-sky-600 dark:text-sky-400" />
             <span>Operational Parameters &amp; Filters</span>
           </div>
 
@@ -185,7 +185,7 @@ export const ReportConfigPanel: React.FC<ReportConfigPanelProps> = ({
                         onClick={() => handleStatusFilter(st)}
                         className={`flex-1 py-1 text-xs font-medium rounded capitalize transition-colors ${
                           config.statusFilter === st
-                            ? "bg-primary-600 text-white font-semibold shadow-xs"
+                            ? "bg-sky-600 text-white font-semibold shadow-xs"
                             : "text-text-secondary hover:text-text-primary"
                         }`}
                       >
@@ -207,6 +207,7 @@ export const ReportConfigPanel: React.FC<ReportConfigPanelProps> = ({
                   Target Candidate Site
                 </label>
                 <div className="relative">
+                  {/* Styled select wrapper for consistent light+dark mode appearance */}
                   <select
                     id="site-selector"
                     value={
@@ -215,7 +216,7 @@ export const ReportConfigPanel: React.FC<ReportConfigPanelProps> = ({
                         : String(config.selectedSiteId)
                     }
                     onChange={(e) => handleSiteSelect(e.target.value)}
-                    className="w-full rounded-md border border-border-subtle bg-surface-panel py-1.5 px-3 text-xs text-text-primary focus:border-primary-500 focus:outline-hidden focus:ring-1 focus:ring-primary-500 font-mono"
+                    className="w-full appearance-none rounded-md border border-border-strong bg-surface-panel text-text-primary py-1.5 pl-3 pr-8 text-xs focus:border-sky-500 focus:outline-none focus:ring-1 focus:ring-sky-500 font-mono cursor-pointer"
                   >
                     <option value="all">All Registered Candidate Sites</option>
                     {sites.map((s) => (
@@ -237,7 +238,7 @@ export const ReportConfigPanel: React.FC<ReportConfigPanelProps> = ({
                     type="checkbox"
                     checked={config.includeAudits}
                     onChange={handleToggleAudits}
-                    className="rounded border-border-subtle bg-surface-panel text-primary-600 focus:ring-primary-500 h-3.5 w-3.5"
+                    className="rounded border-border-subtle bg-surface-panel text-sky-600 focus:ring-sky-500 h-3.5 w-3.5"
                   />
                   <span>Include Candidate Rejection Audits</span>
                 </label>
@@ -249,7 +250,7 @@ export const ReportConfigPanel: React.FC<ReportConfigPanelProps> = ({
                     type="checkbox"
                     checked={config.includeDeficits}
                     onChange={handleToggleDeficits}
-                    className="rounded border-border-subtle bg-surface-panel text-primary-600 focus:ring-primary-500 h-3.5 w-3.5"
+                    className="rounded border-border-subtle bg-surface-panel text-sky-600 focus:ring-sky-500 h-3.5 w-3.5"
                   />
                   <span>Include Infrastructure Deficit Analysis</span>
                 </label>
@@ -276,10 +277,9 @@ export const ReportConfigPanel: React.FC<ReportConfigPanelProps> = ({
             size="sm"
             onClick={onCompile}
             isLoading={isCompiling}
-            leftIcon={<Sparkles className="h-4 w-4 text-white" />}
-            className="bg-primary-600 hover:bg-primary-700 text-white shadow-xs font-medium"
+            leftIcon={<Sparkles className="h-4 w-4" />}
           >
-            <span>Compile Operational Dossier</span>
+            Compile Operational Dossier
           </Button>
         </div>
       </CardContent>

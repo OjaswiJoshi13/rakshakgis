@@ -140,11 +140,14 @@ function AuditOperationsContent() {
             onClick={handleVerifyIntegrity}
             isLoading={isVerifying}
             disabled={isVerifying}
-            className="text-xs gap-1.5"
+            leftIcon={
+              !isVerifying ? (
+                <ShieldCheck className="h-3.5 w-3.5 text-emerald-600 dark:text-emerald-400" />
+              ) : undefined
+            }
             data-testid="verify-hashes-btn"
           >
-            <ShieldCheck className="h-3.5 w-3.5 text-emerald-400" />
-            <span>Verify Cryptographic Hashes</span>
+            Verify Cryptographic Hashes
           </Button>
           <Button
             type="button"
@@ -153,11 +156,14 @@ function AuditOperationsContent() {
             onClick={loadData}
             isLoading={isLoading}
             disabled={isLoading}
-            className="text-xs gap-1.5"
+            leftIcon={
+              !isLoading ? (
+                <RefreshCw className="h-3.5 w-3.5" />
+              ) : undefined
+            }
             data-testid="refresh-audit-btn"
           >
-            <RefreshCw className="h-3.5 w-3.5 text-slate-400" />
-            <span>Refresh Trail</span>
+            Refresh Trail
           </Button>
         </div>
       }

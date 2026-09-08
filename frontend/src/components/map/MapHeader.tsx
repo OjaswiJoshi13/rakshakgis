@@ -87,12 +87,13 @@ export const MapHeader: React.FC<MapHeaderProps> = ({
               variant="secondary"
               size="sm"
               onClick={onResetView}
-              className="text-xs"
               title="Recenter and fit map to loaded features"
+              leftIcon={
+                <svg className="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 8V4m0 0h4M4 4l5 5m11-1V4m0 0h-4m4 0l-5 5M4 16v4m0 0h4m-4 0l5-5m11 5l-5-5m5 5v-4m0 4h-4" />
+                </svg>
+              }
             >
-              <svg className="w-3.5 h-3.5 mr-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 8V4m0 0h4M4 4l5 5m11-1V4m0 0h-4m4 0l-5 5M4 16v4m0 0h4m-4 0l5-5m11 5l-5-5m5 5v-4m0 4h-4" />
-              </svg>
               Fit Bounds
             </Button>
           )}
@@ -100,26 +101,19 @@ export const MapHeader: React.FC<MapHeaderProps> = ({
           {/* Refresh Data Button */}
           {onRefresh && (
             <Button
-              variant="outline"
+              variant="secondary"
               size="sm"
               onClick={onRefresh}
               isLoading={isRefreshing}
-              className="text-xs"
               title="Refresh spatial layers from backend"
+              leftIcon={
+                !isRefreshing ? (
+                  <svg className="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" />
+                  </svg>
+                ) : undefined
+              }
             >
-              <svg
-                className={`w-3.5 h-3.5 mr-1 ${isRefreshing ? "animate-spin" : ""}`}
-                fill="none"
-                viewBox="0 0 24 24"
-                stroke="currentColor"
-              >
-                <path
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                  strokeWidth={2}
-                  d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"
-                />
-              </svg>
               Refresh
             </Button>
           )}

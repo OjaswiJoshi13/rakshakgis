@@ -136,10 +136,19 @@ function ReportsOperationsContent() {
   };
 
   const handlePrint = () => {
-    if (typeof window !== "undefined" && typeof window.print === "function") {
-      window.print();
+    if (typeof window === "undefined") return;
+    // Set page title to dossier name for clean print header/PDF filename
+    const originalTitle = document.title;
+    if (dossier) {
+      document.title = `${dossier.title} — RakshakGIS Operational Dossier`;
     }
+    // @media print CSS in globals.css hides all application chrome
+    // and shows only #operational-dossier-print-root
+    window.print();
+    // Restore title after print dialog closes
+    document.title = originalTitle;
   };
+
 
   const handleReset = () => {
     setDossier(null);

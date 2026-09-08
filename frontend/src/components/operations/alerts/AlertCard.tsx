@@ -241,14 +241,15 @@ export const AlertCard: React.FC<AlertCardProps> = ({
           {!alert.is_acknowledged && onAcknowledge && (
             <Button
               type="button"
-              variant="outline"
+              variant="secondary"
               size="sm"
               onClick={() => onAcknowledge(alert.id)}
               disabled={isAcknowledging}
-              className="text-xs h-7 text-emerald-400 hover:text-emerald-300 hover:border-emerald-600 border-slate-700"
+              isLoading={isAcknowledging}
+              leftIcon={<CheckCircle2 className="h-3.5 w-3.5 text-emerald-600 dark:text-emerald-400" />}
+              className="text-xs text-emerald-700 dark:text-emerald-300 border-emerald-300 dark:border-emerald-700/60 hover:bg-emerald-50 dark:hover:bg-emerald-950/30 hover:border-emerald-400"
             >
-              <CheckCircle2 className="h-3.5 w-3.5 mr-1" />
-              <span>Acknowledge</span>
+              Acknowledge
             </Button>
           )}
 
@@ -258,10 +259,10 @@ export const AlertCard: React.FC<AlertCardProps> = ({
               variant="secondary"
               size="sm"
               onClick={() => onInspect(alert)}
-              className="text-xs h-7"
+              leftIcon={<FileText className="h-3.5 w-3.5" />}
+              className="text-xs"
             >
-              <FileText className="h-3.5 w-3.5 mr-1 text-sky-400" />
-              <span>Audit Trail</span>
+              Audit Trail
             </Button>
           )}
         </div>
