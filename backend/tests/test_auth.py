@@ -77,7 +77,7 @@ def seed_users(db_session: Session):
     users = {
         "admin": User(
             username="test_auth_admin",
-            email="admin@rakshakgis.gov.in",
+            email="test_auth_admin@rakshakgis.gov.in",
             hashed_password=password_hash,
             full_name="Admin Officer",
             role="admin",
@@ -86,7 +86,7 @@ def seed_users(db_session: Session):
         ),
         "district_officer": User(
             username="test_auth_officer",
-            email="officer@rakshakgis.gov.in",
+            email="test_auth_officer@rakshakgis.gov.in",
             hashed_password=password_hash,
             full_name="District Collector Chamoli",
             role="district_officer",
@@ -95,7 +95,7 @@ def seed_users(db_session: Session):
         ),
         "field_responder": User(
             username="test_auth_responder",
-            email="responder@rakshakgis.gov.in",
+            email="test_auth_responder@rakshakgis.gov.in",
             hashed_password=password_hash,
             full_name="Field Team Lead",
             role="field_responder",
@@ -104,7 +104,7 @@ def seed_users(db_session: Session):
         ),
         "viewer": User(
             username="test_auth_viewer",
-            email="viewer@rakshakgis.gov.in",
+            email="test_auth_viewer@rakshakgis.gov.in",
             hashed_password=password_hash,
             full_name="Public Observer",
             role="viewer",
@@ -113,7 +113,7 @@ def seed_users(db_session: Session):
         ),
         "inactive": User(
             username="test_auth_inactive",
-            email="inactive@rakshakgis.gov.in",
+            email="test_auth_inactive@rakshakgis.gov.in",
             hashed_password=password_hash,
             full_name="Deactivated Account",
             role="viewer",
@@ -239,7 +239,7 @@ def test_login_success_with_email(client: TestClient, seed_users: dict):
     """Verify login succeeds using email address."""
     response = client.post(
         "/api/v1/auth/login",
-        json={"username": "officer@rakshakgis.gov.in", "password": seed_users["password"]},
+        json={"username": "test_auth_officer@rakshakgis.gov.in", "password": seed_users["password"]},
     )
     assert response.status_code == 200
     data = response.json()

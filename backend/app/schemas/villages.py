@@ -1,6 +1,6 @@
 """Pydantic validation and serialization schemas for administrative villages (GIS Habitations)."""
 
-from typing import Any, Dict, Optional
+from typing import Any, Dict, Optional, Union
 from pydantic import BaseModel, ConfigDict, Field, field_validator
 
 from app.schemas.sites import (
@@ -8,6 +8,10 @@ from app.schemas.sites import (
     GeoJSONPolygon,
     parse_geometry_to_geojson_point,
     parse_geometry_to_geojson_polygon,
+)
+from app.schemas.red_zones import (
+    GeoJSONMultiPolygon,
+    parse_geometry_to_geojson_multipolygon,
 )
 
 
@@ -21,7 +25,7 @@ class VillageRead(BaseModel):
     census_code: Optional[str] = Field(None, description="Census India identifier code")
     block_id: Optional[int] = Field(None, description="Parent administrative block ID")
     location: GeoJSONPoint = Field(..., description="Centroid/settlement location Point (WGS84)")
-    boundary: Optional[GeoJSONPolygon] = Field(None, description="Settlement cadastral polygon boundary")
+    boundary: Optional[Union[GeoJSONPolygon, GeoJSONMultiPolygon]] = Field(None, description="Settlement cadastral polygon boundary")
     elevation_m: Optional[float] = Field(None, description="Mean elevation above sea level in meters")
     slope_deg: Optional[float] = Field(None, description="Mean terrain slope angle in degrees")
     is_active: bool = Field(True, description="Active status in GIS layers")
@@ -33,8 +37,11 @@ class VillageRead(BaseModel):
 
     @field_validator("boundary", mode="before")
     @classmethod
-    def serialize_boundary_geometry(cls, v: Any) -> Optional[GeoJSONPolygon]:
-        return parse_geometry_to_geojson_polygon(v)
+    def serialize_boundary_geometry(cls, v: Any) -> Optional[Union[GeoJSONPolygon, GeoJSONMultiPolygon]]:
+        poly = parse_geometry_to_geojson_polygon(v)
+        if poly is not None:
+            return poly
+        return parse_geometry_to_geojson_multipolygon(v)
 
 
 class VillageDetailRead(VillageRead):
