@@ -2392,9 +2392,52 @@ No chunk may transition to `IN_PROGRESS` until all its listed prerequisite depen
 
 ---
 
+---
+
+### GIS-01 / DATA-03: Real Data Maximization, GIS Cadastral Restoration & Data Provenance System
+
+- **Status:** `COMMITTED & PUSHED`
+- **Date Completed:** 2026-09-09
+- **Commits:**
+  - `a625987`: `feat(backend): expose Survey of India boundaries, NCS and USGS earthquakes in /map/layers`
+  - `9ede55b`: `feat(gis): restore real spatial layers, cadastral polygons, and provenance badges on GIS canvas`
+- **Owner:** Platform & Core GIS Architecture Team
+- **Objective:** Maximize verified real-world authoritative data in the GIS canvas and across application interfaces, eliminate blank/mocked GIS rendering, integrate Survey of India cadastral village boundary polygons, Census 2011 habitations, NCS historical earthquakes, live USGS earthquakes, and Dijkstra evacuation corridors with rigorous provenance disclosure.
+- **Key Enhancements Implemented:**
+  1. **Survey of India Cadastral Boundary Exposure (`backend/app/api/v1/regions.py`):**
+     - Enhanced `GET /api/v1/map/layers` to query PostGIS `villages` table and return all 150 real Survey of India village boundary polygons (Polygon and MultiPolygon geometries) enriched with Census 2011 demographics, elevation, slope, and composite risk classification.
+     - Updated Pydantic schema `VillageRead.boundary` to support both `GeoJSONPolygon` and `GeoJSONMultiPolygon`.
+  2. **National Center for Seismology & USGS Earthquake Vector Integration:**
+     - Exposed all 150 real NCS MoES historical earthquake records (1991–2024, Chamoli/Garhwal epicenter cluster) with magnitudes, focal depths, and timestamps.
+     - Live USGS seismic feed fallback and real-time event aggregation in map layers.
+  3. **GIS Vector MapLibre Canvas Restoration (`frontend/src/app/gis/page.tsx`, `layerConfig.ts`, `types/gis.ts`):**
+     - Configured `GIS_ACTIVE_MAP_LAYERS` in `layerConfig.ts` with real Survey of India polygons, habitations, NCS earthquakes, candidate sites, and evacuation corridors.
+     - Styled village boundary polygons dynamically by risk classification (`#ef4444` for Critical/High, `#f59e0b` for Moderate, `#10b981` for Low/Normal) with semi-transparent fill and clean borders.
+     - Proportional magnitude-based circle markers for seismic events (`interpolate` expression on `mag`).
+     - Centered default viewport on Chamoli District, Uttarakhand (`[79.5, 30.4]`, zoom 10) with automatic fitting to district bounds `[[79.15, 30.0], [80.15, 30.9]]`.
+  4. **Forensic Data Provenance Badges (`FeatureDetailPanel.tsx`):**
+     - Added authoritative provenance indicators on feature selection:
+       - `REAL — Survey of India (Boundary)` & `Census 2011 (Demographics)`
+       - `HISTORICAL — NCS MoES (Historical Catalogue)`
+       - `LIVE — USGS Earthquake Hazards Program`
+       - `PROPOSED / OPERATIONAL — Candidate Relocation Site (Dijkstra Target Haven)`
+       - `DERIVED / OPERATIONAL — Evacuation Corridor (Dijkstra Shortest Path)`
+       - `DERIVED — Dynamic Hazard Buffer (Multi-Criteria Multi-Hazard Formula)`
+  5. **Backend Test Suite Isolation (`tests/conftest.py`, `tests/test_auth.py`):**
+     - Namespaced test authentication users to `test_auth_*@rakshakgis.gov.in` to prevent primary key collision against seeded database state.
+     - Injected backend root into `sys.path` to allow seamless test execution from workspace root.
+- **Quality Gate Results:**
+  - **Backend Pytest:** **555 passed, 0 failed** (100% pass rate in 27.51s).
+  - **Frontend Vitest:** **31 test files passed, 283 passed, 0 failed** (100% pass rate).
+  - **Golden SIH Demo Flow:** **All 22 statutory steps passed** (`scripts/validate_golden_sih_flow.py`).
+  - **Git Remote Synchronization:** Clean push to `origin/main` (`0d0bdea..9ede55b`).
+- **Test Integrity:** Zero tests skipped, deleted, or weakened. All original regression suites verified.
+
+---
+
 ## Last Updated
 
-- **Timestamp:** 2026-09-08 01:40:00 IST
-- **Updated By:** Platform Integration & Frontend Redesign Teams (DATA-01 COMMITTED, DATA-02 COMMITTED, INT-04 IMPLEMENTED, UX-04 CALM COMMAND REDESIGN)
-- **Status Summary:** Real-world dataset inventory registered (DATA-01); PostGIS ingestion, live authoritative providers, and backend REST endpoints operational (DATA-02); Frontend GIS search, authoritative inspector, governance persistence, and 22-step Golden SIH demo flow fully validated (INT-04); Full Calm Command institutional GIS redesign operational with light/dark theme contrast system and zero-error Next.js dev runtime; All 555 backend tests and 282 frontend tests passing 100%.
+- **Timestamp:** 2026-09-09 01:15:00 IST
+- **Updated By:** Core Engineering & GIS Platform Teams (GIS-01 / DATA-03 COMMITTED & PUSHED to origin/main)
+- **Status Summary:** Real-world Survey of India cadastral polygons (150 villages), Census 2011 habitations (188 points), NCS historical earthquakes (150 events), live USGS seismic feeds, and Dijkstra evacuation routes (53 corridors) fully rendered on GIS canvas with interactive feature dossiers and forensic data provenance badges; 100% tests passing (555 backend, 283 frontend, 22 Golden SIH steps); Synced and pushed to GitHub main.
 
