@@ -39,8 +39,7 @@ export const OperationsShell: React.FC<OperationsShellProps> = ({
           <div>
             <div className="flex items-center gap-2">
               <span className="text-xs font-semibold text-text-muted">
-                <span className="sr-only">Operations Console</span>
-                <span>Operations Console</span>
+                Operations Console
               </span>
               <span className="rounded bg-surface-elevated border border-border-subtle px-1.5 py-0.5 text-[11px] text-text-secondary">
                 Active Protocol
