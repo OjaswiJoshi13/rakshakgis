@@ -170,7 +170,7 @@ export const DATA_MODE_CONFIG: Record<
   { label: string; badgeClass: string }
 > = {
   demo: {
-    label: "DEMO MODE",
+    label: "SIMULATION BASELINE",
     badgeClass:
       "bg-amber-100 text-amber-900 border-amber-300 dark:bg-amber-950/50 dark:text-amber-300 dark:border-amber-700/60",
   },

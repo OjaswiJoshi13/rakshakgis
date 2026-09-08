@@ -16,11 +16,11 @@ const ThemeContext = createContext<ThemeContextType | undefined>(undefined);
 const THEME_STORAGE_KEY = "rakshak_theme_preference";
 
 export const ThemeProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
-  const [theme, setThemeState] = useState<Theme>("dark");
-  const [resolvedTheme, setResolvedTheme] = useState<"light" | "dark">("dark");
+  const [theme, setThemeState] = useState<Theme>("light");
+  const [resolvedTheme, setResolvedTheme] = useState<"light" | "dark">("light");
 
   useEffect(() => {
-    // Read saved preference from localStorage
+    // Read saved preference from localStorage if explicitly set
     try {
       const saved = localStorage.getItem(THEME_STORAGE_KEY) as Theme | null;
       if (saved && (saved === "light" || saved === "dark" || saved === "system")) {
@@ -35,7 +35,7 @@ export const ThemeProvider: React.FC<{ children: React.ReactNode }> = ({ childre
     const root = document.documentElement;
 
     const getSystemTheme = (): "light" | "dark" => {
-      if (typeof window === "undefined" || !window.matchMedia) return "dark";
+      if (typeof window === "undefined" || !window.matchMedia) return "light";
       return window.matchMedia("(prefers-color-scheme: dark)").matches ? "dark" : "light";
     };
 
@@ -82,8 +82,8 @@ export const useTheme = (): ThemeContextType => {
   if (!context) {
     // Fallback if rendered outside ThemeProvider (e.g. in standalone unit tests)
     return {
-      theme: "dark",
-      resolvedTheme: "dark",
+      theme: "light",
+      resolvedTheme: "light",
       setTheme: () => {},
       toggleTheme: () => {},
     };

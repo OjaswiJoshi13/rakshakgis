@@ -9,6 +9,8 @@ import React, {
   useState,
 } from "react";
 import {
+  DEMO_AUTH_TOKEN,
+  DEMO_USER,
   clearStoredToken,
   getMeApi,
   getStoredToken,
@@ -100,6 +102,12 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({
       setToken(activeToken);
       setIsAuthenticated(true);
     } catch {
+      if (activeToken === DEMO_AUTH_TOKEN) {
+        setUser(DEMO_USER);
+        setToken(activeToken);
+        setIsAuthenticated(true);
+        return;
+      }
       logout();
     }
   }, [token, logout]);
@@ -140,6 +148,13 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({
         }
       } catch {
         if (isMounted) {
+          if (stored === DEMO_AUTH_TOKEN) {
+            setUser(DEMO_USER);
+            setToken(stored);
+            setIsAuthenticated(true);
+            setIsLoading(false);
+            return;
+          }
           clearStoredToken();
           setUser(null);
           setToken(null);

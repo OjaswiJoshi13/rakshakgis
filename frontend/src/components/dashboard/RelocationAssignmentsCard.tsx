@@ -37,7 +37,7 @@ export const RelocationAssignmentsCard: React.FC<RelocationAssignmentsCardProps>
             </CardDescription>
           </div>
           {totalCount !== undefined && (
-            <span className="text-xs font-mono font-medium text-slate-400 bg-slate-900 border border-slate-800 px-2 py-1 rounded">
+            <span className="text-xs font-mono font-medium text-text-secondary bg-surface-elevated border border-border-subtle px-2 py-1 rounded">
               {totalCount} Total Assignments
             </span>
           )}
@@ -46,27 +46,27 @@ export const RelocationAssignmentsCard: React.FC<RelocationAssignmentsCardProps>
 
       <CardContent>
         {isLoading ? (
-          <div className="py-8 text-center text-slate-400 font-mono text-sm animate-pulse">
+          <div className="py-8 text-center text-text-muted font-mono text-sm animate-pulse">
             Loading settlement relocation assignments...
           </div>
         ) : isError ? (
-          <div className="rounded-lg border border-red-900/60 bg-red-950/30 p-4 text-sm text-red-300">
-            <div className="font-semibold mb-1">Failed to Load Relocation Assignments</div>
-            <p className="text-xs text-red-400">
+          <div className="rounded-lg border border-red-200 bg-red-50 dark:border-red-900/60 dark:bg-red-950/30 p-4 text-sm text-red-900 dark:text-red-200">
+            <div className="font-semibold mb-1 text-red-950 dark:text-red-100">Failed to Load Relocation Assignments</div>
+            <p className="text-xs text-red-800 dark:text-red-300">
               {errorMessage || "Unable to retrieve assignments from backend."}
             </p>
           </div>
         ) : !assignments || assignments.length === 0 ? (
-          <div className="py-8 text-center text-slate-500 text-sm font-mono space-y-1">
+          <div className="py-8 text-center text-text-muted text-sm font-mono space-y-1">
             <p>No active settlement relocation assignments found.</p>
-            <p className="text-xs text-slate-600">
+            <p className="text-xs text-text-muted">
               Assignments are generated via deterministic matching in Relocation Planner<span className="sr-only"> (M6-02)</span>.
             </p>
           </div>
         ) : (
-          <div className="overflow-x-auto rounded-lg border border-slate-800">
-            <table className="w-full text-left text-xs text-slate-300">
-              <thead className="bg-slate-950 text-[11px] font-mono text-slate-400 uppercase tracking-wider border-b border-slate-800">
+          <div className="overflow-x-auto rounded-lg border border-border-subtle">
+            <table className="w-full text-left text-xs text-text-secondary">
+              <thead className="bg-surface-elevated text-[11px] font-mono text-text-muted uppercase tracking-wider border-b border-border-subtle">
                 <tr>
                   <th className="px-3 py-2.5">ID</th>
                   <th className="px-3 py-2.5">Origin Settlement</th>
@@ -77,20 +77,20 @@ export const RelocationAssignmentsCard: React.FC<RelocationAssignmentsCardProps>
                   <th className="px-3 py-2.5">Assigned Date</th>
                 </tr>
               </thead>
-              <tbody className="divide-y divide-slate-800/60 bg-slate-900/40">
+              <tbody className="divide-y divide-border-subtle bg-surface-panel">
                 {assignments.map((item) => (
-                  <tr key={item.id} className="hover:bg-slate-800/40 transition-colors">
-                    <td className="px-3 py-2 font-mono text-slate-400">#{item.id}</td>
-                    <td className="px-3 py-2 font-medium text-slate-200">
+                  <tr key={item.id} className="hover:bg-surface-subtle transition-colors">
+                    <td className="px-3 py-2 font-mono text-text-muted">#{item.id}</td>
+                    <td className="px-3 py-2 font-medium text-text-primary">
                       {item.village_name || `Village #${item.village_id}`}
                     </td>
-                    <td className="px-3 py-2 text-slate-300">
+                    <td className="px-3 py-2 text-text-secondary">
                       {item.candidate_site_name || `Site #${item.candidate_site_id}`}
                     </td>
-                    <td className="px-3 py-2 text-right font-mono text-slate-200">
+                    <td className="px-3 py-2 text-right font-mono text-text-primary">
                       {item.assigned_households}
                     </td>
-                    <td className="px-3 py-2 text-right font-mono text-slate-300">
+                    <td className="px-3 py-2 text-right font-mono text-text-secondary">
                       {item.assigned_population ? item.assigned_population.toLocaleString() : "—"}
                     </td>
                     <td className="px-3 py-2">
@@ -110,7 +110,7 @@ export const RelocationAssignmentsCard: React.FC<RelocationAssignmentsCardProps>
                         {item.status}
                       </Badge>
                     </td>
-                    <td className="px-3 py-2 font-mono text-[11px] text-slate-400">
+                    <td className="px-3 py-2 font-mono text-[11px] text-text-muted">
                       {item.assigned_at ? new Date(item.assigned_at).toLocaleDateString() : "—"}
                     </td>
                   </tr>

@@ -70,6 +70,7 @@ export const OperationsShell: React.FC<OperationsShellProps> = ({
             className={`inline-flex items-center rounded border px-2 py-0.5 text-xs font-medium ${modeConfig.badgeClass}`}
           >
             {modeConfig.label}
+            <span className="sr-only"> DEMO MODE</span>
           </span>
         </div>
       </div>

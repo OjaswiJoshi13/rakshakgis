@@ -249,7 +249,7 @@ export const MapCanvas: React.FC<MapCanvasProps> = ({
 
   return (
     <div
-      className={`relative rounded-xl overflow-hidden border border-slate-800 bg-slate-950 ${className}`}
+      className={`relative rounded-xl overflow-hidden border border-border-subtle bg-surface-panel ${className}`}
       aria-label={ariaLabel}
       role="region"
       onClick={handleMapBackgroundClick}
@@ -266,10 +266,10 @@ export const MapCanvas: React.FC<MapCanvasProps> = ({
       {isLoading && (
         <div
           data-testid="map-loading-overlay"
-          className="absolute inset-0 bg-slate-950/60 backdrop-blur-xs flex items-center justify-center pointer-events-none z-20"
+          className="absolute inset-0 bg-surface-panel/60 backdrop-blur-xs flex items-center justify-center pointer-events-none z-20"
         >
-          <div className="bg-slate-900/90 border border-slate-700 px-4 py-2.5 rounded-lg text-xs font-mono text-slate-300 flex items-center gap-2.5 shadow-xl">
-            <span className="w-3.5 h-3.5 border-2 border-sky-400 border-t-transparent rounded-full animate-spin" />
+          <div className="bg-surface-elevated border border-border-subtle px-4 py-2.5 rounded-lg text-xs font-mono text-text-primary flex items-center gap-2.5 shadow-xl">
+            <span className="w-3.5 h-3.5 border-2 border-sky-500 border-t-transparent rounded-full animate-spin" />
             <span>Updating Spatial Layers...</span>
           </div>
         </div>
@@ -279,10 +279,10 @@ export const MapCanvas: React.FC<MapCanvasProps> = ({
       {mapError && (
         <div
           data-testid="map-error-banner"
-          className="absolute top-4 left-4 right-4 z-30 bg-red-950/90 border border-red-800 text-red-200 px-4 py-3 rounded-lg text-xs font-mono flex items-center justify-between"
+          className="absolute top-4 left-4 right-4 z-30 bg-red-50 dark:bg-red-950/90 border border-red-200 dark:border-red-800 text-red-900 dark:text-red-200 px-4 py-3 rounded-lg text-xs font-mono flex items-center justify-between shadow-md"
         >
           <div className="flex items-center gap-2">
-            <span className="text-red-400 font-bold">MAP ENGINE NOTICE:</span>
+            <span className="text-red-700 dark:text-red-400 font-bold">MAP ENGINE NOTICE:</span>
             <span>{mapError}</span>
           </div>
           <button

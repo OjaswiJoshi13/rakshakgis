@@ -99,11 +99,11 @@ export const VillageIdentityHeader: React.FC<VillageIdentityHeaderProps> = ({
       {/* Red Zone Warning Alert if triggered */}
       {isRedZone && (
         <div
-          className="mt-4 p-3 bg-red-950/40 border border-red-800/60 rounded-md flex items-start gap-2.5 text-xs text-red-200"
+          className="mt-4 p-3 bg-red-50 dark:bg-red-950/40 border border-red-200 dark:border-red-800/60 rounded-md flex items-start gap-2.5 text-xs text-red-900 dark:text-red-200 shadow-xs"
           role="alert"
         >
           <svg
-            className="w-4 h-4 text-red-400 shrink-0 mt-0.5"
+            className="w-4 h-4 text-red-600 dark:text-red-400 shrink-0 mt-0.5"
             fill="none"
             viewBox="0 0 24 24"
             stroke="currentColor"
@@ -116,8 +116,8 @@ export const VillageIdentityHeader: React.FC<VillageIdentityHeaderProps> = ({
             />
           </svg>
           <div>
-            <strong className="font-semibold text-red-300">Dynamic Red Zone Trigger Tripped:</strong>{" "}
-            This settlement has exceeded dynamic event thresholds under regional profile criteria (M3-11 dynamic trigger engine). Official officer review required prior to executive evacuation declaration.
+            <strong className="font-semibold text-red-950 dark:text-red-300">Dynamic Red Zone Trigger Tripped:</strong>{" "}
+            This settlement has exceeded dynamic event thresholds under regional profile criteria. <span className="sr-only">(M3-11 dynamic trigger engine)</span> Official officer review required prior to executive evacuation declaration.
           </div>
         </div>
       )}

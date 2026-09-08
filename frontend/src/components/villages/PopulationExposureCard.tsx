@@ -93,8 +93,8 @@ export const PopulationExposureCard: React.FC<PopulationExposureCardProps> = ({
           </div>
         </div>
 
-        <div className="mt-4 pt-3 border-t border-slate-800/80 text-xs text-slate-500">
-          Values mapped from authoritative backend settlement demographic registers.
+        <div className="mt-4 pt-3 border-t border-border-subtle text-xs text-text-muted">
+          Values mapped from authoritative settlement demographic registers.
         </div>
       </CardContent>
     </Card>

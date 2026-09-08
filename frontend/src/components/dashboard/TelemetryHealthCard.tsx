@@ -172,7 +172,7 @@ export const TelemetryHealthCard: React.FC<TelemetryHealthCardProps> = ({
                             {src.name}
                             {src.is_synthetic && (
                               <span className="ml-1.5 text-[10px] font-mono text-amber-700 dark:text-amber-400 bg-amber-500/10 border border-amber-500/20 px-1 py-0.2 rounded">
-                                DEMO
+                                SIMULATION
                               </span>
                             )}
                           </td>

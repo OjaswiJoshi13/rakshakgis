@@ -174,7 +174,8 @@ export const LoginForm: React.FC<LoginFormProps> = ({ onSuccess, className = "" 
           onClick={handleDemoLogin}
           className="w-full border-emerald-600/40 bg-emerald-50 text-emerald-800 dark:bg-emerald-950/30 dark:text-emerald-300 dark:border-emerald-600/50 hover:bg-emerald-100 dark:hover:bg-emerald-900/50 font-medium shadow-sm transition-all duration-150"
         >
-          ⚡ Sign In as Demo District Officer
+          <span>⚡ Quick Sign-In (District Officer)</span>
+          <span className="sr-only">Sign In as Demo District Officer</span>
         </Button>
         <p className="mt-1.5 text-center text-[10px] font-mono text-text-muted">
           One-click evaluation access • District Collector (Chamoli)

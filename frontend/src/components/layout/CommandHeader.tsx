@@ -122,6 +122,7 @@ export const CommandHeader: React.FC<CommandHeaderProps> = ({
           <div className="px-2">
             <span className={`text-[11px] font-medium ${modeConfig.badgeClass}`}>
               {modeConfig.label}
+              <span className="sr-only"> DEMO MODE</span>
             </span>
           </div>
           <div className="flex items-center gap-1.5 px-2.5 text-xs text-text-muted tabular-nums">

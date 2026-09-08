@@ -68,23 +68,24 @@ export const ScenarioConfigPanel: React.FC<ScenarioConfigPanelProps> = ({
   };
 
   return (
-    <div className="space-y-4 rounded-lg border border-slate-800 bg-slate-900/60 p-4">
+    <div className="space-y-4 rounded-lg border border-border-subtle bg-surface-panel p-4 shadow-xs">
       {/* Header */}
-      <div className="flex items-center justify-between border-b border-slate-800 pb-3">
+      <div className="flex items-center justify-between border-b border-border-subtle pb-3">
         <div className="flex items-center gap-2">
-          <Sliders className="h-4 w-4 text-sky-400" />
-          <h3 className="text-xs font-mono uppercase tracking-wider text-slate-300 font-semibold">
+          <Sliders className="h-4 w-4 text-primary-600 dark:text-primary-400" />
+          <h3 className="text-xs font-mono uppercase tracking-wider text-text-primary font-semibold">
             Scenario Configuration
           </h3>
         </div>
-        <Badge variant="outline" size="sm" className="text-[10px] font-mono border-sky-500/40 text-sky-300">
-          M4-06 Engine
+        <Badge variant="outline" size="sm" className="text-[10px] font-mono border-border-subtle text-text-muted">
+          Simulation Engine
+          <span className="sr-only">M4-06 Engine</span>
         </Badge>
       </div>
 
       {/* Scenario Presets */}
       <div>
-        <label className="block text-[11px] font-mono text-slate-400 uppercase tracking-wide mb-2">
+        <label className="block text-[11px] font-mono text-text-muted uppercase tracking-wide mb-2">
           Canonical Presets
         </label>
         <div className="grid grid-cols-1 gap-2">
@@ -97,14 +98,14 @@ export const ScenarioConfigPanel: React.FC<ScenarioConfigPanelProps> = ({
                 onClick={() => onSelectScenarioType(sc.scenario_type as ScenarioType)}
                 className={`w-full text-left rounded-lg p-2.5 transition-all border ${
                   isSelected
-                    ? "border-sky-500 bg-sky-950/40 shadow-sm"
-                    : "border-slate-800 bg-slate-950/50 hover:bg-slate-800/40 hover:border-slate-700"
+                    ? "border-primary-500 bg-primary-50 dark:bg-primary-950/40 shadow-xs ring-1 ring-primary-500 text-text-primary"
+                    : "border-border-subtle bg-surface-elevated hover:bg-surface-raised hover:border-border-strong text-text-secondary"
                 }`}
               >
                 <div className="flex items-center justify-between gap-1 mb-1">
                   <div className="flex items-center gap-2">
                     {getScenarioIcon(sc.scenario_type)}
-                    <span className="font-semibold text-xs text-slate-200">
+                    <span className="font-semibold text-xs text-text-primary">
                       {sc.name}
                     </span>
                   </div>
@@ -114,7 +115,7 @@ export const ScenarioConfigPanel: React.FC<ScenarioConfigPanelProps> = ({
                     </Badge>
                   )}
                 </div>
-                <p className="text-[11px] text-slate-400 line-clamp-2 leading-relaxed">
+                <p className="text-[11px] text-text-secondary line-clamp-2 leading-relaxed">
                   {sc.description}
                 </p>
               </button>
@@ -124,15 +125,15 @@ export const ScenarioConfigPanel: React.FC<ScenarioConfigPanelProps> = ({
       </div>
 
       {/* Parameter Controls */}
-      <div className="space-y-3.5 pt-2 border-t border-slate-800">
+      <div className="space-y-3.5 pt-2 border-t border-border-subtle">
         <div className="flex items-center justify-between">
-          <span className="text-[11px] font-mono text-slate-400 uppercase tracking-wide">
+          <span className="text-[11px] font-mono text-text-muted uppercase tracking-wide">
             Perturbation Parameters
           </span>
           <button
             type="button"
             onClick={onResetDefaults}
-            className="inline-flex items-center gap-1 text-[11px] font-mono text-slate-500 hover:text-slate-300 transition-colors"
+            className="inline-flex items-center gap-1 text-[11px] font-mono text-text-muted hover:text-text-primary transition-colors cursor-pointer"
           >
             <RotateCcw className="h-3 w-3" />
             <span>Reset Defaults</span>
@@ -140,13 +141,13 @@ export const ScenarioConfigPanel: React.FC<ScenarioConfigPanelProps> = ({
         </div>
 
         {/* Rainfall Multiplier Slider */}
-        <div className="space-y-1 rounded bg-slate-950 p-2.5 border border-slate-800/80">
+        <div className="space-y-1 rounded bg-surface-elevated p-2.5 border border-border-subtle">
           <div className="flex items-center justify-between text-xs font-mono">
-            <span className="text-slate-300 flex items-center gap-1.5">
-              <CloudRain className="h-3.5 w-3.5 text-amber-400" />
+            <span className="text-text-primary flex items-center gap-1.5">
+              <CloudRain className="h-3.5 w-3.5 text-amber-600 dark:text-amber-400" />
               <span>Rainfall Multiplier</span>
             </span>
-            <span className="font-bold text-amber-400">
+            <span className="font-bold text-amber-700 dark:text-amber-400">
               {(parameters.rainfall_multiplier ?? 1.0).toFixed(2)}x
             </span>
           </div>
@@ -159,9 +160,9 @@ export const ScenarioConfigPanel: React.FC<ScenarioConfigPanelProps> = ({
             onChange={(e) =>
               updateParam("rainfall_multiplier", parseFloat(e.target.value))
             }
-            className="w-full accent-amber-500 cursor-pointer h-1.5 bg-slate-800 rounded-lg"
+            className="w-full accent-amber-600 dark:accent-amber-500 cursor-pointer h-1.5 bg-surface-panel rounded-lg"
           />
-          <div className="flex justify-between text-[10px] font-mono text-slate-500">
+          <div className="flex justify-between text-[10px] font-mono text-text-muted">
             <span>1.0x (Normal)</span>
             <span>1.4x (Cloudburst)</span>
             <span>2.5x (Catastrophic)</span>
@@ -169,13 +170,13 @@ export const ScenarioConfigPanel: React.FC<ScenarioConfigPanelProps> = ({
         </div>
 
         {/* Road Blockage Percentage Slider */}
-        <div className="space-y-1 rounded bg-slate-950 p-2.5 border border-slate-800/80">
+        <div className="space-y-1 rounded bg-surface-elevated p-2.5 border border-border-subtle">
           <div className="flex items-center justify-between text-xs font-mono">
-            <span className="text-slate-300 flex items-center gap-1.5">
-              <Layers className="h-3.5 w-3.5 text-cyan-400" />
+            <span className="text-text-primary flex items-center gap-1.5">
+              <Layers className="h-3.5 w-3.5 text-cyan-600 dark:text-cyan-400" />
               <span>Road Network Blockage</span>
             </span>
-            <span className="font-bold text-cyan-400">
+            <span className="font-bold text-cyan-700 dark:text-cyan-400">
               {(parameters.road_blockage_percentage ?? 0).toFixed(0)}%
             </span>
           </div>
@@ -188,9 +189,9 @@ export const ScenarioConfigPanel: React.FC<ScenarioConfigPanelProps> = ({
             onChange={(e) =>
               updateParam("road_blockage_percentage", parseFloat(e.target.value))
             }
-            className="w-full accent-cyan-500 cursor-pointer h-1.5 bg-slate-800 rounded-lg"
+            className="w-full accent-cyan-600 dark:accent-cyan-500 cursor-pointer h-1.5 bg-surface-panel rounded-lg"
           />
-          <div className="flex justify-between text-[10px] font-mono text-slate-500">
+          <div className="flex justify-between text-[10px] font-mono text-text-muted">
             <span>0% (Open)</span>
             <span>15% (Flash Flood)</span>
             <span>50%+ (Severe Cutoff)</span>
@@ -198,13 +199,13 @@ export const ScenarioConfigPanel: React.FC<ScenarioConfigPanelProps> = ({
         </div>
 
         {/* Site Capacity Reduction Percentage Slider */}
-        <div className="space-y-1 rounded bg-slate-950 p-2.5 border border-slate-800/80">
+        <div className="space-y-1 rounded bg-surface-elevated p-2.5 border border-border-subtle">
           <div className="flex items-center justify-between text-xs font-mono">
-            <span className="text-slate-300 flex items-center gap-1.5">
-              <Building2 className="h-3.5 w-3.5 text-rose-400" />
+            <span className="text-text-primary flex items-center gap-1.5">
+              <Building2 className="h-3.5 w-3.5 text-rose-600 dark:text-rose-400" />
               <span>Site Capacity Reduction</span>
             </span>
-            <span className="font-bold text-rose-400">
+            <span className="font-bold text-rose-700 dark:text-rose-400">
               {(parameters.capacity_reduction_percentage ?? 0).toFixed(0)}%
             </span>
           </div>
@@ -217,9 +218,9 @@ export const ScenarioConfigPanel: React.FC<ScenarioConfigPanelProps> = ({
             onChange={(e) =>
               updateParam("capacity_reduction_percentage", parseFloat(e.target.value))
             }
-            className="w-full accent-rose-500 cursor-pointer h-1.5 bg-slate-800 rounded-lg"
+            className="w-full accent-rose-600 dark:accent-rose-500 cursor-pointer h-1.5 bg-surface-panel rounded-lg"
           />
-          <div className="flex justify-between text-[10px] font-mono text-slate-500">
+          <div className="flex justify-between text-[10px] font-mono text-text-muted">
             <span>0% (Full Slots)</span>
             <span>50% (Crisis Strain)</span>
             <span>100% (Total Deficit)</span>
@@ -227,13 +228,13 @@ export const ScenarioConfigPanel: React.FC<ScenarioConfigPanelProps> = ({
         </div>
 
         {/* Flood Hazard Increase Slider */}
-        <div className="space-y-1 rounded bg-slate-950 p-2.5 border border-slate-800/80">
+        <div className="space-y-1 rounded bg-surface-elevated p-2.5 border border-border-subtle">
           <div className="flex items-center justify-between text-xs font-mono">
-            <span className="text-slate-300 flex items-center gap-1.5">
-              <Waves className="h-3.5 w-3.5 text-sky-400" />
+            <span className="text-text-primary flex items-center gap-1.5">
+              <Waves className="h-3.5 w-3.5 text-primary-600 dark:text-sky-400" />
               <span>Flood Hazard Increase</span>
             </span>
-            <span className="font-bold text-sky-400">
+            <span className="font-bold text-primary-700 dark:text-sky-400">
               +{(parameters.flood_hazard_increase ?? 0).toFixed(0)} pts
             </span>
           </div>
@@ -246,9 +247,9 @@ export const ScenarioConfigPanel: React.FC<ScenarioConfigPanelProps> = ({
             onChange={(e) =>
               updateParam("flood_hazard_increase", parseFloat(e.target.value))
             }
-            className="w-full accent-sky-500 cursor-pointer h-1.5 bg-slate-800 rounded-lg"
+            className="w-full accent-primary-600 dark:accent-sky-500 cursor-pointer h-1.5 bg-surface-panel rounded-lg"
           />
-          <div className="flex justify-between text-[10px] font-mono text-slate-500">
+          <div className="flex justify-between text-[10px] font-mono text-text-muted">
             <span>+0 pts</span>
             <span>+25 pts (GLOF)</span>
             <span>+50 pts (Inundation)</span>

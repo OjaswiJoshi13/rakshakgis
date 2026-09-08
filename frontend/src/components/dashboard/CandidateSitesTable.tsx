@@ -85,9 +85,9 @@ export const CandidateSitesTable: React.FC<CandidateSitesTableProps> = ({
             Loading candidate relocation safe havens...
           </div>
         ) : isError ? (
-          <div className="rounded-lg border border-red-500/30 bg-red-500/10 p-4 text-sm text-red-600 dark:text-red-400">
-            <div className="font-semibold mb-1">Failed to Load Candidate Sites</div>
-            <p className="text-xs text-red-600/80 dark:text-red-400/80">
+          <div className="rounded-lg border border-red-200 bg-red-50 dark:border-red-900/60 dark:bg-red-950/30 p-4 text-sm text-red-900 dark:text-red-200">
+            <div className="font-semibold mb-1 text-red-950 dark:text-red-100">Failed to Load Candidate Sites</div>
+            <p className="text-xs text-red-800 dark:text-red-300">
               {errorMessage || "Unable to retrieve relocation sites from backend."}
             </p>
           </div>

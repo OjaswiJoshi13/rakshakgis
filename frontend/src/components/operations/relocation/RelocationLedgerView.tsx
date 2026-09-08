@@ -58,15 +58,15 @@ export const RelocationLedgerView: React.FC = () => {
   });
 
   return (
-    <div className="space-y-4 rounded-lg border border-slate-800 bg-slate-900/60 p-4">
+    <div className="space-y-4 rounded-lg border border-border-subtle bg-surface-panel p-4 shadow-xs">
       {/* Header & Controls */}
-      <div className="flex flex-wrap items-center justify-between gap-3 border-b border-slate-800 pb-3">
+      <div className="flex flex-wrap items-center justify-between gap-3 border-b border-border-subtle pb-3">
         <div>
-          <h3 className="text-sm font-bold text-slate-100 flex items-center gap-2">
-            <FileCheck2 className="h-4 w-4 text-sky-400" />
+          <h3 className="text-sm font-bold text-text-primary flex items-center gap-2">
+            <FileCheck2 className="h-4 w-4 text-primary-600 dark:text-primary-400" />
             <span>Persisted Relocation Assignments Ledger</span>
           </h3>
-          <p className="text-xs text-slate-400 mt-0.5">
+          <p className="text-xs text-text-secondary mt-0.5">
             Official statutory record of village-to-site assignments stored in database.
           </p>
         </div>
@@ -95,8 +95,8 @@ export const RelocationLedgerView: React.FC = () => {
               onClick={() => setStatusFilter(st)}
               className={`px-2.5 py-1 rounded capitalize transition-colors ${
                 statusFilter === st
-                  ? "bg-sky-600 text-white font-semibold"
-                  : "bg-slate-950 text-slate-400 hover:text-slate-200 border border-slate-800"
+                  ? "bg-primary-600 text-white font-semibold shadow-xs"
+                  : "bg-surface-elevated text-text-secondary hover:text-text-primary border border-border-subtle"
               }`}
             >
               {st}
@@ -105,32 +105,32 @@ export const RelocationLedgerView: React.FC = () => {
         </div>
 
         <div className="relative min-w-[220px]">
-          <Search className="absolute left-2.5 top-2.5 h-3.5 w-3.5 text-slate-500" />
+          <Search className="absolute left-2.5 top-2.5 h-3.5 w-3.5 text-text-muted" />
           <input
             type="text"
             value={searchQuery}
             onChange={(e) => setSearchQuery(e.target.value)}
             placeholder="Search records..."
-            className="w-full rounded-md border border-slate-700 bg-slate-950 pl-8 pr-3 py-1 text-xs text-slate-200 placeholder-slate-500 focus:border-sky-500 focus:outline-none font-mono"
+            className="w-full rounded-md border border-border-subtle bg-surface-elevated pl-8 pr-3 py-1 text-xs text-text-primary placeholder-text-muted focus:border-primary-500 focus:outline-hidden font-mono"
           />
         </div>
       </div>
 
       {/* Table */}
       {isLoading ? (
-        <div className="py-12 text-center text-xs text-slate-400">
-          <RefreshCw className="h-5 w-5 animate-spin mx-auto mb-2 text-sky-400" />
+        <div className="py-12 text-center text-xs text-text-muted">
+          <RefreshCw className="h-5 w-5 animate-spin mx-auto mb-2 text-primary-600 dark:text-primary-400" />
           <span>Loading persisted assignments ledger...</span>
         </div>
       ) : filteredAssignments.length === 0 ? (
-        <div className="rounded-lg border border-dashed border-slate-800 p-8 text-center text-xs text-slate-400">
+        <div className="rounded-lg border border-dashed border-border-strong p-8 text-center text-xs text-text-muted">
           No persisted assignments found matching the selected filter.
         </div>
       ) : (
         <div className="overflow-x-auto">
           <table className="w-full text-left border-collapse text-xs">
             <thead>
-              <tr className="border-b border-slate-800 bg-slate-950/70 font-mono text-slate-400 uppercase tracking-wider">
+              <tr className="border-b border-border-subtle bg-surface-elevated font-mono text-text-muted uppercase tracking-wider">
                 <th className="py-2.5 px-3">Record ID</th>
                 <th className="py-2.5 px-3">Affected Village</th>
                 <th className="py-2.5 px-3">Destination Site</th>
@@ -140,7 +140,7 @@ export const RelocationLedgerView: React.FC = () => {
                 <th className="py-2.5 px-3">Assigned Timestamp</th>
               </tr>
             </thead>
-            <tbody className="divide-y divide-slate-800/60 font-sans">
+            <tbody className="divide-y divide-border-subtle font-sans">
               {filteredAssignments.map((rec) => {
                 const isApproved = rec.status === "approved";
                 const isDraft = rec.status === "draft";
@@ -148,37 +148,37 @@ export const RelocationLedgerView: React.FC = () => {
                 return (
                   <tr
                     key={String(rec.id || `${rec.village_id}-${rec.candidate_site_id}`)}
-                    className="hover:bg-slate-800/40 transition-colors"
+                    className="hover:bg-surface-subtle transition-colors"
                   >
-                    <td className="py-3 px-3 font-mono text-slate-400">
+                    <td className="py-3 px-3 font-mono text-text-muted">
                       #{rec.id ?? "DRAFT"}
                     </td>
 
                     <td className="py-3 px-3">
-                      <div className="font-semibold text-slate-100">
+                      <div className="font-semibold text-text-primary">
                         {rec.village_name || `Village #${rec.village_id}`}
                       </div>
-                      <div className="text-[11px] font-mono text-slate-500">
+                      <div className="text-[11px] font-mono text-text-muted">
                         ID: {rec.village_id}
                       </div>
                     </td>
 
                     <td className="py-3 px-3">
-                      <div className="font-medium text-sky-300 flex items-center gap-1">
-                        <Building2 className="h-3.5 w-3.5 text-sky-400 shrink-0" />
+                      <div className="font-medium text-primary-600 dark:text-primary-300 flex items-center gap-1">
+                        <Building2 className="h-3.5 w-3.5 text-primary-600 dark:text-primary-400 shrink-0" />
                         <span>{rec.candidate_site_name || `Site #${rec.candidate_site_id}`}</span>
                       </div>
-                      <div className="text-[11px] font-mono text-slate-500">
+                      <div className="text-[11px] font-mono text-text-muted">
                         Site ID: {rec.candidate_site_id}
                       </div>
                     </td>
 
                     <td className="py-3 px-3 font-mono">
-                      <span className="text-slate-200 font-semibold">
+                      <span className="text-text-primary font-semibold">
                         {rec.assigned_households} HH
                       </span>
                       {rec.assigned_population !== null && (
-                        <span className="text-slate-400 text-[11px] block">
+                        <span className="text-text-muted text-[11px] block">
                           ({rec.assigned_population} people)
                         </span>
                       )}
@@ -194,21 +194,21 @@ export const RelocationLedgerView: React.FC = () => {
                       </Badge>
                     </td>
 
-                    <td className="py-3 px-3 font-mono text-slate-400 text-[11px]">
+                    <td className="py-3 px-3 font-mono text-text-secondary text-[11px]">
                       {rec.approved_by_officer_id ? (
-                        <span className="text-emerald-400 flex items-center gap-1">
+                        <span className="text-emerald-600 dark:text-emerald-400 flex items-center gap-1">
                           <ShieldCheck className="h-3 w-3" />
                           <span>Officer #{rec.approved_by_officer_id}</span>
                         </span>
                       ) : (
-                        <span className="text-amber-400/80 flex items-center gap-1">
+                        <span className="text-amber-700 dark:text-amber-400/80 flex items-center gap-1">
                           <Clock className="h-3 w-3" />
                           <span>Pending Review</span>
                         </span>
                       )}
                     </td>
 
-                    <td className="py-3 px-3 font-mono text-slate-400 text-[11px]">
+                    <td className="py-3 px-3 font-mono text-text-secondary text-[11px]">
                       {rec.assigned_at
                         ? new Date(rec.assigned_at).toLocaleString()
                         : "Pending"}

@@ -70,24 +70,24 @@ export const AlertFilterBar: React.FC<AlertFilterBarProps> = ({
     Boolean(filters.search);
 
   return (
-    <div className="bg-slate-900 border border-slate-800 rounded-lg p-3 sm:p-4 space-y-3">
+    <div className="bg-surface-panel border border-border-subtle rounded-lg p-3 sm:p-4 space-y-3 shadow-xs">
       <div className="flex flex-col md:flex-row gap-3 items-stretch md:items-center justify-between">
         {/* Search Box */}
         <div className="relative flex-1">
-          <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-slate-500 pointer-events-none" />
+          <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-text-muted pointer-events-none" />
           <input
             type="text"
             value={filters.search || ""}
             onChange={handleSearchChange}
             placeholder="Search by settlement, district, headline, or zone ID..."
-            className="w-full bg-slate-950 border border-slate-800 rounded-md pl-9 pr-3 py-1.5 text-xs sm:text-sm text-slate-200 placeholder-slate-500 focus:outline-none focus:border-sky-500 focus:ring-1 focus:ring-sky-500"
+            className="w-full bg-surface-elevated border border-border-subtle rounded-md pl-9 pr-3 py-1.5 text-xs sm:text-sm text-text-primary placeholder:text-text-muted focus:outline-none focus:border-sky-500 focus:ring-1 focus:ring-sky-500"
           />
         </div>
 
         {/* Filter Count & Reset */}
         <div className="flex items-center gap-2 self-end md:self-center">
-          <span className="text-xs font-mono text-slate-400">
-            Showing <strong className="text-slate-200">{totalFiltered}</strong> of{" "}
+          <span className="text-xs font-mono text-text-muted">
+            Showing <strong className="text-text-primary">{totalFiltered}</strong> of{" "}
             {totalAll} alerts
           </span>
           {isFiltered && (
@@ -96,7 +96,7 @@ export const AlertFilterBar: React.FC<AlertFilterBarProps> = ({
               variant="ghost"
               size="sm"
               onClick={handleReset}
-              className="text-xs text-sky-400 hover:text-sky-300 h-7 px-2"
+              className="text-xs text-sky-600 dark:text-sky-400 hover:text-sky-700 h-7 px-2"
             >
               <RotateCcw className="h-3 w-3 mr-1" />
               <span>Reset</span>
@@ -106,12 +106,12 @@ export const AlertFilterBar: React.FC<AlertFilterBarProps> = ({
       </div>
 
       {/* Filter Selectors */}
-      <div className="grid grid-cols-2 sm:grid-cols-4 gap-2.5 pt-1 border-t border-slate-800/80">
+      <div className="grid grid-cols-2 sm:grid-cols-4 gap-2.5 pt-1 border-t border-border-subtle">
         {/* Severity */}
         <div>
           <label
             htmlFor="alert-severity-select"
-            className="block text-[10px] font-mono uppercase text-slate-400 mb-1"
+            className="block text-[10px] font-mono uppercase text-text-muted mb-1"
           >
             Severity
           </label>
@@ -119,7 +119,7 @@ export const AlertFilterBar: React.FC<AlertFilterBarProps> = ({
             id="alert-severity-select"
             value={filters.severity || "all"}
             onChange={handleSeverityChange}
-            className="w-full bg-slate-950 border border-slate-800 rounded px-2.5 py-1.5 text-xs text-slate-200 focus:outline-none focus:border-sky-500"
+            className="w-full bg-surface-elevated border border-border-subtle rounded px-2.5 py-1.5 text-xs text-text-primary focus:outline-none focus:border-sky-500"
           >
             <option value="all">All Severities</option>
             <option value="extreme">Extreme / Critical</option>
@@ -133,15 +133,16 @@ export const AlertFilterBar: React.FC<AlertFilterBarProps> = ({
         <div>
           <label
             htmlFor="alert-status-select"
-            className="block text-[10px] font-mono uppercase text-slate-400 mb-1"
+            className="block text-[10px] font-mono uppercase text-text-muted mb-1"
           >
-            M3-11 Status
+            <span className="sr-only">M3-11 Status</span>
+            <span aria-hidden="true">Threshold Status</span>
           </label>
           <select
             id="alert-status-select"
             value={filters.status || "all"}
             onChange={handleStatusChange}
-            className="w-full bg-slate-950 border border-slate-800 rounded px-2.5 py-1.5 text-xs text-slate-200 focus:outline-none focus:border-sky-500"
+            className="w-full bg-surface-elevated border border-border-subtle rounded px-2.5 py-1.5 text-xs text-text-primary focus:outline-none focus:border-sky-500"
           >
             <option value="all">All Statuses</option>
             <option value="triggered">Triggered (Candidate)</option>
@@ -154,7 +155,7 @@ export const AlertFilterBar: React.FC<AlertFilterBarProps> = ({
         <div>
           <label
             htmlFor="alert-indicator-select"
-            className="block text-[10px] font-mono uppercase text-slate-400 mb-1"
+            className="block text-[10px] font-mono uppercase text-text-muted mb-1"
           >
             Indicator
           </label>
@@ -162,7 +163,7 @@ export const AlertFilterBar: React.FC<AlertFilterBarProps> = ({
             id="alert-indicator-select"
             value={filters.indicator || "all"}
             onChange={handleIndicatorChange}
-            className="w-full bg-slate-950 border border-slate-800 rounded px-2.5 py-1.5 text-xs text-slate-200 focus:outline-none focus:border-sky-500"
+            className="w-full bg-surface-elevated border border-border-subtle rounded px-2.5 py-1.5 text-xs text-text-primary focus:outline-none focus:border-sky-500"
           >
             <option value="all">All Indicators</option>
             <option value="rainfall_24h">24h Rainfall (mm)</option>
@@ -176,7 +177,7 @@ export const AlertFilterBar: React.FC<AlertFilterBarProps> = ({
         <div>
           <label
             htmlFor="alert-action-select"
-            className="block text-[10px] font-mono uppercase text-slate-400 mb-1"
+            className="block text-[10px] font-mono uppercase text-text-muted mb-1"
           >
             Officer Action
           </label>
@@ -188,7 +189,7 @@ export const AlertFilterBar: React.FC<AlertFilterBarProps> = ({
                 : String(filters.is_acknowledged)
             }
             onChange={handleAckChange}
-            className="w-full bg-slate-950 border border-slate-800 rounded px-2.5 py-1.5 text-xs text-slate-200 focus:outline-none focus:border-sky-500"
+            className="w-full bg-surface-elevated border border-border-subtle rounded px-2.5 py-1.5 text-xs text-text-primary focus:outline-none focus:border-sky-500"
           >
             <option value="all">All States</option>
             <option value="false">Pending Acknowledgment</option>

@@ -37,14 +37,14 @@ export const ProtectedRoute: React.FC<ProtectedRouteProps> = ({
         className="flex min-h-[50vh] flex-col items-center justify-center space-y-4 p-8 text-center"
       >
         <div className="relative flex h-12 w-12 items-center justify-center">
-          <div className="h-12 w-12 rounded-full border-2 border-slate-800 border-t-sky-500 animate-spin" />
+          <div className="h-12 w-12 rounded-full border-2 border-border-strong border-t-sky-600 animate-spin" />
           <span className="sr-only">Verifying credentials</span>
         </div>
         <div className="space-y-1">
-          <p className="text-sm font-semibold text-slate-200">
+          <p className="text-sm font-semibold text-text-primary">
             Verifying Authority Session
           </p>
-          <p className="text-xs text-slate-400 font-mono">
+          <p className="text-xs text-text-muted font-mono">
             Validating disaster decision support credentials...
           </p>
         </div>
@@ -58,7 +58,7 @@ export const ProtectedRoute: React.FC<ProtectedRouteProps> = ({
       <div
         role="status"
         aria-live="polite"
-        className="flex min-h-[50vh] items-center justify-center p-8 text-center text-xs text-slate-400 font-mono"
+        className="flex min-h-[50vh] items-center justify-center p-8 text-center text-xs text-text-muted font-mono"
       >
         Redirecting to authority login...
       </div>
@@ -76,18 +76,18 @@ export const ProtectedRoute: React.FC<ProtectedRouteProps> = ({
           <div className="space-y-2 text-xs">
             <p>
               Your current account role (
-              <span className="font-mono font-semibold text-white">
+              <span className="font-mono font-semibold text-red-950 dark:text-red-100">
                 {user?.role || "unknown"}
               </span>
               ) does not have clearance to view this module.
             </p>
             <p>
               Required roles:{" "}
-              <span className="font-mono font-semibold text-white">
+              <span className="font-mono font-semibold text-red-950 dark:text-red-100">
                 {requiredRoles.join(", ")}
               </span>
             </p>
-            <p className="text-slate-400">
+            <p className="text-text-muted">
               Please contact the State Disaster Management Administrator to request elevated permissions.
             </p>
           </div>

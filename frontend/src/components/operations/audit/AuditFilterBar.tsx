@@ -37,11 +37,11 @@ export const AuditFilterBar: React.FC<AuditFilterBarProps> = ({
     selectedTimeRange !== "all";
 
   return (
-    <div className="space-y-3 rounded-lg border border-slate-800 bg-slate-900/60 p-4">
+    <div className="space-y-3 rounded-lg border border-border-subtle bg-surface-panel p-4 shadow-sm">
       <div className="flex flex-col md:flex-row items-stretch md:items-center justify-between gap-3">
         {/* Search Input */}
         <div className="relative flex-1">
-          <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-slate-400" />
+          <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-text-muted" />
           <input
             type="text"
             id="audit-search"
@@ -49,7 +49,7 @@ export const AuditFilterBar: React.FC<AuditFilterBarProps> = ({
             placeholder="Search by actor, ID, target entity, rationale, or engine..."
             value={searchQuery}
             onChange={(e) => onSearchChange(e.target.value)}
-            className="w-full rounded-md border border-slate-800 bg-slate-950/80 pl-9 pr-3 py-1.5 text-xs text-slate-200 placeholder-slate-500 focus:border-sky-500 focus:outline-none focus:ring-1 focus:ring-sky-500"
+            className="w-full rounded-md border border-border-strong bg-surface-panel pl-9 pr-3 py-1.5 text-xs text-text-primary placeholder:text-text-muted focus:border-sky-500 focus:outline-none focus:ring-1 focus:ring-sky-500"
             data-testid="audit-search-input"
           />
         </div>
@@ -58,12 +58,12 @@ export const AuditFilterBar: React.FC<AuditFilterBarProps> = ({
         <div className="flex flex-wrap items-center gap-2">
           {/* Category Filter */}
           <div className="flex items-center gap-1.5">
-            <Filter className="h-3.5 w-3.5 text-slate-400 shrink-0" />
+            <Filter className="h-3.5 w-3.5 text-text-muted shrink-0" />
             <select
               aria-label="Filter by event category"
               value={selectedCategory}
               onChange={(e) => onCategoryChange(e.target.value as AuditActionCategory)}
-              className="rounded-md border border-slate-800 bg-slate-950 px-2.5 py-1.5 text-xs text-slate-200 focus:border-sky-500 focus:outline-none font-mono"
+              className="rounded-md border border-border-strong bg-surface-panel px-2.5 py-1.5 text-xs text-text-primary focus:border-sky-500 focus:outline-none font-mono"
               data-testid="audit-category-select"
             >
               <option value="all">All Categories</option>
@@ -81,7 +81,7 @@ export const AuditFilterBar: React.FC<AuditFilterBarProps> = ({
             aria-label="Filter by decision status"
             value={selectedStatus}
             onChange={(e) => onStatusChange(e.target.value)}
-            className="rounded-md border border-slate-800 bg-slate-950 px-2.5 py-1.5 text-xs text-slate-200 focus:border-sky-500 focus:outline-none font-mono"
+            className="rounded-md border border-border-strong bg-surface-panel px-2.5 py-1.5 text-xs text-text-primary focus:border-sky-500 focus:outline-none font-mono"
             data-testid="audit-status-select"
           >
             <option value="all">All Statuses</option>
@@ -99,7 +99,7 @@ export const AuditFilterBar: React.FC<AuditFilterBarProps> = ({
             aria-label="Filter by time range"
             value={selectedTimeRange}
             onChange={(e) => onTimeRangeChange(e.target.value as "all" | "24h" | "7d" | "30d")}
-            className="rounded-md border border-slate-800 bg-slate-950 px-2.5 py-1.5 text-xs text-slate-200 focus:border-sky-500 focus:outline-none font-mono"
+            className="rounded-md border border-border-strong bg-surface-panel px-2.5 py-1.5 text-xs text-text-primary focus:border-sky-500 focus:outline-none font-mono"
             data-testid="audit-time-select"
           >
             <option value="all">All Time</option>
@@ -126,11 +126,11 @@ export const AuditFilterBar: React.FC<AuditFilterBarProps> = ({
       </div>
 
       {/* Result Counter & Active Filter Indicators */}
-      <div className="flex items-center justify-between text-xs font-mono text-slate-400 pt-1 border-t border-slate-800/60">
+      <div className="flex items-center justify-between text-xs font-mono text-text-muted pt-1 border-t border-border-subtle">
         <span>
-          Showing <strong className="text-slate-200">{totalResults}</strong> audit trail events
+          Showing <strong className="text-text-primary">{totalResults}</strong> audit trail events
         </span>
-        <span className="text-[11px] text-slate-500">
+        <span className="text-[11px] text-text-muted">
           Strictly Read-Only • Tamper-Evident Immutable Log
         </span>
       </div>

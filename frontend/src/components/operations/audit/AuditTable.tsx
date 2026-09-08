@@ -23,55 +23,55 @@ export const AuditTable: React.FC<AuditTableProps> = ({
     switch (status) {
       case "approved":
         return (
-          <Badge variant="outline" size="sm" className="font-mono text-emerald-400 border-emerald-600/50 bg-emerald-950/30">
+          <Badge variant="outline" size="sm" className="font-mono text-emerald-800 border-emerald-300 bg-emerald-50 dark:text-emerald-400 dark:border-emerald-600/50 dark:bg-emerald-950/30">
             Approved
           </Badge>
         );
       case "rejected":
         return (
-          <Badge variant="outline" size="sm" className="font-mono text-rose-400 border-rose-600/50 bg-rose-950/30">
+          <Badge variant="outline" size="sm" className="font-mono text-rose-800 border-rose-300 bg-rose-50 dark:text-rose-400 dark:border-rose-600/50 dark:bg-rose-950/30">
             Rejected
           </Badge>
         );
       case "revision_requested":
         return (
-          <Badge variant="outline" size="sm" className="font-mono text-amber-400 border-amber-600/50 bg-amber-950/30">
+          <Badge variant="outline" size="sm" className="font-mono text-amber-800 border-amber-300 bg-amber-50 dark:text-amber-400 dark:border-amber-600/50 dark:bg-amber-950/30">
             Revision
           </Badge>
         );
       case "committed":
         return (
-          <Badge variant="outline" size="sm" className="font-mono text-purple-400 border-purple-600/50 bg-purple-950/30">
+          <Badge variant="outline" size="sm" className="font-mono text-purple-800 border-purple-300 bg-purple-50 dark:text-purple-400 dark:border-purple-600/50 dark:bg-purple-950/30">
             Committed
           </Badge>
         );
       case "executed":
         return (
-          <Badge variant="outline" size="sm" className="font-mono text-cyan-400 border-cyan-600/50 bg-cyan-950/30">
+          <Badge variant="outline" size="sm" className="font-mono text-cyan-800 border-cyan-300 bg-cyan-50 dark:text-cyan-400 dark:border-cyan-600/50 dark:bg-cyan-950/30">
             Executed
           </Badge>
         );
       case "acknowledged":
         return (
-          <Badge variant="outline" size="sm" className="font-mono text-sky-400 border-sky-600/50 bg-sky-950/30">
+          <Badge variant="outline" size="sm" className="font-mono text-sky-800 border-sky-300 bg-sky-50 dark:text-sky-400 dark:border-sky-600/50 dark:bg-sky-950/30">
             Acknowledged
           </Badge>
         );
       case "exported":
         return (
-          <Badge variant="outline" size="sm" className="font-mono text-slate-300 border-slate-600/50 bg-slate-900/30">
+          <Badge variant="outline" size="sm" className="font-mono text-text-secondary border-border-subtle bg-surface-elevated">
             Exported
           </Badge>
         );
       case "reopened":
         return (
-          <Badge variant="outline" size="sm" className="font-mono text-yellow-300 border-yellow-600/50 bg-yellow-950/30">
+          <Badge variant="outline" size="sm" className="font-mono text-amber-800 border-amber-300 bg-amber-50 dark:text-yellow-300 dark:border-yellow-600/50 dark:bg-yellow-950/30">
             Reopened
           </Badge>
         );
       default:
         return (
-          <Badge variant="outline" size="sm" className="font-mono text-slate-400">
+          <Badge variant="outline" size="sm" className="font-mono text-text-muted">
             {status}
           </Badge>
         );
@@ -80,8 +80,8 @@ export const AuditTable: React.FC<AuditTableProps> = ({
 
   if (isLoading && records.length === 0) {
     return (
-      <div className="rounded-lg border border-slate-800 bg-slate-900/40 p-12 text-center text-xs font-mono text-slate-400">
-        <Clock className="h-6 w-6 animate-spin mx-auto text-sky-400 mb-2" />
+      <div className="rounded-lg border border-border-subtle bg-surface-panel p-12 text-center text-xs font-mono text-text-muted">
+        <Clock className="h-6 w-6 animate-spin mx-auto text-sky-600 dark:text-sky-400 mb-2" />
         Loading immutable audit trail...
       </div>
     );
@@ -91,12 +91,12 @@ export const AuditTable: React.FC<AuditTableProps> = ({
     return (
       <div
         data-testid="audit-empty-state"
-        className="rounded-lg border border-dashed border-slate-800 bg-slate-900/30 p-12 text-center space-y-2"
+        className="rounded-lg border border-dashed border-border-strong bg-surface-panel/80 p-12 text-center space-y-2"
       >
-        <p className="text-sm font-semibold text-slate-300">
+        <p className="text-sm font-semibold text-text-primary">
           No audit records found matching your filters.
         </p>
-        <p className="text-xs text-slate-500">
+        <p className="text-xs text-text-muted">
           Adjust your search terms or filter selections to view recorded events.
         </p>
       </div>
@@ -106,12 +106,12 @@ export const AuditTable: React.FC<AuditTableProps> = ({
   return (
     <div
       data-testid="audit-table"
-      className="rounded-lg border border-slate-800 bg-slate-900/40 overflow-hidden shadow-lg"
+      className="rounded-lg border border-border-subtle bg-surface-panel overflow-hidden shadow-sm"
     >
       <div className="overflow-x-auto">
         <table className="w-full text-left text-xs border-collapse">
           <thead>
-            <tr className="border-b border-slate-800 bg-slate-950/60 text-slate-400 font-mono text-[11px] uppercase tracking-wider">
+            <tr className="border-b border-border-subtle bg-surface-elevated text-text-muted font-mono text-[11px] uppercase tracking-wider">
               <th className="py-3 px-4">Timestamp & ID</th>
               <th className="py-3 px-4">Actor / Official</th>
               <th className="py-3 px-4">Action & Status</th>
@@ -120,7 +120,7 @@ export const AuditTable: React.FC<AuditTableProps> = ({
               <th className="py-3 px-4 text-right">Details</th>
             </tr>
           </thead>
-          <tbody className="divide-y divide-slate-800/60">
+          <tbody className="divide-y divide-border-subtle bg-surface-panel">
             {records.map((record) => {
               const isSelected = selectedRecordId === record.id;
               const isOfficerDecision = record.category === "officer_decision";
@@ -129,27 +129,27 @@ export const AuditTable: React.FC<AuditTableProps> = ({
                 <tr
                   key={record.id}
                   data-testid={`audit-row-${record.id}`}
-                  className={`hover:bg-slate-800/40 transition-colors ${
-                    isSelected ? "bg-sky-950/20" : ""
+                  className={`hover:bg-surface-subtle transition-colors ${
+                    isSelected ? "bg-sky-50 dark:bg-sky-950/30" : ""
                   }`}
                 >
                   {/* Timestamp & ID */}
                   <td className="py-3 px-4 whitespace-nowrap font-mono">
-                    <div className="font-semibold text-slate-200">
+                    <div className="font-semibold text-text-primary">
                       {new Date(record.timestamp).toLocaleTimeString("en-IN", {
                         hour: "2-digit",
                         minute: "2-digit",
                         second: "2-digit",
                       })}
                     </div>
-                    <div className="text-[10px] text-slate-500">
+                    <div className="text-[10px] text-text-muted">
                       {new Date(record.timestamp).toLocaleDateString("en-IN", {
                         day: "2-digit",
                         month: "short",
                         year: "numeric",
                       })}
                     </div>
-                    <div className="text-[10px] text-sky-400 font-mono mt-0.5">
+                    <div className="text-[10px] text-sky-700 dark:text-sky-400 font-mono mt-0.5">
                       {record.id}
                     </div>
                   </td>
@@ -158,19 +158,19 @@ export const AuditTable: React.FC<AuditTableProps> = ({
                   <td className="py-3 px-4">
                     <div className="flex items-center gap-1.5">
                       {isOfficerDecision ? (
-                        <div className="flex h-5 w-5 items-center justify-center rounded-full bg-emerald-950 border border-emerald-600/60 text-emerald-400 shrink-0">
+                        <div className="flex h-5 w-5 items-center justify-center rounded-full bg-emerald-50 text-emerald-700 border border-emerald-300 dark:bg-emerald-950 dark:border-emerald-600/60 dark:text-emerald-400 shrink-0">
                           <UserCheck className="h-3 w-3" />
                         </div>
                       ) : (
-                        <div className="flex h-5 w-5 items-center justify-center rounded-full bg-purple-950 border border-purple-600/60 text-purple-400 shrink-0">
+                        <div className="flex h-5 w-5 items-center justify-center rounded-full bg-purple-50 text-purple-700 border border-purple-300 dark:bg-purple-950 dark:border-purple-600/60 dark:text-purple-400 shrink-0">
                           <Cpu className="h-3 w-3" />
                         </div>
                       )}
                       <div>
-                        <div className="font-semibold text-slate-200">
+                        <div className="font-semibold text-text-primary">
                           {record.actor.name}
                         </div>
-                        <div className="text-[10px] font-mono text-slate-400">
+                        <div className="text-[10px] font-mono text-text-muted">
                           {record.actor.role}
                         </div>
                       </div>
@@ -180,13 +180,13 @@ export const AuditTable: React.FC<AuditTableProps> = ({
                   {/* Action & Status */}
                   <td className="py-3 px-4">
                     <div className="space-y-1">
-                      <div className="font-medium text-slate-200 line-clamp-1">
+                      <div className="font-medium text-text-primary line-clamp-1">
                         {record.action_label}
                       </div>
                       <div className="flex items-center gap-1.5">
                         {getStatusBadge(record.decision_status)}
                         {isOfficerDecision && (
-                          <span className="inline-flex items-center gap-0.5 text-[10px] font-mono text-emerald-400">
+                          <span className="inline-flex items-center gap-0.5 text-[10px] font-mono text-emerald-700 dark:text-emerald-400">
                             <ShieldCheck className="h-3 w-3" />
                             Rule 12
                           </span>
@@ -197,10 +197,10 @@ export const AuditTable: React.FC<AuditTableProps> = ({
 
                   {/* Target Entity & Resource */}
                   <td className="py-3 px-4 max-w-xs">
-                    <div className="font-medium text-slate-200 line-clamp-1">
+                    <div className="font-medium text-text-primary line-clamp-1">
                       {record.target_entity_name}
                     </div>
-                    <div className="font-mono text-[10px] text-slate-400 truncate">
+                    <div className="font-mono text-[10px] text-text-muted truncate">
                       {record.resource_id}
                     </div>
                   </td>
@@ -208,11 +208,11 @@ export const AuditTable: React.FC<AuditTableProps> = ({
                   {/* Reason / Justification Snippet */}
                   <td className="py-3 px-4 max-w-sm">
                     {record.reason ? (
-                      <p className="text-slate-300 text-[11px] line-clamp-2 italic">
+                      <p className="text-text-secondary text-[11px] line-clamp-2 italic">
                         &ldquo;{record.reason}&rdquo;
                       </p>
                     ) : (
-                      <span className="text-[11px] text-slate-500 font-mono">
+                      <span className="text-[11px] text-text-muted font-mono">
                         No recorded justification
                       </span>
                     )}

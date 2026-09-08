@@ -22,7 +22,7 @@ export const AlertsNoticeCard: React.FC = () => {
               Early warning thresholds and dynamic red zone event triggers under regional SOPs.
             </CardDescription>
           </div>
-          <span className="font-mono text-[11px] text-slate-400 bg-slate-900 border border-slate-800 px-2 py-0.5 rounded">
+          <span className="font-mono text-[11px] text-text-secondary bg-surface-elevated border border-border-subtle px-2 py-0.5 rounded">
             Early Warning Pipeline<span className="sr-only"> M6-05</span>
           </span>
         </div>
@@ -36,32 +36,32 @@ export const AlertsNoticeCard: React.FC = () => {
         </Alert>
 
         <div className="grid grid-cols-1 sm:grid-cols-3 gap-2.5 pt-1">
-          <div className="bg-slate-950/80 border border-slate-800/80 rounded p-2.5 space-y-1">
-            <span className="text-[10px] font-mono uppercase tracking-wider text-slate-400">
+          <div className="bg-surface-elevated border border-border-subtle rounded-lg p-3 space-y-1 shadow-2xs">
+            <span className="text-[10px] font-mono uppercase tracking-wider text-text-muted">
               Rainfall Alert Threshold
             </span>
-            <div className="text-base font-bold font-mono text-slate-200">64.5 mm / 24h</div>
-            <p className="text-[11px] text-slate-400 leading-tight">
+            <div className="text-base font-bold font-mono text-text-primary">64.5 mm / 24h</div>
+            <p className="text-[11px] text-text-secondary leading-tight">
               Standard IMD heavy precipitation boundary.
             </p>
           </div>
 
-          <div className="bg-slate-950/80 border border-slate-800/80 rounded p-2.5 space-y-1">
-            <span className="text-[10px] font-mono uppercase tracking-wider text-slate-400">
+          <div className="bg-surface-elevated border border-border-subtle rounded-lg p-3 space-y-1 shadow-2xs">
+            <span className="text-[10px] font-mono uppercase tracking-wider text-text-muted">
               Critical Slope Trigger
             </span>
-            <div className="text-base font-bold font-mono text-slate-200">&ge; 25.0&deg;</div>
-            <p className="text-[11px] text-slate-400 leading-tight">
+            <div className="text-base font-bold font-mono text-text-primary">&ge; 25.0&deg;</div>
+            <p className="text-[11px] text-text-secondary leading-tight">
               Compound danger trigger with historical slides.
             </p>
           </div>
 
-          <div className="bg-slate-950/80 border border-slate-800/80 rounded p-2.5 space-y-1">
-            <span className="text-[10px] font-mono uppercase tracking-wider text-slate-400">
+          <div className="bg-surface-elevated border border-border-subtle rounded-lg p-3 space-y-1 shadow-2xs">
+            <span className="text-[10px] font-mono uppercase tracking-wider text-text-muted">
               Geodesic Buffer
             </span>
-            <div className="text-base font-bold font-mono text-slate-200">500 m Buffer</div>
-            <p className="text-[11px] text-slate-400 leading-tight">
+            <div className="text-base font-bold font-mono text-text-primary">500 m Buffer</div>
+            <p className="text-[11px] text-text-secondary leading-tight">
               Circular safety perimeter for point settlements.
             </p>
           </div>

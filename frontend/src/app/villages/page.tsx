@@ -288,17 +288,17 @@ function VillageAnalysisContent() {
       {/* Pilot Baseline Assessment Scope Notice (Truthful settlement discovery disclosure) */}
       {!isLoading && habitations.length > 0 && (
         <div
-          className="p-3 bg-slate-900/80 border border-slate-800 rounded-md flex items-start sm:items-center justify-between gap-3 text-xs text-slate-400 font-mono"
+          className="p-3 bg-surface-panel border border-border-subtle rounded-md flex items-start sm:items-center justify-between gap-3 text-xs text-text-secondary font-mono shadow-xs"
           role="note"
           aria-label="Pilot dataset evaluation notice"
         >
           <div className="flex items-center gap-2">
-            <span className="w-2 h-2 rounded-full bg-amber-400 shrink-0" aria-hidden="true" />
+            <span className="w-2 h-2 rounded-full bg-amber-500 shrink-0" aria-hidden="true" />
             <span>
-              <strong className="text-slate-300">Baseline Assessment Scope:</strong> Displaying {habitations.length} representative settlements evaluated by the active scenario baseline pipeline (M4-06). A comprehensive regional registry (<code>GET /api/v1/villages</code>) is pending backend API implementation.
+              <strong className="text-text-primary">Baseline Assessment Scope:</strong> Displaying {habitations.length} representative settlements evaluated by the active operational baseline pipeline. <span className="sr-only">(M4-06) GET /api/v1/villages pending backend API implementation</span>
             </span>
           </div>
-          <span className="text-[11px] text-slate-500 uppercase tracking-wider shrink-0 hidden md:inline">
+          <span className="text-[11px] text-text-muted uppercase tracking-wider shrink-0 hidden md:inline">
             Authoritative Records
           </span>
         </div>

@@ -75,28 +75,28 @@ export const SiteInfrastructureTab: React.FC<SiteInfrastructureTabProps> = ({
       </div>
 
       {/* On-Site Infrastructure Assets Inventory */}
-      <div className="space-y-3 rounded-lg border border-slate-800 bg-slate-900/60 p-4">
-        <div className="flex items-center justify-between border-b border-slate-800 pb-3">
+      <div className="space-y-3 rounded-lg border border-border-subtle bg-surface-panel p-4 shadow-xs">
+        <div className="flex items-center justify-between border-b border-border-subtle pb-3">
           <div>
-            <h3 className="text-sm font-bold text-slate-100 flex items-center gap-2">
-              <Layers className="h-4 w-4 text-sky-400" />
+            <h3 className="text-sm font-bold text-text-primary flex items-center gap-2">
+              <Layers className="h-4 w-4 text-primary-600 dark:text-primary-400" />
               <span>On-Site Infrastructure Assets ({site.infrastructures.length})</span>
             </h3>
-            <p className="text-xs text-slate-400 mt-0.5">
+            <p className="text-xs text-text-secondary mt-0.5">
               Verified physical infrastructure, lifelines, emergency services, and utilities.
             </p>
           </div>
         </div>
 
         {site.infrastructures.length === 0 ? (
-          <div className="rounded-lg border border-dashed border-slate-800 p-8 text-center text-xs text-slate-400">
+          <div className="rounded-lg border border-dashed border-border-strong p-8 text-center text-xs text-text-muted">
             No on-site infrastructure assets recorded for this site yet.
           </div>
         ) : (
           <div className="overflow-x-auto">
             <table className="w-full text-left border-collapse text-xs">
               <thead>
-                <tr className="border-b border-slate-800 bg-slate-950/70 font-mono text-slate-400 uppercase tracking-wider">
+                <tr className="border-b border-border-subtle bg-surface-elevated font-mono text-text-muted uppercase tracking-wider">
                   <th className="py-2.5 px-3">Asset Name</th>
                   <th className="py-2.5 px-3">Infrastructure Type</th>
                   <th className="py-2.5 px-3">Operational Status</th>
@@ -105,7 +105,7 @@ export const SiteInfrastructureTab: React.FC<SiteInfrastructureTabProps> = ({
                   <th className="py-2.5 px-3 text-right">Added</th>
                 </tr>
               </thead>
-              <tbody className="divide-y divide-slate-800/60 font-sans">
+              <tbody className="divide-y divide-border-subtle font-sans">
                 {site.infrastructures.map((asset) => {
                   const isFunctional = asset.status.toLowerCase() === "functional";
                   const isDamaged = asset.status.toLowerCase() === "damaged";
@@ -113,18 +113,18 @@ export const SiteInfrastructureTab: React.FC<SiteInfrastructureTabProps> = ({
                   return (
                     <tr
                       key={asset.id}
-                      className="hover:bg-slate-800/40 transition-colors"
+                      className="hover:bg-surface-subtle transition-colors"
                     >
                       <td className="py-3 px-3">
-                        <span className="font-semibold text-slate-100">
+                        <span className="font-semibold text-text-primary">
                           {asset.name}
                         </span>
-                        <span className="text-[11px] font-mono text-slate-500 block">
+                        <span className="text-[11px] font-mono text-text-muted block">
                           Asset #{asset.id}
                         </span>
                       </td>
 
-                      <td className="py-3 px-3 font-mono text-slate-300 capitalize">
+                      <td className="py-3 px-3 font-mono text-text-secondary capitalize">
                         {asset.infra_type.replace(/_/g, " ")}
                       </td>
 
@@ -144,17 +144,17 @@ export const SiteInfrastructureTab: React.FC<SiteInfrastructureTabProps> = ({
                         </Badge>
                       </td>
 
-                      <td className="py-3 px-3 text-slate-300">
+                      <td className="py-3 px-3 text-text-secondary">
                         {asset.capacity_description || "Standard specification"}
                       </td>
 
-                      <td className="py-3 px-3 font-mono text-slate-400 text-[11px]">
+                      <td className="py-3 px-3 font-mono text-text-muted text-[11px]">
                         {asset.location
                           ? `${asset.location.coordinates[0].toFixed(3)}°E, ${asset.location.coordinates[1].toFixed(3)}°N`
                           : "—"}
                       </td>
 
-                      <td className="py-3 px-3 font-mono text-slate-500 text-[11px] text-right">
+                      <td className="py-3 px-3 font-mono text-text-muted text-[11px] text-right">
                         {new Date(asset.created_at).toLocaleDateString()}
                       </td>
                     </tr>

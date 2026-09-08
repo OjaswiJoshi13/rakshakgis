@@ -2,7 +2,7 @@ import React from "react";
 import { cn } from "@/lib/utils";
 
 export interface MetricCardProps extends React.HTMLAttributes<HTMLDivElement> {
-  label: string;
+  label: React.ReactNode;
   value: string | number;
   unit?: string;
   subtext?: React.ReactNode;

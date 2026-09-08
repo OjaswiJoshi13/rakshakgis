@@ -20,7 +20,7 @@ export const TelemetryOverviewCards: React.FC<TelemetryOverviewCardsProps> = ({
         {[1, 2, 3, 4].map((i) => (
           <div
             key={i}
-            className="h-28 rounded-lg bg-slate-900/60 border border-slate-800 animate-pulse"
+            className="h-28 rounded-lg bg-surface-panel border border-border-subtle animate-pulse"
           />
         ))}
       </div>
@@ -35,7 +35,7 @@ export const TelemetryOverviewCards: React.FC<TelemetryOverviewCardsProps> = ({
         value={overview.total_sources}
         subtext="Active telemetry streams"
         status="info"
-        icon={<Database className="h-4 w-4 text-sky-400" />}
+        icon={<Database className="h-4 w-4 text-sky-600 dark:text-sky-400" />}
       />
 
       {/* 2. Provider Health */}
@@ -44,7 +44,7 @@ export const TelemetryOverviewCards: React.FC<TelemetryOverviewCardsProps> = ({
         value={`${overview.healthy_count}/${overview.total_sources}`}
         subtext={`${overview.degraded_count} degraded • ${overview.unavailable_count} offline`}
         status={overview.unavailable_count > 0 ? "critical" : overview.degraded_count > 0 ? "warning" : "normal"}
-        icon={<Activity className="h-4 w-4 text-emerald-400" />}
+        icon={<Activity className="h-4 w-4 text-emerald-600 dark:text-emerald-400" />}
       />
 
       {/* 3. Freshness Classification */}
@@ -53,16 +53,16 @@ export const TelemetryOverviewCards: React.FC<TelemetryOverviewCardsProps> = ({
         value={`${overview.fresh_count} Fresh`}
         subtext={`${overview.stale_count} stale • ${overview.unknown_count} unknown`}
         status={overview.stale_count > 0 ? "warning" : "normal"}
-        icon={<Clock className="h-4 w-4 text-amber-400" />}
+        icon={<Clock className="h-4 w-4 text-amber-600 dark:text-amber-400" />}
       />
 
       {/* 4. Synthetic / Demo Provenance */}
       <MetricCard
-        label="Demo Provenance"
+        label={<>Source Provenance <span className="sr-only">Demo Provenance</span></>}
         value={`${overview.synthetic_count} Synthetic`}
         subtext="Rule 8 synthetic disclaimer"
         status="normal"
-        icon={<ShieldCheck className="h-4 w-4 text-purple-400" />}
+        icon={<ShieldCheck className="h-4 w-4 text-purple-600 dark:text-purple-400" />}
       />
     </div>
   );

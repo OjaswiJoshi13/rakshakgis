@@ -116,29 +116,29 @@ export const ReviewQueueCard: React.FC<ReviewQueueCardProps> = ({
   };
 
   return (
-    <Card data-testid="review-queue" className="border-slate-800 bg-slate-900/60 shadow-xl overflow-hidden">
-      <CardHeader className="p-4 border-b border-slate-800/80 bg-slate-950/40">
+    <Card data-testid="review-queue" className="border-border-subtle bg-surface-panel shadow-sm overflow-hidden">
+      <CardHeader className="p-4 border-b border-border-subtle bg-surface-elevated">
         <div className="flex items-center justify-between gap-2">
           <div className="flex items-center gap-2">
-            <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-sky-950/80 border border-sky-600/40 text-sky-400">
+            <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-sky-50 dark:bg-sky-950/80 border border-sky-200 dark:border-sky-600/40 text-sky-600 dark:text-sky-400">
               <Inbox className="h-4 w-4" />
             </div>
             <div>
-              <CardTitle className="text-sm font-semibold text-slate-100">
+              <CardTitle className="text-sm font-semibold text-text-primary">
                 Review Queue
               </CardTitle>
-              <CardDescription className="text-xs text-slate-400">
+              <CardDescription className="text-xs text-text-muted">
                 Statutory Sign-Off Dossiers
               </CardDescription>
             </div>
           </div>
-          <Badge variant="outline" size="sm" className="font-mono text-slate-300">
+          <Badge variant="outline" size="sm" className="font-mono text-text-secondary border-border-subtle">
             {dossiers.length} Total
           </Badge>
         </div>
 
         {/* Tab Filters */}
-        <div className="mt-3 grid grid-cols-3 gap-1 rounded-md bg-slate-950 p-1 border border-slate-800 text-xs font-medium">
+        <div className="mt-3 grid grid-cols-3 gap-1 rounded-md bg-surface-panel p-1 border border-border-subtle text-xs font-medium">
           <button
             type="button"
             data-testid="filter-tab-all"
@@ -146,8 +146,8 @@ export const ReviewQueueCard: React.FC<ReviewQueueCardProps> = ({
             className={cn(
               "rounded px-2 py-1 text-center transition-colors flex items-center justify-center gap-1",
               activeTab === "all"
-                ? "bg-slate-800 text-slate-100 font-semibold shadow-sm"
-                : "text-slate-400 hover:text-slate-200"
+                ? "bg-surface-elevated text-text-primary font-semibold shadow-2xs border border-border-subtle"
+                : "text-text-muted hover:text-text-primary"
             )}
           >
             <span>All</span>
@@ -160,8 +160,8 @@ export const ReviewQueueCard: React.FC<ReviewQueueCardProps> = ({
             className={cn(
               "rounded px-2 py-1 text-center transition-colors flex items-center justify-center gap-1",
               activeTab === "pending"
-                ? "bg-amber-950/80 text-amber-300 font-semibold border border-amber-600/50 shadow-sm"
-                : "text-slate-400 hover:text-slate-200"
+                ? "bg-amber-50 dark:bg-amber-950/80 text-amber-900 dark:text-amber-300 font-semibold border border-amber-300 dark:border-amber-600/50 shadow-2xs"
+                : "text-text-muted hover:text-text-primary"
             )}
           >
             <span>Pending</span>
@@ -174,8 +174,8 @@ export const ReviewQueueCard: React.FC<ReviewQueueCardProps> = ({
             className={cn(
               "rounded px-2 py-1 text-center transition-colors flex items-center justify-center gap-1",
               activeTab === "decided"
-                ? "bg-slate-800 text-slate-100 font-semibold shadow-sm"
-                : "text-slate-400 hover:text-slate-200"
+                ? "bg-surface-elevated text-text-primary font-semibold shadow-2xs border border-border-subtle"
+                : "text-text-muted hover:text-text-primary"
             )}
           >
             <span>Decided</span>
@@ -185,24 +185,24 @@ export const ReviewQueueCard: React.FC<ReviewQueueCardProps> = ({
 
         {/* Search input */}
         <div className="relative mt-2.5">
-          <Search className="absolute left-2.5 top-2.5 h-3.5 w-3.5 text-slate-500" />
+          <Search className="absolute left-2.5 top-2.5 h-3.5 w-3.5 text-text-muted" />
           <input
             type="text"
             placeholder="Search dossier by name, ID, or action..."
             value={searchQuery}
             onChange={(e) => setSearchQuery(e.target.value)}
-            className="w-full rounded-md border border-slate-800 bg-slate-950/80 pl-8 pr-3 py-1.5 text-xs text-slate-200 placeholder-slate-500 focus:border-sky-500 focus:outline-none focus:ring-1 focus:ring-sky-500"
+            className="w-full rounded-md border border-border-subtle bg-surface-panel pl-8 pr-3 py-1.5 text-xs text-text-primary placeholder:text-text-muted focus:border-sky-500 focus:outline-none focus:ring-1 focus:ring-sky-500"
           />
         </div>
       </CardHeader>
 
-      <CardContent className="p-2 divide-y divide-slate-800/60 max-h-[580px] overflow-y-auto">
+      <CardContent className="p-2 divide-y divide-border-subtle max-h-[580px] overflow-y-auto">
         {isLoading ? (
-          <div className="py-8 text-center text-xs text-slate-400 font-mono">
+          <div className="py-8 text-center text-xs text-text-muted font-mono">
             Loading recommendation dossiers...
           </div>
         ) : filteredDossiers.length === 0 ? (
-          <div className="py-8 text-center text-xs text-slate-500">
+          <div className="py-8 text-center text-xs text-text-muted">
             No recommendation dossiers found in this view.
           </div>
         ) : (
@@ -216,17 +216,17 @@ export const ReviewQueueCard: React.FC<ReviewQueueCardProps> = ({
                 className={cn(
                   "w-full text-left p-3 transition-all rounded-lg my-1 block",
                   isSelected
-                    ? "bg-sky-950/40 border border-sky-500/60 shadow-md shadow-sky-950/50"
-                    : "hover:bg-slate-800/40 border border-transparent"
+                    ? "bg-sky-50/80 dark:bg-sky-950/40 border border-sky-400 dark:border-sky-500/60 shadow-xs"
+                    : "hover:bg-surface-elevated border border-transparent"
                 )}
               >
                 <div className="flex items-start justify-between gap-2">
                   <div className="flex items-center gap-1.5 flex-wrap">
-                    <span className="text-[11px] font-mono text-slate-500">
+                    <span className="text-[11px] font-mono text-text-muted">
                       {dossier.id}
                     </span>
-                    <span className="text-slate-600">•</span>
-                    <span className="text-[11px] font-mono text-sky-400 capitalize">
+                    <span className="text-text-muted">•</span>
+                    <span className="text-[11px] font-mono text-sky-700 dark:text-sky-400 capitalize">
                       {dossier.type === "relocation_plan"
                         ? "Relocation Plan"
                         : "Scenario Evaluation"}
@@ -235,19 +235,19 @@ export const ReviewQueueCard: React.FC<ReviewQueueCardProps> = ({
                   {getStatusBadge(dossier.status)}
                 </div>
 
-                <div className="font-semibold text-xs text-slate-200 mt-1 line-clamp-1">
+                <div className="font-semibold text-xs text-text-primary mt-1 line-clamp-1">
                   {dossier.title}
                 </div>
 
-                <div className="text-[11px] text-slate-400 mt-1 line-clamp-2 leading-relaxed">
+                <div className="text-[11px] text-text-secondary mt-1 line-clamp-2 leading-relaxed">
                   {dossier.proposed_action}
                 </div>
 
-                <div className="mt-2.5 pt-2 border-t border-slate-800/50 flex items-center justify-between text-[11px]">
+                <div className="mt-2.5 pt-2 border-t border-border-subtle flex items-center justify-between text-[11px]">
                   {getUrgencyBadge(dossier.urgency_level)}
-                  <div className="flex items-center gap-1 text-slate-400 group-hover:text-slate-200">
+                  <div className="flex items-center gap-1 text-text-muted group-hover:text-text-primary">
                     <span className="text-[10px] font-mono">Inspect</span>
-                    <ArrowRight className="h-3 w-3 text-sky-400" />
+                    <ArrowRight className="h-3 w-3 text-sky-600 dark:text-sky-400" />
                   </div>
                 </div>
               </button>

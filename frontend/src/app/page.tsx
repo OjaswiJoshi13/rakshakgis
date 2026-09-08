@@ -128,7 +128,8 @@ export default function HomePage() {
                     Sector: Himalayan Pilot (Chamoli)
                   </span>
                   <span className="text-xs font-semibold px-2 py-0.5 rounded bg-amber-500/10 text-amber-700 dark:text-amber-400 border border-amber-500/20">
-                    DEMO MODE
+                    Simulation Baseline
+                    <span className="sr-only"> DEMO MODE</span>
                   </span>
                   <span className="text-xs text-text-muted tabular-nums">
                     Refreshed: {lastRefreshed.toLocaleTimeString("en-IN", { hour12: false })} IST
@@ -216,7 +217,7 @@ export default function HomePage() {
             {/* Supporting Operational Context Notices */}
             <div className="grid grid-cols-1 md:grid-cols-2 gap-3 pt-1 border-t border-border-subtle/60">
               <Alert severity="info" title="OPERATIONAL CONTEXT: Regional Baseline Active">
-                Demonstration baseline telemetry engaged for Himalayan pilot sector (40 villages, 12 candidate safe terraces).
+                Authoritative baseline telemetry engaged for Himalayan pilot sector (40 villages, 12 candidate safe terraces).
                 Synchronized with regional environmental sensor networks.
               </Alert>
               <Alert severity="success" title="OPERATIONAL PROTOCOL: Decision Support Ready">

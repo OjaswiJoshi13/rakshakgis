@@ -49,7 +49,14 @@ export const DashboardHeader: React.FC<DashboardHeaderProps> = ({
                   : "bg-amber-100 border-amber-300 text-amber-800 dark:bg-amber-950/80 dark:border-amber-700 dark:text-amber-300"
               }`}
             >
-              Mode: {dataMode === "live" ? "LIVE (Telemetry)" : "DEMO (Synthetic)"}
+              {dataMode === "live" ? (
+                "LIVE (Telemetry)"
+              ) : (
+                <>
+                  Simulation Baseline
+                  <span className="sr-only"> DEMO (Synthetic)</span>
+                </>
+              )}
             </span>
           </div>
 

@@ -84,29 +84,29 @@ export const OfficerDecisionPanel: React.FC<OfficerDecisionPanelProps> = ({
   };
 
   return (
-    <Card className="border-slate-800 bg-slate-900/70 shadow-xl overflow-hidden">
-      <CardHeader className="p-4 sm:p-5 border-b border-slate-800/80 bg-slate-950/50">
+    <Card className="border-border-subtle bg-surface-panel shadow-sm overflow-hidden">
+      <CardHeader className="p-4 sm:p-5 border-b border-border-subtle bg-surface-elevated">
         <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2">
           <div className="flex items-center gap-2">
-            <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-emerald-950/80 border border-emerald-600/50 text-emerald-400">
+            <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-emerald-50 dark:bg-emerald-950/80 border border-emerald-300 dark:border-emerald-600/50 text-emerald-600 dark:text-emerald-400">
               <ShieldCheck className="h-4 w-4" />
             </div>
             <div>
-              <CardTitle className="text-sm sm:text-base font-bold text-slate-100">
+              <CardTitle className="text-sm sm:text-base font-bold text-text-primary">
                 Officer Action & Statutory Endorsement
               </CardTitle>
-              <CardDescription className="text-xs text-slate-400">
+              <CardDescription className="text-xs text-text-muted">
                 Rule 12 Legal Decision Gateway
               </CardDescription>
             </div>
           </div>
 
           {/* Reviewing Officer Identity */}
-          <div className="flex items-center gap-2 rounded-md bg-slate-950 px-3 py-1.5 border border-slate-800">
-            <UserCheck className="h-3.5 w-3.5 text-sky-400 shrink-0" />
+          <div className="flex items-center gap-2 rounded-md bg-surface-panel px-3 py-1.5 border border-border-subtle">
+            <UserCheck className="h-3.5 w-3.5 text-sky-600 dark:text-sky-400 shrink-0" />
             <div className="text-[11px] leading-tight font-mono">
-              <span className="font-semibold text-slate-200">{officerName}</span>
-              <span className="text-slate-500 block text-[10px]">{officerRole}</span>
+              <span className="font-semibold text-text-primary">{officerName}</span>
+              <span className="text-text-muted block text-[10px]">{officerRole}</span>
             </div>
           </div>
         </div>
@@ -116,8 +116,8 @@ export const OfficerDecisionPanel: React.FC<OfficerDecisionPanelProps> = ({
         <form onSubmit={handleSubmit} className="space-y-5">
           {/* Action Choice Buttons */}
           <div>
-            <label className="block text-xs font-semibold text-slate-300 uppercase tracking-wider mb-2 font-mono">
-              1. Select Binding Operational Decision <span className="text-rose-400">*</span>
+            <label className="block text-xs font-semibold text-text-primary uppercase tracking-wider mb-2 font-mono">
+              1. Select Binding Operational Decision <span className="text-rose-500">*</span>
             </label>
             <div className="grid grid-cols-1 sm:grid-cols-3 gap-2.5">
               {/* Approve Button */}
@@ -131,25 +131,25 @@ export const OfficerDecisionPanel: React.FC<OfficerDecisionPanelProps> = ({
                 className={cn(
                   "p-3 rounded-lg border text-left transition-all flex items-start gap-2.5",
                   selectedAction === "approved"
-                    ? "bg-emerald-950/60 border-emerald-500 text-emerald-100 shadow-md shadow-emerald-950/60 ring-1 ring-emerald-500"
-                    : "bg-slate-950/50 border-slate-800 text-slate-300 hover:border-slate-700 hover:bg-slate-900/60"
+                    ? "bg-emerald-50 dark:bg-emerald-950/60 border-emerald-500 text-emerald-900 dark:text-emerald-100 shadow-2xs ring-1 ring-emerald-500"
+                    : "bg-surface-elevated border-border-subtle text-text-secondary hover:border-border-strong hover:bg-surface-subtle"
                 )}
               >
                 <div
                   className={cn(
                     "mt-0.5 flex h-4 w-4 shrink-0 items-center justify-center rounded-full border",
                     selectedAction === "approved"
-                      ? "border-emerald-400 bg-emerald-500 text-white"
-                      : "border-slate-600"
+                      ? "border-emerald-500 bg-emerald-500 text-white"
+                      : "border-border-strong"
                   )}
                 >
                   {selectedAction === "approved" && <CheckCircle2 className="h-3 w-3" />}
                 </div>
                 <div>
-                  <div className="text-xs font-bold text-slate-100 flex items-center gap-1">
+                  <div className="text-xs font-bold text-text-primary flex items-center gap-1">
                     <span>Approve Action</span>
                   </div>
-                  <div className="text-[11px] text-slate-400 mt-0.5 leading-snug">
+                  <div className="text-[11px] text-text-muted mt-0.5 leading-snug">
                     Enact operational plan under Rule 12 protocol.
                   </div>
                 </div>
@@ -166,25 +166,25 @@ export const OfficerDecisionPanel: React.FC<OfficerDecisionPanelProps> = ({
                 className={cn(
                   "p-3 rounded-lg border text-left transition-all flex items-start gap-2.5",
                   selectedAction === "rejected"
-                    ? "bg-rose-950/60 border-rose-500 text-rose-100 shadow-md shadow-rose-950/60 ring-1 ring-rose-500"
-                    : "bg-slate-950/50 border-slate-800 text-slate-300 hover:border-slate-700 hover:bg-slate-900/60"
+                    ? "bg-rose-50 dark:bg-rose-950/60 border-rose-500 text-rose-900 dark:text-rose-100 shadow-2xs ring-1 ring-rose-500"
+                    : "bg-surface-elevated border-border-subtle text-text-secondary hover:border-border-strong hover:bg-surface-subtle"
                 )}
               >
                 <div
                   className={cn(
                     "mt-0.5 flex h-4 w-4 shrink-0 items-center justify-center rounded-full border",
                     selectedAction === "rejected"
-                      ? "border-rose-400 bg-rose-500 text-white"
-                      : "border-slate-600"
+                      ? "border-rose-500 bg-rose-500 text-white"
+                      : "border-border-strong"
                   )}
                 >
                   {selectedAction === "rejected" && <XCircle className="h-3 w-3" />}
                 </div>
                 <div>
-                  <div className="text-xs font-bold text-slate-100 flex items-center gap-1">
+                  <div className="text-xs font-bold text-text-primary flex items-center gap-1">
                     <span>Reject Action</span>
                   </div>
-                  <div className="text-[11px] text-slate-400 mt-0.5 leading-snug">
+                  <div className="text-[11px] text-text-muted mt-0.5 leading-snug">
                     Prohibit operational execution; requires justification.
                   </div>
                 </div>
@@ -201,25 +201,25 @@ export const OfficerDecisionPanel: React.FC<OfficerDecisionPanelProps> = ({
                 className={cn(
                   "p-3 rounded-lg border text-left transition-all flex items-start gap-2.5",
                   selectedAction === "revision_requested"
-                    ? "bg-sky-950/60 border-sky-500 text-sky-100 shadow-md shadow-sky-950/60 ring-1 ring-sky-500"
-                    : "bg-slate-950/50 border-slate-800 text-slate-300 hover:border-slate-700 hover:bg-slate-900/60"
+                    ? "bg-sky-50 dark:bg-sky-950/60 border-sky-500 text-sky-900 dark:text-sky-100 shadow-2xs ring-1 ring-sky-500"
+                    : "bg-surface-elevated border-border-subtle text-text-secondary hover:border-border-strong hover:bg-surface-subtle"
                 )}
               >
                 <div
                   className={cn(
                     "mt-0.5 flex h-4 w-4 shrink-0 items-center justify-center rounded-full border",
                     selectedAction === "revision_requested"
-                      ? "border-sky-400 bg-sky-500 text-white"
-                      : "border-slate-600"
+                      ? "border-sky-500 bg-sky-500 text-white"
+                      : "border-border-strong"
                   )}
                 >
                   {selectedAction === "revision_requested" && <RotateCcw className="h-3 w-3" />}
                 </div>
                 <div>
-                  <div className="text-xs font-bold text-slate-100 flex items-center gap-1">
+                  <div className="text-xs font-bold text-text-primary flex items-center gap-1">
                     <span>Return for Revision</span>
                   </div>
-                  <div className="text-[11px] text-slate-400 mt-0.5 leading-snug">
+                  <div className="text-[11px] text-text-muted mt-0.5 leading-snug">
                     Instruct technical team to recalibrate model.
                   </div>
                 </div>
@@ -232,20 +232,21 @@ export const OfficerDecisionPanel: React.FC<OfficerDecisionPanelProps> = ({
             <div className="flex items-center justify-between mb-1.5">
               <label
                 htmlFor="officer-rationale-input"
-                className="block text-xs font-semibold text-slate-300 uppercase tracking-wider font-mono"
+                className="text-xs font-semibold text-text-primary uppercase tracking-wider font-mono flex items-center gap-1"
               >
-                2.{" "}
-                {selectedAction === "rejected"
-                  ? "Official Justification for Rejection *"
-                  : selectedAction === "revision_requested"
-                  ? "Specific Revision Instructions *"
-                  : "Administrative Directives / Notes (Optional)"}
+                <span>
+                  {selectedAction === "rejected"
+                    ? "2. Official Justification for Rejection *"
+                    : selectedAction === "revision_requested"
+                    ? "2. Specific Revision Instructions *"
+                    : "2. Administrative Directives / Notes (Optional)"}
+                </span>
               </label>
-              {(selectedAction === "rejected" || selectedAction === "revision_requested") && (
-                <Badge variant="danger" size="sm" className="text-[10px] font-mono">
-                  Mandatory Field
-                </Badge>
-              )}
+              <span className="text-[11px] text-text-muted font-mono">
+                {selectedAction === "approved"
+                  ? "Optional for Approval"
+                  : "Mandatory Factual Justification"}
+              </span>
             </div>
 
             <textarea
@@ -265,19 +266,19 @@ export const OfficerDecisionPanel: React.FC<OfficerDecisionPanelProps> = ({
               }}
               disabled={isSubmitting}
               className={cn(
-                "w-full rounded-lg border bg-slate-950 p-3 text-xs text-slate-200 placeholder-slate-500 focus:outline-none focus:ring-1",
+                "w-full rounded-lg border bg-surface-panel p-3 text-xs text-text-primary placeholder:text-text-muted focus:outline-none focus:ring-1",
                 validationError && !rationale.trim() && (selectedAction === "rejected" || selectedAction === "revision_requested")
                   ? "border-rose-500 focus:ring-rose-500"
-                  : "border-slate-800 focus:border-sky-500 focus:ring-sky-500"
+                  : "border-border-subtle focus:border-sky-500 focus:ring-sky-500"
               )}
             />
           </div>
 
           {/* Additional Options */}
-          <div className="space-y-3 pt-1 border-t border-slate-800/60">
+          <div className="space-y-3 pt-1 border-t border-border-subtle">
             {/* Approval: Statutory Confirmation Checkbox */}
             {selectedAction === "approved" && (
-              <label className="flex items-start gap-2.5 cursor-pointer rounded-lg border border-emerald-900/60 bg-emerald-950/20 p-3 text-xs text-emerald-200">
+              <label className="flex items-start gap-2.5 cursor-pointer rounded-lg border border-emerald-300 dark:border-emerald-900/60 bg-emerald-50 dark:bg-emerald-950/20 p-3 text-xs text-emerald-900 dark:text-emerald-200">
                 <input
                   type="checkbox"
                   checked={statutoryConfirmed}
@@ -286,10 +287,10 @@ export const OfficerDecisionPanel: React.FC<OfficerDecisionPanelProps> = ({
                     if (validationError) setValidationError(null);
                   }}
                   disabled={isSubmitting}
-                  className="mt-0.5 h-4 w-4 rounded border-emerald-700 bg-slate-950 text-emerald-500 focus:ring-emerald-400"
+                  className="mt-0.5 h-4 w-4 rounded border-emerald-500 bg-surface-panel text-emerald-600 focus:ring-emerald-400"
                 />
                 <div className="leading-snug">
-                  <span className="font-semibold text-emerald-300">
+                  <span className="font-semibold text-emerald-950 dark:text-emerald-300">
                     Rule 12 Ground Verification Certification (Required):
                   </span>{" "}
                   I hereby certify as an authorized officer that I have verified local terrain,
@@ -300,13 +301,13 @@ export const OfficerDecisionPanel: React.FC<OfficerDecisionPanelProps> = ({
             )}
 
             {/* Override AI Recommendation Checkbox */}
-            <label className="flex items-center gap-2.5 cursor-pointer text-xs text-slate-400 hover:text-slate-300">
+            <label className="flex items-center gap-2.5 cursor-pointer text-xs text-text-muted hover:text-text-secondary">
               <input
                 type="checkbox"
                 checked={overrideAi}
                 onChange={(e) => setOverrideAi(e.target.checked)}
                 disabled={isSubmitting}
-                className="h-3.5 w-3.5 rounded border-slate-700 bg-slate-950 text-amber-500 focus:ring-amber-400"
+                className="h-3.5 w-3.5 rounded border-border-subtle bg-surface-panel text-amber-500 focus:ring-amber-400"
               />
               <span className="font-mono text-[11px]">
                 Record as an explicit Officer Override of automated AI algorithmic recommendation
@@ -316,8 +317,8 @@ export const OfficerDecisionPanel: React.FC<OfficerDecisionPanelProps> = ({
 
           {/* Validation Error Banner */}
           {validationError && (
-            <div className="rounded-md border border-rose-900/80 bg-rose-950/50 p-3 text-xs text-rose-300 flex items-center gap-2">
-              <AlertTriangle className="h-4 w-4 text-rose-400 shrink-0" />
+            <div className="rounded-md border border-red-200 dark:border-rose-900/80 bg-red-50 dark:bg-rose-950/50 p-3 text-xs text-red-900 dark:text-rose-300 flex items-center gap-2">
+              <AlertTriangle className="h-4 w-4 text-red-600 dark:text-rose-400 shrink-0" />
               <span>{validationError}</span>
             </div>
           )}

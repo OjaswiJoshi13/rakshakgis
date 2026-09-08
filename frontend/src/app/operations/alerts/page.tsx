@@ -224,10 +224,10 @@ function AlertsOperationsContent() {
         {isLoading ? (
           <div className="space-y-3">
             {[1, 2, 3].map((i) => (
-              <Card key={i} className="p-6 animate-pulse bg-slate-900/40 border-slate-800">
-                <div className="h-4 bg-slate-800 rounded w-1/4 mb-3" />
-                <div className="h-4 bg-slate-800 rounded w-3/4 mb-2" />
-                <div className="h-3 bg-slate-800/60 rounded w-1/2" />
+              <Card key={i} className="p-6 animate-pulse bg-surface-panel border-border-subtle">
+                <div className="h-4 bg-surface-elevated rounded w-1/4 mb-3" />
+                <div className="h-4 bg-surface-elevated rounded w-3/4 mb-2" />
+                <div className="h-3 bg-surface-subtle rounded w-1/2" />
               </Card>
             ))}
           </div>

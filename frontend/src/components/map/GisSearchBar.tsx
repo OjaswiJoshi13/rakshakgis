@@ -103,22 +103,22 @@ export const GisSearchBar: React.FC<GisSearchBarProps> = ({
   const getEntityBadge = (type: string) => {
     switch (type) {
       case "village":
-        return <span className="text-[10px] uppercase font-mono px-1.5 py-0.5 rounded bg-emerald-950 text-emerald-400 border border-emerald-800">Village</span>;
+        return <span className="text-[10px] uppercase font-mono px-1.5 py-0.5 rounded bg-emerald-50 text-emerald-800 border border-emerald-300 dark:bg-emerald-950 dark:text-emerald-400 dark:border-emerald-800">Village</span>;
       case "candidate_site":
-        return <span className="text-[10px] uppercase font-mono px-1.5 py-0.5 rounded bg-sky-950 text-sky-400 border border-sky-800">Haven Site</span>;
+        return <span className="text-[10px] uppercase font-mono px-1.5 py-0.5 rounded bg-sky-50 text-sky-800 border border-sky-300 dark:bg-sky-950 dark:text-sky-400 dark:border-sky-800">Haven Site</span>;
       case "red_zone":
-        return <span className="text-[10px] uppercase font-mono px-1.5 py-0.5 rounded bg-rose-950 text-rose-400 border border-rose-800">Red Zone</span>;
+        return <span className="text-[10px] uppercase font-mono px-1.5 py-0.5 rounded bg-rose-50 text-rose-800 border border-rose-300 dark:bg-rose-950 dark:text-rose-400 dark:border-rose-800">Red Zone</span>;
       case "region":
-        return <span className="text-[10px] uppercase font-mono px-1.5 py-0.5 rounded bg-purple-950 text-purple-400 border border-purple-800">Region</span>;
+        return <span className="text-[10px] uppercase font-mono px-1.5 py-0.5 rounded bg-purple-50 text-purple-800 border border-purple-300 dark:bg-purple-950 dark:text-purple-400 dark:border-purple-800">Region</span>;
       default:
-        return <span className="text-[10px] uppercase font-mono px-1.5 py-0.5 rounded bg-slate-800 text-slate-400">Entity</span>;
+        return <span className="text-[10px] uppercase font-mono px-1.5 py-0.5 rounded bg-surface-elevated text-text-secondary border border-border-subtle">Entity</span>;
     }
   };
 
   return (
     <div ref={dropdownRef} className={`relative w-full max-w-md ${className}`}>
       <div className="relative flex items-center">
-        <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none text-slate-400">
+        <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none text-text-muted">
           <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
           </svg>
@@ -133,11 +133,11 @@ export const GisSearchBar: React.FC<GisSearchBarProps> = ({
             if (results.length > 0) setIsOpen(true);
           }}
           placeholder="Search villages, sites, zones..."
-          className="w-full pl-9 pr-8 py-1.5 bg-slate-900/90 hover:bg-slate-900 focus:bg-slate-900 backdrop-blur border border-slate-700 focus:border-sky-500 rounded-lg text-sm text-slate-100 placeholder-slate-400 outline-none transition-colors shadow-lg font-sans"
+          className="w-full pl-9 pr-8 py-1.5 bg-surface-panel hover:bg-surface-panel focus:bg-surface-panel backdrop-blur border border-border-strong focus:border-sky-500 rounded-lg text-sm text-text-primary placeholder:text-text-muted outline-none transition-colors shadow-sm font-sans"
         />
         {isLoading && (
           <div className="absolute inset-y-0 right-2 flex items-center">
-            <svg className="animate-spin h-3.5 w-3.5 text-sky-400" viewBox="0 0 24 24">
+            <svg className="animate-spin h-3.5 w-3.5 text-sky-600 dark:text-sky-400" viewBox="0 0 24 24">
               <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" fill="none" />
               <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z" />
             </svg>
@@ -150,7 +150,7 @@ export const GisSearchBar: React.FC<GisSearchBarProps> = ({
               setResults([]);
               setIsOpen(false);
             }}
-            className="absolute inset-y-0 right-2 flex items-center text-slate-400 hover:text-slate-200"
+            className="absolute inset-y-0 right-2 flex items-center text-text-muted hover:text-text-primary"
             title="Clear search"
           >
             <svg className="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -162,9 +162,9 @@ export const GisSearchBar: React.FC<GisSearchBarProps> = ({
 
       {/* Dropdown Results */}
       {isOpen && (
-        <div className="absolute left-0 right-0 top-full mt-1.5 max-h-72 overflow-y-auto bg-slate-900/95 backdrop-blur border border-slate-700 rounded-lg shadow-2xl z-50 divide-y divide-slate-800 font-sans">
+        <div className="absolute left-0 right-0 top-full mt-1.5 max-h-72 overflow-y-auto bg-surface-panel/95 backdrop-blur border border-border-strong rounded-lg shadow-xl z-50 divide-y divide-border-subtle font-sans">
           {results.length === 0 ? (
-            <div className="p-3 text-xs text-slate-400 text-center font-mono">
+            <div className="p-3 text-xs text-text-muted text-center font-mono">
               No matching geographic entities found for &ldquo;{query}&rdquo;
             </div>
           ) : (
@@ -173,21 +173,21 @@ export const GisSearchBar: React.FC<GisSearchBarProps> = ({
                 key={`${item.entity_type}-${item.id}`}
                 onClick={() => handleSelect(item)}
                 className={`w-full text-left px-3 py-2 text-xs flex items-center justify-between transition-colors ${
-                  idx === selectedIndex ? "bg-sky-950/80 text-sky-100" : "hover:bg-slate-800/80 text-slate-200"
+                  idx === selectedIndex ? "bg-sky-50 text-sky-900 dark:bg-sky-950/80 dark:text-sky-100" : "hover:bg-surface-elevated text-text-primary"
                 }`}
               >
                 <div className="flex flex-col gap-0.5">
                   <div className="flex items-center gap-1.5">
-                    <span className="font-semibold text-slate-100 text-sm">{item.name}</span>
-                    {item.code && <span className="text-[11px] font-mono text-slate-400">({item.code})</span>}
+                    <span className="font-semibold text-text-primary text-sm">{item.name}</span>
+                    {item.code && <span className="text-[11px] font-mono text-text-muted">({item.code})</span>}
                   </div>
                   {item.highlight && (
-                    <span className="text-[11px] text-slate-400 font-mono">{item.highlight}</span>
+                    <span className="text-[11px] text-text-muted font-mono">{item.highlight}</span>
                   )}
                 </div>
                 <div className="flex items-center gap-2 flex-shrink-0">
                   {item.coordinates && (
-                    <span className="text-[10px] text-slate-500 font-mono hidden sm:inline">
+                    <span className="text-[10px] text-text-muted font-mono hidden sm:inline">
                       {item.coordinates[0].toFixed(3)}, {item.coordinates[1].toFixed(3)}
                     </span>
                   )}

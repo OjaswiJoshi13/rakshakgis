@@ -54,13 +54,14 @@ export const CandidateAuditModal: React.FC<CandidateAuditModalProps> = ({
       />
 
       {/* Modal Dialog Box */}
-      <div className="relative w-full max-w-4xl max-h-[90vh] overflow-y-auto rounded-xl border border-slate-700 bg-slate-900 shadow-2xl shadow-black/80 flex flex-col z-10">
+      <div className="relative w-full max-w-4xl max-h-[90vh] overflow-y-auto rounded-xl border border-border-subtle bg-surface-panel shadow-2xl flex flex-col z-10">
         {/* Header */}
-        <div className="flex items-start justify-between border-b border-slate-800 p-5 bg-slate-950/60 sticky top-0 z-10">
+        <div className="flex items-start justify-between border-b border-border-subtle p-5 bg-surface-elevated sticky top-0 z-10">
           <div>
             <div className="flex items-center gap-2 mb-1">
-              <span className="text-xs font-mono uppercase tracking-wider text-slate-400">
-                M4-04 Explainability Audit
+              <span className="text-xs font-mono uppercase tracking-wider text-text-muted">
+                <span className="sr-only">M4-04 Explainability Audit</span>
+                <span aria-hidden="true">Explainability Audit</span>
               </span>
               <Badge
                 variant={isAssigned ? "success" : "warning"}
@@ -72,10 +73,10 @@ export const CandidateAuditModal: React.FC<CandidateAuditModalProps> = ({
             </div>
             <h2
               id="audit-modal-title"
-              className="text-xl font-bold tracking-tight text-slate-100 flex items-center gap-2"
+              className="text-xl font-bold tracking-tight text-text-primary flex items-center gap-2"
             >
               <span>{assignment.village_name}</span>
-              <span className="text-sm font-normal font-mono text-slate-400">
+              <span className="text-sm font-normal font-mono text-text-muted">
                 (ID: {assignment.village_id})
               </span>
             </h2>
@@ -85,7 +86,7 @@ export const CandidateAuditModal: React.FC<CandidateAuditModalProps> = ({
             type="button"
             onClick={onClose}
             aria-label="Close audit modal"
-            className="rounded-lg p-1.5 text-slate-400 hover:bg-slate-800 hover:text-slate-100 transition-colors"
+            className="rounded-lg p-1.5 text-text-muted hover:bg-surface-subtle hover:text-text-primary transition-colors"
           >
             <X className="h-5 w-5" />
           </button>
@@ -94,29 +95,29 @@ export const CandidateAuditModal: React.FC<CandidateAuditModalProps> = ({
         {/* Modal Body */}
         <div className="p-5 space-y-6 flex-1">
           {/* Village Context Strip */}
-          <div className="grid grid-cols-2 gap-3 sm:grid-cols-4 rounded-lg bg-slate-950/80 border border-slate-800 p-3.5 text-xs font-mono">
+          <div className="grid grid-cols-2 gap-3 sm:grid-cols-4 rounded-lg bg-surface-elevated border border-border-subtle p-3.5 text-xs font-mono">
             <div>
-              <span className="text-slate-500 block">Priority Score:</span>
-              <span className="text-slate-200 font-bold text-sm">
+              <span className="text-text-muted block">Priority Score:</span>
+              <span className="text-text-primary font-bold text-sm">
                 {assignment.priority_score.toFixed(1)} / 100
               </span>
               {assignment.priority_band && (
-                <span className="text-slate-400 block capitalize text-[11px]">
+                <span className="text-text-secondary block capitalize text-[11px]">
                   {assignment.priority_band.replace("_", " ")}
                 </span>
               )}
             </div>
 
             <div>
-              <span className="text-slate-500 block">Demanded Households:</span>
-              <span className="text-sky-300 font-bold text-sm">
+              <span className="text-text-muted block">Demanded Households:</span>
+              <span className="text-sky-700 dark:text-sky-300 font-bold text-sm">
                 {assignment.incoming_households} HH
               </span>
             </div>
 
             <div>
-              <span className="text-slate-500 block">Estimated Population:</span>
-              <span className="text-slate-300 font-bold text-sm">
+              <span className="text-text-muted block">Estimated Population:</span>
+              <span className="text-text-primary font-bold text-sm">
                 {assignment.incoming_population
                   ? `${assignment.incoming_population} people`
                   : "N/A"}
@@ -124,8 +125,8 @@ export const CandidateAuditModal: React.FC<CandidateAuditModalProps> = ({
             </div>
 
             <div>
-              <span className="text-slate-500 block">Evaluated Sites:</span>
-              <span className="text-emerald-400 font-bold text-sm">
+              <span className="text-text-muted block">Evaluated Sites:</span>
+              <span className="text-emerald-700 dark:text-emerald-400 font-bold text-sm">
                 {assignment.evaluated_candidates.length} candidates
               </span>
             </div>
@@ -133,15 +134,15 @@ export const CandidateAuditModal: React.FC<CandidateAuditModalProps> = ({
 
           {/* Outcome Rationale Banner */}
           {isAssigned ? (
-            <div className="rounded-lg border border-emerald-700/60 bg-emerald-950/40 p-4 space-y-2">
-              <div className="flex items-center gap-2 text-emerald-400 font-semibold text-sm font-mono">
+            <div className="rounded-lg border border-emerald-300 dark:border-emerald-700/60 bg-emerald-50 dark:bg-emerald-950/40 p-4 space-y-2">
+              <div className="flex items-center gap-2 text-emerald-900 dark:text-emerald-400 font-semibold text-sm font-mono">
                 <CheckCircle2 className="h-4 w-4" />
                 <span>Assignment Successful: {assignment.assigned_site_name}</span>
               </div>
-              <p className="text-xs text-emerald-200/90 leading-relaxed">
+              <p className="text-xs text-emerald-800 dark:text-emerald-200/90 leading-relaxed">
                 {assignment.selection_reason || "Selected as the highest-ranking feasible candidate site."}
               </p>
-              <div className="flex flex-wrap items-center gap-4 text-xs font-mono text-emerald-300/80 pt-1 border-t border-emerald-800/40">
+              <div className="flex flex-wrap items-center gap-4 text-xs font-mono text-emerald-800 dark:text-emerald-300/80 pt-1 border-t border-emerald-200 dark:border-emerald-800/40">
                 <span>Distance: {assignment.distance_km?.toFixed(1) ?? "—"} km</span>
                 <span>Suitability Score: {assignment.suitability_score?.toFixed(1) ?? "—"}</span>
                 <span>
@@ -150,14 +151,14 @@ export const CandidateAuditModal: React.FC<CandidateAuditModalProps> = ({
               </div>
             </div>
           ) : (
-            <div className="rounded-lg border border-amber-700/60 bg-amber-950/40 p-4 space-y-2">
-              <div className="flex items-center gap-2 text-amber-400 font-semibold text-sm font-mono">
+            <div className="rounded-lg border border-amber-300 dark:border-amber-700/60 bg-amber-50 dark:bg-amber-950/40 p-4 space-y-2">
+              <div className="flex items-center gap-2 text-amber-900 dark:text-amber-400 font-semibold text-sm font-mono">
                 <ShieldAlert className="h-4 w-4" />
                 <span>
                   Village Unassigned: Code [{assignment.unassigned_code || "NO_FEASIBLE_SITE"}]
                 </span>
               </div>
-              <p className="text-xs text-amber-200/90 leading-relaxed">
+              <p className="text-xs text-amber-800 dark:text-amber-200/90 leading-relaxed">
                 {assignment.unassigned_reason || "All evaluated candidate sites failed either safety constraints, minimum suitability criteria, or carrying capacity limits."}
               </p>
             </div>
@@ -171,7 +172,7 @@ export const CandidateAuditModal: React.FC<CandidateAuditModalProps> = ({
             </h3>
 
             {assignment.evaluated_candidates.length === 0 ? (
-              <p className="text-xs text-slate-500 italic p-4 text-center border border-dashed border-slate-800 rounded-lg">
+              <p className="text-xs text-text-muted italic p-4 text-center border border-dashed border-border-subtle rounded-lg">
                 No individual candidate site evaluation audits recorded for this village.
               </p>
             ) : (
@@ -185,19 +186,19 @@ export const CandidateAuditModal: React.FC<CandidateAuditModalProps> = ({
                       key={`${audit.site_id}-${idx}`}
                       className={`rounded-lg border p-4 transition-all ${
                         isSelectedSite
-                          ? "border-emerald-600 bg-emerald-950/20"
+                          ? "border-emerald-500 bg-emerald-50/60 dark:bg-emerald-950/20"
                           : audit.is_feasible
-                          ? "border-slate-700 bg-slate-800/40"
-                          : "border-slate-800 bg-slate-900/40 opacity-80"
+                          ? "border-border-subtle bg-surface-elevated"
+                          : "border-border-subtle bg-surface-subtle opacity-80"
                       }`}
                     >
                       <div className="flex flex-wrap items-start justify-between gap-2 mb-2">
                         <div className="flex items-center gap-2">
-                          <Building2 className="h-4 w-4 text-slate-400" />
-                          <h4 className="font-semibold text-slate-200 text-sm">
+                          <Building2 className="h-4 w-4 text-text-muted" />
+                          <h4 className="font-semibold text-text-primary text-sm">
                             {audit.site_name}
                           </h4>
-                          <span className="text-xs font-mono text-slate-500">
+                          <span className="text-xs font-mono text-text-muted">
                             (ID: {audit.site_id})
                           </span>
                           {isSelectedSite && (
@@ -223,10 +224,10 @@ export const CandidateAuditModal: React.FC<CandidateAuditModalProps> = ({
                       </div>
 
                       {/* Metrics Matrix */}
-                      <div className="grid grid-cols-2 sm:grid-cols-4 gap-2 text-xs font-mono bg-slate-950/50 rounded p-2.5 my-2 border border-slate-800/60">
+                      <div className="grid grid-cols-2 sm:grid-cols-4 gap-2 text-xs font-mono bg-surface-panel rounded p-2.5 my-2 border border-border-subtle">
                         <div>
-                          <span className="text-slate-500 block">Distance:</span>
-                          <span className="text-slate-200">
+                          <span className="text-text-muted block">Distance:</span>
+                          <span className="text-text-primary">
                             {audit.distance_km !== null && audit.distance_km !== undefined
                               ? `${audit.distance_km.toFixed(1)} km`
                               : "N/A"}
@@ -234,8 +235,8 @@ export const CandidateAuditModal: React.FC<CandidateAuditModalProps> = ({
                         </div>
 
                         <div>
-                          <span className="text-slate-500 block">Suitability:</span>
-                          <span className="text-slate-200">
+                          <span className="text-text-muted block">Suitability:</span>
+                          <span className="text-text-primary">
                             {audit.suitability_score !== null && audit.suitability_score !== undefined
                               ? `${audit.suitability_score.toFixed(1)} (${audit.suitability_decision || "N/A"})`
                               : "N/A"}
@@ -243,14 +244,14 @@ export const CandidateAuditModal: React.FC<CandidateAuditModalProps> = ({
                         </div>
 
                         <div>
-                          <span className="text-slate-500 block">Capacity Margin:</span>
+                          <span className="text-text-muted block">Capacity Margin:</span>
                           <span
                             className={
                               audit.capacity_margin !== null && audit.capacity_margin !== undefined
                                 ? audit.capacity_margin >= 0
-                                  ? "text-emerald-400"
-                                  : "text-red-400 font-bold"
-                                : "text-slate-400"
+                                  ? "text-emerald-700 dark:text-emerald-400 font-bold"
+                                  : "text-red-700 dark:text-red-400 font-bold"
+                                : "text-text-muted"
                             }
                           >
                             {audit.capacity_margin !== null && audit.capacity_margin !== undefined
@@ -262,8 +263,8 @@ export const CandidateAuditModal: React.FC<CandidateAuditModalProps> = ({
                         </div>
 
                         <div>
-                          <span className="text-slate-500 block">Composite Rank:</span>
-                          <span className="text-sky-300">
+                          <span className="text-text-muted block">Composite Rank:</span>
+                          <span className="text-sky-700 dark:text-sky-300 font-bold">
                             {audit.rank_score !== null && audit.rank_score !== undefined
                               ? audit.rank_score.toFixed(1)
                               : "N/A"}
@@ -273,8 +274,8 @@ export const CandidateAuditModal: React.FC<CandidateAuditModalProps> = ({
 
                       {/* Rejection Details if Failed */}
                       {!audit.is_feasible && audit.rejection_reasons.length > 0 && (
-                        <div className="mt-2 space-y-1 text-xs text-red-300/90 font-mono bg-red-950/30 rounded p-2 border border-red-900/50">
-                          <span className="font-semibold text-red-400 block">Constraint Failure(s):</span>
+                        <div className="mt-2 space-y-1 text-xs text-red-900 dark:text-red-300/90 font-mono bg-red-50 dark:bg-red-950/30 rounded p-2 border border-red-200 dark:border-red-900/50">
+                          <span className="font-semibold text-red-800 dark:text-red-400 block">Constraint Failure(s):</span>
                           <ul className="list-disc list-inside space-y-0.5">
                             {audit.rejection_reasons.map((reason, rIdx) => (
                               <li key={rIdx}>{reason}</li>
@@ -291,9 +292,9 @@ export const CandidateAuditModal: React.FC<CandidateAuditModalProps> = ({
         </div>
 
         {/* Footer */}
-        <div className="border-t border-slate-800 p-4 bg-slate-950/60 flex items-center justify-between">
-          <div className="text-xs text-slate-500 font-mono flex items-center gap-1.5">
-            <Activity className="h-3.5 w-3.5 text-sky-400" />
+        <div className="border-t border-border-subtle p-4 bg-surface-elevated flex items-center justify-between">
+          <div className="text-xs text-text-muted font-mono flex items-center gap-1.5">
+            <Activity className="h-3.5 w-3.5 text-sky-600 dark:text-sky-400" />
             <span>Deterministic Greedy Allocation Engine Trace</span>
           </div>
 

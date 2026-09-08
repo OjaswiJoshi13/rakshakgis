@@ -37,25 +37,28 @@ export const SiteSelectorCard: React.FC<SiteSelectorCardProps> = ({
   }, [sites, statusFilter, searchQuery]);
 
   return (
-    <div className="space-y-3 rounded-lg border border-slate-800 bg-slate-900/60 p-3.5">
+    <div className="space-y-3 rounded-lg border border-border-subtle bg-surface-panel p-3.5 shadow-xs">
       {/* Selector Header */}
       <div className="flex items-center justify-between">
-        <h3 className="text-xs font-mono uppercase tracking-wider text-slate-400 flex items-center gap-1.5">
-          <Building2 className="h-3.5 w-3.5 text-sky-400" />
+        <h3 className="text-xs font-mono uppercase tracking-wider text-text-muted flex items-center gap-1.5">
+          <Building2 className="h-3.5 w-3.5 text-primary-600 dark:text-primary-400" />
           <span>Candidate Sites ({sites.length})</span>
         </h3>
-        <span className="text-[11px] font-mono text-slate-500">M4-01 Registry</span>
+        <span className="text-[11px] font-mono text-text-muted">
+          Registry
+          <span className="sr-only">M4-01 Registry</span>
+        </span>
       </div>
 
       {/* Search Input */}
       <div className="relative">
-        <Search className="absolute left-2.5 top-2.5 h-3.5 w-3.5 text-slate-500" />
+        <Search className="absolute left-2.5 top-2.5 h-3.5 w-3.5 text-text-muted" />
         <input
           type="text"
           value={searchQuery}
           onChange={(e) => setSearchQuery(e.target.value)}
           placeholder="Search site name or ID..."
-          className="w-full rounded-md border border-slate-700 bg-slate-950 pl-8 pr-2.5 py-1.5 text-xs text-slate-200 placeholder-slate-500 focus:border-sky-500 focus:outline-none font-mono"
+          className="w-full rounded-md border border-border-subtle bg-surface-elevated pl-8 pr-2.5 py-1.5 text-xs text-text-primary placeholder-text-muted focus:border-primary-500 focus:outline-hidden font-mono"
         />
       </div>
 
@@ -68,8 +71,8 @@ export const SiteSelectorCard: React.FC<SiteSelectorCardProps> = ({
             onClick={() => setStatusFilter(st)}
             className={`px-2 py-0.5 rounded capitalize transition-colors ${
               statusFilter === st
-                ? "bg-sky-600 text-white font-semibold"
-                : "bg-slate-950 text-slate-400 hover:text-slate-200 border border-slate-800"
+                ? "bg-primary-600 text-white font-semibold shadow-xs"
+                : "bg-surface-elevated text-text-secondary hover:text-text-primary border border-border-subtle"
             }`}
           >
             {st}
@@ -79,11 +82,11 @@ export const SiteSelectorCard: React.FC<SiteSelectorCardProps> = ({
 
       {/* Sites List */}
       {isLoading ? (
-        <div className="py-8 text-center text-xs text-slate-500">
+        <div className="py-8 text-center text-xs text-text-muted">
           Loading candidate sites...
         </div>
       ) : filteredSites.length === 0 ? (
-        <div className="rounded border border-dashed border-slate-800 p-4 text-center text-xs text-slate-500 font-mono">
+        <div className="rounded border border-dashed border-border-strong p-4 text-center text-xs text-text-muted font-mono">
           No sites match filter criteria.
         </div>
       ) : (
@@ -100,12 +103,12 @@ export const SiteSelectorCard: React.FC<SiteSelectorCardProps> = ({
                 onClick={() => onSelectSite(site.id)}
                 className={`w-full text-left rounded-lg p-2.5 transition-all border ${
                   isSelected
-                    ? "border-sky-500 bg-sky-950/40 shadow-sm"
-                    : "border-slate-800 bg-slate-950/50 hover:bg-slate-800/40 hover:border-slate-700"
+                    ? "border-primary-500 bg-primary-50 dark:bg-primary-950/40 shadow-xs ring-1 ring-primary-500 text-text-primary"
+                    : "border-border-subtle bg-surface-elevated hover:bg-surface-raised hover:border-border-strong text-text-secondary"
                 }`}
               >
                 <div className="flex items-start justify-between gap-1 mb-1">
-                  <span className="font-semibold text-xs text-slate-200 line-clamp-1">
+                  <span className="font-semibold text-xs text-text-primary line-clamp-1">
                     {site.name}
                   </span>
                   <Badge
@@ -117,7 +120,7 @@ export const SiteSelectorCard: React.FC<SiteSelectorCardProps> = ({
                   </Badge>
                 </div>
 
-                <div className="grid grid-cols-3 gap-1 text-[11px] font-mono text-slate-400">
+                <div className="grid grid-cols-3 gap-1 text-[11px] font-mono text-text-muted">
                   <span title="Elevation">
                     {site.elevation_m != null ? `${site.elevation_m}m` : "—"}
                   </span>

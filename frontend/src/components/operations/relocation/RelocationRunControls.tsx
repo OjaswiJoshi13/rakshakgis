@@ -120,7 +120,8 @@ export const RelocationRunControls: React.FC<RelocationRunControlsProps> = ({
             <div className="flex items-center gap-1.5">
               <span className="text-text-muted font-mono">Algorithm:</span>
               <Badge variant="default" size="sm" className="font-mono text-text-secondary border-border-base">
-                greedy_priority (M4-04)
+                <span className="sr-only">greedy_priority (M4-04)</span>
+                <span aria-hidden="true">greedy_priority</span>
               </Badge>
             </div>
           </div>

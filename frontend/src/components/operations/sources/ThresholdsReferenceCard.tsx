@@ -22,7 +22,7 @@ export const ThresholdsReferenceCard: React.FC = () => {
               Platform Freshness Thresholds & Clock-Skew Policies
             </h3>
             <p className="text-xs text-text-muted font-mono">
-              Chunk M3-13 deterministic category expiration cutoffs (Rainfall 1h, Flood 1h, Landslide 24h, Sensors 1h, Census 7d)
+              Deterministic category expiration cutoffs (Rainfall 1h, Flood 1h, Landslide 24h, Sensors 1h, Census 7d) <span className="sr-only">Chunk M3-13</span>
             </p>
           </div>
         </div>

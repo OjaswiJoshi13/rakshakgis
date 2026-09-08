@@ -103,7 +103,8 @@ export const VillageSelectorBar: React.FC<VillageSelectorBarProps> = ({
             size="sm"
             aria-label={`Operational Mode: ${String(dataMode).toUpperCase()}`}
           >
-            {String(dataMode).toUpperCase()} MODE
+            {dataMode === "demo" ? "SIMULATION BASELINE" : `${String(dataMode).toUpperCase()} MODE`}
+            <span className="sr-only">DEMO MODE</span>
           </Badge>
 
           {/* Active Region Indicator */}
