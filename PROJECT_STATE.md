@@ -2622,8 +2622,49 @@ No chunk may transition to `IN_PROGRESS` until all its listed prerequisite depen
 
 ---
 
+### BACKEND-REQUIREMENTS: Authoritative Backend Dependencies Specification (`backend/requirements.txt`)
+
+- **Status:** `COMPLETED — COMMITTED (AWAITING INDEPENDENT AUDIT / VERIFICATION)`
+- **Date Completed:** 2026-09-09
+- **Owner:** Backend & Platform Engineering Teams
+- **Objective:** Establish an authoritative, properly scoped, and reproducible `backend/requirements.txt` specification for the RakshakGIS FastAPI backend, ensuring complete dependency coverage, mutual version compatibility across Python 3.11 (Docker runtime) and Python 3.13 (local environment), and zero unused or unrelated global packages.
+- **Exact File Created:**
+  - `backend/requirements.txt`
+- **Dependency-Generation Approach:**
+  1. **Static AST Import Auditing:** Executed AST-based module analysis over all Python files across `backend/app/`, `backend/tests/`, `backend/alembic/`, and `scripts/` to derive the exact set of top-level third-party imports.
+  2. **Domain Categorization & Explicit Scoping:** Structured dependencies into clear functional sections:
+     - *Web Framework & ASGI Server:* `fastapi==0.141.1`, `uvicorn==0.52.4`
+     - *Data Validation & Configuration:* `pydantic==2.13.5`, `pydantic-settings==2.15.0`
+     - *Database & Migrations:* `SQLAlchemy==2.0.52`, `alembic==1.19.1`, `psycopg2-binary==2.9.12`
+     - *Geospatial Processing & GIS:* `GeoAlchemy2==0.20.0`, `shapely==2.1.2`, `pyproj==3.7.2`, `geopandas==1.1.4`, `pyogrio==0.13.0`, `rasterio==1.4.4`, `affine==3.0.1`
+     - *Scientific & Data Analysis:* `pandas==3.0.5`, `numpy==2.4.6`
+     - *Security & Authentication:* `bcrypt==5.0.0`, `pyjwt==2.13.0`
+     - *Utilities & Environment:* `python-dotenv==1.2.3`, `python-dateutil==2.9.0.post0`
+     - *Testing & TestClient Dependencies:* `pytest==9.1.1`, `httpx==0.28.1`
+  3. **Exclusion of Unrelated Transitive Artifacts:** Omitted arbitrary environment-dump packages, allowing pip to resolve compatible transitive dependencies automatically while pinning root requirements for reproducibility.
+- **Validation Results:**
+  - **Clean Virtual Environment Installation:**
+    - Created an isolated Python environment via `python -m venv`.
+    - Executed `pip install -r backend/requirements.txt`.
+    - Result: Succeeded with exit code 0; all packages and wheels installed cleanly without dependency conflicts.
+  - **FastAPI Application Initialization:**
+    - Executed import verification: `from app.main import app`.
+    - Result: Successfully loaded `app.title == "RakshakGIS"` and all registered API routers.
+  - **Backend Test Suite Execution:**
+    - Executed targeted test suites in clean environment (`test_health.py`, `test_m4_04_matching.py`, `test_m4_06_scenarios.py`).
+    - Result: 67 passed, 0 failed in 4.04s. (Note: Full 541+ backend pytest suite was not rerun in the clean requirements environment; exactly 67 targeted tests were executed).
+  - **Docker Container Build & Runtime Verification:**
+    - Built container image via `docker build -f backend/Dockerfile -t rakshakgis-backend:validation .`.
+    - Result: Successfully compiled native GDAL/GEOS/PROJ libraries, installed dependencies, and built image.
+    - Verified container execution: `docker run -i --rm rakshakgis-backend:validation python -c "import app.main; print(app.main.app.title)"` returned `RakshakGIS` with exit code 0 under Python 3.11.16.
+- **Compatibility Notes:**
+  - Package versions verified mutually compatible with both Python 3.11 (Debian Bookworm Docker base image) and Python 3.13 (host local development environment).
+  - Preserved root `requirements.txt` to ensure uninterrupted compatibility with the root Docker build context.
+
+---
+
 ## Last Updated
 
-- **Timestamp:** 2026-09-09 13:17:00 IST
-- **Updated By:** Core Engineering & GIS Platform Teams (DEMO-UX-PASS IMPLEMENTED — AWAITING INDEPENDENT REVIEW)
-- **Status Summary:** Critical demo correction and operational UX pass completed. GIS layers styled with high visual contrast and bounded to Chamoli operational theater. Candidate-site boundaries truthfully marked as Not available in source. Relocation constraint rejections provide clear human-readable reasons with deficits and explained N/As. Scenario simulator displays 188-habitation full-region scope with transparent simulation parameters. All 65 targeted frontend tests and 69 targeted backend tests passed with 0 errors. Ready for independent review.
+- **Timestamp:** 2026-09-09 13:56:00 IST
+- **Updated By:** Backend & Platform Engineering Teams (BACKEND-REQUIREMENTS COMPLETED — COMMITTED)
+- **Status Summary:** Created authoritative `backend/requirements.txt` covering all runtime, geospatial, authentication, database, and test dependencies. Validated clean environment installation (`pip install -r backend/requirements.txt` -> code 0), FastAPI application import, backend tests (67 targeted passed), and Docker backend build (`rakshakgis-backend` on Python 3.11). Pinned requirements committed to repository.

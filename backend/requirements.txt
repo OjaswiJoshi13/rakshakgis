@@ -1,0 +1,40 @@
+# RakshakGIS Backend Dependencies
+# Python 3.11+ / 3.13 compatible
+
+# Web Framework & ASGI Server
+fastapi==0.141.1
+uvicorn==0.52.4
+
+# Data Validation & Configuration
+pydantic==2.13.5
+pydantic-settings==2.15.0
+
+# Database & Migrations
+SQLAlchemy==2.0.52
+alembic==1.19.1
+psycopg2-binary==2.9.12
+
+# Geospatial Processing & GIS
+GeoAlchemy2==0.20.0
+shapely==2.1.2
+pyproj==3.7.2
+geopandas==1.1.4
+pyogrio==0.13.0
+rasterio==1.4.4
+affine==3.0.1
+
+# Scientific & Data Analysis
+pandas==3.0.5
+numpy==2.4.6
+
+# Security & Authentication
+bcrypt==5.0.0
+pyjwt==2.13.0
+
+# Utilities & Environment
+python-dotenv==1.2.3
+python-dateutil==2.9.0.post0
+
+# Testing & TestClient Dependencies
+pytest==9.1.1
+httpx==0.28.1
