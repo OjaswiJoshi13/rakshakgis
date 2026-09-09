@@ -151,6 +151,9 @@ export const ScenarioConfigPanel: React.FC<ScenarioConfigPanelProps> = ({
               {(parameters.rainfall_multiplier ?? 1.0).toFixed(2)}x
             </span>
           </div>
+          <p className="text-[10px] text-text-muted font-mono leading-tight">
+            Simulation parameter: Deterministic rainfall perturbation (not an observed weather measurement)
+          </p>
           <input
             type="range"
             min="1.0"

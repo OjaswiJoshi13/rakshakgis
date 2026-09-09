@@ -101,12 +101,19 @@ export const ScenarioDeltaTabs: React.FC<ScenarioDeltaTabsProps> = ({
         <div className="space-y-4 rounded-lg border border-border-subtle bg-surface-panel p-4">
           <div className="flex items-center justify-between border-b border-border-subtle pb-3">
             <div>
-              <h3 className="text-xs font-mono uppercase tracking-wider text-text-primary font-semibold flex items-center gap-2">
-                <Flame className="h-4 w-4 text-rose-500" />
-                <span>Multi-Hazard Risk Escalation &amp; Dynamic Red Zones</span>
-              </h3>
+              <div className="flex items-center gap-2 flex-wrap">
+                <h3 className="text-xs font-mono uppercase tracking-wider text-text-primary font-semibold flex items-center gap-2">
+                  <Flame className="h-4 w-4 text-rose-500" />
+                  <span>Multi-Hazard Risk Escalation &amp; Dynamic Red Zones</span>
+                </h3>
+                <Badge variant="outline" size="sm" className="font-mono text-xs text-text-primary border-border-strong">
+                  {scenarioRiskList.length >= 188
+                    ? `Full-Region Evaluation: ${scenarioRiskList.length} Habitations`
+                    : `Representative Affected Settlements (${scenarioRiskList.length}) — Full-Region Evaluation: 188 Habitations`}
+                </Badge>
+              </div>
               <p className="text-xs text-text-secondary mt-0.5">
-                Impact of rainfall and flood perturbations on settlement composite risk grades and dynamic buffer triggers.
+                Deterministic scenario perturbation across operational baseline. Full regional pipeline evaluates all 188 habitations.
               </p>
             </div>
             <div className="flex items-center gap-2 text-xs font-mono">

@@ -2573,11 +2573,57 @@ No chunk may transition to `IN_PROGRESS` until all its listed prerequisite depen
 
 ---
 
+### DEMO-UX-PASS: Critical Demo Correction & Operational UX Pass (GIS Contrast & Bounds, Relocation Explainability, Full-Region Scenario Scope)
+
+- **Status:** `IMPLEMENTED — AWAITING INDEPENDENT REVIEW`
+- **Date Completed:** 2026-09-09
+- **Owner:** Platform, GIS & Operations Teams
+- **Objective:** Final operational demo correction and UX pass based on live application screenshots. Resolves GIS vector styling contrast, ensures active region viewport fits Chamoli operational features, provides truthful handling of candidate-site boundaries, enriches candidate rejection explainability with clear reasons and deficit calculations, eliminates raw N/A without explanation, and ensures full-region scope (188 habitations) and deterministic simulation parameters are transparently communicated to officers.
+- **Key Enhancements Implemented:**
+  1. **GIS Vector Map Rendering & Visual Contrast (`frontend/src/components/map/layerConfig.ts`, `MapCanvas.tsx`, `mapStyle.ts`, `LayerControlPanel.tsx`, `frontend/src/app/gis/page.tsx`):**
+     - Subdued OpenStreetMap raster tiles in `mapStyle.ts` (`raster-opacity: 0.85, raster-saturation: -0.15`) so colored vector overlays stand out with high contrast.
+     - Added automatic vector stroke companion layer (`${layerConfig.id}-stroke`) in `MapCanvas.tsx` for fill layers (`village-boundaries-polygons` with 1.5px `#1d4ed8` stroke, `red-zones-polygons` with 2px dashed `#b91c1c` perimeter) to ensure sharp polygon demarcation above the basemap.
+     - Increased `village-boundaries-polygons` fill-opacity from 0.22 to 0.35, and `red-zones-polygons` fill-opacity to 0.45.
+     - Enhanced `habitations-points` and `candidate-sites-points` with white high-contrast borders (`circle-stroke-color: "#ffffff"`, stroke-width: 2–2.5px, radiuses: 6–8px).
+     - Fixed `candidate-sites-boundaries`: set `status: "pending_dependency"`, `defaultVisible: false`, and `pendingNote: "Not available in source"`. In `LayerControlPanel.tsx`, it renders unchecked, disabled, and labeled `"Spatial geometry not available in source (point locations available)"`.
+     - Fixed `computedBounds` in `frontend/src/app/gis/page.tsx`: computed directly from active operational layers (`village_boundaries`, `villages`, `sites`, `routes`, `red_zones`) which resolves to `[[79.107, 29.937], [79.802, 30.613]]` (Chamoli operational pilot theater), strictly excluding macro-seismic catalogs (`earthquakes_ncs`, `earthquakes_usgs`) so nationwide earthquakes do NOT zoom out the map to India/Asia.
+  2. **Relocation Constraint Failure Language & N/A Explanations (`frontend/src/components/operations/relocation/CandidateAuditModal.tsx`, `RelocationAssignmentTable.tsx`):**
+     - Replaced raw engineering codes in primary visual presentation:
+       - Status badge for rejected candidates: `REJECTED — INSUFFICIENT CAPACITY` or `REJECTED — SAFETY CONSTRAINT` (instead of raw `Rejected [INSUFFICIENT_CAPACITY]`).
+       - Section heading: `"Why this site was rejected"` with subtitle `"Capacity constraint"` or `"Safety constraint"` (instead of `"Constraint Failure(s):"`).
+       - Human-readable reason: `"Available capacity is 105 households, below the required 215 households (deficit: 110)."`
+     - Replaced raw `"N/A"` with operational explanations:
+       - Distance: `"Not evaluated — site rejected before ranking"`
+       - Composite Rank: `"Not evaluated — failed mandatory capacity constraint"` (or `"Not evaluated — failed mandatory safety constraint"`)
+       - Capacity Margin: displays exact shortfall, e.g. `-110 HH (Deficit: 110 HH)`
+     - In `RelocationAssignmentTable.tsx`: unassigned rows display `"Capacity Shortfall across Candidates"` and note that available capacity is below demanded households. Columns for Distance, Suitability, and Capacity Impact explicitly indicate `"Not evaluated — site failed mandatory feasibility constraints"` and `"Not evaluated — prerequisite constraint failed"`. Preserved machine-readable codes in audit metadata / sr-only spans for compliance and automated testing.
+  3. **Scenario Simulator Evaluation Scope & Provenance Disclosure (`frontend/src/components/operations/scenarios/ScenarioComparisonSummary.tsx`, `ScenarioDeltaTabs.tsx`, `ScenarioConfigPanel.tsx`, `frontend/src/app/operations/scenarios/page.tsx`):**
+     - Added explicit `"Full-Region Scope: 188 Habitations"` badge to `ScenarioComparisonSummary.tsx`.
+     - In `ScenarioDeltaTabs.tsx`, labeled the evaluation scope as `"Full-Region Evaluation: 188 Habitations"` and clarified that the pipeline evaluates all 188 habitations across the Himalayan Pilot operational theater.
+     - Labeled canonical `EXTREME_RAINFALL` (+40% / 1.40x) explicitly as `"Simulation parameter: Deterministic rainfall perturbation (not an observed weather measurement)"` in `ScenarioConfigPanel.tsx` and the comparison summary banner.
+     - Removed uncontrolled background execution on page mount in `frontend/src/app/operations/scenarios/page.tsx` to eliminate test rendering race conditions while ensuring full backend execution on user action.
+  4. **Officer Terminology & Cleanup:**
+     - Cleaned `villages/page.tsx` loading text from `Executing deterministic backend assessment engines (M3-06, M3-09, M3-12, M4-04)` to `Executing deterministic backend risk, vulnerability, and relocation assessment engines`.
+     - Replaced `"safe havens"` in `DashboardHeader.tsx` with `"proposed candidate relocation sites"`.
+- **Quality Gate Results:**
+  - **TypeScript Compilation:** `npx tsc --noEmit` -> **0 errors** (clean).
+  - **Targeted Frontend Vitest:** `src/__tests__/MapCanvas.test.tsx` (25/25), `src/__tests__/RelocationPlanner.test.tsx` (9/9), `src/__tests__/ScenarioSimulator.test.tsx` (9/9), `src/__tests__/VillageAnalysis.test.tsx` (22/22) -> **4 test files passed, 65 tests passed, 0 failed**.
+  - **Targeted Backend Pytest:** `test_region_resolver.py` (7/7), `test_real01b_forensic_paths.py` (3/3), `test_m4_06_scenarios.py` (31/31), `test_m4_04_matching.py` (28/28) -> **69 passed, 0 failed**.
+  - **Direct Live HTTP API Verification (PostgreSQL port 5433):**
+    - `GET /api/v1/map/layers?region_id=himalayan_pilot`: 150 boundaries, 188 habitations, 12 sites, 0 boundaries, 53 routes, 7 red zones, 150 earthquakes.
+    - `GET /api/v1/villages?region_id=himalayan_pilot&page=1&page_size=200`: 188 habitations returned in pagination.
+    - `GET /api/v1/villages/42/analysis`: full risk factor breakdown with correct provenance and zero fabricated numbers.
+    - `POST /api/v1/relocation/match`: 188 habitations evaluated, 32 assigned, 156 unassigned due to shelter capacity constraints (938 allocated HH, 15,695 demanded HH).
+    - `POST /api/v1/scenarios/run` (`EXTREME_RAINFALL`): 188 habitations evaluated, +4.29 average risk delta.
+- **Tests Not Run Due to Quota Constraints:**
+  - Full 563+ backend pytest suite and full 284+ frontend vitest suite were not rerun to conserve quota, per explicit instructions. Targeted verification was executed instead.
+- **Visual Verification Status:**
+  - Automated browser-level visual verification was unavailable in the headless execution environment; verified programmatically via style-spec conformance, geometry verification, and React component tests.
+
+---
+
 ## Last Updated
 
-- **Timestamp:** 2026-09-09 12:50:00 IST
-- **Updated By:** Core Engineering & GIS Platform Teams (FINAL-PASS IMPLEMENTED — AWAITING INDEPENDENT REVIEW)
-- **Status Summary:** All operational issues resolved. GIS layers render visibly above basemap with proper z-index and auto-fit to Chamoli operational bounds. Scenario simulator executes across all 188 database habitations on port 5433. Engineering milestone IDs (M3-, M4-, M5-) removed from officer-facing UI. Constraint rejection explainability provides human-readable deficits. Candidate sites labeled Proposed/Synthetic. All targeted tests passed (65/65 frontend, 41/41 backend, 0 tsc errors). Ready for independent review.
-
-
-
+- **Timestamp:** 2026-09-09 13:17:00 IST
+- **Updated By:** Core Engineering & GIS Platform Teams (DEMO-UX-PASS IMPLEMENTED — AWAITING INDEPENDENT REVIEW)
+- **Status Summary:** Critical demo correction and operational UX pass completed. GIS layers styled with high visual contrast and bounded to Chamoli operational theater. Candidate-site boundaries truthfully marked as Not available in source. Relocation constraint rejections provide clear human-readable reasons with deficits and explained N/As. Scenario simulator displays 188-habitation full-region scope with transparent simulation parameters. All 65 targeted frontend tests and 69 targeted backend tests passed with 0 errors. Ready for independent review.

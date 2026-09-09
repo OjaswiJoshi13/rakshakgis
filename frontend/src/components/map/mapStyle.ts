@@ -23,6 +23,10 @@ export const CREDENTIAL_FREE_OSM_STYLE: StyleSpecification = {
       source: "osm-tiles",
       minzoom: 0,
       maxzoom: 19,
+      paint: {
+        "raster-opacity": 0.85,
+        "raster-saturation": -0.15,
+      },
     },
   ],
 };

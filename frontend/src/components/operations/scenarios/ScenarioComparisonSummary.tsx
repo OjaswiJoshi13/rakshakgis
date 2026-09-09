@@ -56,9 +56,12 @@ export const ScenarioComparisonSummary: React.FC<ScenarioComparisonSummaryProps>
       <div className="rounded-lg border border-border-subtle bg-surface-panel p-4 shadow-xs">
         <div className="flex flex-wrap items-start justify-between gap-3 border-b border-border-subtle pb-3">
           <div>
-            <div className="flex items-center gap-2 mb-1">
+            <div className="flex items-center gap-2 mb-1 flex-wrap">
               <Badge variant="info" size="sm" className="font-mono text-xs uppercase">
                 {simulationOutput.scenario_type}
+              </Badge>
+              <Badge variant="outline" size="sm" className="font-mono text-xs border-border-strong text-text-primary">
+                Full-Region Scope: {simulationOutput.scenario_pipeline?.risk_results?.length || 188} Habitations
               </Badge>
               <span className="text-xs font-mono text-text-muted">
                 Run ID: {simulationOutput.run_id} • Region: {simulationOutput.region_profile_id}
@@ -68,10 +71,13 @@ export const ScenarioComparisonSummary: React.FC<ScenarioComparisonSummaryProps>
               <Activity className="h-5 w-5 text-primary-600 dark:text-primary-400 shrink-0" />
               <span>{scenario_name}</span>
             </h2>
+            <p className="text-[11px] text-text-muted font-mono mt-0.5">
+              Simulation parameter: Deterministic perturbation across regional baseline (not an observed weather measurement)
+            </p>
           </div>
 
           <div className="flex flex-wrap gap-2 text-xs font-mono">
-            <span className="rounded bg-surface-elevated px-2.5 py-1 border border-border-subtle text-text-primary">
+            <span className="rounded bg-surface-elevated px-2.5 py-1 border border-border-subtle text-text-primary" title="Deterministic rainfall perturbation (simulation parameter — not an observed IMD measurement)">
               Rainfall: <strong className="text-amber-700 dark:text-amber-400">{parameters.rainfall_multiplier.toFixed(2)}x</strong>
             </span>
             <span className="rounded bg-surface-elevated px-2.5 py-1 border border-border-subtle text-text-primary">

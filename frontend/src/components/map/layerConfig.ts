@@ -39,12 +39,13 @@ export const DEFAULT_MAP_LAYERS: MapLayerConfig[] = [
     id: "candidate-sites-boundaries",
     name: "Candidate Site Boundaries",
     category: "candidate_sites",
-    description: "Spatial boundary polygons for proposed candidate sites where surveyed.",
+    description: "Spatial boundary footprints for candidate sites are not available in current survey source (point coordinates only).",
     sourceId: "candidate-site-boundaries-source",
     layerType: "fill",
     geometryType: "Polygon",
-    defaultVisible: true,
-    status: "available",
+    defaultVisible: false,
+    status: "pending_dependency",
+    pendingNote: "Not available in source",
     paint: {
       "fill-color": "#38bdf8",
       "fill-opacity": 0.2,
@@ -167,20 +168,21 @@ export const GIS_ACTIVE_MAP_LAYERS: MapLayerConfig[] = [
         75, "#ea580c",   // High: Orange
         88, "#dc2626"    // Critical: Red
       ],
-      "fill-opacity": 0.22,
-      "fill-outline-color": "#475569",
+      "fill-opacity": 0.35,
+      "fill-outline-color": "#1d4ed8",
     },
   },
   {
     id: "candidate-sites-boundaries",
     name: "Candidate Site Boundaries",
     category: "candidate_sites",
-    description: "Spatial boundary polygons for proposed candidate sites where surveyed.",
+    description: "Spatial boundary footprints for candidate sites are not available in current survey source (point coordinates only).",
     sourceId: "candidate-site-boundaries-source",
     layerType: "fill",
     geometryType: "Polygon",
-    defaultVisible: true,
-    status: "available",
+    defaultVisible: false,
+    status: "pending_dependency",
+    pendingNote: "Not available in source",
     paint: {
       "fill-color": "#38bdf8",
       "fill-opacity": 0.2,
@@ -209,8 +211,8 @@ export const GIS_ACTIVE_MAP_LAYERS: MapLayerConfig[] = [
         "#ea580c",
         "#b91c1c",
       ],
-      "fill-opacity": 0.4,
-      "fill-outline-color": "#7f1d1d",
+      "fill-opacity": 0.45,
+      "fill-outline-color": "#b91c1c",
     },
   },
   {
@@ -258,10 +260,10 @@ export const GIS_ACTIVE_MAP_LAYERS: MapLayerConfig[] = [
     defaultVisible: true,
     status: "available",
     paint: {
-      "circle-radius": 5.5,
+      "circle-radius": 6,
       "circle-color": "#f59e0b",
-      "circle-stroke-width": 1.5,
-      "circle-stroke-color": "#090d16",
+      "circle-stroke-width": 2,
+      "circle-stroke-color": "#ffffff",
     },
   },
   {
@@ -275,7 +277,7 @@ export const GIS_ACTIVE_MAP_LAYERS: MapLayerConfig[] = [
     defaultVisible: true,
     status: "available",
     paint: {
-      "circle-radius": 7,
+      "circle-radius": 8,
       "circle-color": [
         "match",
         ["coalesce", ["get", "suitability_decision"], ["get", "status"]],
@@ -293,8 +295,8 @@ export const GIS_ACTIVE_MAP_LAYERS: MapLayerConfig[] = [
         "#f43f5e", // Rose 500
         "#94a3b8", // Slate 400 fallback
       ],
-      "circle-stroke-width": 2,
-      "circle-stroke-color": "#090d16",
+      "circle-stroke-width": 2.5,
+      "circle-stroke-color": "#ffffff",
     },
   },
   {

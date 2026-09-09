@@ -65,7 +65,7 @@ export const DashboardHeader: React.FC<DashboardHeaderProps> = ({
           </h1>
 
           <p className="text-xs sm:text-sm text-text-muted max-w-3xl leading-relaxed">
-            Multi-hazard disaster overview, candidate relocation safe havens, scenario contingencies,
+            Multi-hazard disaster overview, proposed candidate relocation sites, scenario contingencies,
             and data feed telemetry.
           </p>
         </div>

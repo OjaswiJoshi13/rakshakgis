@@ -169,6 +169,32 @@ export const MapCanvas: React.FC<MapCanvasProps> = ({
           };
           map.addLayer(maplibreLayer);
 
+          // Add companion high-contrast boundary stroke for polygon fills
+          if (layerConfig.layerType === "fill") {
+            const strokeLayerId = `${layerConfig.id}-stroke`;
+            if (!map.getLayer(strokeLayerId)) {
+              const outlineColor =
+                layerConfig.id === "red-zones-polygons"
+                  ? "#b91c1c"
+                  : ((layerConfig.paint as any)?.["fill-outline-color"] || "#1d4ed8");
+              const strokeLayer: any = {
+                id: strokeLayerId,
+                type: "line",
+                source: layerConfig.sourceId,
+                paint: {
+                  "line-color": outlineColor,
+                  "line-width": layerConfig.id === "red-zones-polygons" ? 2 : 1.5,
+                  "line-opacity": 0.85,
+                  ...(layerConfig.id === "red-zones-polygons" ? { "line-dasharray": [2, 1] } : {}),
+                },
+                layout: {
+                  visibility: isVisible ? "visible" : "none",
+                },
+              };
+              map.addLayer(strokeLayer);
+            }
+          }
+
           // Click interaction for feature selection
           map.on("click", layerConfig.id, (e) => {
             if (!e.features || e.features.length === 0) return;
@@ -203,6 +229,16 @@ export const MapCanvas: React.FC<MapCanvasProps> = ({
             "visibility",
             isVisible ? "visible" : "none"
           );
+          if (layerConfig.layerType === "fill") {
+            const strokeLayerId = `${layerConfig.id}-stroke`;
+            if (map.getLayer(strokeLayerId)) {
+              map.setLayoutProperty(
+                strokeLayerId,
+                "visibility",
+                isVisible ? "visible" : "none"
+              );
+            }
+          }
         } catch {
           // Visibility update error guard
         }

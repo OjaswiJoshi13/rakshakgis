@@ -70,7 +70,8 @@ export const LayerControlPanel: React.FC<LayerControlPanelProps> = ({
       {!isCollapsed && (
         <div className="space-y-2 max-h-[380px] overflow-y-auto pr-1">
           {layers.map((layer) => {
-            const isAvailable = layer.status === "available";
+            const hasGeometryInSource = layer.id !== "candidate-sites-boundaries" && layer.status === "available";
+            const isAvailable = hasGeometryInSource;
             const isVisible = isAvailable && (layerVisibility[layer.id] ?? layer.defaultVisible);
             const count = featureCounts[layer.id];
 
@@ -89,8 +90,8 @@ export const LayerControlPanel: React.FC<LayerControlPanelProps> = ({
                 <div className="flex items-center justify-between gap-2">
                   <label
                     htmlFor={`toggle-layer-${layer.id}`}
-                    className={`flex items-center gap-2 cursor-pointer select-none ${
-                      !isAvailable ? "cursor-not-allowed" : ""
+                    className={`flex items-center gap-2 select-none ${
+                      !isAvailable ? "cursor-not-allowed text-text-muted" : "cursor-pointer"
                     }`}
                   >
                     <input
@@ -98,7 +99,7 @@ export const LayerControlPanel: React.FC<LayerControlPanelProps> = ({
                       type="checkbox"
                       checked={isVisible}
                       disabled={!isAvailable}
-                      onChange={() => onToggleLayer(layer.id)}
+                      onChange={() => isAvailable && onToggleLayer(layer.id)}
                       className="rounded border-border-strong text-sky-600 focus:ring-sky-500 bg-surface-panel h-3.5 w-3.5 cursor-pointer disabled:cursor-not-allowed"
                       aria-label={`Toggle visibility of ${layer.name}`}
                     />
@@ -113,14 +114,18 @@ export const LayerControlPanel: React.FC<LayerControlPanelProps> = ({
 
                   {/* Status & Count Badges */}
                   <div className="flex items-center gap-1.5">
-                    {isAvailable ? (
+                    {layer.id === "candidate-sites-boundaries" ? (
+                      <span className="text-[11px] text-text-muted bg-surface-elevated px-2 py-0.5 rounded border border-border-subtle font-medium">
+                        Not available in source
+                      </span>
+                    ) : isAvailable ? (
                       count !== undefined ? (
                         <span className="text-xs text-text-secondary bg-surface-elevated px-2 py-0.5 rounded border border-border-subtle tabular-nums font-medium">
                           {count} {count === 1 ? "feature" : "features"}
                         </span>
                       ) : (
                         <Badge variant="outline" size="sm" className="text-xs text-amber-700 dark:text-amber-400">
-                          Unavailable
+                          Not available in source
                         </Badge>
                       )
                     ) : (
@@ -133,7 +138,9 @@ export const LayerControlPanel: React.FC<LayerControlPanelProps> = ({
 
                 {/* Description or Pending Note */}
                 <p className="text-[10px] text-text-muted pl-5 leading-tight">
-                  {!isAvailable && layer.pendingNote ? (
+                  {layer.id === "candidate-sites-boundaries" ? (
+                    <span className="text-text-muted">Spatial geometry not available in source (point locations available)</span>
+                  ) : !isAvailable && layer.pendingNote ? (
                     <span className="text-amber-600 dark:text-amber-400 font-mono">{layer.pendingNote}</span>
                   ) : (
                     layer.description

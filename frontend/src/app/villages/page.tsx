@@ -327,7 +327,7 @@ function VillageAnalysisContent() {
             Evaluating Settlement Vulnerability & Risk...
           </h2>
           <p className="text-xs text-text-muted font-mono">
-            Executing deterministic backend assessment engines (M3-06, M3-09, M3-12, M4-04)
+            Executing deterministic backend risk, vulnerability, and relocation assessment engines
           </p>
         </div>
       )}

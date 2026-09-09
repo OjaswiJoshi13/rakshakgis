@@ -39,7 +39,7 @@ export default function GisMapPage() {
     "earthquakes-ncs": true,
     "earthquakes-usgs": true,
     "candidate-sites-points": true,
-    "candidate-sites-boundaries": true,
+    "candidate-sites-boundaries": false,
     "routes-lines": true,
     "red-zones-polygons": true,
     "hazards-extents": false,
@@ -200,12 +200,10 @@ export default function GisMapPage() {
     }
   };
 
-  // Compute bounding box across all active features
+  // Compute bounding box across all active operational features
+  // Strictly excludes macro-seismic catalogs (NCS/USGS) to prevent nationwide viewport expansion
   const computedBounds = useMemo(() => {
-    if (mapLayersEnvelope?.data?.bounds && Array.isArray(mapLayersEnvelope.data.bounds)) {
-      return mapLayersEnvelope.data.bounds as [[number, number], [number, number]];
-    }
-    const allFeatures = [
+    const operationalFeatures = [
       ...villageBoundariesGeoJSON.features,
       ...sitesGeoJSON.features,
       ...siteBoundariesGeoJSON.features,
@@ -213,15 +211,22 @@ export default function GisMapPage() {
       ...redZonesGeoJSON.features,
       ...villagesGeoJSON.features,
     ];
-    return calculateBounds(allFeatures);
+    if (operationalFeatures.length > 0) {
+      const calculated = calculateBounds(operationalFeatures);
+      if (calculated) return calculated;
+    }
+    if (mapLayersEnvelope?.data?.bounds && Array.isArray(mapLayersEnvelope.data.bounds)) {
+      return mapLayersEnvelope.data.bounds as [[number, number], [number, number]];
+    }
+    return null;
   }, [
-    mapLayersEnvelope?.data?.bounds,
     villageBoundariesGeoJSON,
     sitesGeoJSON,
     siteBoundariesGeoJSON,
     routesGeoJSON,
     redZonesGeoJSON,
     villagesGeoJSON,
+    mapLayersEnvelope?.data?.bounds,
   ]);
 
   // Automatically fit viewport to active region features when data arrives or region changes

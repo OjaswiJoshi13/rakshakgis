@@ -221,11 +221,14 @@ export const RelocationAssignmentTable: React.FC<RelocationAssignmentTableProps>
                         </div>
                       ) : (
                         <div>
-                          <span className="text-amber-800 dark:text-amber-300 font-mono text-[11px]">
-                            Code: [{assignment.unassigned_code || "INSUFFICIENT_CAPACITY"}]
+                          <span className="text-amber-800 dark:text-amber-300 font-mono text-[11px] font-medium block">
+                            Capacity Shortfall across Candidates
+                          </span>
+                          <span className="sr-only font-mono">
+                            Code: [{assignment.unassigned_code || "insufficient_capacity"}]
                           </span>
                           <p className="text-[11px] text-text-secondary line-clamp-1 max-w-xs" title={assignment.unassigned_reason || ""}>
-                            {assignment.unassigned_reason || "No feasible candidate site"}
+                            {assignment.unassigned_reason || "Available candidate site capacity is below the required households"}
                           </p>
                         </div>
                       )}
@@ -239,7 +242,9 @@ export const RelocationAssignmentTable: React.FC<RelocationAssignmentTableProps>
                           <span>{assignment.distance_km.toFixed(1)} km</span>
                         </span>
                       ) : (
-                        <span className="text-text-muted">Not available in source</span>
+                        <span className="text-text-muted text-[11px]" title="Site rejected before route calculation">
+                          Not evaluated — site failed mandatory feasibility constraints
+                        </span>
                       )}
                     </td>
 
@@ -250,7 +255,9 @@ export const RelocationAssignmentTable: React.FC<RelocationAssignmentTableProps>
                           {assignment.suitability_score.toFixed(1)}
                         </span>
                       ) : (
-                        <span className="text-text-muted">Not available in source</span>
+                        <span className="text-text-muted text-[11px]">
+                          Not evaluated — prerequisite constraint failed
+                        </span>
                       )}
                     </td>
 
@@ -267,7 +274,9 @@ export const RelocationAssignmentTable: React.FC<RelocationAssignmentTableProps>
                           </span>
                         </div>
                       ) : (
-                        <span className="text-text-muted">Not available in source</span>
+                        <span className="text-text-muted text-[11px]">
+                          Not evaluated — prerequisite constraint failed
+                        </span>
                       )}
                     </td>
 

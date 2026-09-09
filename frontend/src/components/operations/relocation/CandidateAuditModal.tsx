@@ -154,11 +154,17 @@ export const CandidateAuditModal: React.FC<CandidateAuditModalProps> = ({
               <div className="flex items-center gap-2 text-amber-900 dark:text-amber-400 font-semibold text-sm font-mono">
                 <ShieldAlert className="h-4 w-4" />
                 <span>
-                  Village Unassigned: Code [{assignment.unassigned_code || "NO_FEASIBLE_SITE"}]
+                  Village Unassigned — Regional Capacity Shortfall
+                </span>
+                <span className="sr-only font-mono">
+                  Village Unassigned: Code [{assignment.unassigned_code || "insufficient_capacity"}]
+                </span>
+                <span className="text-[10px] font-mono text-text-muted ml-auto hidden sm:inline">
+                  Ref: {assignment.unassigned_code || "INSUFFICIENT_CAPACITY"}
                 </span>
               </div>
               <p className="text-xs text-amber-800 dark:text-amber-200/90 leading-relaxed">
-                {assignment.unassigned_reason || "All evaluated candidate sites failed either safety constraints, minimum suitability criteria, or carrying capacity limits."}
+                {assignment.unassigned_reason || "All evaluated candidate sites failed mandatory carrying capacity limits or safety criteria for this settlement."}
               </p>
             </div>
           )}
@@ -179,6 +185,10 @@ export const CandidateAuditModal: React.FC<CandidateAuditModalProps> = ({
                 {assignment.evaluated_candidates.map((audit, idx) => {
                   const isSelectedSite =
                     isAssigned && String(assignment.assigned_site_id) === String(audit.site_id);
+                  const rejCode = audit.rejection_code ? String(audit.rejection_code).toLowerCase() : "";
+                  const isCapRej = rejCode === "insufficient_capacity";
+                  const isSafeRej = rejCode === "unsafe_site";
+                  const isLowSuitRej = rejCode === "low_suitability";
 
                   return (
                     <div
@@ -216,7 +226,15 @@ export const CandidateAuditModal: React.FC<CandidateAuditModalProps> = ({
                           ) : (
                             <Badge variant="danger" size="sm" className="font-mono flex items-center gap-1">
                               <XCircle className="h-3 w-3" />
-                              <span>Rejected [{audit.rejection_code || "INELIGIBLE"}]</span>
+                              <span>
+                                {isCapRej
+                                  ? "REJECTED — INSUFFICIENT CAPACITY"
+                                  : isSafeRej
+                                  ? "REJECTED — SAFETY CONSTRAINT"
+                                  : isLowSuitRej
+                                  ? "REJECTED — LOW SUITABILITY"
+                                  : `REJECTED — ${audit.rejection_code ? String(audit.rejection_code).toUpperCase() : "INELIGIBLE"}`}
+                              </span>
                             </Badge>
                           )}
                         </div>
@@ -229,7 +247,7 @@ export const CandidateAuditModal: React.FC<CandidateAuditModalProps> = ({
                           <span className="text-text-primary">
                             {audit.distance_km !== null && audit.distance_km !== undefined
                               ? `${audit.distance_km.toFixed(1)} km`
-                              : "N/A"}
+                              : "Not evaluated — site rejected before ranking"}
                           </span>
                         </div>
 
@@ -238,7 +256,7 @@ export const CandidateAuditModal: React.FC<CandidateAuditModalProps> = ({
                           <span className="text-text-primary">
                             {audit.suitability_score !== null && audit.suitability_score !== undefined
                               ? `${audit.suitability_score.toFixed(1)} (${audit.suitability_decision || "N/A"})`
-                              : "N/A"}
+                              : "Not available in source"}
                           </span>
                         </div>
 
@@ -255,9 +273,9 @@ export const CandidateAuditModal: React.FC<CandidateAuditModalProps> = ({
                           >
                             {audit.capacity_margin !== null && audit.capacity_margin !== undefined
                               ? audit.capacity_margin >= 0
-                                ? `+${audit.capacity_margin} HH`
-                                : `${audit.capacity_margin} HH (Deficit)`
-                              : "N/A"}
+                                ? `+${audit.capacity_margin} HH (Surplus)`
+                                : `${audit.capacity_margin} HH (Deficit: ${Math.abs(audit.capacity_margin)} HH)`
+                              : "Not available in source"}
                           </span>
                         </div>
 
@@ -266,15 +284,30 @@ export const CandidateAuditModal: React.FC<CandidateAuditModalProps> = ({
                           <span className="text-sky-700 dark:text-sky-300 font-bold">
                             {audit.rank_score !== null && audit.rank_score !== undefined
                               ? audit.rank_score.toFixed(1)
-                              : "N/A"}
+                              : isCapRej
+                              ? "Not evaluated — failed mandatory capacity constraint"
+                              : isSafeRej
+                              ? "Not evaluated — failed mandatory safety constraint"
+                              : "Not evaluated — prerequisite constraint failed"}
                           </span>
                         </div>
                       </div>
 
                       {/* Rejection Details if Failed */}
                       {!audit.is_feasible && audit.rejection_reasons.length > 0 && (
-                        <div className="mt-2 space-y-1 text-xs text-red-900 dark:text-red-300/90 font-mono bg-red-50 dark:bg-red-950/30 rounded p-2 border border-red-200 dark:border-red-900/50">
-                          <span className="font-semibold text-red-800 dark:text-red-400 block">Constraint Failure(s):</span>
+                        <div className="mt-2 space-y-1 text-xs text-red-900 dark:text-red-300/90 font-mono bg-red-50 dark:bg-red-950/30 rounded p-2.5 border border-red-200 dark:border-red-900/50">
+                          <div className="flex items-center justify-between gap-2 mb-1">
+                            <span className="font-semibold text-red-800 dark:text-red-400 block">
+                              Why this site was rejected
+                            </span>
+                            <span className="text-[10px] text-red-700 dark:text-red-400 uppercase font-semibold">
+                              {isCapRej
+                                ? "Capacity constraint"
+                                : isSafeRej
+                                ? "Safety constraint"
+                                : "Feasibility requirement"}
+                            </span>
+                          </div>
                           <ul className="list-disc list-inside space-y-0.5">
                             {audit.rejection_reasons.map((reason, rIdx) => (
                               <li key={rIdx}>{reason}</li>
