@@ -5,3 +5,4 @@ export * from "./MapHeader";
 export * from "./mapStyle";
 export * from "./layerConfig";
 export * from "./GisSearchBar";
+export * from "./MapLegend";

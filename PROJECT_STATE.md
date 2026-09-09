@@ -2797,19 +2797,33 @@ No chunk may transition to `IN_PROGRESS` until all its listed prerequisite depen
   - Confirmed distinct geographical centers and bounds for each village.
 - **Targeted Test Results:**
   - `npx tsc --noEmit` in `frontend/`: 0 errors.
-  - `npm run test -- src/__tests__/MapCanvas.test.tsx`: **31 passed, 0 failed**.
+  - `npm run test -- src/__tests__/MapCanvas.test.tsx`: **34 passed, 0 failed**.
 - **Browser Visual Verification Results:**
   - Executed browser verification against live local stack (`http://localhost:3000/gis` and `http://localhost:3000/gis?village_id=1`).
-  - Verified: MapLibre tiles, 40 Habitations, 7 Red Zones, 53 Corridors, 12 Candidate Sites, layer controls, and focused inspector panel for Sunil (Census: 044101, Score: 55.63 High, Red Zone Warning).
-  - Screenshots recorded: `gis_map_initial_1788968271185.png`, `sunil_village_focused_1788968290821.png`.
+  - Verified: MapLibre tiles, 40 Habitations (color-coded by authoritative risk band), 7 Red Zones, 53 Corridors, 12 Candidate Sites, GIS Layer Controls, Operational Map Legend (Habitation Risk Bands + Demarcations & Corridors), and focused inspector panel for Sunil (Census: 044101, Score: 55.63 High, Red Zone Warning).
+  - Screenshots recorded: `gis_map_overview_1788969911840.png`, `sunil_focused_gis_view_1788969974667.png`.
 - **Remaining Limitations:**
   - `village_boundaries` FeatureCollection contains 0 features in current database seed; rendered truthfully without fabricating synthetic polygons.
   - Candidate site boundaries remain unavailable in source (point geometries only); truthfully indicated in layer controls.
+
+### Final GIS Command Map Operational Refinement
+
+- **Status:** `IMPLEMENTED — AWAITING INDEPENDENT REVIEW`
+- **Module:** M5 Frontend GIS Command Map (`MapCanvas.tsx`, `layerConfig.ts`, `MapLegend.tsx`, `gis/page.tsx`)
+- **Key Enhancements:**
+  1. *Authoritative 5-Band Risk Visualization:* Mapped `habitations-points` circle-color and radius to the project's authoritative 5 risk tiers (Safe `< 25` `#10b981`, Moderate `25-49` `#f59e0b`, High `50-69` `#ea580c`, Very High `70-84` `#f43f5e`, Critical `85-100` `#dc2626`) using `match` on `properties.risk_band` and `step` on `properties.risk_score`.
+  2. *Operational Map Legend:* Added collapsible, accessible `MapLegend.tsx` component in the bottom-right corner displaying risk band dots and demarcation symbols.
+  3. *Fit Bounds UX:* Enhanced "Fit Bounds" button to clear active village selection and restore the complete operational theater bounds.
+  4. *Layer Visibility Integrity:* Verified MapLibre `map.setLayoutProperty` handles both base and companion stroke layers for all operational layers.
+- **Verification:**
+  - `npx tsc --noEmit`: Passed with 0 errors.
+  - Vitest `src/__tests__/MapCanvas.test.tsx`: **34 passed, 0 failed**.
+  - Browser visual subagent: Successfully navigated `/gis`, verified legend, layer controls, red zones, routes, and habitations, navigated to Sunil from `/villages` via "View on GIS Canvas", captured snapshots `gis_map_overview_1788969911840.png` and `sunil_focused_gis_view_1788969974667.png`.
 
 ---
 
 ## Last Updated
 
-- **Timestamp:** 2026-09-09 21:10:00 IST
-- **Updated By:** GIS Core Engine & Frontend Engineering Teams (P0-GIS-COMPLETE IMPLEMENTED — AWAITING INDEPENDENT REVIEW)
-- **Status Summary:** Completed P0 operational GIS map correction and Settlement Analysis → View on GIS workflow. Replaced static navigation with dynamic `village_id` query param, resolved village coordinates dynamically, computed centered operational neighborhood viewport (`±0.02°`), added MapLibre top-level highlight vector layers, verified 3 distinct villages (Sunil, Ravigram, Marwari) with unique coordinates, passed all 31 unit/integration tests and TypeScript check, visually verified via browser subagent.
+- **Timestamp:** 2026-09-09 21:38:00 IST
+- **Updated By:** GIS Core Engine & Frontend Engineering Teams (FINAL-GIS-COMMAND-MAP IMPLEMENTED — AWAITING INDEPENDENT REVIEW)
+- **Status Summary:** Completed final operational GIS Command Map implementation. Configured authoritative 5-band risk styling (`match` & `step` expressions), built collapsible `MapLegend` component, verified layer controls and Fit Bounds behavior, validated 3-village focus flow, passed 34 unit tests, verified zero TypeScript errors, and confirmed live browser visual verification.

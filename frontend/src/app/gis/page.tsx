@@ -23,6 +23,7 @@ import {
   LayerControlPanel,
   MapCanvas,
   MapHeader,
+  MapLegend,
 } from "@/components/map";
 
 function GisMapContent() {
@@ -351,6 +352,8 @@ function GisMapContent() {
   }, [computedBounds, viewportBounds, villageIdParam]);
 
   const handleResetView = () => {
+    setSelectedFeature(null);
+    lastFocusedVillageRef.current = null;
     if (computedBounds) {
       setViewportBounds([[...computedBounds[0]], [...computedBounds[1]]]);
     }
@@ -442,7 +445,7 @@ function GisMapContent() {
         </div>
 
         {/* Floating Layer Control Panel (Top-Left) */}
-        <div className="absolute top-4 left-4 max-w-xs w-full pointer-events-auto">
+        <div className="absolute top-4 left-4 max-w-xs w-full pointer-events-auto z-20">
           <LayerControlPanel
             layers={GIS_ACTIVE_MAP_LAYERS}
             layerVisibility={layerVisibility}
@@ -451,15 +454,20 @@ function GisMapContent() {
           />
         </div>
 
-        {/* Floating Feature Inspector (Bottom-Left / Top-Right) */}
+        {/* Floating Feature Inspector (Bottom-Left) */}
         {selectedFeature && (
-          <div className="absolute bottom-4 left-4 pointer-events-auto">
+          <div className="absolute bottom-4 left-4 pointer-events-auto z-20">
             <FeatureDetailPanel
               feature={selectedFeature}
               onClose={() => setSelectedFeature(null)}
             />
           </div>
         )}
+
+        {/* Floating Operational Map Legend (Bottom-Right) */}
+        <div className="absolute bottom-4 right-4 pointer-events-auto z-20 max-w-xs">
+          <MapLegend />
+        </div>
       </div>
     </div>
   );

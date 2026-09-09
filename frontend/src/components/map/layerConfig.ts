@@ -159,14 +159,31 @@ export const GIS_ACTIVE_MAP_LAYERS: MapLayerConfig[] = [
     status: "available",
     paint: {
       "fill-color": [
-        "interpolate",
-        ["linear"],
-        ["coalesce", ["get", "risk_score"], ["get", "composite_risk"], 0],
-        0, "#10b981",    // Low risk: Emerald
-        35, "#38bdf8",   // Moderate-Low: Sky
-        55, "#fbbf24",   // Moderate: Amber
-        75, "#ea580c",   // High: Orange
-        88, "#dc2626"    // Critical: Red
+        "match",
+        ["downcase", ["coalesce", ["get", "risk_band"], ""]],
+        "safe",
+        "#10b981",
+        "moderate",
+        "#f59e0b",
+        "high",
+        "#ea580c",
+        "very_high",
+        "#f43f5e",
+        "critical",
+        "#dc2626",
+        [
+          "step",
+          ["coalesce", ["get", "risk_score"], ["get", "composite_risk"], 0],
+          "#10b981",
+          25,
+          "#f59e0b",
+          50,
+          "#ea580c",
+          70,
+          "#f43f5e",
+          85,
+          "#dc2626",
+        ],
       ],
       "fill-opacity": 0.35,
       "fill-outline-color": "#1d4ed8",
@@ -261,16 +278,43 @@ export const GIS_ACTIVE_MAP_LAYERS: MapLayerConfig[] = [
     defaultVisible: true,
     status: "available",
     paint: {
-      "circle-radius": 7,
+      "circle-radius": [
+        "step",
+        ["coalesce", ["get", "risk_score"], ["get", "composite_risk_score"], 45],
+        6.5,
+        50,
+        7.5,
+        70,
+        8.5,
+        85,
+        9.5,
+      ],
       "circle-color": [
-        "interpolate",
-        ["linear"],
-        ["coalesce", ["get", "risk_score"], 45],
-        0, "#10b981",    // Low: Emerald
-        35, "#38bdf8",   // Moderate-Low: Sky
-        55, "#f59e0b",   // Moderate: Amber
-        75, "#ea580c",   // High: Orange
-        88, "#dc2626"    // Critical: Red
+        "match",
+        ["downcase", ["coalesce", ["get", "risk_band"], ""]],
+        "safe",
+        "#10b981", // Safe: Emerald (< 25)
+        "moderate",
+        "#f59e0b", // Moderate: Amber (25-49)
+        "high",
+        "#ea580c", // High: Orange (50-69)
+        "very_high",
+        "#f43f5e", // Very High: Rose (70-84)
+        "critical",
+        "#dc2626", // Critical: Red (85-100)
+        [
+          "step",
+          ["coalesce", ["get", "risk_score"], ["get", "composite_risk_score"], 45],
+          "#10b981",
+          25,
+          "#f59e0b",
+          50,
+          "#ea580c",
+          70,
+          "#f43f5e",
+          85,
+          "#dc2626",
+        ],
       ],
       "circle-stroke-width": 2.5,
       "circle-stroke-color": "#ffffff",

@@ -5,6 +5,7 @@ import { MapCanvas } from "@/components/map/MapCanvas";
 import { LayerControlPanel } from "@/components/map/LayerControlPanel";
 import { FeatureDetailPanel } from "@/components/map/FeatureDetailPanel";
 import { MapHeader } from "@/components/map/MapHeader";
+import { MapLegend } from "@/components/map/MapLegend";
 import GisMapPage from "@/app/gis/page";
 import { DEFAULT_MAP_LAYERS } from "@/components/map/layerConfig";
 import { getMapStyle, CREDENTIAL_FREE_OSM_STYLE } from "@/components/map/mapStyle";
@@ -1067,6 +1068,95 @@ describe("MapLibre GIS Interactive Map Canvas (Chunk M5-05)", () => {
 
       fireEvent.click(checkbox);
       expect(mockToggle).toHaveBeenCalledWith("village-boundaries-polygons");
+    });
+
+    it("verifies GIS_ACTIVE_MAP_LAYERS contains authoritative 5-band risk expressions", () => {
+      const habitationsLayer = GIS_ACTIVE_MAP_LAYERS.find((l) => l.id === "habitations-points");
+      expect(habitationsLayer).toBeDefined();
+      const circleColor = habitationsLayer?.paint?.["circle-color"] as any[];
+      expect(Array.isArray(circleColor)).toBe(true);
+      expect(circleColor[0]).toBe("match");
+
+      // Check authoritative risk colors
+      expect(circleColor).toContain("#10b981"); // safe
+      expect(circleColor).toContain("#f59e0b"); // moderate
+      expect(circleColor).toContain("#ea580c"); // high
+      expect(circleColor).toContain("#f43f5e"); // very_high
+      expect(circleColor).toContain("#dc2626"); // critical
+    });
+
+    it("renders MapLegend with authoritative risk bands and operational symbology", () => {
+      render(<MapLegend />);
+
+      expect(screen.getByTestId("map-legend")).toBeInTheDocument();
+      expect(screen.getByText("Operational Legend")).toBeInTheDocument();
+      expect(screen.getByText("Habitation Risk Bands")).toBeInTheDocument();
+      expect(screen.getByText("Safe")).toBeInTheDocument();
+      expect(screen.getByText("Moderate")).toBeInTheDocument();
+      expect(screen.getByText("High")).toBeInTheDocument();
+      expect(screen.getByText("Very High")).toBeInTheDocument();
+      expect(screen.getByText("Critical / Red")).toBeInTheDocument();
+
+      expect(screen.getByText("Demarcated Red Zone")).toBeInTheDocument();
+      expect(screen.getByText("Evacuation Route")).toBeInTheDocument();
+      expect(screen.getByText("Candidate Relocation Site")).toBeInTheDocument();
+      expect(screen.getByText("Selected Settlement")).toBeInTheDocument();
+
+      // Test collapse/expand toggle
+      const toggleBtn = screen.getByLabelText("Collapse operational map legend");
+      fireEvent.click(toggleBtn);
+      expect(screen.queryByText("Habitation Risk Bands")).not.toBeInTheDocument();
+
+      const expandBtn = screen.getByLabelText("Expand operational map legend");
+      fireEvent.click(expandBtn);
+      expect(screen.getByText("Habitation Risk Bands")).toBeInTheDocument();
+    });
+
+    it("clicking Fit Bounds button in GisMapPage resets viewport to operational bounds", async () => {
+      authService.setStoredToken("valid-officer-token", 3600);
+      vi.spyOn(authService, "getMeApi").mockResolvedValue(mockOfficerUser);
+      vi.spyOn(nextNavigation, "useSearchParams").mockReturnValue(new URLSearchParams() as unknown as ReturnType<typeof nextNavigation.useSearchParams>);
+
+      vi.spyOn(apiModule.apiClient, "get").mockImplementation(async (path: string) => {
+        if (path.includes("/map/layers")) {
+          return {
+            success: true,
+            data: {
+              villages: {
+                type: "FeatureCollection",
+                features: [
+                  { type: "Feature", id: 1, geometry: { type: "Point", coordinates: [79.55621, 30.53357] }, properties: { name: "Sunil" } },
+                ],
+              },
+              routes: {
+                type: "FeatureCollection",
+                features: [
+                  { type: "Feature", id: 10, geometry: { type: "LineString", coordinates: [[79.5, 30.4], [79.6, 30.5]] }, properties: {} },
+                ],
+              },
+              bounds: [[79.15, 30.0], [80.15, 30.9]],
+            },
+          };
+        }
+        return { success: true, data: [] };
+      });
+
+      render(
+        <AuthProvider initialState={{ user: mockOfficerUser, isAuthenticated: true, token: "valid-officer-token" }}>
+          <OperationalProvider>
+            <GisMapPage />
+          </OperationalProvider>
+        </AuthProvider>
+      );
+
+      await waitFor(() => {
+        expect(screen.getByRole("button", { name: /Fit Bounds/i })).toBeInTheDocument();
+      });
+
+      mockFitBounds.mockClear();
+      fireEvent.click(screen.getByRole("button", { name: /Fit Bounds/i }));
+
+      expect(mockFitBounds).toHaveBeenCalled();
     });
   });
 });
