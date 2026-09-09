@@ -67,10 +67,16 @@ app = FastAPI(
 app.add_middleware(RequestIDMiddleware)
 
 # Configure CORS for local development
+# Configure CORS for local development
 if settings.CORS_ORIGINS:
     app.add_middleware(
         CORSMiddleware,
         allow_origins=settings.CORS_ORIGINS,
+        allow_origin_regex=(
+            r"^https?://(localhost|127\.0\.0\.1)(:[0-9]+)?$"
+            if settings.APP_ENV == "development"
+            else None
+        ),
         allow_credentials=True,
         allow_methods=["*"],
         allow_headers=["*"],
@@ -81,6 +87,7 @@ register_error_handlers(app)
 
 
 @app.get("/health", tags=["Health"])
+@app.get("/api/health", tags=["Health"], include_in_schema=False)
 def health_check() -> dict:
     """Process health check endpoint (independent of database connectivity)."""
     return {
