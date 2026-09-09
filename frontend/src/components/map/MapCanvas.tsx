@@ -12,6 +12,21 @@ import {
 import { getMapStyle } from "./mapStyle";
 import { DEFAULT_MAP_LAYERS } from "./layerConfig";
 
+// Conceptual layer order (Bottom to Top above basemap)
+const STRICT_LAYER_ORDER = [
+  "village-boundaries-polygons",
+  "red-zones-polygons",
+  "candidate-sites-boundaries",
+  "village-boundaries-polygons-stroke",
+  "red-zones-polygons-stroke",
+  "routes-lines",
+  "habitations-points",
+  "candidate-sites-points",
+  "earthquakes-ncs",
+  "earthquakes-usgs",
+  "hazards-extents",
+];
+
 export interface MapCanvasProps {
   /** Map layers configuration */
   layers?: MapLayerConfig[];
@@ -52,6 +67,7 @@ export const MapCanvas: React.FC<MapCanvasProps> = ({
 }) => {
   const mapContainerRef = useRef<HTMLDivElement>(null);
   const mapInstanceRef = useRef<MapLibreMap | null>(null);
+  const [styleVersion, setStyleVersion] = useState<number>(0);
   const [isStyleLoaded, setIsStyleLoaded] = useState<boolean>(false);
   const [mapError, setMapError] = useState<string | null>(null);
 
@@ -64,27 +80,34 @@ export const MapCanvas: React.FC<MapCanvasProps> = ({
   useEffect(() => {
     if (!mapContainerRef.current) return;
 
-    let map: MapLibreMap;
     try {
-      map = new MapLibreMap({
+      const map = new MapLibreMap({
         container: mapContainerRef.current,
         style: getMapStyle(),
         center: initialCenter,
         zoom: initialZoom,
-        attributionControl: { compact: true },
+        attributionControl: false,
       });
 
-      // Add navigation controls (zoom in/out, pitch/compass)
-      const navControl = new NavigationControl({
-        showCompass: true,
-        showZoom: true,
-        visualizePitch: true,
-      });
-      map.addControl(navControl, "top-right");
+      // Accessible navigation control
+      map.addControl(
+        new NavigationControl({ showCompass: true, showZoom: true, visualizePitch: true }),
+        "bottom-right"
+      );
 
-      map.on("load", () => {
+      // Listen to both load and style.load to reliably handle initial setup and style switches
+      const onStyleReady = () => {
         setIsStyleLoaded(true);
-      });
+        setStyleVersion((v) => v + 1);
+        try {
+          map.resize();
+        } catch {
+          // ignore resize errors on early load
+        }
+      };
+
+      map.on("load", onStyleReady);
+      map.on("style.load", onStyleReady);
 
       map.on("error", (e) => {
         // Suppress non-critical tile 404s, but record serious WebGL/style failures
@@ -92,6 +115,10 @@ export const MapCanvas: React.FC<MapCanvasProps> = ({
           setMapError(e.error.message);
         }
       });
+
+      if (typeof map.isStyleLoaded === "function" && map.isStyleLoaded()) {
+        onStyleReady();
+      }
 
       mapInstanceRef.current = map;
     } catch (err) {
@@ -103,45 +130,54 @@ export const MapCanvas: React.FC<MapCanvasProps> = ({
       if (mapInstanceRef.current) {
         mapInstanceRef.current.remove();
         mapInstanceRef.current = null;
-        setIsStyleLoaded(false);
       }
     };
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []); // Run once on initial mount
+  }, []);
 
   // Resize handler on container dimension changes
   useEffect(() => {
-    const map = mapInstanceRef.current;
-    if (!map || !mapContainerRef.current) return;
+    const container = mapContainerRef.current;
+    if (!container) return;
 
     const resizeObserver = new ResizeObserver(() => {
-      if (map && typeof map.resize === "function") {
-        map.resize();
+      if (mapInstanceRef.current && typeof mapInstanceRef.current.resize === "function") {
+        mapInstanceRef.current.resize();
       }
     });
 
-    resizeObserver.observe(mapContainerRef.current);
+    resizeObserver.observe(container);
     return () => resizeObserver.disconnect();
   }, []);
 
-  // Synchronize GeoJSON sources and layers when style is ready
+  // Synchronize GeoJSON sources and layers when style is ready or data updates
   useEffect(() => {
     const map = mapInstanceRef.current;
-    if (!map || !isStyleLoaded) return;
+    const isReady = isStyleLoaded || (typeof map?.isStyleLoaded === "function" ? map.isStyleLoaded() : false);
+    if (!map || !isReady) return;
 
     // 1. Add or update GeoJSON Sources
     Object.entries(sourcesData).forEach(([sourceId, collection]) => {
+      const safeCollection: GeoJSONFeatureCollection =
+        collection && collection.type === "FeatureCollection" && Array.isArray(collection.features)
+          ? collection
+          : { type: "FeatureCollection", features: [] };
+
       const existingSource = map.getSource(sourceId) as GeoJSONSource | undefined;
       if (existingSource && typeof existingSource.setData === "function") {
-        existingSource.setData(collection);
+        try {
+          existingSource.setData(safeCollection);
+        } catch (err) {
+          console.error(`[GIS] Error updating source ${sourceId}:`, err);
+        }
       } else if (!existingSource) {
         try {
           map.addSource(sourceId, {
             type: "geojson",
-            data: collection,
+            data: safeCollection,
           });
-        } catch {
-          // Source already added or invalid
+        } catch (err) {
+          console.error(`[GIS] Error adding source ${sourceId}:`, err);
         }
       }
     });
@@ -169,32 +205,6 @@ export const MapCanvas: React.FC<MapCanvasProps> = ({
           };
           map.addLayer(maplibreLayer);
 
-          // Add companion high-contrast boundary stroke for polygon fills
-          if (layerConfig.layerType === "fill") {
-            const strokeLayerId = `${layerConfig.id}-stroke`;
-            if (!map.getLayer(strokeLayerId)) {
-              const outlineColor =
-                layerConfig.id === "red-zones-polygons"
-                  ? "#b91c1c"
-                  : ((layerConfig.paint as any)?.["fill-outline-color"] || "#1d4ed8");
-              const strokeLayer: any = {
-                id: strokeLayerId,
-                type: "line",
-                source: layerConfig.sourceId,
-                paint: {
-                  "line-color": outlineColor,
-                  "line-width": layerConfig.id === "red-zones-polygons" ? 2 : 1.5,
-                  "line-opacity": 0.85,
-                  ...(layerConfig.id === "red-zones-polygons" ? { "line-dasharray": [2, 1] } : {}),
-                },
-                layout: {
-                  visibility: isVisible ? "visible" : "none",
-                },
-              };
-              map.addLayer(strokeLayer);
-            }
-          }
-
           // Click interaction for feature selection
           map.on("click", layerConfig.id, (e) => {
             if (!e.features || e.features.length === 0) return;
@@ -218,8 +228,8 @@ export const MapCanvas: React.FC<MapCanvasProps> = ({
           map.on("mouseleave", layerConfig.id, () => {
             map.getCanvas().style.cursor = "";
           });
-        } catch {
-          // Layer add collision safely handled
+        } catch (err) {
+          console.error(`[GIS Layer Error] Failed to add layer ${layerConfig.id}:`, err);
         }
       } else {
         // Layer exists: update visibility
@@ -229,38 +239,95 @@ export const MapCanvas: React.FC<MapCanvasProps> = ({
             "visibility",
             isVisible ? "visible" : "none"
           );
-          if (layerConfig.layerType === "fill") {
-            const strokeLayerId = `${layerConfig.id}-stroke`;
-            if (map.getLayer(strokeLayerId)) {
-              map.setLayoutProperty(
-                strokeLayerId,
-                "visibility",
-                isVisible ? "visible" : "none"
-              );
-            }
+        } catch (err) {
+          console.error(`[GIS Layer Error] Failed to update visibility for ${layerConfig.id}:`, err);
+        }
+      }
+
+      // 3. Add companion high-contrast boundary stroke for polygon fills
+      if (layerConfig.layerType === "fill") {
+        const strokeLayerId = `${layerConfig.id}-stroke`;
+        const existingStroke = map.getLayer(strokeLayerId);
+        if (!existingStroke) {
+          try {
+            const outlineColor =
+              layerConfig.id === "red-zones-polygons"
+                ? "#b91c1c"
+                : ((layerConfig.paint as any)?.["fill-outline-color"] || "#1d4ed8");
+            const strokeLayer: any = {
+              id: strokeLayerId,
+              type: "line",
+              source: layerConfig.sourceId,
+              paint: {
+                "line-color": outlineColor,
+                "line-width": layerConfig.id === "red-zones-polygons" ? 3 : 2,
+                "line-opacity": 0.95,
+                ...(layerConfig.id === "red-zones-polygons" ? { "line-dasharray": [3, 1] } : {}),
+              },
+              layout: {
+                visibility: isVisible ? "visible" : "none",
+              },
+            };
+            map.addLayer(strokeLayer);
+          } catch (err) {
+            console.error(`[GIS Layer Error] Failed to add companion stroke layer ${strokeLayerId}:`, err);
           }
-        } catch {
-          // Visibility update error guard
+        } else {
+          try {
+            map.setLayoutProperty(
+              strokeLayerId,
+              "visibility",
+              isVisible ? "visible" : "none"
+            );
+          } catch (err) {
+            console.error(`[GIS Layer Error] Failed to update stroke layer ${strokeLayerId} visibility:`, err);
+          }
         }
       }
     });
-  }, [isStyleLoaded, sourcesData, layers, layerVisibility]);
+
+    // 4. Enforce strict layer rendering order (bottom-to-top)
+    for (const layerId of STRICT_LAYER_ORDER) {
+      if (map.getLayer(layerId)) {
+        try {
+          map.moveLayer(layerId);
+        } catch {
+          // moveLayer collision safely guarded
+        }
+      }
+    }
+
+    // 5. Development Diagnostics (Console only, not visible in officer UI)
+    if (process.env.NODE_ENV !== "production") {
+      const vbCount = sourcesData["village-boundaries-source"]?.features?.length || 0;
+      const vCount = sourcesData["habitations-source"]?.features?.length || 0;
+      const rzCount = sourcesData["red-zones-source"]?.features?.length || 0;
+      const rtCount = sourcesData["routes-source"]?.features?.length || 0;
+      const csCount = sourcesData["candidate-sites-source"]?.features?.length || 0;
+      console.log(`[GIS] village_boundaries: ${vbCount} Polygon features`);
+      console.log(`[GIS] villages: ${vCount} Point features`);
+      console.log(`[GIS] red_zones: ${rzCount} MultiPolygon features`);
+      console.log(`[GIS] routes: ${rtCount} LineString features`);
+      console.log(`[GIS] candidate_sites: ${csCount} Point features`);
+    }
+  }, [styleVersion, isStyleLoaded, sourcesData, layers, layerVisibility]);
 
   // Fit bounds when bounds prop changes or geometry updates
   useEffect(() => {
     const map = mapInstanceRef.current;
-    if (!map || !isStyleLoaded) return;
+    const isReady = isStyleLoaded || (typeof map?.isStyleLoaded === "function" ? map.isStyleLoaded() : false);
+    if (!map || !isReady) return;
 
     if (bounds) {
       try {
-        map.fitBounds(bounds, { padding: 40, maxZoom: 15, duration: 1000 });
-      } catch {
-        // Bounds fitting error guard
+        map.fitBounds(bounds, { padding: 40, maxZoom: 14, duration: 800 });
+      } catch (err) {
+        console.error("[GIS] Bounds fitting error:", err);
       }
       return;
     }
 
-    // Auto-calculate bounds from active regional operational sources (excluding macro-seismic catalogs)
+    // Auto-calculate bounds from active regional operational sources (strictly excluding macro-seismic catalogs)
     const REGIONAL_OPERATIONAL_SOURCES = [
       "village-boundaries-source",
       "habitations-source",
@@ -280,11 +347,11 @@ export const MapCanvas: React.FC<MapCanvasProps> = ({
     if (calculated) {
       try {
         map.fitBounds(calculated, { padding: 40, maxZoom: 14, duration: 800 });
-      } catch {
-        // Fallback guard
+      } catch (err) {
+        console.error("[GIS] Auto bounds fitting error:", err);
       }
     }
-  }, [bounds, sourcesData, isStyleLoaded]);
+  }, [bounds, sourcesData, isStyleLoaded, styleVersion]);
 
   // Handle map click on empty space to deselect
   const handleMapBackgroundClick = useCallback(

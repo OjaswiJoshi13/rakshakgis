@@ -226,7 +226,7 @@ export const GIS_ACTIVE_MAP_LAYERS: MapLayerConfig[] = [
     defaultVisible: true,
     status: "available",
     paint: {
-      "line-width": 3.5,
+      "line-width": 4,
       "line-color": [
         "case",
         ["get", "is_blocked"],
@@ -235,14 +235,15 @@ export const GIS_ACTIVE_MAP_LAYERS: MapLayerConfig[] = [
           "match",
           ["get", "route_type"],
           "evacuation",
-          "#10b981", // Emerald 500
+          "#059669", // Emerald 600 - High Contrast
           "alternate",
-          "#f59e0b", // Amber 500
+          "#d97706", // Amber 600
           "relief",
-          "#818cf8", // Indigo 400
-          "#38bdf8", // Sky 400
+          "#4f46e5", // Indigo 600
+          "#0284c7", // Sky 600
         ],
       ],
+      "line-opacity": 0.95,
     },
     layout: {
       "line-cap": "round",
@@ -260,10 +261,20 @@ export const GIS_ACTIVE_MAP_LAYERS: MapLayerConfig[] = [
     defaultVisible: true,
     status: "available",
     paint: {
-      "circle-radius": 6,
-      "circle-color": "#f59e0b",
-      "circle-stroke-width": 2,
+      "circle-radius": 7,
+      "circle-color": [
+        "interpolate",
+        ["linear"],
+        ["coalesce", ["get", "risk_score"], 45],
+        0, "#10b981",    // Low: Emerald
+        35, "#38bdf8",   // Moderate-Low: Sky
+        55, "#f59e0b",   // Moderate: Amber
+        75, "#ea580c",   // High: Orange
+        88, "#dc2626"    // Critical: Red
+      ],
+      "circle-stroke-width": 2.5,
       "circle-stroke-color": "#ffffff",
+      "circle-opacity": 0.95,
     },
   },
   {
@@ -277,7 +288,7 @@ export const GIS_ACTIVE_MAP_LAYERS: MapLayerConfig[] = [
     defaultVisible: true,
     status: "available",
     paint: {
-      "circle-radius": 8,
+      "circle-radius": 9,
       "circle-color": [
         "match",
         ["coalesce", ["get", "suitability_decision"], ["get", "status"]],
@@ -286,17 +297,18 @@ export const GIS_ACTIVE_MAP_LAYERS: MapLayerConfig[] = [
         "active",
         "#10b981", // Emerald 500
         "constrained",
-        "#fbbf24", // Amber 400
+        "#f59e0b", // Amber 500
         "proposed",
-        "#fbbf24", // Amber 400
+        "#0284c7", // Sky 600
         "approved",
         "#38bdf8", // Sky 400
         "rejected",
         "#f43f5e", // Rose 500
         "#94a3b8", // Slate 400 fallback
       ],
-      "circle-stroke-width": 2.5,
+      "circle-stroke-width": 3,
       "circle-stroke-color": "#ffffff",
+      "circle-opacity": 1,
     },
   },
   {
