@@ -2822,8 +2822,43 @@ No chunk may transition to `IN_PROGRESS` until all its listed prerequisite depen
 
 ---
 
+### Removal of GIS Layer Controls and Operational Map Legend
+
+- **Status:** `IMPLEMENTED / AWAITING_REVIEW`
+- **Date Completed:** 2026-09-10
+- **Owner:** Frontend & GIS Engineering Teams
+- **Objective:** Completely remove the nonfunctional GIS Layer Controls panel and Operational Map Legend from the RakshakGIS map UI (`/gis`), cleaning up dedicated code/imports and updating test suites, while fully retaining all underlying operational map layers and navigation capabilities.
+- **Changes Made:**
+  1. **Removed GIS Layer Controls Panel (`frontend/src/app/gis/page.tsx`):**
+     - Removed `LayerControlPanel` component usage, accordion header, layer checkbox states (`layerVisibility`), and toggle handlers from `page.tsx`.
+     - Did not attempt to repair, redesign, or replace the layer controls UI.
+  2. **Removed Operational Map Legend (`frontend/src/components/map/MapLegend.tsx`, `index.ts`, `frontend/src/app/gis/page.tsx`):**
+     - Completely removed the floating operational legend from the GIS page viewport.
+     - Deleted dedicated `MapLegend.tsx` component file and removed its barrel export from `frontend/src/components/map/index.ts`.
+     - Did not introduce any replacement legend.
+  3. **Preserved All Underlying Operational Layers & Interactions:**
+     - MapLibre canvas continues to render all backend-derived layers: demarcated red zones, risk-colored habitation markers, evacuation routes, candidate relocation sites, and seismic event points.
+     - Preserved MapLibre navigation controls (zoom, compass, fit bounds).
+     - Preserved spatial search bar (`GisSearchBar`) and feature inspection panel (`FeatureDetailPanel`).
+     - Preserved deep-linking workflow: `/villages` -> "View on GIS Canvas" correctly navigates to `/gis?village_id=<id>` and zooms directly to the selected settlement with inspector details.
+  4. **Test Suite Modernization (`frontend/src/__tests__/MapCanvas.test.tsx`, `frontend/src/__tests__/GisGeoJsonIntegration.test.tsx`):**
+     - Updated unit and integration tests to assert the absence of `layer-control-panel`, `map-legend`, `"GIS Layer Controls"`, and `"Operational Legend"`.
+     - Preserved all tests asserting operational layer data rendering and settlement focus workflows.
+  5. **Zero Changes to Backend / Data Models / Risk Engine:**
+     - Pure frontend UI cleanup; no modifications to backend APIs, database models, seed data, risk engines, or GIS geometries.
+- **Verification Results:**
+  - **TypeScript Type-Check:** `npm run type-check` (`tsc --noEmit`) passed with **0 errors**.
+  - **Frontend Unit Tests:**
+    - `src/__tests__/MapCanvas.test.tsx`: **34 passed, 0 failed**.
+    - `src/__tests__/GisGeoJsonIntegration.test.tsx`: **18 passed, 0 failed**.
+  - **Browser Visual Verification:**
+    - Navigated to `http://localhost:3000/gis`: Confirmed both GIS Layer Controls panel and Operational Map Legend are completely absent; MapLibre map, operational layers, and header counters are fully rendered. Snapshot saved to `gis_map_view_1788983359299.png`.
+    - Navigated to `http://localhost:3000/villages`, selected Sunil (ID: 1), clicked "View on GIS Canvas": Confirmed navigation to `http://localhost:3000/gis?village_id=1`, viewport auto-focus on Sunil, and Spatial Feature Inspector displayed with Sunil details and Red Zone warning, with no layer controls or legend shown. Snapshot saved to `gis_focused_village_view_1788983405566.png`.
+
+---
+
 ## Last Updated
 
-- **Timestamp:** 2026-09-09 21:38:00 IST
-- **Updated By:** GIS Core Engine & Frontend Engineering Teams (FINAL-GIS-COMMAND-MAP IMPLEMENTED — AWAITING INDEPENDENT REVIEW)
-- **Status Summary:** Completed final operational GIS Command Map implementation. Configured authoritative 5-band risk styling (`match` & `step` expressions), built collapsible `MapLegend` component, verified layer controls and Fit Bounds behavior, validated 3-village focus flow, passed 34 unit tests, verified zero TypeScript errors, and confirmed live browser visual verification.
+- **Timestamp:** 2026-09-10 01:21:00 IST
+- **Updated By:** GIS Frontend Engineering Team (REMOVAL-GIS-LAYER-CONTROLS-AND-LEGEND IMPLEMENTED / AWAITING_REVIEW)
+- **Status Summary:** Removed nonfunctional GIS Layer Controls panel and Operational Map Legend from `/gis`. Deleted `MapLegend.tsx`, cleaned imports/exports, updated GIS test suites to assert absence, verified TypeScript passes with 0 errors, all 34 `MapCanvas` and 18 `GisGeoJsonIntegration` vitest tests pass, and verified live browser state.

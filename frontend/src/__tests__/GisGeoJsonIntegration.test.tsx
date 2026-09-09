@@ -550,74 +550,18 @@ describe("GIS API Integration & GeoJSON Layers (Chunk M5-07)", () => {
   // 5, 6. GisMapPage Full Integration & Error Handling
   // =========================================================================
   describe("5. GisMapPage Integration, Loading, and Partial Failure States", () => {
-    it("renders full GIS map with candidate sites, routes, and red zones", async () => {
+    it("renders full GIS map with candidate sites, routes, and red zones without layer controls or legend", async () => {
       vi.spyOn(apiClient, "get").mockImplementation((url) => {
-        if (url.includes("/sites")) {
+        if (url.includes("/map/layers")) {
           return Promise.resolve({
             success: true,
-            data: [
-              {
-                id: 1,
-                name: "Safe Site Pipalkoti",
-                district_id: 1,
-                location: { type: "Point", coordinates: [79.4, 30.4] },
-                boundary: null,
-                status: "approved",
-              },
-            ],
-            pagination: { total: 1, page: 1, page_size: 50, total_pages: 1, has_next: false, has_prev: false },
-          });
-        }
-        if (url.includes("/routes")) {
-          return Promise.resolve({
-            success: true,
-            data: [
-              {
-                id: 10,
-                name: "NH-7 Evacuation Corridor",
-                path: {
-                  type: "LineString",
-                  coordinates: [
-                    [79.4, 30.4],
-                    [79.5, 30.5],
-                  ],
-                },
-                distance_km: 14.5,
-                route_type: "evacuation",
-                is_blocked: false,
-              },
-            ],
-            pagination: { total: 1, page: 1, page_size: 50, total_pages: 1, has_next: false, has_prev: false },
-          });
-        }
-        if (url.includes("/red-zones")) {
-          return Promise.resolve({
-            success: true,
-            data: [
-              {
-                id: "RZ-1",
-                name: "High Slope Buffer Zone",
-                zone_type: "landslide_danger",
-                danger_level: "critical",
-                geometry: {
-                  type: "MultiPolygon",
-                  coordinates: [
-                    [
-                      [
-                        [79.4, 30.4],
-                        [79.5, 30.4],
-                        [79.5, 30.5],
-                        [79.4, 30.5],
-                        [79.4, 30.4],
-                      ],
-                    ],
-                  ],
-                },
-                area_sq_km: 1.5,
-                is_active: false,
-              },
-            ],
-            pagination: { total: 1, page: 1, page_size: 50, total_pages: 1, has_next: false, has_prev: false },
+            data: {
+              type: "FeatureCollection",
+              features: [],
+              sites: { type: "FeatureCollection", features: [{ id: 1, type: "Feature", geometry: { type: "Point", coordinates: [79.4, 30.4] }, properties: { name: "Safe Site" } }] },
+              routes: { type: "FeatureCollection", features: [{ id: 10, type: "Feature", geometry: { type: "LineString", coordinates: [[79.4, 30.4], [79.5, 30.5]] }, properties: { name: "Route" } }] },
+              red_zones: { type: "FeatureCollection", features: [{ id: "RZ-1", type: "Feature", geometry: { type: "Polygon", coordinates: [[[79.4, 30.4], [79.5, 30.4], [79.5, 30.5], [79.4, 30.5], [79.4, 30.4]]] }, properties: { name: "RZ" } }] },
+            },
           });
         }
         return Promise.resolve({
@@ -639,17 +583,20 @@ describe("GIS API Integration & GeoJSON Layers (Chunk M5-07)", () => {
         expect(screen.getByRole("heading", { name: "Command GIS Map Canvas" })).toBeInTheDocument();
       });
 
-      await waitFor(() => {
-        expect(screen.getByText(/1 Havens/i)).toBeInTheDocument();
-        expect(screen.getByText(/1 Corridors/i)).toBeInTheDocument();
-        expect(screen.getByText(/1 Red Zones/i)).toBeInTheDocument();
-      });
+      // Map canvas renders operational
+      expect(screen.getByTestId("maplibre-canvas")).toBeInTheDocument();
+
+      // UI Layer Controls and Operational Legend must be completely absent
+      expect(screen.queryByTestId("layer-control-panel")).not.toBeInTheDocument();
+      expect(screen.queryByTestId("map-legend")).not.toBeInTheDocument();
+      expect(screen.queryByText("GIS Layer Controls")).not.toBeInTheDocument();
+      expect(screen.queryByText("Operational Legend")).not.toBeInTheDocument();
     });
 
     it("displays section-level user-safe error notice when an endpoint fails without crashing map", async () => {
       vi.spyOn(apiClient, "get").mockImplementation((url) => {
-        if (url.includes("/red-zones")) {
-          return Promise.reject(new Error("Red Zones backend service temporarily unavailable"));
+        if (url.includes("/map/layers")) {
+          return Promise.reject(new Error("GIS layers service connection timed out"));
         }
         return Promise.resolve({
           success: true,
@@ -669,7 +616,6 @@ describe("GIS API Integration & GeoJSON Layers (Chunk M5-07)", () => {
       await waitFor(() => {
         expect(screen.getByTestId("gis-error-banner")).toBeInTheDocument();
         expect(screen.getByText(/Some spatial layers could not be retrieved/i)).toBeInTheDocument();
-        expect(screen.getByText(/Red Zones: Red Zones backend service temporarily unavailable/i)).toBeInTheDocument();
       });
 
       // Map canvas still renders operational

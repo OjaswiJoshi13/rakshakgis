@@ -20,10 +20,8 @@ import {
   FeatureDetailPanel,
   GisSearchBar,
   GisSearchResult,
-  LayerControlPanel,
   MapCanvas,
   MapHeader,
-  MapLegend,
 } from "@/components/map";
 
 function GisMapContent() {
@@ -38,18 +36,6 @@ function GisMapContent() {
   );
   const lastFittedRegionRef = useRef<string | null>(null);
   const lastFocusedVillageRef = useRef<string | null>(null);
-
-  const [layerVisibility, setLayerVisibility] = useState<Record<string, boolean>>({
-    "village-boundaries-polygons": true,
-    "habitations-points": true,
-    "earthquakes-ncs": true,
-    "earthquakes-usgs": true,
-    "candidate-sites-points": true,
-    "candidate-sites-boundaries": false,
-    "routes-lines": true,
-    "red-zones-polygons": true,
-    "hazards-extents": false,
-  });
 
   // Reset region-specific UI state on activeRegion transition to prevent stale feature/viewport leak
   useEffect(() => {
@@ -168,34 +154,6 @@ function GisMapContent() {
     routesGeoJSON,
     redZonesGeoJSON,
   ]);
-
-  // Dynamic feature counts for layer controls.
-  // Preserves distinction between unavailable data and genuine zero features:
-  // When API errors or data is not yet loaded, counts are undefined and UI displays 'Unavailable'.
-  // When API returns empty feature list, count is 0 and UI displays '0 features'.
-  const featureCounts: Record<string, number | undefined> = useMemo(() => {
-    if (mapLayersError || !mapLayersEnvelope?.data) {
-      return {};
-    }
-    return {
-      "village-boundaries-polygons": mapLayersEnvelope.data.village_boundaries?.features?.length,
-      "habitations-points": mapLayersEnvelope.data.villages?.features?.length,
-      "earthquakes-ncs": mapLayersEnvelope.data.earthquakes_ncs?.features?.length,
-      "earthquakes-usgs": mapLayersEnvelope.data.earthquakes_usgs?.features?.length,
-      "candidate-sites-points": (mapLayersEnvelope.data.sites || mapLayersEnvelope.data.candidate_sites)?.features?.length,
-      "candidate-sites-boundaries": (mapLayersEnvelope.data.site_boundaries || mapLayersEnvelope.data.candidate_site_boundaries)?.features?.length,
-      "routes-lines": mapLayersEnvelope.data.routes?.features?.length,
-      "red-zones-polygons": mapLayersEnvelope.data.red_zones?.features?.length,
-    };
-  }, [mapLayersError, mapLayersEnvelope?.data]);
-
-  // Toggle individual layer visibility
-  const handleToggleLayer = (layerId: string) => {
-    setLayerVisibility((prev) => ({
-      ...prev,
-      [layerId]: !prev[layerId],
-    }));
-  };
 
   // Manual refresh across all spatial layers
   const handleRefreshAll = async () => {
@@ -428,7 +386,6 @@ function GisMapContent() {
         {/* Interactive Map Canvas */}
         <MapCanvas
           layers={GIS_ACTIVE_MAP_LAYERS}
-          layerVisibility={layerVisibility}
           sourcesData={sourcesData}
           onFeatureSelect={setSelectedFeature}
           selectedFeature={selectedFeature}
@@ -444,16 +401,6 @@ function GisMapContent() {
           <GisSearchBar onSelectResult={handleSelectSearchResult} />
         </div>
 
-        {/* Floating Layer Control Panel (Top-Left) */}
-        <div className="absolute top-4 left-4 max-w-xs w-full pointer-events-auto z-20">
-          <LayerControlPanel
-            layers={GIS_ACTIVE_MAP_LAYERS}
-            layerVisibility={layerVisibility}
-            onToggleLayer={handleToggleLayer}
-            featureCounts={featureCounts}
-          />
-        </div>
-
         {/* Floating Feature Inspector (Bottom-Left) */}
         {selectedFeature && (
           <div className="absolute bottom-4 left-4 pointer-events-auto z-20">
@@ -463,11 +410,6 @@ function GisMapContent() {
             />
           </div>
         )}
-
-        {/* Floating Operational Map Legend (Bottom-Right) */}
-        <div className="absolute bottom-4 right-4 pointer-events-auto z-20 max-w-xs">
-          <MapLegend />
-        </div>
       </div>
     </div>
   );

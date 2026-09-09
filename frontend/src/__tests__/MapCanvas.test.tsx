@@ -5,7 +5,6 @@ import { MapCanvas } from "@/components/map/MapCanvas";
 import { LayerControlPanel } from "@/components/map/LayerControlPanel";
 import { FeatureDetailPanel } from "@/components/map/FeatureDetailPanel";
 import { MapHeader } from "@/components/map/MapHeader";
-import { MapLegend } from "@/components/map/MapLegend";
 import GisMapPage from "@/app/gis/page";
 import { DEFAULT_MAP_LAYERS } from "@/components/map/layerConfig";
 import { getMapStyle, CREDENTIAL_FREE_OSM_STYLE } from "@/components/map/mapStyle";
@@ -644,9 +643,11 @@ describe("MapLibre GIS Interactive Map Canvas (Chunk M5-05)", () => {
       });
 
       expect(screen.getByTestId("maplibre-canvas")).toBeInTheDocument();
-      expect(screen.getByTestId("layer-control-panel")).toBeInTheDocument();
-      expect(screen.getByText("Proposed Candidate Sites")).toBeInTheDocument();
-      expect(screen.getByText("Evacuation Corridors")).toBeInTheDocument();
+      // Layer controls and operational legend are removed from map UI
+      expect(screen.queryByTestId("layer-control-panel")).not.toBeInTheDocument();
+      expect(screen.queryByTestId("map-legend")).not.toBeInTheDocument();
+      expect(screen.queryByText("GIS Layer Controls")).not.toBeInTheDocument();
+      expect(screen.queryByText("Operational Legend")).not.toBeInTheDocument();
     });
 
     it("displays user-safe warning when backend GIS endpoints fail without crashing map", async () => {
@@ -1085,31 +1086,40 @@ describe("MapLibre GIS Interactive Map Canvas (Chunk M5-05)", () => {
       expect(circleColor).toContain("#dc2626"); // critical
     });
 
-    it("renders MapLegend with authoritative risk bands and operational symbology", () => {
-      render(<MapLegend />);
+    it("ensures Layer Controls and Operational Legend are completely absent from GIS page", async () => {
+      authService.setStoredToken("valid-officer-token", 3600);
+      vi.spyOn(authService, "getMeApi").mockResolvedValue(mockOfficerUser);
+      vi.spyOn(nextNavigation, "useSearchParams").mockReturnValue(new URLSearchParams() as unknown as ReturnType<typeof nextNavigation.useSearchParams>);
 
-      expect(screen.getByTestId("map-legend")).toBeInTheDocument();
-      expect(screen.getByText("Operational Legend")).toBeInTheDocument();
-      expect(screen.getByText("Habitation Risk Bands")).toBeInTheDocument();
-      expect(screen.getByText("Safe")).toBeInTheDocument();
-      expect(screen.getByText("Moderate")).toBeInTheDocument();
-      expect(screen.getByText("High")).toBeInTheDocument();
-      expect(screen.getByText("Very High")).toBeInTheDocument();
-      expect(screen.getByText("Critical / Red")).toBeInTheDocument();
+      vi.spyOn(apiModule.apiClient, "get").mockImplementation(async (path: string) => {
+        if (path.includes("/map/layers")) {
+          return {
+            success: true,
+            data: {
+              type: "FeatureCollection",
+              features: [],
+            },
+          };
+        }
+        return { success: true, data: [] };
+      });
 
-      expect(screen.getByText("Demarcated Red Zone")).toBeInTheDocument();
-      expect(screen.getByText("Evacuation Route")).toBeInTheDocument();
-      expect(screen.getByText("Candidate Relocation Site")).toBeInTheDocument();
-      expect(screen.getByText("Selected Settlement")).toBeInTheDocument();
+      render(
+        <AuthProvider>
+          <OperationalProvider>
+            <GisMapPage />
+          </OperationalProvider>
+        </AuthProvider>
+      );
 
-      // Test collapse/expand toggle
-      const toggleBtn = screen.getByLabelText("Collapse operational map legend");
-      fireEvent.click(toggleBtn);
-      expect(screen.queryByText("Habitation Risk Bands")).not.toBeInTheDocument();
+      await waitFor(() => {
+        expect(screen.getByRole("heading", { name: "Command GIS Map Canvas" })).toBeInTheDocument();
+      });
 
-      const expandBtn = screen.getByLabelText("Expand operational map legend");
-      fireEvent.click(expandBtn);
-      expect(screen.getByText("Habitation Risk Bands")).toBeInTheDocument();
+      expect(screen.queryByTestId("layer-control-panel")).not.toBeInTheDocument();
+      expect(screen.queryByTestId("map-legend")).not.toBeInTheDocument();
+      expect(screen.queryByText("GIS Layer Controls")).not.toBeInTheDocument();
+      expect(screen.queryByText("Operational Legend")).not.toBeInTheDocument();
     });
 
     it("clicking Fit Bounds button in GisMapPage resets viewport to operational bounds", async () => {
