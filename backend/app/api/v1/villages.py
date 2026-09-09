@@ -223,6 +223,7 @@ def get_village_analysis(
             joinedload(Village.population_profile),
             joinedload(Village.vulnerability_profile),
             joinedload(Village.risk_scores),
+            joinedload(Village.block).joinedload(Block.district),
         )
         .filter(Village.id == id)
         .first()
@@ -232,6 +233,7 @@ def get_village_analysis(
 
     from app.models.risk import RedZone, RiskFactor, RiskScore
     from app.models.hazards import HazardObservation
+    from geoalchemy2.shape import to_shape
 
     current_risk = db.query(RiskScore).filter(RiskScore.village_id == id, RiskScore.is_current == True).first()
     if not current_risk:
@@ -272,6 +274,23 @@ def get_village_analysis(
     pop_prof = village.population_profile
     vuln_prof = village.vulnerability_profile
 
+    # Extract coordinates [lon, lat] from Point geometry
+    coords = None
+    if village.location:
+        try:
+            pt = to_shape(village.location)
+            coords = [round(float(pt.x), 5), round(float(pt.y), 5)]
+        except Exception:
+            coords = None
+
+    # Administrative hierarchy
+    block_name = village.block.name if village.block else None
+    block_code = village.block.code if village.block else None
+    district_name = village.block.district.name if village.block and village.block.district else None
+    district_code = village.block.district.code if village.block and village.block.district else None
+    region_name = village.block.district.region.name if village.block and village.block.district and getattr(village.block.district, "region", None) else None
+    region_code = village.block.district.region.code if village.block and village.block.district and getattr(village.block.district, "region", None) else None
+
     # Recent hazard observations
     hazards = (
         db.query(HazardObservation)
@@ -302,6 +321,13 @@ def get_village_analysis(
                 "elevation_m": village.elevation_m,
                 "slope_deg": village.slope_deg,
                 "is_active": village.is_active,
+                "coordinates": coords,
+                "district_name": district_name,
+                "district_code": district_code,
+                "block_name": block_name,
+                "block_code": block_code,
+                "region_name": region_name,
+                "region_code": region_code,
             },
             "population": {
                 "total": pop_prof.total_population if pop_prof else None,

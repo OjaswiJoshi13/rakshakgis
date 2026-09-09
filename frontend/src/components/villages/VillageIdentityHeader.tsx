@@ -15,7 +15,7 @@ export const VillageIdentityHeader: React.FC<VillageIdentityHeaderProps> = ({
   const coordsFormatted =
     habitation.coordinates && habitation.coordinates.length === 2
       ? `${habitation.coordinates[1].toFixed(4)}° N, ${habitation.coordinates[0].toFixed(4)}° E`
-      : "Coordinates unavailable";
+      : "Not available in source";
 
   const isRedZone = habitation.risk.is_red_zone_triggered;
 
@@ -51,15 +51,15 @@ export const VillageIdentityHeader: React.FC<VillageIdentityHeaderProps> = ({
           {/* Context Metadata */}
           <div className="flex items-center gap-4 text-xs text-text-muted flex-wrap">
             <span>
-              <strong className="text-text-secondary font-medium">Region:</strong> {habitation.region_profile_id || "—"}
+              <strong className="text-text-secondary font-medium">Region:</strong> {habitation.region_profile_id || "Not available in source"}
             </span>
             <span aria-hidden="true" className="text-border-strong">•</span>
             <span>
-              <strong className="text-text-secondary font-medium">District:</strong> {habitation.district || "—"}
+              <strong className="text-text-secondary font-medium">District:</strong> {habitation.district || "Not available in source"}
             </span>
             <span aria-hidden="true" className="text-border-strong">•</span>
             <span>
-              <strong className="text-text-secondary font-medium">Block:</strong> {habitation.block || "—"}
+              <strong className="text-text-secondary font-medium">Block:</strong> {habitation.block || "Not available in source"}
             </span>
             <span aria-hidden="true" className="text-border-strong">•</span>
             <span>

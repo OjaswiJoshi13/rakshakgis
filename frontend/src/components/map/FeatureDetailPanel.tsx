@@ -61,7 +61,7 @@ export const FeatureDetailPanel: React.FC<FeatureDetailPanelProps> = ({
       <div className="flex items-start justify-between gap-2">
         <div>
           <span className="text-[10px] font-mono uppercase tracking-wider text-sky-600 dark:text-sky-400">
-            Candidate Safe Haven #{feature.id}
+            Proposed Candidate Site #{feature.id}
           </span>
           <h3 className="text-sm font-bold text-text-primary leading-snug">
             {String(props.name || `Site #${feature.id}`)}
@@ -122,6 +122,10 @@ export const FeatureDetailPanel: React.FC<FeatureDetailPanelProps> = ({
           Location: {feature.coordinates[0].toFixed(5)}, {feature.coordinates[1].toFixed(5)} (WGS84)
         </div>
       )}
+
+      <div className="text-[10px] font-mono bg-sky-500/10 text-sky-700 dark:text-sky-300 border border-sky-500/20 p-2 rounded">
+        <strong>PROVENANCE:</strong> {String(props.provenance || "SYNTHETIC / PROPOSED — Candidate Relocation Site")}
+      </div>
     </div>
   );
 
@@ -192,6 +196,10 @@ export const FeatureDetailPanel: React.FC<FeatureDetailPanelProps> = ({
           Hazard Notice: {String(props.blockage_reason)}
         </div>
       )}
+
+      <div className="text-[10px] font-mono bg-emerald-500/10 text-emerald-700 dark:text-emerald-300 border border-emerald-500/20 p-2 rounded">
+        <strong>PROVENANCE:</strong> {String(props.provenance || "SYNTHETIC / DERIVED — Evacuation Corridors")}
+      </div>
     </div>
   );
 
@@ -272,6 +280,10 @@ export const FeatureDetailPanel: React.FC<FeatureDetailPanelProps> = ({
         <div className="text-[10px] text-amber-800 dark:text-amber-300 bg-amber-500/10 border border-amber-500/30 p-2 rounded font-mono leading-relaxed">
           <strong className="text-amber-700 dark:text-amber-400 block mb-0.5">RULE 12 GOVERNANCE INVARIANT:</strong>
           {governanceNotice}
+        </div>
+
+        <div className="text-[10px] font-mono bg-rose-500/10 text-rose-700 dark:text-rose-300 border border-rose-500/20 p-2 rounded">
+          <strong>PROVENANCE:</strong> {String(props.provenance || "DERIVED / DEMONSTRATION — Permanent & Dynamic Red Zone Spatial Engine")}
         </div>
       </div>
     );

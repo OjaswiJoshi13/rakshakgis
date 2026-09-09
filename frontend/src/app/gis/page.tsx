@@ -122,6 +122,8 @@ export default function GisMapPage() {
   const {
     data: mapLayersEnvelope,
     isLoading: mapLayersLoading,
+    isError: mapLayersError,
+    error: mapLayersErrObj,
     refetch: refetchMapLayers,
   } = useApiQuery<ResponseEnvelope<Record<string, any>>>(
     `gis-map-layers-${activeRegion}`,
@@ -131,18 +133,20 @@ export default function GisMapPage() {
 
   // Transform backend models to standard GeoJSON FeatureCollections
   const sitesGeoJSON = useMemo(() => {
-    if (mapLayersEnvelope?.data?.candidate_sites?.features?.length) {
-      return mapLayersEnvelope.data.candidate_sites as GeoJSONFeatureCollection;
+    const layer = mapLayersEnvelope?.data?.sites || mapLayersEnvelope?.data?.candidate_sites;
+    if (layer?.features?.length) {
+      return layer as GeoJSONFeatureCollection;
     }
     return candidateSitesToGeoJSON(sitesEnvelope?.data || []);
-  }, [mapLayersEnvelope?.data?.candidate_sites, sitesEnvelope?.data]);
+  }, [mapLayersEnvelope?.data?.sites, mapLayersEnvelope?.data?.candidate_sites, sitesEnvelope?.data]);
 
   const siteBoundariesGeoJSON = useMemo(() => {
-    if (mapLayersEnvelope?.data?.candidate_site_boundaries?.features?.length) {
-      return mapLayersEnvelope.data.candidate_site_boundaries as GeoJSONFeatureCollection;
+    const layer = mapLayersEnvelope?.data?.site_boundaries || mapLayersEnvelope?.data?.candidate_site_boundaries;
+    if (layer?.features?.length) {
+      return layer as GeoJSONFeatureCollection;
     }
     return candidateSiteBoundariesToGeoJSON(sitesEnvelope?.data || []);
-  }, [mapLayersEnvelope?.data?.candidate_site_boundaries, sitesEnvelope?.data]);
+  }, [mapLayersEnvelope?.data?.site_boundaries, mapLayersEnvelope?.data?.candidate_site_boundaries, sitesEnvelope?.data]);
 
   const routesGeoJSON = useMemo(() => {
     if (mapLayersEnvelope?.data?.routes?.features?.length) {
@@ -158,19 +162,23 @@ export default function GisMapPage() {
     return redZonesToGeoJSON(redZonesEnvelope?.data || []);
   }, [mapLayersEnvelope?.data?.red_zones, redZonesEnvelope?.data]);
 
+  // STRICT REQUIREMENT: No silent fallback to 40 demo villages.
+  // Must strictly consume real region-scoped habitation records from /map/layers.
   const villagesGeoJSON = useMemo(() => {
     if (mapLayersEnvelope?.data?.villages?.features?.length) {
       return mapLayersEnvelope.data.villages as GeoJSONFeatureCollection;
     }
-    return villagesToGeoJSON(villagesEnvelope?.data || []);
-  }, [mapLayersEnvelope?.data?.villages, villagesEnvelope?.data]);
+    return { type: "FeatureCollection" as const, features: [] };
+  }, [mapLayersEnvelope?.data?.villages]);
 
+  // STRICT REQUIREMENT: No silent fallback to 0 boundaries.
+  // Must strictly consume real Survey of India cadastral boundaries from /map/layers.
   const villageBoundariesGeoJSON = useMemo(() => {
     if (mapLayersEnvelope?.data?.village_boundaries?.features?.length) {
       return mapLayersEnvelope.data.village_boundaries as GeoJSONFeatureCollection;
     }
-    return villageBoundariesToGeoJSON(villagesEnvelope?.data || []);
-  }, [mapLayersEnvelope?.data?.village_boundaries, villagesEnvelope?.data]);
+    return { type: "FeatureCollection" as const, features: [] };
+  }, [mapLayersEnvelope?.data?.village_boundaries]);
 
   const earthquakesNcsGeoJSON = useMemo(() => {
     if (mapLayersEnvelope?.data?.earthquakes_ncs?.features?.length) {
@@ -321,8 +329,8 @@ export default function GisMapPage() {
     });
   };
 
-  const isMapLoading = sitesLoading || routesLoading || redZonesLoading || villagesLoading;
-  const hasMapErrors = sitesError || routesError || redZonesError || villagesError;
+  const isMapLoading = mapLayersLoading || sitesLoading || routesLoading || redZonesLoading || villagesLoading;
+  const hasMapErrors = mapLayersError || sitesError || routesError || redZonesError || villagesError;
 
   return (
     <ProtectedRoute>
@@ -349,6 +357,7 @@ export default function GisMapPage() {
                 <strong className="text-amber-700 dark:text-amber-400">Layer Notice:</strong> Some spatial layers could
                 not be retrieved from backend (
                 {[
+                  mapLayersError && `Authoritative GIS Layers: ${mapLayersErrObj?.message || "Unavailable"}`,
                   sitesError && `Sites: ${sitesErrObj?.message || "Unavailable"}`,
                   routesError && `Routes: ${routesErrObj?.message || "Unavailable"}`,
                   redZonesError && `Red Zones: ${redZonesErrObj?.message || "Unavailable"}`,

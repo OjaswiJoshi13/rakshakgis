@@ -90,12 +90,12 @@ export const DashboardKpiStrip: React.FC<DashboardKpiStripProps> = ({
       </h2>
 
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-6 gap-3">
-        {/* 1. Candidate Relocation Sites */}
+        {/* 1. Candidate Safe Sites */}
         <MetricCard
           label="Candidate Safe Sites"
           value={sitesTotal}
           unit={sitesError || sitesLoading ? undefined : "Sites"}
-          subtext={sitesError ? "API Error" : "Verified Relocation Havens"}
+          subtext={sitesError ? "API Error" : "Proposed Candidate Sites (Synthetic)"}
           status={sitesError ? "warning" : "normal"}
           icon={
             <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">

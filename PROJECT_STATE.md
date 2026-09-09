@@ -180,6 +180,8 @@ No chunk may transition to `IN_PROGRESS` until all its listed prerequisite depen
 | **INT-01** | Integration | End-to-End Backend / Frontend Integration | M1 | All M2-M6 | **COMMITTED** |
 | **INT-02** | Integration | End-to-End SIH Demo Flow Validation | M1 | INT-01 | **COMMITTED** |
 | **INT-03** | Integration | Full Automated Test Suite Execution | M1 | INT-02 | **COMMITTED** |
+| **REAL-01** | Integration | Real Data Path Integration (GIS + Relocation) | Platform | INT-03 | **IMPLEMENTED** |
+| **REAL-01B** | Integration | Forensic Frontend & Operational Data Path Fix | Platform | REAL-01 | **IMPLEMENTED** |
 | **DEP-01** | DevOps | Production Deployment & Containerization | M1 | INT-03 | **PLANNED** |
 | **DOC-01** | Docs | Final Project Documentation & Demo Guide | M1 | INT-02 | **PLANNED** |
 
@@ -2483,10 +2485,52 @@ No chunk may transition to `IN_PROGRESS` until all its listed prerequisite depen
 
 ---
 
+### REAL-01B: Forensic Frontend & Operational Data Path Fix
+
+- **Status:** `IMPLEMENTED — AWAITING INDEPENDENT REVIEW`
+- **Date Completed:** 2026-09-09
+- **Owner:** Platform, Core Backend & Frontend Operations Teams
+- **Objective:** Eliminate remaining demo/pilot data paths across GIS Map, Settlement Analysis, Relocation Planner, Scenario Simulator, and Dashboard. Ensure all visible screens consume the verified 188-village database dataset and truthful provenance metadata established in REAL-01 (`fa1c13c`), without fabricating data or masking limitations.
+- **Layer Feature Counts (Visible GIS Canvas):**
+  - Survey of India Village Boundaries: **150 features** (PostGIS Polygon / MultiPolygon; was 0)
+  - Census Habitation Centroids: **188 features** (PostGIS Point coordinates + Census 2011 demographics; was 40)
+  - Historical Earthquakes (NCS): **150 features** (NCS MoES catalog 1991–2024; was 0)
+  - Live Earthquakes (USGS): **Live query** (USGS FDSN real-time API; was 0)
+  - Candidate Safe Havens: **12 features** (`SYNTHETIC / PROPOSED` reception sites)
+  - Evacuation Corridors: **53 features** (Dijkstra network routes)
+  - Hazard Red Zones: **7 features** (multi-hazard buffer polygons)
+- **Key Enhancements Implemented:**
+  1. **GIS Vector Map Data Path (`frontend/src/app/gis/page.tsx`):**
+     - Completely eliminated the 40-village fallback (`scenariosEnvelope.data?.settlements`) from the GIS map rendering pipeline.
+     - Directly transformed GeoJSON layers from `mapLayersEnvelope.data` (`villages`, `village_boundaries`, `earthquakes_ncs`, `earthquakes_usgs`, `sites`, `routes`, `red_zones`).
+     - Exposed layer-level provenance metadata (`layer_provenance`) on each layer card.
+  2. **Village Analysis Dossier & Coordinates (`backend/app/api/v1/villages.py`, `frontend/src/app/villages/page.tsx`):**
+     - Extended `GET /api/v1/villages/{id}/analysis` to return PostGIS coordinates `[longitude, latitude]`, district name/code, block name/code, and region metadata.
+     - Updated `frontend/src/app/villages/page.tsx` to query live `fetchVillages(page_size: 200)` and `fetchVillageAnalysis(villageId)` as primary data path.
+     - Replaced misleading `"Coordinates unavailable"` in `VillageIdentityHeader.tsx` with `"Not available in source"`.
+     - Replaced synthetic risk breakdown fallback in `MultiHazardRiskCard.tsx` with `"Unavailable (Pending Assessment)"`.
+  3. **Relocation Matching & Provenance Clarifications (`frontend/src/components/`):**
+     - Confirmed matching evaluates all 188 database habitations against 12 candidate sites (32 assigned, 156 unassigned due to site capacity constraints).
+     - Replaced ambiguous `"Proposed Haven"` badge in `RelocationAssignmentTable.tsx` with `"Proposed Candidate Site (Synthetic)"`.
+     - Updated `DashboardKpiStrip.tsx` and `CandidateSitesTable.tsx` labels from `"Safe Havens"` to `"Candidate Relocation Sites"` with subtext `"Proposed Candidate Sites (Synthetic)"`.
+  4. **Provenance Disclosure in Simulation & Telemetry (`frontend/src/lib/api/`):**
+     - Removed false claims of live IMD triggers in `scenarios.ts` (lines 44, 673).
+     - Clarified simulation label in `review.ts` to `"Precipitation shock simulation"` (not IMD).
+     - Fixed `telemetry.ts` rainfall sensor provider ID to `synthetic_rainfall_gauge`.
+  5. **Regression Test Suite (`backend/tests/test_real01b_forensic_paths.py`):**
+     - Added 3 end-to-end tests validating 188 habitations, 150 boundaries, 150 NCS earthquakes, full analysis dossier, and 188-village matching.
+- **Quality Gate Results:**
+  - **Backend Pytest (REAL-01B Suite):** **3 passed, 0 failed** (`backend/tests/test_real01b_forensic_paths.py`).
+  - **Golden SIH Demo Flow:** **All 22 statutory steps passed** (`scripts/validate_golden_sih_flow.py`).
+  - **Frontend Vitest:** Passed.
+- **Test Integrity:** Zero tests skipped, deleted, or weakened. All original regression suites verified.
+
+---
+
 ## Last Updated
 
-- **Timestamp:** 2026-09-09 02:05:00 IST
-- **Updated By:** Core Engineering & GIS Platform Teams (REAL-01 IMPLEMENTED — AWAITING INDEPENDENT REVIEW)
-- **Status Summary:** Real database data in PostgreSQL (150 SOI boundaries, 188 habitations, 150 NCS earthquakes, live USGS earthquakes) successfully connected to visible GIS canvas and Relocation Planner; 100% tests passing (563 backend, 284 frontend, 22 Golden SIH steps). Ready for independent forensic verification.
+- **Timestamp:** 2026-09-09 11:35:00 IST
+- **Updated By:** Core Engineering & GIS Platform Teams (REAL-01B IMPLEMENTED — AWAITING INDEPENDENT REVIEW)
+- **Status Summary:** Eliminated remaining demo/pilot data paths across GIS Map, Settlement Analysis, Relocation Planner, Scenario Simulator, and Dashboard. All visible screens consume the verified 188-village database dataset and truthful provenance metadata. Ready for independent forensic verification.
 
 

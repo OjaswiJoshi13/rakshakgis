@@ -180,7 +180,7 @@ def get_map_layers(
                         "risk_band": current_risk.band if current_risk else "MODERATE",
                         "is_active": v.is_active,
                         "has_boundary": v.boundary is not None,
-                        "provenance": "REAL — Census 2011 & Survey of India Centroid",
+                        "provenance": "REAL / OFFICIAL — Census 2011 & Survey of India Centroid",
                     },
                 }
             )
@@ -220,7 +220,7 @@ def get_map_layers(
                             "households": v.population_profile.households if v.population_profile else None,
                             "risk_score": current_risk.score if current_risk else None,
                             "risk_band": current_risk.band if current_risk else "MODERATE",
-                            "provenance": "REAL — Survey of India (Boundary Cadastral Polygon)",
+                            "provenance": "REAL / OFFICIAL — Survey of India (Boundary Cadastral Polygon)",
                         },
                     }
                 )
@@ -252,7 +252,7 @@ def get_map_layers(
                         "danger_level": rz.danger_level,
                         "area_sq_km": rz.area_sq_km,
                         "is_active": rz.is_active,
-                        "provenance": "DERIVED — Permanent & Dynamic Red Zone Spatial Engine",
+                        "provenance": "DERIVED / DEMONSTRATION — Permanent & Dynamic Red Zone Spatial Engine",
                     },
                 }
             )
@@ -262,7 +262,7 @@ def get_map_layers(
         }
 
     # 4. Candidate Relocation Sites Layer
-    if layer_type in (None, "sites"):
+    if layer_type in (None, "sites", "candidate_sites"):
         sites_records = db.query(CandidateSite).options(joinedload(CandidateSite.capacities)).all()
         features = []
         for s in sites_records:
@@ -284,7 +284,7 @@ def get_map_layers(
                         "housing_capacity": cap.max_households if cap else None,
                         "total_capacity": cap.max_population if cap else None,
                         "current_occupancy": cap.allocated_population if cap else 0,
-                        "provenance": "PROPOSED / SYNTHETIC — Candidate Relocation Safe Haven",
+                        "provenance": "SYNTHETIC / PROPOSED — Candidate Relocation Site",
                     },
                 }
             )
@@ -292,6 +292,7 @@ def get_map_layers(
             "type": "FeatureCollection",
             "features": features,
         }
+        layers["candidate_sites"] = layers["sites"]
 
     # 5. NCS Historical Earthquakes Layer (150 Real Events)
     if layer_type in (None, "earthquakes_ncs", "hazards"):
@@ -318,7 +319,7 @@ def get_map_layers(
                         "severity": h.severity,
                         "description": h.description or f"NCS Earthquake M{h.intensity_value}",
                         "source": "National Centre for Seismology (NCS), Ministry of Earth Sciences",
-                        "provenance": "HISTORICAL — NCS MoES Official Catalog (1991–2024)",
+                        "provenance": "REAL / OFFICIAL — National Centre for Seismology MoES (1991–2024)",
                     },
                 }
             )
@@ -394,7 +395,7 @@ def get_map_layers(
                         "distance_km": r.distance_km,
                         "estimated_travel_time_min": r.estimated_travel_time_min,
                         "is_blocked": False,
-                        "provenance": "REAL / DERIVED — Evacuation Corridors",
+                        "provenance": "SYNTHETIC / DERIVED — Evacuation Corridors",
                     },
                 }
             )
@@ -417,5 +418,18 @@ def get_map_layers(
 
     # 9. Geographic Bounding Box for Viewport Auto-fit (Chamoli District)
     layers["bounds"] = [[79.15, 30.0], [80.15, 30.9]]
+
+    # 10. Truthful Layer Provenance Metadata
+    layers["layer_provenance"] = {
+        "village_boundaries": "REAL / OFFICIAL — Survey of India (Boundary Cadastral Polygon)",
+        "villages": "REAL / OFFICIAL — Census 2011 & Survey of India Centroid",
+        "earthquakes_ncs": "REAL / OFFICIAL — National Centre for Seismology MoES (1991–2024)",
+        "earthquakes_usgs": "LIVE — USGS Real-Time Feed",
+        "sites": "SYNTHETIC / PROPOSED — Candidate Relocation Site",
+        "candidate_sites": "SYNTHETIC / PROPOSED — Candidate Relocation Site",
+        "routes": "SYNTHETIC / DERIVED — Evacuation Corridors",
+        "red_zones": "DERIVED / DEMONSTRATION — Permanent & Dynamic Red Zone Spatial Engine",
+        "osm_roads": "DERIVED / OFFLINE — OpenStreetMap Road Network Extract",
+    }
 
     return ResponseEnvelope(success=True, data=layers)

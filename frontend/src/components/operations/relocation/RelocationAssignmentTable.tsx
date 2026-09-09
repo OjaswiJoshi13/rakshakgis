@@ -215,7 +215,7 @@ export const RelocationAssignmentTable: React.FC<RelocationAssignmentTableProps>
                           <div className="text-xs text-text-muted flex items-center gap-1.5 mt-0.5">
                             <span>Site ID: {assignment.assigned_site_id}</span>
                             <Badge variant="outline" size="sm" className="text-[10px] text-amber-700 dark:text-amber-300 border-amber-500/30 font-normal">
-                              Proposed Haven
+                              Proposed Candidate Site (Synthetic)
                             </Badge>
                           </div>
                         </div>

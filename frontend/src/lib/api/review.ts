@@ -71,7 +71,7 @@ export const INITIAL_REVIEW_DOSSIERS: RecommendationDossier[] = [
     executive_summary:
       "What-if simulation modeling an intense cloudburst (+40% precipitation surge). Triggers 2 high-risk village threshold breaches and cuts off NH-58 transit corridor. 2 routes diverted, average risk score increases by +18.5 points across the valley.",
     metrics: [
-      { label: "Precipitation Surge", value: "+40%", subtext: "IMD cloudburst simulation", variant: "warning" },
+      { label: "Precipitation Surge", value: "+40%", subtext: "Precipitation shock simulation", variant: "warning" },
       { label: "Critical Risk Villages", value: 2, subtext: "Threshold breached", variant: "danger" },
       { label: "Diverted Routes", value: 2, subtext: "NH-58 blockage bypass", variant: "warning" },
       { label: "Mean Risk Delta", value: "+18.5 pts", subtext: "Regional escalation", variant: "danger" },

@@ -68,7 +68,7 @@ export const CandidateSitesTable: React.FC<CandidateSitesTableProps> = ({
           <div>
             <CardTitle>Candidate Relocation Sites</CardTitle>
             <CardDescription>
-              Verified safe havens catalog evaluated against slope, flood buffers, and carrying capacity constraints.
+              Proposed candidate relocation sites catalog (SYNTHETIC / PROPOSED) evaluated against slope, flood buffers, and carrying capacity constraints.
             </CardDescription>
           </div>
           {totalCount !== undefined && (
@@ -82,7 +82,7 @@ export const CandidateSitesTable: React.FC<CandidateSitesTableProps> = ({
       <CardContent>
         {isLoading ? (
           <div className="py-8 text-center text-text-muted font-mono text-sm animate-pulse">
-            Loading candidate relocation safe havens...
+            Loading candidate relocation sites...
           </div>
         ) : isError ? (
           <div className="rounded-lg border border-red-200 bg-red-50 dark:border-red-900/60 dark:bg-red-950/30 p-4 text-sm text-red-900 dark:text-red-200">

@@ -322,7 +322,7 @@ describe("Village Vulnerability Detail / Habitation Analysis (Chunk M5-06)", () 
 
       expect(screen.getByText("Marwari Valley Cluster")).toBeInTheDocument();
       expect(screen.getByText(/STANDARD MONITORING/i)).toBeInTheDocument();
-      expect(screen.getByText("Coordinates unavailable")).toBeInTheDocument();
+      expect(screen.getAllByText("Not available in source").length).toBeGreaterThanOrEqual(1);
     });
 
     it("never fabricates physical slope degrees from normalized landslide susceptibility index", () => {

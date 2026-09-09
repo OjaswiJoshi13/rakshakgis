@@ -41,7 +41,7 @@ export const CANONICAL_SCENARIO_CATALOG: ScenarioDefinitionRead[] = [
     scenario_type: "EXTREME_RAINFALL",
     name: "Extreme Rainfall Simulation (+40%)",
     description:
-      "Simulates a 40% increase in precipitation intensity (cloudburst / monsoon surge) based on IMD heavy rainfall triggers.",
+      "Simulates a 40% increase in precipitation intensity (simulation parameter for heavy rainfall stress testing).",
     default_parameters: {
       scenario_type: "EXTREME_RAINFALL",
       rainfall_multiplier: 1.4,
@@ -670,7 +670,7 @@ export const HIMALAYAN_PILOT_SAMPLE_SIMULATION_OUTPUTS: Record<
       },
     },
     provenance: { engine_version: "1.0.0", algorithm: "M4-06 Pipeline Orchestrator" },
-    explainability: { methodology: "IMD Heavy Rainfall (+40%) Multiplier" },
+    explainability: { methodology: "Heavy Rainfall (+40%) Multiplier Simulation" },
   },
   FLASH_FLOOD: {
     scenario_name: "Flash Flood / GLOF Valley Inundation",
