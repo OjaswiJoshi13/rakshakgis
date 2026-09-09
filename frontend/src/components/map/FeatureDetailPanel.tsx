@@ -430,7 +430,7 @@ export const FeatureDetailPanel: React.FC<FeatureDetailPanelProps> = ({
       <div className="flex items-center justify-between bg-surface-elevated p-2 rounded border border-border-subtle font-mono text-[11px]">
         <span className="text-text-muted uppercase text-[10px]">Composite Risk</span>
         <Badge variant={String(props.risk_band) === "CRITICAL" ? "danger" : String(props.risk_band) === "HIGH" ? "warning" : "success"} size="sm">
-          {Number(props.composite_risk || 0).toFixed(1)} / 100 ({String(props.risk_band || "LOW")})
+          {Number(props.risk_score || props.composite_risk || 0).toFixed(1)} / 100 ({String(props.risk_band || "LOW")})
         </Badge>
       </div>
 
@@ -471,7 +471,7 @@ export const FeatureDetailPanel: React.FC<FeatureDetailPanelProps> = ({
         </div>
       </div>
 
-      {props.description && (
+      {Boolean(props.description) && (
         <div className="text-[11px] text-text-secondary bg-surface-elevated p-2 rounded border border-border-subtle">
           {String(props.description)}
         </div>

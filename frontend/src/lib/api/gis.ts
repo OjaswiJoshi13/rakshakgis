@@ -46,7 +46,9 @@ export interface VillagesQueryParams {
   page_size?: number;
   district_id?: number;
   block_id?: number;
+  region_id?: string;
   is_active?: boolean;
+  search?: string;
 }
 
 /**

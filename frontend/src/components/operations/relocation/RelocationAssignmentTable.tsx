@@ -177,7 +177,7 @@ export const RelocationAssignmentTable: React.FC<RelocationAssignmentTableProps>
                       <div className="text-text-muted text-[11px]">
                         {assignment.incoming_population
                           ? `${assignment.incoming_population} people`
-                          : "—"}
+                          : "Not available in source"}
                       </div>
                     </td>
 
@@ -239,7 +239,7 @@ export const RelocationAssignmentTable: React.FC<RelocationAssignmentTableProps>
                           <span>{assignment.distance_km.toFixed(1)} km</span>
                         </span>
                       ) : (
-                        <span className="text-text-muted">—</span>
+                        <span className="text-text-muted">Not available in source</span>
                       )}
                     </td>
 
@@ -250,7 +250,7 @@ export const RelocationAssignmentTable: React.FC<RelocationAssignmentTableProps>
                           {assignment.suitability_score.toFixed(1)}
                         </span>
                       ) : (
-                        <span className="text-text-muted">—</span>
+                        <span className="text-text-muted">Not available in source</span>
                       )}
                     </td>
 
@@ -267,7 +267,7 @@ export const RelocationAssignmentTable: React.FC<RelocationAssignmentTableProps>
                           </span>
                         </div>
                       ) : (
-                        <span className="text-text-muted">—</span>
+                        <span className="text-text-muted">Not available in source</span>
                       )}
                     </td>
 

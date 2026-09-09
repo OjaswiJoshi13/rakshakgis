@@ -41,7 +41,7 @@ export const CANONICAL_SCENARIO_CATALOG: ScenarioDefinitionRead[] = [
     scenario_type: "EXTREME_RAINFALL",
     name: "Extreme Rainfall Simulation (+40%)",
     description:
-      "Simulates a 40% increase in precipitation intensity (simulation parameter for heavy rainfall stress testing).",
+      "Extreme Rainfall Simulation (+40%) — Deterministic scenario perturbation (simulation parameter — not an observed IMD measurement).",
     default_parameters: {
       scenario_type: "EXTREME_RAINFALL",
       rainfall_multiplier: 1.4,

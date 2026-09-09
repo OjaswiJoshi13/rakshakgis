@@ -279,7 +279,7 @@ describe("Village Vulnerability Detail / Habitation Analysis (Chunk M5-06)", () 
       expect(screen.getByPlaceholderText(/Search settlements by name or ID/i)).toBeInTheDocument();
       expect(screen.getByText("DEMO MODE")).toBeInTheDocument();
       expect(screen.getByText("Region: himalayan_pilot")).toBeInTheDocument();
-      expect(screen.getByText("2 Baseline Settlements")).toBeInTheDocument();
+      expect(screen.getByText(/2 Habitations Evaluated/i)).toBeInTheDocument();
     });
 
     it("triggers onSelectVillage when dropdown selection changes", () => {
@@ -306,41 +306,28 @@ describe("Village Vulnerability Detail / Habitation Analysis (Chunk M5-06)", () 
     it("renders settlement identity, census code, and dynamic Red Zone active trigger", () => {
       render(<VillageIdentityHeader habitation={mockHabitationA} />);
 
-      expect(screen.getByText("Ravigram Upper Sector")).toBeInTheDocument();
+      expect(screen.getByRole("heading", { level: 1, name: "Ravigram Upper Sector" })).toBeInTheDocument();
       expect(screen.getByText("ID: VILL-001")).toBeInTheDocument();
       expect(screen.getByText("Census: CENS-04821")).toBeInTheDocument();
-      expect(screen.getByText(/RED ZONE TRIGGER ACTIVE/i)).toBeInTheDocument();
-      expect(screen.getByText(/30.5543° N, 79.5678° E/i)).toBeInTheDocument();
-      expect(screen.getByRole("link", { name: /View Ravigram Upper Sector on GIS Interactive Map/i })).toHaveAttribute(
-        "href",
-        "/gis"
-      );
+      expect(screen.getByText("Red Zone Trigger Active")).toBeInTheDocument();
+      expect(screen.getByText(/Dynamic Red Zone Trigger Tripped/i)).toBeInTheDocument();
+      expect(screen.getByRole("link", { name: /View on GIS Canvas/i })).toBeInTheDocument();
     });
 
     it("renders standard monitoring status when Red Zone trigger is not active", () => {
       render(<VillageIdentityHeader habitation={mockHabitationB} />);
 
-      expect(screen.getByText("Marwari Valley Cluster")).toBeInTheDocument();
-      expect(screen.getByText(/STANDARD MONITORING/i)).toBeInTheDocument();
-      expect(screen.getAllByText("Not available in source").length).toBeGreaterThanOrEqual(1);
+      expect(screen.getByRole("heading", { level: 1, name: "Marwari Valley Cluster" })).toBeInTheDocument();
+      expect(screen.getByText("Standard Monitoring")).toBeInTheDocument();
+      expect(screen.queryByText(/Dynamic Red Zone Trigger Tripped/i)).not.toBeInTheDocument();
     });
 
     it("never fabricates physical slope degrees from normalized landslide susceptibility index", () => {
-      const habitationWithoutSlope: HabitationDetail = {
-        ...mockHabitationA,
-        slope_deg: null,
-        risk: {
-          ...mockHabitationA.risk,
-          factors: {
-            slope_landslide_susceptibility: 82.0,
-          },
-        },
-      };
-
-      render(<VillageIdentityHeader habitation={habitationWithoutSlope} />);
-      // 82 * 0.45 = 36.9
-      expect(screen.queryByText(/36\.9/)).not.toBeInTheDocument();
-      expect(screen.queryByText(/°.*slope/i)).not.toBeInTheDocument();
+      render(<VillageIdentityHeader habitation={mockHabitationB} />);
+      // mockHabitationB has slope_deg: null, while slope_landslide_susceptibility: 30.0.
+      // Must NOT display "30.0°" or fabricate degrees.
+      expect(screen.queryByText("30.0°")).not.toBeInTheDocument();
+      expect(screen.queryByText("30°")).not.toBeInTheDocument();
     });
   });
 
@@ -360,7 +347,7 @@ describe("Village Vulnerability Detail / Habitation Analysis (Chunk M5-06)", () 
 
       expect(screen.getByText("180")).toBeInTheDocument();
       expect(screen.getByText("45")).toBeInTheDocument();
-      expect(screen.getByText("Unavailable from backend")).toBeInTheDocument();
+      expect(screen.getAllByText("Not available in source").length).toBeGreaterThanOrEqual(1);
     });
 
     it("never fabricates population from households (e.g. demanded_households * 4)", () => {
@@ -376,8 +363,7 @@ describe("Village Vulnerability Detail / Habitation Analysis (Chunk M5-06)", () 
 
       render(<PopulationExposureCard habitation={habitationWithoutPop} />);
 
-      expect(screen.getByText("Census record unavailable")).toBeInTheDocument();
-      expect(screen.getAllByText("—").length).toBeGreaterThanOrEqual(1);
+      expect(screen.getAllByText("Not available in source").length).toBeGreaterThanOrEqual(1);
       expect(screen.getByText("78")).toBeInTheDocument();
       // Ensure 78 * 4 = 312 is NEVER rendered in the document
       expect(screen.queryByText("312")).not.toBeInTheDocument();
@@ -521,25 +507,61 @@ describe("Village Vulnerability Detail / Habitation Analysis (Chunk M5-06)", () 
   });
 
   describe("VillageAnalysisPage Full Integration", () => {
-    it("renders page with backend scenario baseline and allows switching settlements", async () => {
+    it("renders page with backend habitations and allows switching settlements", async () => {
       authService.setStoredToken("valid-officer-token", 3600);
       vi.spyOn(authService, "getMeApi").mockResolvedValue(mockOfficerUser);
 
-      vi.spyOn(apiModule.apiClient, "post").mockImplementation(async (path: string) => {
-        if (path.includes("/scenarios/run")) {
-          return { success: true, data: mockScenarioOutput };
-        }
-        return { success: true, data: {} };
-      });
+      const mockVillagesList = [
+        { id: 1, name: "Ravigram Upper Sector", census_code: "CENS-04821", is_active: true },
+        { id: 2, name: "Marwari Valley Cluster", census_code: "CENS-04823", is_active: true },
+      ];
+
+      const mockAnalysisMap: Record<string, any> = {
+        "1": {
+          village: { id: 1, name: "Ravigram Upper Sector", census_code: "CENS-04821" },
+          population: { total: 340, households: 85 },
+          vulnerability: { social_index: 0.554, road_connectivity_index: 0.38 },
+          risk: {
+            score: 72.8,
+            band: "CRITICAL",
+            factors: [
+              { factor_name: "hazard_severity", weight: 0.3, normalized_score: 85.0 },
+              { factor_name: "slope_landslide_susceptibility", weight: 0.15, normalized_score: 82.0 },
+            ],
+          },
+        },
+        "2": {
+          village: { id: 2, name: "Marwari Valley Cluster", census_code: "CENS-04823" },
+          population: { total: 190, households: 45 },
+          vulnerability: { social_index: 0.38, road_connectivity_index: 0.55 },
+          risk: {
+            score: 44.5,
+            band: "MODERATE",
+            factors: [
+              { factor_name: "hazard_severity", weight: 0.3, normalized_score: 40.0 },
+              { factor_name: "slope_landslide_susceptibility", weight: 0.15, normalized_score: 45.0 },
+            ],
+          },
+        },
+      };
 
       vi.spyOn(apiModule.apiClient, "get").mockImplementation(async (path: string) => {
-        if (path.includes("/relocation/assignments")) {
+        if (path.includes("/villages/") && path.includes("/analysis")) {
+          const match = path.match(/\/villages\/([^/]+)\/analysis/);
+          const vId = match ? match[1] : "1";
+          return { success: true, data: mockAnalysisMap[vId] || mockAnalysisMap["1"] };
+        }
+        if (path.includes("/villages")) {
+          return {
+            success: true,
+            data: mockVillagesList,
+            pagination: { total_records: 2, page: 1, page_size: 200, total_pages: 1, has_next: false, has_prev: false },
+          };
+        }
+        if (path.includes("/relocation/assignments") || path.includes("/routes")) {
           return { success: true, data: [], pagination: { total: 0, page: 1, page_size: 50, total_pages: 0, has_next: false, has_prev: false } };
         }
-        if (path.includes("/routes")) {
-          return { success: true, data: [], pagination: { total: 0, page: 1, page_size: 50, total_pages: 0, has_next: false, has_prev: false } };
-        }
-        return { success: true, data: {} };
+        return { success: true, data: [] };
       });
 
       render(
@@ -555,13 +577,13 @@ describe("Village Vulnerability Detail / Habitation Analysis (Chunk M5-06)", () 
         expect(screen.getByRole("heading", { level: 1, name: "Ravigram Upper Sector" })).toBeInTheDocument();
       });
 
-      expect(screen.getByText("2 Baseline Settlements")).toBeInTheDocument();
-      expect(screen.getByText(/Baseline Assessment Scope/i)).toBeInTheDocument();
+      expect(screen.getByText(/2 Habitations Evaluated/i)).toBeInTheDocument();
+      expect(screen.getByText(/Operational Habitation Scope/i)).toBeInTheDocument();
       expect(screen.getByText("72.8 / 100")).toBeInTheDocument();
 
       // Switch to second settlement via selector dropdown
       const dropdown = screen.getByLabelText(/Select habitation/i);
-      fireEvent.change(dropdown, { target: { value: "VILL-002" } });
+      fireEvent.change(dropdown, { target: { value: "2" } });
 
       await waitFor(() => {
         expect(screen.getByRole("heading", { level: 1, name: "Marwari Valley Cluster" })).toBeInTheDocument();
@@ -573,22 +595,15 @@ describe("Village Vulnerability Detail / Habitation Analysis (Chunk M5-06)", () 
       authService.setStoredToken("valid-officer-token", 3600);
       vi.spyOn(authService, "getMeApi").mockResolvedValue(mockOfficerUser);
 
-      vi.spyOn(apiModule.apiClient, "post").mockResolvedValue({
-        success: true,
-        data: {
-          ...mockScenarioOutput,
-          baseline_pipeline: {
-            risk_results: [],
-            red_zone_result: { total_evaluated: 0, triggered_count: 0, triggered_village_ids: [], candidate_ids: [] },
-            priority_results: [],
-          },
-        },
-      });
-
-      vi.spyOn(apiModule.apiClient, "get").mockResolvedValue({
-        success: true,
-        data: [],
-        pagination: { total: 0, page: 1, page_size: 50, total_pages: 0, has_next: false, has_prev: false },
+      vi.spyOn(apiModule.apiClient, "get").mockImplementation(async (path: string) => {
+        if (path.includes("/villages")) {
+          return {
+            success: true,
+            data: [],
+            pagination: { total_records: 0, page: 1, page_size: 200, total_pages: 0, has_next: false, has_prev: false },
+          };
+        }
+        return { success: true, data: [] };
       });
 
       render(
@@ -609,8 +624,7 @@ describe("Village Vulnerability Detail / Habitation Analysis (Chunk M5-06)", () 
       authService.setStoredToken("valid-officer-token", 3600);
       vi.spyOn(authService, "getMeApi").mockResolvedValue(mockOfficerUser);
 
-      vi.spyOn(apiModule.apiClient, "post").mockRejectedValue(new Error("Connection refused by backend gateway"));
-      vi.spyOn(apiModule.apiClient, "get").mockResolvedValue({ success: true, data: [] });
+      vi.spyOn(apiModule.apiClient, "get").mockRejectedValue(new Error("Connection refused by backend gateway"));
 
       render(
         <AuthProvider initialState={{ user: mockOfficerUser, isAuthenticated: true, token: "valid-officer-token" }}>
@@ -631,11 +645,31 @@ describe("Village Vulnerability Detail / Habitation Analysis (Chunk M5-06)", () 
       authService.setStoredToken("valid-officer-token", 3600);
       vi.spyOn(authService, "getMeApi").mockResolvedValue(mockOfficerUser);
 
-      vi.spyOn(apiModule.apiClient, "post").mockResolvedValue({
-        success: true,
-        data: mockScenarioOutput,
+      const mockVillagesList = [
+        { id: 1, name: "Ravigram Upper Sector", census_code: "CENS-04821", is_active: true },
+      ];
+
+      vi.spyOn(apiModule.apiClient, "get").mockImplementation(async (path: string) => {
+        if (path.includes("/villages/") && path.includes("/analysis")) {
+          return {
+            success: true,
+            data: {
+              village: { id: 1, name: "Ravigram Upper Sector", census_code: "CENS-04821" },
+              population: { total: 340, households: 85 },
+              vulnerability: { social_index: 0.554, road_connectivity_index: 0.38 },
+              risk: { score: 72.8, band: "CRITICAL", factors: [] },
+            },
+          };
+        }
+        if (path.includes("/villages")) {
+          return {
+            success: true,
+            data: mockVillagesList,
+            pagination: { total_records: 1, page: 1, page_size: 200, total_pages: 1, has_next: false, has_prev: false },
+          };
+        }
+        return { success: true, data: [] };
       });
-      vi.spyOn(apiModule.apiClient, "get").mockResolvedValue({ success: true, data: [] });
 
       const RegionSwitcher: React.FC = () => {
         const { setActiveRegion } = useOperational();

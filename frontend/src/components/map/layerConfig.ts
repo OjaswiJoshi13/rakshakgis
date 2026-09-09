@@ -8,9 +8,9 @@ import { MapLayerConfig } from "@/types/gis";
 export const DEFAULT_MAP_LAYERS: MapLayerConfig[] = [
   {
     id: "candidate-sites-points",
-    name: "Candidate Safe Havens",
+    name: "Proposed Candidate Sites",
     category: "candidate_sites",
-    description: "Verified relocation safe havens evaluated against slope, buffers, and capacity.",
+    description: "Proposed candidate relocation sites (synthetic model) evaluated against slope, buffers, and capacity.",
     sourceId: "candidate-sites-source",
     layerType: "circle",
     geometryType: "Point",
@@ -37,9 +37,9 @@ export const DEFAULT_MAP_LAYERS: MapLayerConfig[] = [
   },
   {
     id: "candidate-sites-boundaries",
-    name: "Safe Haven Boundaries",
+    name: "Candidate Site Boundaries",
     category: "candidate_sites",
-    description: "Spatial boundary polygons for candidate safe havens where surveyed.",
+    description: "Spatial boundary polygons for proposed candidate sites where surveyed.",
     sourceId: "candidate-site-boundaries-source",
     layerType: "fill",
     geometryType: "Polygon",
@@ -160,7 +160,7 @@ export const GIS_ACTIVE_MAP_LAYERS: MapLayerConfig[] = [
       "fill-color": [
         "interpolate",
         ["linear"],
-        ["coalesce", ["get", "composite_risk"], 0],
+        ["coalesce", ["get", "risk_score"], ["get", "composite_risk"], 0],
         0, "#10b981",    // Low risk: Emerald
         35, "#38bdf8",   // Moderate-Low: Sky
         55, "#fbbf24",   // Moderate: Amber
@@ -232,9 +232,9 @@ export const GIS_ACTIVE_MAP_LAYERS: MapLayerConfig[] = [
   },
   {
     id: "candidate-sites-points",
-    name: "Candidate Safe Havens",
+    name: "Proposed Candidate Sites",
     category: "candidate_sites",
-    description: "Verified relocation safe havens evaluated against slope, buffers, and capacity.",
+    description: "Proposed candidate relocation sites (synthetic model) evaluated against slope, buffers, and capacity.",
     sourceId: "candidate-sites-source",
     layerType: "circle",
     geometryType: "Point",
@@ -261,9 +261,9 @@ export const GIS_ACTIVE_MAP_LAYERS: MapLayerConfig[] = [
   },
   {
     id: "candidate-sites-boundaries",
-    name: "Safe Haven Boundaries",
+    name: "Candidate Site Boundaries",
     category: "candidate_sites",
-    description: "Spatial boundary polygons for candidate safe havens where surveyed.",
+    description: "Spatial boundary polygons for proposed candidate sites where surveyed.",
     sourceId: "candidate-site-boundaries-source",
     layerType: "fill",
     geometryType: "Polygon",

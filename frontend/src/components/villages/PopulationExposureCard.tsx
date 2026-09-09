@@ -14,7 +14,7 @@ export const PopulationExposureCard: React.FC<PopulationExposureCardProps> = ({
   const { demographics } = habitation;
 
   const formatNum = (val: number | null | undefined): string => {
-    if (val === null || val === undefined) return "—";
+    if (val === null || val === undefined) return "Not available in source";
     return val.toLocaleString();
   };
 
@@ -48,7 +48,7 @@ export const PopulationExposureCard: React.FC<PopulationExposureCardProps> = ({
               {formatNum(demographics.total_population)}
             </div>
             <div className="text-xs text-text-muted mt-0.5">
-              {demographics.total_population !== null ? "Authoritative census" : "Census record unavailable"}
+              {demographics.total_population !== null ? "Authoritative census" : "Not available in source"}
             </div>
           </div>
 
@@ -88,7 +88,7 @@ export const PopulationExposureCard: React.FC<PopulationExposureCardProps> = ({
             <span className="font-mono text-text-muted italic">
               {demographics.disabled_count !== undefined && demographics.disabled_count !== null
                 ? formatNum(demographics.disabled_count)
-                : "Unavailable from backend"}
+                : "Not available in source"}
             </span>
           </div>
         </div>

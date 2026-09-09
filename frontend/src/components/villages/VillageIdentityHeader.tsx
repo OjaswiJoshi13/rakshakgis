@@ -81,7 +81,7 @@ export const VillageIdentityHeader: React.FC<VillageIdentityHeaderProps> = ({
           <Link
             href="/gis"
             className="inline-flex items-center gap-2 px-3 py-1.5 text-xs font-medium rounded-md border border-border-strong bg-surface-elevated text-text-primary hover:bg-surface-elevated/80 transition-colors focus:outline-none focus:ring-1 focus:ring-focus-ring"
-            aria-label={`View ${habitation.name} on GIS Interactive Map`}
+            aria-label="View on GIS Canvas"
           >
             <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
               <path

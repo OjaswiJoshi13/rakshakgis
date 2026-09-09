@@ -31,7 +31,7 @@ export const AlertsNoticeCard: React.FC = () => {
       <CardContent className="space-y-3">
         <Alert severity="info" title="Dynamic Hazard Monitoring Protocol Active">
           Automated threshold triggers evaluate continuous precipitation, seismic intensity, and terrain
-          slope against regional limits (e.g., IMD 64.5mm/24h heavy rainfall standard). Dynamic Red Zone
+          slope against regional limits (e.g., regional 64.5mm/24h heavy rainfall threshold standard). Dynamic Red Zone
           proposals require statutory District Officer sign-off under SOP-RZ-01 prior to evacuation dispatch.
         </Alert>
 
@@ -42,7 +42,7 @@ export const AlertsNoticeCard: React.FC = () => {
             </span>
             <div className="text-base font-bold font-mono text-text-primary">64.5 mm / 24h</div>
             <p className="text-[11px] text-text-secondary leading-tight">
-              Standard IMD heavy precipitation boundary.
+              Regional heavy precipitation threshold standard.
             </p>
           </div>
 

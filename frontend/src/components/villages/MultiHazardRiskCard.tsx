@@ -79,11 +79,11 @@ export const MultiHazardRiskCard: React.FC<MultiHazardRiskCardProps> = ({
             <div className="text-2xl font-bold font-mono text-text-primary tabular-nums">
               {isExplainable && score !== null
                 ? `${score.toFixed(1)} / 100`
-                : "Unavailable (Pending Assessment)"}
+                : "Not available in source"}
             </div>
             {!isExplainable && (
               <div className="text-[11px] text-amber-700 dark:text-amber-400 font-mono mt-1">
-                Risk factor values unavailable in source; numerical score not presented.
+                Risk factor values not available in source; numerical score not presented.
               </div>
             )}
           </div>
@@ -110,7 +110,7 @@ export const MultiHazardRiskCard: React.FC<MultiHazardRiskCardProps> = ({
               Explainable 6-Factor Decomposition
             </span>
             <span className="text-[11px] font-mono text-text-muted">
-              {isExplainable ? `${availableFactorsCount}/6 factors populated` : "All factors unavailable"}
+              {isExplainable ? `${availableFactorsCount}/6 factors populated` : "All factors not available in source"}
             </span>
           </div>
 
@@ -130,12 +130,12 @@ export const MultiHazardRiskCard: React.FC<MultiHazardRiskCardProps> = ({
                     </span>
                     {prov && (
                       <span className="text-[9px] font-mono uppercase px-1.5 py-0.2 rounded bg-surface-base border border-border-subtle text-text-muted">
-                        {hasVal ? prov.label : "UNAVAILABLE"}
+                        {hasVal ? prov.label : "NOT AVAILABLE IN SOURCE"}
                       </span>
                     )}
                   </div>
                   <span className="font-mono text-text-primary tabular-nums text-xs shrink-0">
-                    {hasVal ? `${factorVal.toFixed(1)} [→ +${pts} pts]` : "Unavailable"}
+                    {hasVal ? `${factorVal.toFixed(1)} [→ +${pts} pts]` : "Not available in source"}
                   </span>
                 </div>
                 <div className="w-full bg-surface-elevated rounded-full h-1.5 overflow-hidden border border-border-subtle">

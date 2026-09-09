@@ -9,7 +9,6 @@ import {
   useApiQuery,
   fetchVillages,
   fetchVillageAnalysis,
-  runScenarioEvaluation,
 } from "@/lib/api";
 import { useOperational } from "@/context/OperationalContext";
 import { ResponseEnvelope, PaginatedResponse } from "@/types/api";
@@ -17,10 +16,6 @@ import { RelocationAssignmentRead } from "@/types/dashboard";
 import { RouteRead, VillageRead } from "@/types/gis";
 import {
   HabitationDetail,
-  ScenarioSimulationOutput,
-  PriorityStageResult,
-  MatchingAssignmentSummary,
-  RoutingPathSummary,
   parseRiskBand,
   parseRelocationPriorityBand,
 } from "@/types/villages";
@@ -42,6 +37,7 @@ function VillageAnalysisContent() {
   const deepLinkedId = searchParams.get("id") || searchParams.get("village_id");
 
   const { activeRegion, dataMode } = useOperational();
+  const effectiveRegion = activeRegion || "himalayan_pilot";
   const [selectedVillageId, setSelectedVillageId] = useState<string | null>(deepLinkedId);
   const [searchQuery, setSearchQuery] = useState<string>("");
   const [isRefreshing, setIsRefreshing] = useState<boolean>(false);
@@ -59,29 +55,8 @@ function VillageAnalysisContent() {
     error: villagesErrObj,
     refetch: refetchVillages,
   } = useApiQuery<PaginatedResponse<VillageRead>>(
-    `villages-list-${activeRegion}`,
-    (signal) => fetchVillages({ region_id: activeRegion, page: 1, page_size: 200 }, signal),
-    { cacheTtlMs: 60000 }
-  );
-
-  // Baseline Scenario Query (used in demo mode or fallback)
-  const {
-    data: scenariosEnvelope,
-    isLoading: scenariosLoading,
-    isError: scenariosError,
-    error: scenariosErrObj,
-    refetch: refetchScenarios,
-  } = useApiQuery<ResponseEnvelope<ScenarioSimulationOutput>>(
-    `villages-baseline-${activeRegion}`,
-    (signal) =>
-      apiClient.post(
-        "/scenarios/run",
-        {
-          scenario_type: "NORMAL",
-          region_profile_id: activeRegion,
-        },
-        { signal }
-      ),
+    `villages-list-${effectiveRegion}`,
+    (signal) => fetchVillages({ region_id: effectiveRegion, page: 1, page_size: 200 }, signal),
     { cacheTtlMs: 60000 }
   );
 
@@ -90,15 +65,16 @@ function VillageAnalysisContent() {
     if (selectedVillageId) return selectedVillageId;
     if (deepLinkedId) return deepLinkedId;
     const rawVillages = villagesEnvelope?.data;
-    if (Array.isArray(rawVillages) && rawVillages.length > 0) {
-      return String(rawVillages[0].id);
-    }
-    const baseVillages = scenariosEnvelope?.data?.villages;
-    if (Array.isArray(baseVillages) && baseVillages.length > 0) {
-      return String(baseVillages[0].id);
+    const vList: VillageRead[] = Array.isArray(rawVillages)
+      ? rawVillages
+      : Array.isArray((rawVillages as any)?.items)
+      ? (rawVillages as any).items
+      : [];
+    if (vList.length > 0) {
+      return String(vList[0].id);
     }
     return null;
-  }, [selectedVillageId, deepLinkedId, villagesEnvelope?.data, scenariosEnvelope?.data?.villages]);
+  }, [selectedVillageId, deepLinkedId, villagesEnvelope?.data]);
 
   // 3. Secondary Query: Retrieve comprehensive analytical disaster dossier for active village
   const {
@@ -204,8 +180,8 @@ function VillageAnalysisContent() {
           elevation_m: analysis?.village?.elevation_m ?? v.elevation_m ?? null,
           slope_deg: analysis?.village?.slope_deg ?? v.slope_deg ?? null,
           demographics: {
-            total_population: analysis?.population?.total ?? 0,
-            households: analysis?.population?.households ?? assignment?.assigned_households ?? 0,
+            total_population: analysis?.population?.total ?? null,
+            households: analysis?.population?.households ?? assignment?.assigned_households ?? null,
             elderly_count: analysis?.population?.elderly ?? null,
             children_count: analysis?.population?.children ?? null,
             disabled_count: analysis?.population?.disabled ?? null,
@@ -252,94 +228,14 @@ function VillageAnalysisContent() {
       });
     }
 
-    // Fallback to scenario baseline (used in demo mode / tests)
-    const baseline = scenariosEnvelope?.data?.baseline_pipeline;
-    if (baseline && baseline.risk_results && baseline.risk_results.length > 0) {
-      const redZoneSet = new Set(baseline.red_zone_result?.triggered_village_ids || []);
-      const prioritiesMap = new Map<string, PriorityStageResult>();
-      baseline.priority_results?.forEach((p) => {
-        prioritiesMap.set(p.village_id, p);
-      });
-      const matchingMap = new Map<string, MatchingAssignmentSummary>();
-      baseline.matching_result?.assignments?.forEach((m) => {
-        matchingMap.set(m.village_id, m);
-      });
-      const routingMap = new Map<string, RoutingPathSummary>();
-      baseline.routing_result?.routes?.forEach((rt) => {
-        routingMap.set(rt.village_id, rt);
-      });
-
-      const map = new Map<string, HabitationDetail>();
-      baseline.risk_results.forEach((r) => {
-        const vId = r.village_id;
-        const priority = prioritiesMap.get(vId);
-        const match = matchingMap.get(vId);
-        const route = routingMap.get(vId);
-        const isRedZone = redZoneSet.has(vId);
-
-        map.set(vId, {
-          id: vId,
-          name: r.village_name,
-          census_code: vId === "VILL-001" ? "CENS-04821" : vId === "VILL-002" ? "CENS-04823" : null,
-          region_profile_id: activeRegion,
-          district: "Chamoli",
-          block: "Joshimath",
-          coordinates: vId === "VILL-001" ? [79.5678, 30.5543] : null,
-          elevation_m: vId === "VILL-001" ? 1890 : 1650,
-          slope_deg: vId === "VILL-001" ? 24.5 : 18.0,
-          demographics: {
-            total_population: vId === "VILL-001" ? 340 : 190,
-            households: match?.demanded_households ?? 0,
-            elderly_count: vId === "VILL-001" ? 42 : 18,
-            children_count: vId === "VILL-001" ? 65 : 32,
-            disabled_count: null,
-          },
-          vulnerability: {
-            social_vulnerability_score: r.factor_breakdown.social_vulnerability ?? null,
-            infrastructure_vulnerability_score: r.factor_breakdown.infrastructure_vulnerability ?? null,
-            vulnerability_band: null,
-          },
-          risk: {
-            risk_score: r.risk_score,
-            risk_band: parseRiskBand(r.risk_band),
-            raw_band_string: r.risk_band,
-            factors: r.factor_breakdown,
-            is_red_zone_triggered: isRedZone,
-          },
-          relocation: {
-            priority_score: priority?.priority_score ?? null,
-            priority_band: parseRelocationPriorityBand(priority?.priority_band),
-            raw_priority_band_string: priority?.priority_band ?? null,
-            is_assigned: match?.is_assigned ?? false,
-            assigned_site_id: match?.assigned_site_id ?? null,
-            assigned_site_name: match?.assigned_site_name ?? null,
-            demanded_households: match?.demanded_households ?? null,
-            allocated_households: match?.allocated_households ?? null,
-            unassigned_code: match?.unassigned_code ?? null,
-          },
-          evacuation: route
-            ? {
-                route_feasible: route.is_feasible,
-                distance_km: route.distance_km ?? null,
-                estimated_time_minutes: route.estimated_time_minutes ?? null,
-                blocked_corridors_count: route.blocked_avoided_count ?? 0,
-                route_status: route.route_status,
-              }
-            : undefined,
-        });
-      });
-      return Array.from(map.values());
-    }
-
     return [];
   }, [
     villagesEnvelope?.data,
-    scenariosEnvelope?.data,
     assignmentsEnvelope?.data,
     routesEnvelope?.data,
     effectiveVillageId,
     analysisEnvelope?.data,
-    activeRegion,
+    effectiveRegion,
   ]);
 
   // Keep selection synchronized
@@ -365,7 +261,6 @@ function VillageAnalysisContent() {
     try {
       await Promise.all([
         refetchVillages(),
-        refetchScenarios(),
         refetchAnalysis(),
         refetchAssignments(),
         refetchRoutes(),
@@ -375,8 +270,8 @@ function VillageAnalysisContent() {
     }
   };
 
-  const isLoading = villagesLoading || scenariosLoading || (habitations.length === 0 && analysisLoading);
-  const isError = (villagesError || scenariosError) && habitations.length === 0;
+  const isLoading = villagesLoading || (habitations.length === 0 && analysisLoading);
+  const isError = villagesError && habitations.length === 0;
 
   return (
     <div className="space-y-6">
@@ -400,21 +295,13 @@ function VillageAnalysisContent() {
           aria-label="Authoritative settlement records notice"
         >
           <div className="flex items-center gap-2">
-            <span className={`w-2 h-2 rounded-full ${habitations.length > 2 ? 'bg-emerald-500' : 'bg-amber-500'} shrink-0`} aria-hidden="true" />
+            <span className="w-2 h-2 rounded-full bg-emerald-500 shrink-0" aria-hidden="true" />
             <span>
-              {habitations.length > 2 ? (
-                <>
-                  <strong className="text-text-primary">Operational Habitation Scope:</strong> Displaying {habitations.length} administrative settlements retrieved from operational database (Survey of India & Census 2011).
-                </>
-              ) : (
-                <>
-                  <strong className="text-text-primary">Baseline Assessment Scope:</strong> Displaying {habitations.length} reference settlements evaluated under normal baseline conditions.
-                </>
-              )}
+              <strong className="text-text-primary">Operational Habitation Scope:</strong> Displaying {habitations.length} administrative settlements retrieved from operational database (Survey of India & Census 2011).
             </span>
           </div>
           <span className="text-[11px] text-text-muted uppercase tracking-wider shrink-0 hidden md:inline">
-            {habitations.length > 2 ? "Authoritative Records" : "Baseline Mode"}
+            Authoritative Records
           </span>
         </div>
       )}
@@ -465,7 +352,7 @@ function VillageAnalysisContent() {
             Failed to Load Settlement Vulnerability Data
           </h2>
           <p className="text-xs text-red-700 dark:text-red-300 mb-4 max-w-md mx-auto">
-            {(scenariosErrObj || villagesErrObj)?.message || "Unable to retrieve backend evaluation for the active region."}
+            {villagesErrObj?.message || "Unable to retrieve backend evaluation for the active region."}
           </p>
           <Button variant="outline" size="sm" onClick={handleRefresh}>
             Retry Assessment

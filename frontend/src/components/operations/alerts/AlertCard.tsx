@@ -202,8 +202,10 @@ export const AlertCard: React.FC<AlertCardProps> = ({
             <span className="text-[10px] font-mono uppercase text-text-muted block mb-0.5">
               Source & Protocol
             </span>
-            <div className="font-mono text-text-secondary truncate">
-              {alert.source_id || "Telemetry Station"}
+            <div className="font-mono text-text-secondary truncate" title={alert.source_id === "synthetic_rainfall_gauge" ? "SYNTHETIC — Simulated Rainfall Gauge (Simulation Parameter — Not Official IMD)" : alert.source_id || "Telemetry Station"}>
+              {alert.source_id === "synthetic_rainfall_gauge"
+                ? "SYNTHETIC — Simulated Rainfall Gauge (Simulation Parameter — Not Official IMD)"
+                : alert.source_id || "Telemetry Station"}
             </div>
             <span className="text-[10px] text-sky-700 dark:text-sky-400 font-mono block">
               Regional Profile Protocol <span className="sr-only">M3-11</span>

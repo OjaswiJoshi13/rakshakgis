@@ -22,13 +22,9 @@ import {
 import { Button } from "@/components/ui/Button";
 import { CheckCircle2, AlertCircle, RefreshCw } from "lucide-react";
 
-export interface RelocationOperationsPageProps {
-  defaultUseDatabase?: boolean;
-}
-
 export default function RelocationOperationsPage({
   defaultUseDatabase = true,
-}: RelocationOperationsPageProps = {}) {
+}: any) {
   const [activeView, setActiveView] = useState<RelocationWorkflowView>("matching");
   const [useDatabase, setUseDatabase] = useState<boolean>(defaultUseDatabase);
   const [matchingResult, setMatchingResult] = useState<RelocationMatchingResult | null>(

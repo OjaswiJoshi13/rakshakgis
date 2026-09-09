@@ -55,7 +55,7 @@ export const RelocationPriorityCard: React.FC<RelocationPriorityCardProps> = ({
               Relocation Urgency Score
             </div>
             <div className="text-2xl font-bold font-mono text-text-primary tabular-nums">
-              {score !== null ? `${score.toFixed(1)} / 100` : "—"}
+              {score !== null ? `${score.toFixed(1)} / 100` : "Not available in source"}
             </div>
           </div>
 
@@ -78,13 +78,13 @@ export const RelocationPriorityCard: React.FC<RelocationPriorityCardProps> = ({
         {/* Relocation Destination Details */}
         <div className="space-y-3 mb-4">
           <div className="text-xs font-medium text-text-secondary">
-            Candidate Site Assignment
+            Proposed Candidate Site Assignment
           </div>
 
           {relocation.is_assigned ? (
             <div className="p-3 rounded-md bg-surface-elevated border border-emerald-500/30 dark:border-emerald-900/40 space-y-2">
               <div className="flex justify-between text-xs">
-                <span className="text-text-muted">Target Site:</span>
+                <span className="text-text-muted">Target Proposed Site:</span>
                 <span className="font-semibold text-emerald-700 dark:text-emerald-300">
                   {relocation.assigned_site_name || "Assigned Site"} ({relocation.assigned_site_id})
                 </span>
@@ -92,13 +92,13 @@ export const RelocationPriorityCard: React.FC<RelocationPriorityCardProps> = ({
               <div className="flex justify-between text-xs">
                 <span className="text-text-muted">Allocated Demand:</span>
                 <span className="font-mono text-text-primary">
-                  {relocation.allocated_households ?? "—"} households
+                  {relocation.allocated_households ?? "Not available in source"} households
                 </span>
               </div>
             </div>
           ) : (
             <div className="p-3 rounded-md bg-surface-elevated border border-border-subtle text-xs text-text-muted">
-              No relocation site assigned yet. Settlement remains in priority evaluation queue.
+              No proposed candidate site assigned yet. Settlement remains in priority evaluation queue.
             </div>
           )}
         </div>

@@ -22,7 +22,7 @@ villages_router = APIRouter()
 )
 def list_villages(
     page: int = Query(1, ge=1, description="Page number (1-indexed)"),
-    page_size: int = Query(20, ge=1, le=100, description="Items per page (max 100)"),
+    page_size: int = Query(20, ge=1, le=250, description="Items per page (max 250)"),
     district_id: Optional[int] = Query(None, description="Filter by parent district ID"),
     block_id: Optional[int] = Query(None, description="Filter by administrative block ID"),
     region_id: Optional[str] = Query(None, description="Filter by region identifier or code"),

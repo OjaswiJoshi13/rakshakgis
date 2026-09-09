@@ -51,7 +51,7 @@ export const ThresholdConfigCard: React.FC<ThresholdConfigCardProps> = ({ thresh
             <div className="bg-surface-elevated p-2 rounded border border-border-subtle">
               <span className="text-[10px] uppercase text-text-muted block mb-0.5">24h Rainfall</span>
               <span className="font-bold text-text-primary">&ge; {thresholds.rainfall_trigger_24h_mm} mm</span>
-              <span className="text-[10px] text-text-muted block">IMD heavy rain trigger</span>
+              <span className="text-[10px] text-text-muted block">Regional heavy rainfall threshold (64.5 mm)</span>
             </div>
 
             {/* Seismic MMI */}

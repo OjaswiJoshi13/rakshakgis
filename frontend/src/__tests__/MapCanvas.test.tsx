@@ -459,7 +459,7 @@ describe("MapLibre GIS Interactive Map Canvas (Chunk M5-05)", () => {
       );
 
       expect(screen.getByText("GIS Layer Controls")).toBeInTheDocument();
-      expect(screen.getByText("Candidate Safe Havens")).toBeInTheDocument();
+      expect(screen.getByText("Proposed Candidate Sites")).toBeInTheDocument();
       expect(screen.getByText("Evacuation Corridors")).toBeInTheDocument();
       expect(screen.getByText("5 features")).toBeInTheDocument();
       // Pending layers explicitly disclosed
@@ -478,7 +478,7 @@ describe("MapLibre GIS Interactive Map Canvas (Chunk M5-05)", () => {
         />
       );
 
-      const checkbox = screen.getByLabelText("Toggle visibility of Candidate Safe Havens");
+      const checkbox = screen.getByLabelText("Toggle visibility of Proposed Candidate Sites");
       fireEvent.click(checkbox);
       expect(onToggle).toHaveBeenCalledWith("candidate-sites-points");
     });
@@ -588,7 +588,7 @@ describe("MapLibre GIS Interactive Map Canvas (Chunk M5-05)", () => {
       expect(screen.getByRole("heading", { name: "Command GIS Map Canvas" })).toBeInTheDocument();
       expect(screen.getByText(/Region: chamoli_pilot/i)).toBeInTheDocument();
       expect(screen.getByTestId("map-data-mode")).toHaveTextContent("DEMO (Synthetic)");
-      expect(screen.getByText(/5 Havens • 2 Corridors/i)).toBeInTheDocument();
+      expect(screen.getByText(/5 Candidate Sites • 2 Corridors/i)).toBeInTheDocument();
     });
 
     it("displays LIVE mode when dataMode is live", () => {
@@ -608,18 +608,19 @@ describe("MapLibre GIS Interactive Map Canvas (Chunk M5-05)", () => {
       vi.spyOn(authService, "getMeApi").mockResolvedValue(mockOfficerUser);
 
       vi.spyOn(apiModule.apiClient, "get").mockImplementation(async (path: string) => {
-        if (path.includes("/sites")) {
+        if (path.includes("/map/layers")) {
           return {
             success: true,
-            data: mockCandidateSites,
-            pagination: { total: 1, page: 1, page_size: 50, total_pages: 1, has_next: false, has_prev: false },
-          };
-        }
-        if (path.includes("/routes")) {
-          return {
-            success: true,
-            data: mockRoutes,
-            pagination: { total: 1, page: 1, page_size: 50, total_pages: 1, has_next: false, has_prev: false },
+            data: {
+              "candidate-sites": candidateSitesToGeoJSON(mockCandidateSites),
+              "candidate-site-boundaries": { type: "FeatureCollection", features: [] },
+              "routes": routesToGeoJSON(mockRoutes),
+              "red-zones": { type: "FeatureCollection", features: [] },
+              "villages": { type: "FeatureCollection", features: [] },
+              "village-boundaries": { type: "FeatureCollection", features: [] },
+              "earthquakes": { type: "FeatureCollection", features: [] },
+              "critical-facilities": { type: "FeatureCollection", features: [] },
+            },
           };
         }
         return { success: true, data: [] };
@@ -639,7 +640,7 @@ describe("MapLibre GIS Interactive Map Canvas (Chunk M5-05)", () => {
 
       expect(screen.getByTestId("maplibre-canvas")).toBeInTheDocument();
       expect(screen.getByTestId("layer-control-panel")).toBeInTheDocument();
-      expect(screen.getByText("Candidate Safe Havens")).toBeInTheDocument();
+      expect(screen.getByText("Proposed Candidate Sites")).toBeInTheDocument();
       expect(screen.getByText("Evacuation Corridors")).toBeInTheDocument();
     });
 
@@ -648,19 +649,12 @@ describe("MapLibre GIS Interactive Map Canvas (Chunk M5-05)", () => {
       vi.spyOn(authService, "getMeApi").mockResolvedValue(mockOfficerUser);
 
       vi.spyOn(apiModule.apiClient, "get").mockImplementation(async (path: string) => {
-        if (path.includes("/routes")) {
+        if (path.includes("/map/layers")) {
           throw new apiModule.ApiError({
-            message: "Routes service connection timed out",
+            message: "GIS layers service connection timed out",
             status: 504,
             code: "GATEWAY_TIMEOUT",
           });
-        }
-        if (path.includes("/sites")) {
-          return {
-            success: true,
-            data: mockCandidateSites,
-            pagination: { total: 1, page: 1, page_size: 50, total_pages: 1, has_next: false, has_prev: false },
-          };
         }
         return { success: true, data: [] };
       });
@@ -679,7 +673,7 @@ describe("MapLibre GIS Interactive Map Canvas (Chunk M5-05)", () => {
 
       // Error banner displays safe message
       expect(screen.getByTestId("gis-error-banner")).toBeInTheDocument();
-      expect(screen.getByText(/Routes service connection timed out/i)).toBeInTheDocument();
+      expect(screen.getByText(/GIS layers service connection timed out/i)).toBeInTheDocument();
       // Map canvas still renders smoothly
       expect(screen.getByTestId("maplibre-canvas")).toBeInTheDocument();
     });
@@ -689,18 +683,19 @@ describe("MapLibre GIS Interactive Map Canvas (Chunk M5-05)", () => {
       vi.spyOn(authService, "getMeApi").mockResolvedValue(mockOfficerUser);
 
       vi.spyOn(apiModule.apiClient, "get").mockImplementation(async (path: string) => {
-        if (path.includes("/sites")) {
+        if (path.includes("/map/layers")) {
           return {
             success: true,
-            data: mockCandidateSites,
-            pagination: { total: 1, page: 1, page_size: 50, total_pages: 1, has_next: false, has_prev: false },
-          };
-        }
-        if (path.includes("/routes")) {
-          return {
-            success: true,
-            data: mockRoutes,
-            pagination: { total: 1, page: 1, page_size: 50, total_pages: 1, has_next: false, has_prev: false },
+            data: {
+              "candidate-sites": candidateSitesToGeoJSON(mockCandidateSites),
+              "candidate-site-boundaries": { type: "FeatureCollection", features: [] },
+              "routes": routesToGeoJSON(mockRoutes),
+              "red-zones": { type: "FeatureCollection", features: [] },
+              "villages": { type: "FeatureCollection", features: [] },
+              "village-boundaries": { type: "FeatureCollection", features: [] },
+              "earthquakes": { type: "FeatureCollection", features: [] },
+              "critical-facilities": { type: "FeatureCollection", features: [] },
+            },
           };
         }
         return { success: true, data: [] };
@@ -742,7 +737,7 @@ describe("MapLibre GIS Interactive Map Canvas (Chunk M5-05)", () => {
               id: 101,
               geometry: { type: "Point", coordinates: [79.4321, 30.4123] },
               properties: {
-                name: "Safe Haven Pipalkoti Terrace",
+                name: "Proposed Candidate Site Pipalkoti Terrace",
                 status: "approved",
                 elevation_m: 1320,
                 terrain_slope_deg: 9.2,
@@ -758,7 +753,7 @@ describe("MapLibre GIS Interactive Map Canvas (Chunk M5-05)", () => {
       await waitFor(() => {
         expect(screen.getByTestId("feature-detail-panel")).toBeInTheDocument();
       });
-      expect(screen.getByText("Safe Haven Pipalkoti Terrace")).toBeInTheDocument();
+      expect(screen.getByText("Proposed Candidate Site Pipalkoti Terrace")).toBeInTheDocument();
 
       // Click button to switch region inside act
       act(() => {

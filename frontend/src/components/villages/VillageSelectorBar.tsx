@@ -114,7 +114,7 @@ export const VillageSelectorBar: React.FC<VillageSelectorBarProps> = ({
 
           {/* Habitations Count */}
           <span className="text-xs text-text-muted" aria-live="polite">
-            {villages.length} Baseline {villages.length === 1 ? "Settlement" : "Settlements"}
+            {villages.length} {villages.length === 1 ? "Habitation" : "Habitations"} Evaluated
           </span>
 
           {/* Refresh Action */}

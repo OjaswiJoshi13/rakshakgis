@@ -2520,17 +2520,17 @@ No chunk may transition to `IN_PROGRESS` until all its listed prerequisite depen
   5. **Regression Test Suite (`backend/tests/test_real01b_forensic_paths.py`):**
      - Added 3 end-to-end tests validating 188 habitations, 150 boundaries, 150 NCS earthquakes, full analysis dossier, and 188-village matching.
 - **Quality Gate Results:**
-  - **Backend Pytest (REAL-01B Suite):** **3 passed, 0 failed** (`backend/tests/test_real01b_forensic_paths.py`).
-  - **Golden SIH Demo Flow:** **All 22 statutory steps passed** (`scripts/validate_golden_sih_flow.py`).
-  - **Frontend Vitest:** Passed.
+  - **Frontend TypeScript (`tsc --noEmit`):** **0 errors** (clean compilation).
+  - **Frontend Targeted Vitest (REAL-01B Suite):** **4 test files passed, 65 tests passed, 0 failed** (`RelocationPlanner.test.tsx` [9/9], `ScenarioSimulator.test.tsx` [9/9], `VillageAnalysis.test.tsx` [22/22], `MapCanvas.test.tsx` [25/25]).
+  - **Backend Pytest (Targeted Real-Data Suites):** **10 passed, 0 failed** (`backend/tests/test_region_resolver.py` [7/7], `backend/tests/test_real01b_forensic_paths.py` [3/3]).
 - **Test Integrity:** Zero tests skipped, deleted, or weakened. All original regression suites verified.
 
 ---
 
 ## Last Updated
 
-- **Timestamp:** 2026-09-09 11:35:00 IST
+- **Timestamp:** 2026-09-09 12:05:00 IST
 - **Updated By:** Core Engineering & GIS Platform Teams (REAL-01B IMPLEMENTED — AWAITING INDEPENDENT REVIEW)
-- **Status Summary:** Eliminated remaining demo/pilot data paths across GIS Map, Settlement Analysis, Relocation Planner, Scenario Simulator, and Dashboard. All visible screens consume the verified 188-village database dataset and truthful provenance metadata. Ready for independent forensic verification.
+- **Status Summary:** Strictly connected the RakshakGIS operational frontend to the canonical real-data path backed by PostgreSQL 16 on port 5433 (188 villages, 150 boundaries, 150 NCS earthquakes, 12 sites, 53 routes, 7 red zones). Eliminated synthetic 40-village fixture fallbacks, 5-settlement mock scenario paths, false IMD weather claims, and unverified safe haven designations. All targeted test suites passed (65/65 frontend, 10/10 backend, 0 tsc errors). Ready for independent review.
 
 

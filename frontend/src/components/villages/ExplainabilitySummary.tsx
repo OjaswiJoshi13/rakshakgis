@@ -63,10 +63,10 @@ export const ExplainabilitySummary: React.FC<ExplainabilitySummaryProps> = ({
             2. Exposure & Vulnerability
           </div>
           <div className="text-sm font-semibold text-text-primary">
-            {pop !== null ? `${pop.toLocaleString()} people` : "Population unavailable"}
+            {pop !== null ? `${pop.toLocaleString()} people` : "Not available in source"}
           </div>
           <div className="text-xs text-purple-700 dark:text-purple-400 font-mono mt-1">
-            Vulnerability: {socialScore !== null ? `${socialScore.toFixed(1)} / 100` : "—"}
+            Vulnerability: {socialScore !== null ? `${socialScore.toFixed(1)} / 100` : "Not available in source"}
           </div>
         </div>
 
@@ -76,7 +76,7 @@ export const ExplainabilitySummary: React.FC<ExplainabilitySummaryProps> = ({
             3. Multi-Hazard Risk
           </div>
           <div className="text-sm font-semibold text-text-primary">
-            Score: {riskScore !== null ? `${riskScore.toFixed(1)}` : "—"}
+            Score: {riskScore !== null ? `${riskScore.toFixed(1)}` : "Not available in source"}
           </div>
           <div className="mt-1">
             <RiskBadge band={riskBand} score={riskScore ?? undefined} />
@@ -89,7 +89,7 @@ export const ExplainabilitySummary: React.FC<ExplainabilitySummaryProps> = ({
             4. Relocation Urgency
           </div>
           <div className="text-sm font-semibold text-text-primary">
-            Urgency: {priorityScore !== null ? `${priorityScore.toFixed(1)}` : "—"}
+            Urgency: {priorityScore !== null ? `${priorityScore.toFixed(1)}` : "Not available in source"}
           </div>
           <div className="mt-1">
             <RelocationBadge band={priorityBand} score={priorityScore ?? undefined} />

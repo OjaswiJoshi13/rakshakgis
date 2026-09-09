@@ -8,7 +8,7 @@ export interface LayerControlPanelProps {
   layers: MapLayerConfig[];
   layerVisibility: Record<string, boolean>;
   onToggleLayer: (layerId: string) => void;
-  featureCounts?: Record<string, number>;
+  featureCounts?: Record<string, number | undefined>;
   className?: string;
 }
 
@@ -119,8 +119,8 @@ export const LayerControlPanel: React.FC<LayerControlPanelProps> = ({
                           {count} {count === 1 ? "feature" : "features"}
                         </span>
                       ) : (
-                        <Badge variant="success" size="sm" className="text-xs">
-                          Active
+                        <Badge variant="outline" size="sm" className="text-xs text-amber-700 dark:text-amber-400">
+                          Unavailable
                         </Badge>
                       )
                     ) : (

@@ -64,7 +64,7 @@ export const MapHeader: React.FC<MapHeaderProps> = ({
           </h1>
 
           <p className="text-xs sm:text-sm text-text-muted max-w-2xl leading-relaxed">
-            Interactive multi-hazard geospatial canvas visualizing candidate relocation safe havens,
+            Interactive multi-hazard geospatial canvas visualizing proposed candidate relocation sites,
             evacuation road corridors, and regional zoning bounds.
           </p>
         </div>
@@ -75,7 +75,7 @@ export const MapHeader: React.FC<MapHeaderProps> = ({
           <div className="flex items-center gap-2 bg-surface-elevated border border-border-subtle rounded-md px-3 py-1.5 text-xs font-medium text-text-secondary tabular-nums">
             <span className="w-2 h-2 rounded-full bg-slate-500" />
             <span>
-              {totalSites} Havens &bull; {totalRoutes} Corridors
+              {totalSites} Candidate Sites &bull; {totalRoutes} Corridors
               {totalRedZones > 0 ? ` • ${totalRedZones} Red Zones` : ""}
               {totalVillages > 0 ? ` • ${totalVillages} Habitations` : ""}
             </span>
