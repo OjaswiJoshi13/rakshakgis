@@ -2663,8 +2663,80 @@ No chunk may transition to `IN_PROGRESS` until all its listed prerequisite depen
 
 ---
 
+### P0-GIS-RENDER: Visible Operational Vector Layers Restoration
+
+- **Status:** `IMPLEMENTED — AWAITING INDEPENDENT REVIEW`
+- **Date Completed:** 2026-09-09
+- **Owner:** GIS Core Engine & Frontend Engineering Teams
+- **Objective:** Fix P0 GIS rendering failure where MapLibre map rendered the basemap in the Chamoli viewport with feature counters displayed, but lacked visible operational vector markings (boundaries, habitations, red zones, routes, candidate sites). Trace and resolve root cause in MapLibre source/layer lifecycle and vector styling.
+- **Actual Root Causes Identified:**
+  1. **MapLibre Style Reload & Lifecycle Race Condition:** MapLibre GL clears all custom layers and sources when a style is loaded or reloaded. The previous `useEffect` relied solely on a single `map.on("load")` event and an unreactive `isStyleLoaded` check. Style reloads or asynchronous timing caused sources/layers to either fail silently or be purged without recreation.
+  2. **Silent Try/Catch Swallowing Failures:** Previously, `try...catch` blocks around `map.addSource` and `map.addLayer` swallowed exceptions silently without development logging, obscuring individual layer failures.
+  3. **ResizeObserver Instance Capture:** The initial `ResizeObserver` setup captured `mapInstanceRef.current` as `null` at mount time, preventing automatic map canvas resizing.
+  4. **Non-Deterministic Layer Stacking & Low Contrast:** Vector styling had insufficient contrast against the dominant OpenStreetMap basemap (thin 1.5–2px lines, transparent 0.35 fills, subtle amber markers). Without strict layer sorting (`map.moveLayer`), polygon fills could occlude routes and points.
+- **Actual Files Changed:**
+  - `frontend/src/components/map/MapCanvas.tsx`:
+    - Added reactive `styleVersion` and `isStyleLoaded` state tracking both `map.on("load")` and `map.on("style.load")`.
+    - Implemented safe style readiness check (`isStyleLoaded || (typeof map.isStyleLoaded === "function" && map.isStyleLoaded())`).
+    - Enforced strict bottom-to-top rendering order using `STRICT_LAYER_ORDER` with `map.moveLayer`.
+    - Added development diagnostics logging feature counts, geometry types, and layer errors without cluttering officer UI.
+    - Fixed `ResizeObserver` to dynamically reference `mapInstanceRef.current`.
+    - Added individual layer error logging.
+  - `frontend/src/components/map/layerConfig.ts`:
+    - Retained `DEFAULT_MAP_LAYERS` contract for Chunk M5-05 unit tests.
+    - Updated `GIS_ACTIVE_MAP_LAYERS` with high-contrast, visually prominent vector styling:
+      - *Red Zones:* 3px red outline (`#b91c1c`, dashed `[3, 1]`), fill opacity 0.45 (`#991b1b` / `#dc2626` / `#ea580c`).
+      - *Evacuation Corridors:* 4px line width, vibrant emerald (`#059669`) for evacuation, amber (`#d97706`) for alternate, indigo (`#4f46e5`) for relief, sky (`#0284c7`), 0.95 opacity.
+      - *Habitation Centroids:* 7px radius, high-contrast amber/risk-color fill, 2.5px crisp white halo (`#ffffff`), 0.95 opacity.
+      - *Proposed Candidate Sites:* 9px radius, prominent emerald green (`#10b981`), 3px crisp white halo (`#ffffff`), 1.0 opacity.
+      - *Village Boundaries:* 2px high-contrast blue outline (`#1d4ed8`), fill opacity 0.35.
+      - *Candidate Site Boundaries:* Disclosed truthfully as `"Not available in source"` (point geometry only).
+- **API Keys / Layer Keys Used:**
+  - Consumes backend endpoint `GET /api/v1/map/layers?region_id=himalayan_pilot`.
+  - Keys returned by API and bound by frontend:
+    - `village_boundaries` (150 Polygon features) -> `village-boundaries-source` / `village-boundaries-polygons`
+    - `villages` (188 Point features) -> `habitations-source` / `habitations-points`
+    - `sites` (12 Point features) -> `candidate-sites-source` / `candidate-sites-points`
+    - `routes` (53 LineString features) -> `routes-source` / `routes-lines`
+    - `red_zones` (7 MultiPolygon features) -> `red-zones-source` / `red-zones-polygons`
+    - `earthquakes_ncs` (150 Point features) -> `earthquakes-ncs-source` / `earthquakes-ncs`
+    - `earthquakes_usgs` (Point features) -> `earthquakes-usgs-source` / `earthquakes-usgs`
+- **MapLibre Source/Layer Lifecycle:**
+  - Initialization: Map container rendered -> `new MapLibreMap` initialized with neutral default viewport `[0, 20]` (or props `[79.5, 30.4]`).
+  - Events: `map.on("load")` and `map.on("style.load")` increment `styleVersion` and set `isStyleLoaded(true)`.
+  - Synchronization: Effect triggers on `[styleVersion, isStyleLoaded, sourcesData, layers, layerVisibility]`.
+  - Sources: Checks `map.getSource()`; updates via `setData()` or creates via `addSource()`.
+  - Layers: Adds layers with explicit paint/layout properties; attaches click/hover handlers; appends companion stroke layer for fills.
+  - Sorting: Iterates over `STRICT_LAYER_ORDER` and calls `map.moveLayer()` to ensure fills remain below lines and lines below points.
+- **Operational Bounds Behavior:**
+  - Auto-fit bounds strictly aggregates geometries from regional operational sources (`village-boundaries-source`, `habitations-source`, `candidate-sites-source`, `routes-source`, `red-zones-source`).
+  - Broad macro-seismic catalogs (`earthquakes-ncs`, `earthquakes-usgs`) are strictly excluded from initial and auto bounds calculations.
+- **Layer Rendering Order (Bottom to Top):**
+  1. Basemap (OpenStreetMap raster tiles)
+  2. `village-boundaries-polygons` (polygon fill)
+  3. `red-zones-polygons` (polygon fill)
+  4. `candidate-sites-boundaries` (if present)
+  5. `village-boundaries-polygons-stroke` (blue outline, 2px)
+  6. `red-zones-polygons-stroke` (red dashed outline, 3px)
+  7. `routes-lines` (line corridors, 4px)
+  8. `habitations-points` (circle markers, 7px with white halo)
+  9. `candidate-sites-points` (circle markers, 9px with white halo)
+  10. `earthquakes-ncs` / `earthquakes-usgs` (seismic markers)
+- **Visual Verification Status:**
+  - Automated browser-level visual verification was attempted; due to external host resolution unavailability for browser subagents in this environment, formal status is **"Browser visual verification unavailable"**.
+  - Programmatic verification executed: MapLibre GL style specification conformance validated (0 errors via `@maplibre/maplibre-gl-style-spec`), GeoJSON coordinates verified in WGS84 `[lng, lat]`, and component lifecycle verified via Vitest.
+- **Targeted Tests Run:**
+  - `npx tsc --noEmit` in `frontend/`: 0 errors.
+  - `npm run test -- src/__tests__/MapCanvas.test.tsx` in `frontend/`: **25 passed, 0 failed**.
+- **Remaining Limitations:**
+  - Candidate site boundary polygons do not exist in the survey source data (point coordinates only); truthfully displayed as unavailable.
+  - Browser-level automated visual snapshotting driver remains unavailable in the container environment.
+
+---
+
 ## Last Updated
 
-- **Timestamp:** 2026-09-09 13:56:00 IST
-- **Updated By:** Backend & Platform Engineering Teams (BACKEND-REQUIREMENTS COMPLETED — COMMITTED)
-- **Status Summary:** Created authoritative `backend/requirements.txt` covering all runtime, geospatial, authentication, database, and test dependencies. Validated clean environment installation (`pip install -r backend/requirements.txt` -> code 0), FastAPI application import, backend tests (67 targeted passed), and Docker backend build (`rakshakgis-backend` on Python 3.11). Pinned requirements committed to repository.
+- **Timestamp:** 2026-09-09 14:31:00 IST
+- **Updated By:** GIS Core Engine & Frontend Engineering Teams (P0-GIS-RENDER IMPLEMENTED — AWAITING INDEPENDENT REVIEW)
+- **Status Summary:** Fixed P0 GIS rendering failure. Solved MapLibre style lifecycle race condition, added strict layer ordering (`map.moveLayer`), implemented high-contrast operational vector styling for boundaries, red zones, routes, habitations, and candidate sites. Verified type checking (`npx tsc --noEmit` -> 0 errors) and targeted unit tests (`src/__tests__/MapCanvas.test.tsx` -> 25/25 passed). Changes committed and pushed to `main`.
+
