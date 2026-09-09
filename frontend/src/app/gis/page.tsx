@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState, useMemo, useEffect } from "react";
+import React, { useState, useMemo, useEffect, useRef } from "react";
 import { ProtectedRoute } from "@/components/auth/ProtectedRoute";
 import { AppLayout } from "@/components/layout/AppLayout";
 import {
@@ -32,6 +32,7 @@ export default function GisMapPage() {
   const [viewportBounds, setViewportBounds] = useState<[[number, number], [number, number]] | null>(
     null
   );
+  const lastFittedRegionRef = useRef<string | null>(null);
   const [layerVisibility, setLayerVisibility] = useState<Record<string, boolean>>({
     "village-boundaries-polygons": true,
     "habitations-points": true,
@@ -48,6 +49,7 @@ export default function GisMapPage() {
   useEffect(() => {
     setSelectedFeature(null);
     setViewportBounds(null);
+    lastFittedRegionRef.current = null;
   }, [activeRegion]);
 
   // Canonical Vector Map Layers via GET /map/layers?region_id=...
@@ -221,6 +223,14 @@ export default function GisMapPage() {
     redZonesGeoJSON,
     villagesGeoJSON,
   ]);
+
+  // Automatically fit viewport to active region features when data arrives or region changes
+  useEffect(() => {
+    if (computedBounds && lastFittedRegionRef.current !== effectiveRegion) {
+      setViewportBounds([[...computedBounds[0]], [...computedBounds[1]]]);
+      lastFittedRegionRef.current = effectiveRegion;
+    }
+  }, [computedBounds, effectiveRegion]);
 
   const handleResetView = () => {
     if (computedBounds) {

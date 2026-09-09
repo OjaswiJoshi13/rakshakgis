@@ -224,9 +224,23 @@ export const MapCanvas: React.FC<MapCanvasProps> = ({
       return;
     }
 
-    // Auto-calculate bounds from all available and visible sources
-    const allFeatures = Object.values(sourcesData).flatMap((c) => c.features);
-    const calculated = calculateBounds(allFeatures);
+    // Auto-calculate bounds from active regional operational sources (excluding macro-seismic catalogs)
+    const REGIONAL_OPERATIONAL_SOURCES = [
+      "village-boundaries-source",
+      "habitations-source",
+      "candidate-sites-source",
+      "candidate-site-boundaries-source",
+      "routes-source",
+      "red-zones-source",
+    ];
+    const regionalFeatures = REGIONAL_OPERATIONAL_SOURCES
+      .flatMap((sourceKey) => sourcesData[sourceKey]?.features || []);
+
+    const featuresForBounds = regionalFeatures.length > 0
+      ? regionalFeatures
+      : Object.values(sourcesData).flatMap((c) => c.features);
+
+    const calculated = calculateBounds(featuresForBounds);
     if (calculated) {
       try {
         map.fitBounds(calculated, { padding: 40, maxZoom: 14, duration: 800 });

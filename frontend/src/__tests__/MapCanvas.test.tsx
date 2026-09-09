@@ -518,7 +518,7 @@ describe("MapLibre GIS Interactive Map Canvas (Chunk M5-05)", () => {
       render(<FeatureDetailPanel feature={selectedSite} onClose={vi.fn()} />);
 
       expect(screen.getByText("Safe Haven Pipalkoti Terrace")).toBeInTheDocument();
-      expect(screen.getByText(/approved/i)).toBeInTheDocument();
+      expect(screen.getAllByText(/proposed/i).length).toBeGreaterThanOrEqual(1);
       expect(screen.getByText("1320 m")).toBeInTheDocument();
       expect(screen.getByText("9.2°")).toBeInTheDocument();
       expect(screen.getByText("54,000 m²")).toBeInTheDocument();

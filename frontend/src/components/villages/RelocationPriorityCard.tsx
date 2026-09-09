@@ -42,7 +42,7 @@ export const RelocationPriorityCard: React.FC<RelocationPriorityCardProps> = ({
           </CardTitle>
           <div className="flex items-center gap-2">
             <RelocationBadge band={resolvedBand} score={score ?? undefined} />
-            <span className="text-xs font-mono text-text-muted">M3-12 / M4-04</span>
+            <span className="text-xs font-mono text-text-muted">Relocation Engine</span>
           </div>
         </div>
       </CardHeader>
@@ -106,7 +106,7 @@ export const RelocationPriorityCard: React.FC<RelocationPriorityCardProps> = ({
         {/* Evacuation Route Corridor Details */}
         <div className="space-y-2 border-t border-border-subtle pt-3">
           <div className="text-xs font-medium text-text-secondary">
-            Evacuation & Access Routing (M4-05)
+            Evacuation & Access Routing
           </div>
 
           {evacuation ? (
@@ -152,7 +152,7 @@ export const RelocationPriorityCard: React.FC<RelocationPriorityCardProps> = ({
 
         {/* Formula Citation */}
         <div className="mt-4 pt-3 border-t border-border-subtle text-xs text-text-muted font-mono">
-          Priority = 0.40R + 0.25E + 0.20V + 0.10H + 0.05A (M3-12)
+          Priority Formula: 0.40R + 0.25E + 0.20V + 0.10H + 0.05A
         </div>
       </CardContent>
     </Card>

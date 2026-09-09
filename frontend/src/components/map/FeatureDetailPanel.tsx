@@ -69,18 +69,14 @@ export const FeatureDetailPanel: React.FC<FeatureDetailPanelProps> = ({
         </div>
         <Badge
           variant={
-            String(props.status).toLowerCase() === "active"
-              ? "success"
-              : String(props.status).toLowerCase() === "approved"
-              ? "info"
-              : String(props.status).toLowerCase() === "rejected"
+            String(props.status).toLowerCase() === "rejected"
               ? "danger"
-              : "outline"
+              : "warning"
           }
           size="sm"
-          className="capitalize"
+          className="uppercase font-mono text-[10px]"
         >
-          {String(props.status || "Unknown")}
+          {String(props.planning_status || "Proposed / Synthetic")}
         </Badge>
       </div>
 

@@ -2,6 +2,7 @@
 
 import React, { useState, useCallback, useEffect } from "react";
 import { OperationsSectionShell } from "@/components/operations/OperationsSectionShell";
+import { useOperational } from "@/context/OperationalContext";
 import {
   RelocationMatchingResult,
   RelocationWorkflowView,
@@ -25,6 +26,9 @@ import { CheckCircle2, AlertCircle, RefreshCw } from "lucide-react";
 export default function RelocationOperationsPage({
   defaultUseDatabase = true,
 }: any) {
+  const { activeRegion } = useOperational();
+  const effectiveRegion = activeRegion || "himalayan_pilot";
+
   const [activeView, setActiveView] = useState<RelocationWorkflowView>("matching");
   const [useDatabase, setUseDatabase] = useState<boolean>(defaultUseDatabase);
   const [matchingResult, setMatchingResult] = useState<RelocationMatchingResult | null>(
@@ -54,7 +58,7 @@ export default function RelocationOperationsPage({
       const response = await evaluateRelocationMatching({
         use_database_villages: true,
         use_database_sites: true,
-        region_profile_id: "himalayan_pilot",
+        region_profile_id: effectiveRegion,
       });
 
       if (response && response.data && response.data.assignments) {
@@ -69,7 +73,7 @@ export default function RelocationOperationsPage({
     } finally {
       setIsExecuting(false);
     }
-  }, [useDatabase]);
+  }, [useDatabase, effectiveRegion]);
 
   useEffect(() => {
     if (defaultUseDatabase) {
@@ -136,6 +140,7 @@ export default function RelocationOperationsPage({
             matchingResult?.assignments.filter((a) => a.status === "assigned")
               .length || 0
           }
+          regionProfileId={effectiveRegion}
         />
 
         {/* Persistence Success Banner */}

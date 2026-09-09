@@ -26,7 +26,6 @@ export const SiteHeaderCard: React.FC<SiteHeaderCardProps> = ({
   activeTab,
   onTabChange,
 }) => {
-  const isApproved = site.status.toLowerCase() === "approved";
   const isRejected = site.status.toLowerCase() === "rejected";
   const isSlopeSafe = site.terrain_slope_deg != null && site.terrain_slope_deg <= 15.0;
 
@@ -37,11 +36,11 @@ export const SiteHeaderCard: React.FC<SiteHeaderCardProps> = ({
         <div>
           <div className="flex items-center gap-2 mb-1">
             <Badge
-              variant={isApproved ? "success" : isRejected ? "danger" : "default"}
+              variant={isRejected ? "danger" : "warning"}
               size="sm"
               className="font-mono text-xs uppercase"
             >
-              {site.status}
+              {isRejected ? "REJECTED" : "PROPOSED / SYNTHETIC"}
             </Badge>
             <span className="text-xs font-mono text-text-muted">
               Site ID: #{site.id} • District #{site.district_id}

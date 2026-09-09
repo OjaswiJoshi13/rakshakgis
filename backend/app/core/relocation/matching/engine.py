@@ -171,18 +171,30 @@ class RelocationMatchingEngine:
                     )
                     continue
 
-                # Check 2: M4-02 Hard safety constraints
+                # Check 2: Hard safety constraints
                 if not suit_res.is_eligible:
                     failed_names = [c.name for c in suit_res.hard_constraints if not c.passed]
+                    reasons = []
+                    for c in suit_res.hard_constraints:
+                        if not c.passed:
+                            c_lower = c.name.lower()
+                            if "slope" in c_lower:
+                                reasons.append("Safety constraint failed: Terrain slope exceeds the configured safe threshold.")
+                            elif "buffer" in c_lower or "hazard" in c_lower:
+                                reasons.append("Safety constraint failed: Site is within the active hazard buffer perimeter.")
+                            elif "capacity" in c_lower:
+                                reasons.append("Safety constraint failed: Usable site carrying capacity is zero or indeterminate.")
+                            else:
+                                reasons.append(f"Safety constraint failed: {c.name}.")
+                    if not reasons:
+                        reasons = [f"Safety constraint failed: {', '.join(failed_names)}."]
                     v_audits.append(
                         CandidateEvaluationAudit(
                             site_id=s_id,
                             site_name=site.site_name,
                             is_feasible=False,
                             rejection_code=RejectionReasonCode.UNSAFE_SITE,
-                            rejection_reasons=[
-                                f"Failed M4-02 hard safety constraint(s): {failed_names}."
-                            ],
+                            rejection_reasons=reasons,
                             suitability_score=suit_res.overall_score,
                             suitability_decision=suit_res.decision.value,
                             available_capacity_before=remaining_capacities.get(s_key, 0),
@@ -242,7 +254,7 @@ class RelocationMatchingEngine:
                             is_feasible=False,
                             rejection_code=RejectionReasonCode.INSUFFICIENT_CAPACITY,
                             rejection_reasons=[
-                                f"Site available capacity is exhausted (0 households available, {demand} required)."
+                                f"Available capacity is 0 households, below the required {demand} households (deficit: {demand})."
                             ],
                             suitability_score=suit_res.overall_score,
                             suitability_decision=suit_res.decision.value,
@@ -260,8 +272,7 @@ class RelocationMatchingEngine:
                             is_feasible=False,
                             rejection_code=RejectionReasonCode.INSUFFICIENT_CAPACITY,
                             rejection_reasons=[
-                                f"Insufficient capacity: Available {curr_avail} households < required {demand} households "
-                                f"(deficit of {abs(margin)} households)."
+                                f"Available capacity is {curr_avail} households, below the required {demand} households (deficit: {abs(margin)})."
                             ],
                             suitability_score=suit_res.overall_score,
                             suitability_decision=suit_res.decision.value,
@@ -314,7 +325,7 @@ class RelocationMatchingEngine:
                     reason = f"All {len(sites)} candidate sites have insufficient remaining capacity for {demand} households."
                 elif all(c in (RejectionReasonCode.UNSAFE_SITE, RejectionReasonCode.LOW_SUITABILITY) for c in codes):
                     primary_code = RejectionReasonCode.UNSAFE_SITE
-                    reason = f"All {len(sites)} candidate sites failed M4-02 safety constraints or suitability thresholds."
+                    reason = f"All {len(sites)} candidate sites failed safety constraints or suitability thresholds."
                 elif all(c == RejectionReasonCode.UNKNOWN_CAPACITY for c in codes):
                     primary_code = RejectionReasonCode.UNKNOWN_CAPACITY
                     reason = f"All {len(sites)} candidate sites have unmeasured or unknown critical capacity."

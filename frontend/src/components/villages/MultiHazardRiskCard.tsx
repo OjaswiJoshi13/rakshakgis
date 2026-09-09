@@ -64,7 +64,7 @@ export const MultiHazardRiskCard: React.FC<MultiHazardRiskCardProps> = ({
           </CardTitle>
           <div className="flex items-center gap-2">
             <RiskBadge band={isExplainable ? resolvedBand : "safe"} score={isExplainable ? (score ?? undefined) : undefined} />
-            <span className="text-xs font-mono text-text-muted">M3-06 Engine</span>
+            <span className="text-xs font-mono text-text-muted">Multi-Hazard Engine</span>
           </div>
         </div>
       </CardHeader>
@@ -156,7 +156,7 @@ export const MultiHazardRiskCard: React.FC<MultiHazardRiskCardProps> = ({
 
         {/* Formula Citation */}
         <div className="mt-4 pt-3 border-t border-border-subtle text-xs text-text-muted font-mono">
-          Model: Risk = 0.30H + 0.20F + 0.15R + 0.15S + 0.10D + 0.10V (M3-06)
+          Formula: Risk = 0.30H + 0.20F + 0.15R + 0.15S + 0.10D + 0.10V
         </div>
       </CardContent>
     </Card>

@@ -33,7 +33,7 @@ export const PopulationExposureCard: React.FC<PopulationExposureCardProps> = ({
             </svg>
             Demographics & Exposure
           </CardTitle>
-          <span className="text-xs font-mono text-text-muted">M3-09 Profile</span>
+          <span className="text-xs font-mono text-text-muted">Census Profile</span>
         </div>
       </CardHeader>
 

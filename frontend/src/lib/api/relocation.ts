@@ -143,7 +143,7 @@ export const HIMALAYAN_PILOT_SAMPLE_MATCH_RESULT: RelocationMatchingResult = {
           is_feasible: false,
           rejection_code: "unsafe_site",
           rejection_reasons: [
-            "Failed M4-02 hard safety constraint(s): ['hazard_buffer_distance_m < 500m'].",
+            "Safety constraint failed: Site is within the active hazard buffer perimeter.",
           ],
           suitability_score: 41.0,
           suitability_decision: "unsuitable",
@@ -305,7 +305,7 @@ export const HIMALAYAN_PILOT_SAMPLE_MATCH_RESULT: RelocationMatchingResult = {
           is_feasible: false,
           rejection_code: "unsafe_site",
           rejection_reasons: [
-            "Failed M4-02 hard safety constraint(s): ['hazard_buffer_distance_m < 500m'].",
+            "Safety constraint failed: Site is within the active hazard buffer perimeter.",
           ],
           suitability_score: 41.0,
           suitability_decision: "unsuitable",

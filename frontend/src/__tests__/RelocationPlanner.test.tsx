@@ -55,7 +55,7 @@ describe("Relocation Planner Workflow UI Suite (Chunk M6-02)", () => {
       renderWithAuth();
 
       expect(screen.getByText(/himalayan_pilot \(Chamoli\)/i)).toBeInTheDocument();
-      expect(screen.getByText(/greedy_priority \(M4-04\)/i)).toBeInTheDocument();
+      expect(screen.getAllByText(/greedy_priority/i).length).toBeGreaterThanOrEqual(1);
       expect(screen.getByRole("button", { name: /Pilot Evaluation Set/i })).toBeInTheDocument();
       expect(screen.getByRole("button", { name: /Live Database/i })).toBeInTheDocument();
     });
@@ -123,13 +123,13 @@ describe("Relocation Planner Workflow UI Suite (Chunk M6-02)", () => {
       // Verify modal opens
       const dialog = screen.getByRole("dialog");
       expect(dialog).toBeInTheDocument();
-      expect(within(dialog).getByText("M4-04 Explainability Audit")).toBeInTheDocument();
+      expect(within(dialog).getByText("Explainability Audit")).toBeInTheDocument();
       expect(within(dialog).getByText(/Village Unassigned: Code \[insufficient_capacity\]/i)).toBeInTheDocument();
 
       // Verify individual candidate site constraints inside dialog
       expect(within(dialog).getByText("Joshimath Safe Terrace")).toBeInTheDocument();
       expect(within(dialog).getByText("Urgam North Ridge")).toBeInTheDocument();
-      expect(within(dialog).getByText(/Failed M4-02 hard safety constraint/i)).toBeInTheDocument();
+      expect(within(dialog).getByText(/Safety constraint failed/i)).toBeInTheDocument();
 
       // Close modal using footer Close Audit button
       const closeButton = within(dialog).getByRole("button", { name: "Close Audit" });

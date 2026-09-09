@@ -17,6 +17,11 @@ export interface GeoJSONLineStringGeometry {
   coordinates: [number, number][];
 }
 
+export interface GeoJSONMultiLineStringGeometry {
+  type: "MultiLineString";
+  coordinates: [number, number][][];
+}
+
 export interface GeoJSONPolygonGeometry {
   type: "Polygon";
   coordinates: [number, number][][];
@@ -30,6 +35,7 @@ export interface GeoJSONMultiPolygonGeometry {
 export type GeoJSONGeometry =
   | GeoJSONPointGeometry
   | GeoJSONLineStringGeometry
+  | GeoJSONMultiLineStringGeometry
   | GeoJSONPolygonGeometry
   | GeoJSONMultiPolygonGeometry;
 
@@ -219,6 +225,16 @@ export function isValidGeometry(geom: unknown): geom is GeoJSONGeometry {
         g.coordinates.length >= 2 &&
         g.coordinates.every(isValidPosition)
       );
+    case "MultiLineString":
+      return (
+        Array.isArray(g.coordinates) &&
+        g.coordinates.every(
+          (line) =>
+            Array.isArray(line) &&
+            line.length >= 2 &&
+            line.every(isValidPosition)
+        )
+      );
     case "Polygon":
       return (
         Array.isArray(g.coordinates) &&
@@ -281,6 +297,14 @@ export function calculateBounds(
     } else if (geom.type === "LineString" && Array.isArray(geom.coordinates)) {
       for (const pt of geom.coordinates) {
         if (isValidPosition(pt)) processCoord(pt[0], pt[1]);
+      }
+    } else if (geom.type === "MultiLineString" && Array.isArray(geom.coordinates)) {
+      for (const line of geom.coordinates) {
+        if (Array.isArray(line)) {
+          for (const pt of line) {
+            if (isValidPosition(pt)) processCoord(pt[0], pt[1]);
+          }
+        }
       }
     } else if (geom.type === "Polygon" && Array.isArray(geom.coordinates)) {
       for (const ring of geom.coordinates) {

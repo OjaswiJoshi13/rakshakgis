@@ -98,7 +98,7 @@ export const ExplainabilitySummary: React.FC<ExplainabilitySummaryProps> = ({
       </div>
 
       <div className="mt-3 text-xs text-text-muted font-mono flex items-center justify-between flex-wrap gap-2">
-        <span>Authority: Backend Engines (M3-06 Risk + M3-09 Vulnerability + M3-12 Priority + M4-04 Matching)</span>
+        <span>Authority: Backend Computational Engines (Multi-Hazard Risk + Vulnerability + Relocation Priority + Site Matching)</span>
         <span>Zero LLM numerical calculation</span>
       </div>
     </div>

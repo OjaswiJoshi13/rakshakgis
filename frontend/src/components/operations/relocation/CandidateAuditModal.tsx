@@ -60,8 +60,7 @@ export const CandidateAuditModal: React.FC<CandidateAuditModalProps> = ({
           <div>
             <div className="flex items-center gap-2 mb-1">
               <span className="text-xs font-mono uppercase tracking-wider text-text-muted">
-                <span className="sr-only">M4-04 Explainability Audit</span>
-                <span aria-hidden="true">Explainability Audit</span>
+                Explainability Audit
               </span>
               <Badge
                 variant={isAssigned ? "success" : "warning"}

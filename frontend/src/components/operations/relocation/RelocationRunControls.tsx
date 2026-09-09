@@ -24,6 +24,7 @@ export interface RelocationRunControlsProps {
   onOpenCommitDialog?: () => void;
   canCommit?: boolean;
   totalAssignmentsCount?: number;
+  regionProfileId?: string;
 }
 
 export const RelocationRunControls: React.FC<RelocationRunControlsProps> = ({
@@ -36,6 +37,7 @@ export const RelocationRunControls: React.FC<RelocationRunControlsProps> = ({
   onOpenCommitDialog,
   canCommit = false,
   totalAssignmentsCount = 0,
+  regionProfileId = "himalayan_pilot",
 }) => {
   return (
     <div className="space-y-4 rounded-lg border border-border-base bg-surface-raised p-4 shadow-2xs">
@@ -113,14 +115,14 @@ export const RelocationRunControls: React.FC<RelocationRunControlsProps> = ({
               <Sliders className="h-3.5 w-3.5 text-text-muted" />
               <span className="text-text-muted font-mono">Region Profile:</span>
               <Badge variant="outline" size="sm" className="font-mono text-text-secondary border-border-base">
-                himalayan_pilot (Chamoli)
+                {regionProfileId === "himalayan_pilot" ? "himalayan_pilot (Chamoli)" : regionProfileId}
               </Badge>
             </div>
 
             <div className="flex items-center gap-1.5">
               <span className="text-text-muted font-mono">Algorithm:</span>
               <Badge variant="default" size="sm" className="font-mono text-text-secondary border-border-base">
-                <span className="sr-only">greedy_priority (M4-04)</span>
+                <span className="sr-only">greedy_priority (Greedy Priority Matching)</span>
                 <span aria-hidden="true">greedy_priority</span>
               </Badge>
             </div>

@@ -58,54 +58,88 @@ def _extract_lon_lat(geometry_or_coords: Any, default: Tuple[float, float] = (79
     return default
 
 
-def _get_default_pilot_inputs() -> Tuple[List[VillageSimulationInput], List[SiteSimulationInput]]:
-    """Load default representative inputs from the deterministic Himalayan pilot dataset."""
-    dataset = load_himalayan_pilot_dataset()
+def _get_region_inputs(db: Session, region_id: str) -> Tuple[List[VillageSimulationInput], List[SiteSimulationInput]]:
+    """Load canonical operational inputs from the database for the active region."""
+    from sqlalchemy.orm import joinedload
+    from geoalchemy2.shape import to_shape
+    from app.core.regions.resolver import resolve_region_scope, apply_region_scope_to_village_query
+    from app.models.geographic import Village
+    from app.models.relocation import CandidateSite
 
-    # Load 5 sample villages representing valley and high slope corridors
-    sample_villages: List[VillageSimulationInput] = []
-    for f in dataset.villages.features[:5]:
-        props = f.properties
-        coords = _extract_lon_lat(f.geometry, (79.565, 30.555))
-        demo = getattr(props, "demographics", {}) or {}
-        risk_data = getattr(props, "risk", {}) or {}
+    scope = resolve_region_scope(db, region_id)
+    v_query = db.query(Village).options(
+        joinedload(Village.population_profile),
+        joinedload(Village.vulnerability_profile),
+        joinedload(Village.risk_scores),
+    )
+    v_query = apply_region_scope_to_village_query(v_query, scope)
+    v_records = v_query.all()
 
-        hh = demo.get("households", 50) if isinstance(demo, dict) else getattr(demo, "households", 50)
-        pop = demo.get("total_population", 200) if isinstance(demo, dict) else getattr(demo, "total_population", 200)
-        c_score = risk_data.get("composite_score", 50.0) if isinstance(risk_data, dict) else getattr(risk_data, "composite_score", 50.0)
+    villages: List[VillageSimulationInput] = []
+    for v in v_records:
+        coords = (79.565, 30.555)
+        if v.location:
+            try:
+                pt = to_shape(v.location)
+                coords = (float(pt.x), float(pt.y))
+            except Exception:
+                pass
 
-        sample_villages.append(
+        pop = v.population_profile.total_population if v.population_profile else 100
+        hh = v.population_profile.households if v.population_profile else max(1, pop // 4)
+        elderly = v.population_profile.elderly_count if v.population_profile else 0
+        children = v.population_profile.children_count if v.population_profile else 0
+        disabled = v.population_profile.disabled_count if v.population_profile else 0
+
+        current_risk = next((r for r in v.risk_scores if r.is_current), None)
+        if not current_risk and v.risk_scores:
+            current_risk = v.risk_scores[0]
+
+        score = float(current_risk.score) if current_risk and current_risk.score is not None else 50.0
+
+        villages.append(
             VillageSimulationInput(
-                village_id=props.id,
-                village_name=props.name,
+                village_id=str(v.id),
+                village_name=v.name,
                 location=coords,
                 households=int(hh),
                 population=int(pop),
-                elderly_count=int(demo.get("elderly", 10) if isinstance(demo, dict) else 10),
-                children_count=int(demo.get("children", 20) if isinstance(demo, dict) else 20),
-                hazard_severity=float(c_score),
-                flood_exposure=40.0,
-                rainfall_intensity=float(c_score * 0.8),
-                slope_landslide_susceptibility=float(c_score * 0.9),
+                elderly_count=int(elderly),
+                children_count=int(children),
+                disabled_count=int(disabled),
+                hazard_severity=score,
+                flood_exposure=score * 0.7,
+                rainfall_intensity=score * 0.8,
+                slope_landslide_susceptibility=float(v.slope_deg) if v.slope_deg else score * 0.9,
                 rainfall_24h_mm=45.0,
             )
         )
 
-    # Load 4 sample candidate sites
-    sample_sites: List[SiteSimulationInput] = []
-    for f in dataset.candidate_sites.features[:4]:
-        props = f.properties
-        coords = _extract_lon_lat(f.geometry, (79.430, 30.430))
-        caps = getattr(props, "capacities", {}) or {}
+    # Load candidate sites for region
+    sites_query = db.query(CandidateSite).options(joinedload(CandidateSite.capacities))
+    if scope.district_ids:
+        sites_query = sites_query.filter(CandidateSite.district_id.in_(scope.district_ids))
+    site_records = sites_query.all()
 
-        max_hh = caps.get("max_households", 120) if isinstance(caps, dict) else getattr(caps, "max_households", 120)
+    sites: List[SiteSimulationInput] = []
+    for s in site_records:
+        coords = (79.430, 30.430)
+        if s.location:
+            try:
+                pt = to_shape(s.location)
+                coords = (float(pt.x), float(pt.y))
+            except Exception:
+                pass
 
-        sample_sites.append(
+        cap = s.capacities[0] if s.capacities else None
+        max_hh = cap.max_households if cap else 100
+
+        sites.append(
             SiteSimulationInput(
-                site_id=props.id,
-                site_name=props.name,
+                site_id=str(s.id),
+                site_name=s.name,
                 location=coords,
-                terrain_slope_deg=float(getattr(props, "slope_deg", 5.0) or 5.0),
+                terrain_slope_deg=float(s.terrain_slope_deg) if s.terrain_slope_deg else 5.0,
                 hazard_buffer_distance_m=1000.0,
                 housing_capacity=int(max_hh),
                 water_capacity=int(max_hh),
@@ -115,7 +149,8 @@ def _get_default_pilot_inputs() -> Tuple[List[VillageSimulationInput], List[Site
             )
         )
 
-    return sample_villages, sample_sites
+    return villages, sites
+
 
 Tuple_Inputs = tuple[List[VillageSimulationInput], List[SiteSimulationInput]]
 
@@ -257,14 +292,20 @@ def run_scenario_simulation(
             detail=f"Region profile '{prof_id}' not found: {str(e)}",
         )
 
-    # 3. Resolve Inputs (Caller-provided or fallback to synthetic pilot defaults)
+    # 3. Resolve Inputs (Caller-provided or query canonical database for region)
     if payload.villages and payload.sites:
         villages = payload.villages
         sites = payload.sites
     else:
-        def_vills, def_sites = _get_default_pilot_inputs()
-        villages = payload.villages or def_vills
-        sites = payload.sites or def_sites
+        db_vills, db_sites = _get_region_inputs(db, prof_id)
+        villages = payload.villages or db_vills
+        sites = payload.sites or db_sites
+
+    if not villages:
+        raise HTTPException(
+            status_code=status.HTTP_422_UNPROCESSABLE_ENTITY,
+            detail=f"No operational settlements found for region '{prof_id}'.",
+        )
 
     # 4. Instantiate and run simulator engine
     engine = ScenarioSimulatorEngine(profile=profile)

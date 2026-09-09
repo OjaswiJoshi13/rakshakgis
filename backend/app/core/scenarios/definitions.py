@@ -36,7 +36,7 @@ CANONICAL_SCENARIOS: Dict[ScenarioType, ScenarioDefinition] = {
     ScenarioType.EXTREME_RAINFALL: ScenarioDefinition(
         scenario_type=ScenarioType.EXTREME_RAINFALL,
         name="Extreme Rainfall Simulation (+40%)",
-        description="Simulates a 40% increase in precipitation intensity (cloudburst / monsoon surge) based on IMD heavy rainfall triggers.",
+        description="Simulates a 40% increase in precipitation intensity (cloudburst / monsoon surge) using regional extreme rainfall threshold parameters (simulation parameter — not an observed IMD measurement).",
         default_parameters=ScenarioParameters(
             scenario_type=ScenarioType.EXTREME_RAINFALL,
             rainfall_multiplier=1.40,

@@ -46,7 +46,7 @@ export const HIMALAYAN_PILOT_ALERT_DATASET: OperationalAlertItem[] = [
     status: "triggered",
     headline: "Critical Rainfall Threshold Exceeded — Joshimath Upper Ridge",
     message:
-      "24-hour cumulative precipitation reached 84.2 mm at Sunil Station, exceeding the regional dynamic threshold of 64.5 mm (IMD Heavy Rain Standard). High antecedent moisture elevates active subsidence and debris flow vulnerability.",
+      "24-hour cumulative precipitation reached 84.2 mm at Sunil Station (synthetic simulation gauge), exceeding the regional dynamic threshold of 64.5 mm. High antecedent moisture elevates active subsidence and debris flow vulnerability.",
     village_id: "VIL-CHAMOLI-001",
     village_name: "Joshimath (Ward 5 - Sunil)",
     district_id: "DIST-UK-01",

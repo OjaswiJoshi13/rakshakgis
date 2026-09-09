@@ -30,20 +30,35 @@ def _db_alert_to_operational(alert: Alert) -> OperationalAlertRead:
         except Exception:
             pass
 
+    headline = alert.headline
+    message = alert.message
+    source_id = alert_meta.get("source_id", "synthetic_rainfall_gauge")
+    indicator = alert_meta.get("indicator", "rainfall_24h")
+
+    # Truthfulness correction: If an alert claims satellite InSAR or field observation from a synthetic source, make the synthetic nature explicit
+    if "insar" in (message or "").lower() or "insar" in (headline or "").lower():
+        headline = "SIMULATION / SYNTHETIC WARNING: Ground Deformation Threshold Breach"
+        message = (
+            "Simulated ground-deformation threshold breach (>15mm/month) in synthetic simulation input. "
+            "Scenario evaluation parameter — not an official observed satellite InSAR measurement."
+        )
+        source_id = "synthetic_simulation_input"
+        indicator = "simulated_ground_deformation"
+
     return OperationalAlertRead(
         id=f"ALT-{alert.id}",
         alert_type=alert.alert_type,
         severity=alert.severity,
         danger_level=alert_meta.get("danger_level", "HIGH"),
         status=alert_meta.get("status", "triggered"),
-        headline=alert.headline,
-        message=alert.message,
+        headline=headline,
+        message=message,
         village_id=str(alert.village_id) if alert.village_id else None,
         village_name=alert.village.name if alert.village else alert_meta.get("village_name"),
         district_id=str(alert.district_id) if alert.district_id else None,
         district_name=alert.district.name if alert.district else "Chamoli District",
         coordinates=coords,
-        indicator=alert_meta.get("indicator", "rainfall_24h"),
+        indicator=indicator,
         observed_value=alert_meta.get("observed_value"),
         configured_threshold=alert_meta.get("configured_threshold"),
         operator=alert_meta.get("operator", ">="),
@@ -55,7 +70,7 @@ def _db_alert_to_operational(alert: Alert) -> OperationalAlertRead:
         issued_at=alert.issued_at,
         expires_at=alert.expires_at,
         candidate_id=alert_meta.get("candidate_id"),
-        source_id=alert_meta.get("source_id", "synthetic_rainfall_gauge"),
+        source_id=source_id,
         is_synthetic=True,
         explainability=alert_meta.get("explainability"),
     )

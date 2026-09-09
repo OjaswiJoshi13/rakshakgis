@@ -3,6 +3,7 @@
 import React, { useState, useEffect, useCallback, Suspense } from "react";
 import { useSearchParams } from "next/navigation";
 import { OperationsSectionShell } from "@/components/operations/OperationsSectionShell";
+import { useOperational } from "@/context/OperationalContext";
 import { Button } from "@/components/ui/Button";
 import { Badge } from "@/components/ui/Badge";
 import {
@@ -26,6 +27,9 @@ import { Sliders, RotateCcw, AlertCircle, RefreshCw } from "lucide-react";
 
 function ScenariosOperationsContent() {
   const searchParams = useSearchParams();
+  const { activeRegion } = useOperational();
+  const effectiveRegion = activeRegion || "himalayan_pilot";
+
   const initialTypeParam = searchParams.get("scenario")?.toUpperCase() as ScenarioType | null;
 
   const [catalog, setCatalog] = useState<ScenarioDefinitionRead[]>(
@@ -91,14 +95,14 @@ function ScenariosOperationsContent() {
     }
   };
 
-  // Execute simulation run
+  // Execute simulation run across full canonical regional dataset
   const handleRunSimulation = useCallback(async () => {
     setIsRunning(true);
     setError(null);
     try {
       const resp = await runScenarioSimulation({
         scenario_type: selectedScenarioType,
-        region_profile_id: "himalayan_pilot",
+        region_profile_id: effectiveRegion,
         parameters,
       });
       if (resp.success && resp.data) {
@@ -108,7 +112,6 @@ function ScenariosOperationsContent() {
       }
     } catch (err: any) {
       setError(err?.message || "Failed to communicate with scenario simulator backend.");
-      // Fallback
       if (HIMALAYAN_PILOT_SAMPLE_SIMULATION_OUTPUTS[selectedScenarioType]) {
         setSimulationOutput(
           HIMALAYAN_PILOT_SAMPLE_SIMULATION_OUTPUTS[selectedScenarioType]
@@ -117,7 +120,7 @@ function ScenariosOperationsContent() {
     } finally {
       setIsRunning(false);
     }
-  }, [selectedScenarioType, parameters]);
+  }, [selectedScenarioType, effectiveRegion, parameters]);
 
   return (
     <OperationsSectionShell
@@ -183,6 +186,11 @@ function ScenariosOperationsContent() {
               {/* Domain Impact Tabs (Risk, Relocation, Routing) */}
               <ScenarioDeltaTabs simulationOutput={simulationOutput} />
             </>
+          ) : isRunning ? (
+            <div className="rounded-lg border border-border-subtle bg-surface-panel p-12 text-center text-xs text-text-muted font-mono flex flex-col items-center justify-center gap-3">
+              <RefreshCw className="h-6 w-6 animate-spin text-primary-600 dark:text-primary-400" />
+              <p>Executing scenario simulation across operational region ({effectiveRegion})...</p>
+            </div>
           ) : (
             <div className="rounded-lg border border-dashed border-border-base p-12 text-center text-xs text-text-muted font-mono">
               <Sliders className="h-8 w-8 mx-auto text-text-muted mb-3" />
