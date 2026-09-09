@@ -177,7 +177,7 @@ export const FeatureDetailPanel: React.FC<FeatureDetailPanelProps> = ({
       </div>
 
       {Boolean(props.origin_village_name || props.destination_site_name) && (
-        <div className="text-[11px] bg-surface-elevated/70 p-2 rounded border border-border-subtle space-y-1">
+        <div className="text-[11px] bg-surface-elevated p-2 rounded border border-border-subtle space-y-1">
           <div className="text-text-muted">
             From: <strong className="text-text-primary">{String(props.origin_village_name || "—")}</strong>
           </div>
@@ -268,7 +268,7 @@ export const FeatureDetailPanel: React.FC<FeatureDetailPanelProps> = ({
         </div>
 
         {Array.isArray(props.contributing_village_ids) && props.contributing_village_ids.length > 0 && (
-          <div className="text-[10px] font-mono text-text-muted bg-surface-elevated/70 p-2 rounded border border-border-subtle">
+          <div className="text-[10px] font-mono text-text-muted bg-surface-elevated p-2 rounded border border-border-subtle">
             Village IDs: {props.contributing_village_ids.join(", ")}
           </div>
         )}
@@ -497,7 +497,7 @@ export const FeatureDetailPanel: React.FC<FeatureDetailPanelProps> = ({
 
   return (
     <div
-      className={`bg-surface-panel/95 backdrop-blur-md border border-border-subtle rounded-xl shadow-2xl p-4 text-xs z-20 max-w-sm w-full ${className}`}
+      className={`bg-surface-panel border border-border-subtle rounded-xl shadow-2xl p-4 text-xs text-text-primary z-20 max-w-sm w-full ${className}`}
       data-testid="feature-detail-panel"
       role="dialog"
       aria-labelledby="feature-detail-title"
