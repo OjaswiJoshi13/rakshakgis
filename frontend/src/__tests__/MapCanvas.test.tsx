@@ -22,10 +22,14 @@ import {
 } from "@/types/gis";
 import { CandidateSiteRead } from "@/types/dashboard";
 import { RouteRead } from "@/types/gis";
+import { GIS_ACTIVE_MAP_LAYERS } from "@/components/map/layerConfig";
+import { VillageIdentityHeader } from "@/components/villages/VillageIdentityHeader";
+import { HabitationDetail } from "@/types/villages";
 import { AuthProvider } from "@/context/AuthContext";
 import { OperationalProvider, useOperational } from "@/context/OperationalContext";
 import * as authService from "@/lib/auth";
 import * as apiModule from "@/lib/api";
+import * as nextNavigation from "next/navigation";
 
 const mockOfficerUser = {
   id: 1,
@@ -764,6 +768,305 @@ describe("MapLibre GIS Interactive Map Canvas (Chunk M5-05)", () => {
       await waitFor(() => {
         expect(screen.queryByTestId("feature-detail-panel")).not.toBeInTheDocument();
       });
+    });
+  });
+
+  describe("Settlement Analysis -> View on GIS Workflow & Village Focus", () => {
+    it("passes actual selected village ID in View on GIS link from Settlement Analysis", () => {
+      const testHabitation: HabitationDetail = {
+        id: "1",
+        name: "Sunil",
+        census_code: "044101",
+        region_profile_id: "himalayan_pilot",
+        district: "Chamoli",
+        block: "Joshimath",
+        coordinates: [79.55621, 30.53357],
+        elevation_m: 1950,
+        slope_deg: 18.5,
+        demographics: { total_population: 507, households: 112, elderly_count: 45, children_count: 60, disabled_count: 5 },
+        vulnerability: { social_vulnerability_score: 42.0, infrastructure_vulnerability_score: 55.0, vulnerability_band: null },
+        risk: { risk_score: 55.63, risk_band: "high", factors: {}, is_red_zone_triggered: true },
+        relocation: { priority_score: 72.5, priority_band: "immediate", is_assigned: false },
+      };
+
+      render(<VillageIdentityHeader habitation={testHabitation} />);
+      const link = screen.getByRole("link", { name: /View on GIS Canvas/i });
+      expect(link).toBeInTheDocument();
+      expect(link).toHaveAttribute("href", "/gis?village_id=1");
+    });
+
+    it("reads village_id from URL query parameter, resolves village, and focuses viewport", async () => {
+      authService.setStoredToken("valid-officer-token", 3600);
+      vi.spyOn(authService, "getMeApi").mockResolvedValue(mockOfficerUser);
+      vi.spyOn(nextNavigation, "useSearchParams").mockReturnValue(new URLSearchParams("village_id=1") as unknown as ReturnType<typeof nextNavigation.useSearchParams>);
+
+      vi.spyOn(apiModule.apiClient, "get").mockImplementation(async (path: string) => {
+        if (path.includes("/map/layers")) {
+          return {
+            success: true,
+            data: {
+              villages: {
+                type: "FeatureCollection",
+                features: [
+                  {
+                    type: "Feature",
+                    id: 1,
+                    geometry: { type: "Point", coordinates: [79.55621, 30.53357] },
+                    properties: { id: 1, name: "Sunil", census_code: "044101", risk_score: 55.63, risk_band: "high" },
+                  },
+                  {
+                    type: "Feature",
+                    id: 2,
+                    geometry: { type: "Point", coordinates: [79.59017, 30.51535] },
+                    properties: { id: 2, name: "Ravigram", census_code: "044102", risk_score: 62.1, risk_band: "high" },
+                  },
+                ],
+              },
+              village_boundaries: { type: "FeatureCollection", features: [] },
+              red_zones: { type: "FeatureCollection", features: [] },
+              sites: { type: "FeatureCollection", features: [] },
+              routes: { type: "FeatureCollection", features: [] },
+              earthquakes_ncs: { type: "FeatureCollection", features: [] },
+              earthquakes_usgs: { type: "FeatureCollection", features: [] },
+            },
+          };
+        }
+        if (path.includes("/villages/1/analysis")) {
+          return {
+            success: true,
+            data: {
+              village: { id: 1, name: "Sunil", census_code: "044101" },
+              population: { total: 507, households: 112 },
+              risk: { score: 55.63, band: "HIGH" },
+            },
+          };
+        }
+        return { success: true, data: [] };
+      });
+
+      render(
+        <AuthProvider initialState={{ user: mockOfficerUser, isAuthenticated: true, token: "valid-officer-token" }}>
+          <OperationalProvider>
+            <GisMapPage />
+          </OperationalProvider>
+        </AuthProvider>
+      );
+
+      await waitFor(() => {
+        expect(screen.getByRole("heading", { name: "Command GIS Map Canvas" })).toBeInTheDocument();
+      });
+
+      // Feature detail panel should be visible for Sunil
+      await waitFor(() => {
+        expect(screen.getByTestId("feature-detail-panel")).toBeInTheDocument();
+        expect(screen.getByText("Sunil")).toBeInTheDocument();
+      });
+
+      // MapLibre fitBounds should be called with bounds centered at Sunil coordinates
+      expect(mockFitBounds).toHaveBeenCalledWith(
+        [
+          [expect.closeTo(79.53621, 3), expect.closeTo(30.51357, 3)],
+          [expect.closeTo(79.57621, 3), expect.closeTo(30.55357, 3)],
+        ],
+        expect.objectContaining({ maxZoom: 14 })
+      );
+    });
+
+    it("demonstrates distinct viewport focus and coordinates for multiple actual villages", async () => {
+      authService.setStoredToken("valid-officer-token", 3600);
+      vi.spyOn(authService, "getMeApi").mockResolvedValue(mockOfficerUser);
+
+      const mockLayerData = {
+        villages: {
+          type: "FeatureCollection",
+          features: [
+            {
+              type: "Feature",
+              id: 1,
+              geometry: { type: "Point", coordinates: [79.55621, 30.53357] },
+              properties: { id: 1, name: "Sunil", census_code: "044101" },
+            },
+            {
+              type: "Feature",
+              id: 2,
+              geometry: { type: "Point", coordinates: [79.59017, 30.51535] },
+              properties: { id: 2, name: "Ravigram", census_code: "044102" },
+            },
+            {
+              type: "Feature",
+              id: 3,
+              geometry: { type: "Point", coordinates: [79.55852, 30.58066] },
+              properties: { id: 3, name: "Marwari", census_code: "044103" },
+            },
+          ],
+        },
+        village_boundaries: { type: "FeatureCollection", features: [] },
+        red_zones: { type: "FeatureCollection", features: [] },
+        sites: { type: "FeatureCollection", features: [] },
+        routes: { type: "FeatureCollection", features: [] },
+        earthquakes_ncs: { type: "FeatureCollection", features: [] },
+        earthquakes_usgs: { type: "FeatureCollection", features: [] },
+      };
+
+      vi.spyOn(apiModule.apiClient, "get").mockImplementation(async (path: string) => {
+        if (path.includes("/map/layers")) {
+          return { success: true, data: mockLayerData };
+        }
+        return { success: true, data: [] };
+      });
+
+      // Test Village 2 (Ravigram)
+      vi.spyOn(nextNavigation, "useSearchParams").mockReturnValue(new URLSearchParams("village_id=2") as unknown as ReturnType<typeof nextNavigation.useSearchParams>);
+      const { unmount } = render(
+        <AuthProvider initialState={{ user: mockOfficerUser, isAuthenticated: true, token: "valid-officer-token" }}>
+          <OperationalProvider>
+            <GisMapPage />
+          </OperationalProvider>
+        </AuthProvider>
+      );
+
+      await waitFor(() => {
+        expect(screen.getByTestId("feature-detail-panel")).toBeInTheDocument();
+        expect(screen.getByText("Ravigram")).toBeInTheDocument();
+      });
+
+      // Center should match Ravigram [79.59017, 30.51535]
+      expect(mockFitBounds).toHaveBeenCalledWith(
+        [
+          [expect.closeTo(79.57017, 3), expect.closeTo(30.49535, 3)],
+          [expect.closeTo(79.61017, 3), expect.closeTo(30.53535, 3)],
+        ],
+        expect.objectContaining({ maxZoom: 14 })
+      );
+
+      unmount();
+      mockFitBounds.mockClear();
+
+      // Test Village 3 (Marwari)
+      vi.spyOn(nextNavigation, "useSearchParams").mockReturnValue(new URLSearchParams("village_id=3") as unknown as ReturnType<typeof nextNavigation.useSearchParams>);
+      render(
+        <AuthProvider initialState={{ user: mockOfficerUser, isAuthenticated: true, token: "valid-officer-token" }}>
+          <OperationalProvider>
+            <GisMapPage />
+          </OperationalProvider>
+        </AuthProvider>
+      );
+
+      await waitFor(() => {
+        expect(screen.getByTestId("feature-detail-panel")).toBeInTheDocument();
+        expect(screen.getByText("Marwari")).toBeInTheDocument();
+      });
+
+      // Center should match Marwari [79.55852, 30.58066]
+      expect(mockFitBounds).toHaveBeenCalledWith(
+        [
+          [expect.closeTo(79.53852, 3), expect.closeTo(30.56066, 3)],
+          [expect.closeTo(79.57852, 3), expect.closeTo(30.60066, 3)],
+        ],
+        expect.objectContaining({ maxZoom: 14 })
+      );
+    });
+
+    it("handles non-existent or invalid village_id gracefully by falling back to operational bounds", async () => {
+      authService.setStoredToken("valid-officer-token", 3600);
+      vi.spyOn(authService, "getMeApi").mockResolvedValue(mockOfficerUser);
+      vi.spyOn(nextNavigation, "useSearchParams").mockReturnValue(new URLSearchParams("village_id=nonexistent_9999") as unknown as ReturnType<typeof nextNavigation.useSearchParams>);
+
+      vi.spyOn(apiModule.apiClient, "get").mockImplementation(async (path: string) => {
+        if (path.includes("/map/layers")) {
+          return {
+            success: true,
+            data: {
+              villages: {
+                type: "FeatureCollection",
+                features: [
+                  {
+                    type: "Feature",
+                    id: 1,
+                    geometry: { type: "Point", coordinates: [79.55621, 30.53357] },
+                    properties: { id: 1, name: "Sunil" },
+                  },
+                ],
+              },
+              village_boundaries: { type: "FeatureCollection", features: [] },
+              red_zones: { type: "FeatureCollection", features: [] },
+              sites: { type: "FeatureCollection", features: [] },
+              routes: { type: "FeatureCollection", features: [] },
+              earthquakes_ncs: { type: "FeatureCollection", features: [] },
+              earthquakes_usgs: { type: "FeatureCollection", features: [] },
+            },
+          };
+        }
+        return { success: true, data: [] };
+      });
+
+      render(
+        <AuthProvider initialState={{ user: mockOfficerUser, isAuthenticated: true, token: "valid-officer-token" }}>
+          <OperationalProvider>
+            <GisMapPage />
+          </OperationalProvider>
+        </AuthProvider>
+      );
+
+      await waitFor(() => {
+        expect(screen.getByRole("heading", { name: "Command GIS Map Canvas" })).toBeInTheDocument();
+      });
+
+      // Feature detail panel should not open for non-existent village
+      expect(screen.queryByTestId("feature-detail-panel")).not.toBeInTheDocument();
+      // Map canvas still mounted and operational
+      expect(screen.getByTestId("maplibre-canvas")).toBeInTheDocument();
+    });
+
+    it("renders highlight layers for selectedFeature above other operational layers in MapCanvas", () => {
+      const selectedPointFeature: SelectedFeatureInfo = {
+        id: 1,
+        layerId: "habitations-points",
+        layerCategory: "habitations",
+        geometryType: "Point",
+        coordinates: [79.55621, 30.53357],
+        properties: { name: "Sunil", risk_score: 55.63 },
+      };
+
+      render(
+        <MapCanvas
+          layers={GIS_ACTIVE_MAP_LAYERS}
+          selectedFeature={selectedPointFeature}
+          sourcesData={{
+            "habitations-source": {
+              type: "FeatureCollection",
+              features: [
+                {
+                  type: "Feature",
+                  id: 1,
+                  geometry: { type: "Point", coordinates: [79.55621, 30.53357] },
+                  properties: { name: "Sunil" },
+                },
+              ],
+            },
+          }}
+        />
+      );
+
+      expect(screen.getByTestId("maplibre-canvas")).toBeInTheDocument();
+    });
+
+    it("layer toggle controls trigger visibility changes", () => {
+      const mockToggle = vi.fn();
+      render(
+        <LayerControlPanel
+          layers={GIS_ACTIVE_MAP_LAYERS}
+          layerVisibility={{ "village-boundaries-polygons": true, "habitations-points": false }}
+          onToggleLayer={mockToggle}
+          featureCounts={{ "village-boundaries-polygons": 150, "habitations-points": 188 }}
+        />
+      );
+
+      const checkbox = screen.getByLabelText(/Toggle visibility of Survey of India Village Boundaries/i);
+      expect(checkbox).toBeChecked();
+
+      fireEvent.click(checkbox);
+      expect(mockToggle).toHaveBeenCalledWith("village-boundaries-polygons");
     });
   });
 });

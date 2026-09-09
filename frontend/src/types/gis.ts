@@ -174,6 +174,7 @@ export interface SelectedFeatureInfo {
   geometryType: string;
   coordinates?: [number, number];
   properties: Record<string, unknown>;
+  geometry?: GeoJSONGeometry;
 }
 
 /**

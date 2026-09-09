@@ -2732,11 +2732,84 @@ No chunk may transition to `IN_PROGRESS` until all its listed prerequisite depen
   - Candidate site boundary polygons do not exist in the survey source data (point coordinates only); truthfully displayed as unavailable.
   - Browser-level automated visual snapshotting driver remains unavailable in the container environment.
 
+### Complete P0 GIS Operational-Map Correction & Settlement Analysis → View on GIS Workflow
+
+- **Status:** `IMPLEMENTED — AWAITING INDEPENDENT REVIEW`
+- **Module:** M5 Frontend GIS & Settlement Analysis (`/gis`, `MapCanvas.tsx`, `VillageIdentityHeader.tsx`)
+- **Actual Root Cause(s):**
+  1. *Settlement Analysis Navigation Disconnect:* The "View on GIS Canvas" link in `VillageIdentityHeader.tsx` routed to static `/gis` without preserving or passing the selected habitation/village ID.
+  2. *GIS Page Parameter Ignorance:* The `/gis` page did not inspect URL search parameters (`village_id`), did not resolve the selected village against backend GeoJSON, and defaulted to district-wide bounds regardless of user navigation context.
+  3. *Missing Visual Highlight on MapLibre Canvas:* `MapCanvas.tsx` lacked dedicated highlight vector layers for active feature focus, causing selected villages to blend indistinguishably with surrounding habitations.
+  4. *Selected Feature Geometry Propagation:* Feature click and selection state lacked explicit geometry payloads needed for immediate boundary or centroid focus.
+- **Actual Files Changed:**
+  - `frontend/src/types/gis.ts`: Added optional `geometry?: GeoJSONGeometry` to `SelectedFeatureInfo`.
+  - `frontend/src/components/villages/VillageIdentityHeader.tsx`: Updated "View on GIS Canvas" link `href` to `/gis?village_id=${encodeURIComponent(habitation.id)}`.
+  - `frontend/src/components/map/MapCanvas.tsx`:
+    - Added dedicated `"selected-feature-source"` GeoJSON source and top-of-stack vector highlight layers (`selected-feature-polygon-fill`, `selected-feature-polygon-stroke`, `selected-feature-point-outer-halo`, `selected-feature-point-inner-pin`).
+    - Enforced layer order placing selected feature highlights at the very top of `STRICT_LAYER_ORDER` above all habitations, sites, and corridors.
+    - Added developer diagnostic logging (`[GIS] selected feature: ID ...`).
+  - `frontend/src/app/gis/page.tsx`:
+    - Extracted `GisMapContent` wrapped in Next.js `<Suspense>` to safely consume `useSearchParams`.
+    - Implemented `village_id` query parameter parsing and resolution against real backend `villagesGeoJSON` and `villageBoundariesGeoJSON`.
+    - Computed operational theater bounds around the selected village (`±0.02°` margin / ~2 km operational neighborhood) preserving local context (nearby red zones, evacuation routes, and candidate sites).
+    - Added graceful fallback to regional operational bounds when `village_id` is missing or invalid.
+    - Updated error banner text to meet authoritative spec while preserving user-facing clarity.
+  - `frontend/src/__tests__/MapCanvas.test.tsx`:
+    - Added 6 targeted test cases covering: URL search param parsing, village resolution, 3-village distinct viewport center verification, graceful invalid ID fallback, `selected-feature` highlight layers rendering, and layer visibility toggles.
+- **Actual API Layer Keys:**
+  - Endpoint: `GET /api/v1/map/layers?region_id=himalayan_pilot`
+  - Response Keys:
+    - `villages`: 40 Point features (`habitations-source`, e.g., Sunil `[79.55621, 30.53357]`, Ravigram `[79.59017, 30.51535]`, Marwari `[79.55852, 30.58066]`)
+    - `red_zones`: 7 MultiPolygon features (`red-zones-source`, e.g., Permanent Red Zone Candidate (Sunil))
+    - `routes`: 53 LineString features (`routes-source`, evacuation/relief corridors)
+    - `sites`: 12 Point features (`candidate-sites-source`, e.g., Gauchar Aerodrome Terrace Flat)
+    - `village_boundaries`: 0 features (truthfully represented; empty FeatureCollection, no synthetic polygons fabricated)
+    - `bounds`: `[[79.15, 30.0], [80.15, 30.9]]`
+- **API → React → MapLibre Trace:**
+  - Backend `GET /api/v1/map/layers` -> `useQuery` in `gis/page.tsx` -> `layersData.villages`, `layersData.red_zones`, `layersData.routes`, `layersData.sites` -> `sourcesData` dictionary passed to `<MapCanvas />` -> MapLibre `map.addSource` / `map.getSource().setData()` -> Paint layers added (`habitations-points`, `red-zones-polygons`, `routes-lines`, `candidate-sites-points`) -> Sorted via `STRICT_LAYER_ORDER` with `map.moveLayer`.
+- **Layer Rendering Order (Bottom to Top):**
+  1. Basemap (OpenStreetMap raster tiles)
+  2. `village-boundaries-polygons` (polygon fill)
+  3. `red-zones-polygons` (polygon fill, 0.45 opacity)
+  4. `candidate-sites-boundaries` (disclosed as unavailable)
+  5. `village-boundaries-polygons-stroke` (blue outline, 2px)
+  6. `red-zones-polygons-stroke` (red dashed outline, 3px)
+  7. `routes-lines` (line corridors, 4px)
+  8. `habitations-points` (circle markers, 7px with white halo)
+  9. `candidate-sites-points` (circle markers, 9px with white halo)
+  10. `earthquakes-ncs` / `earthquakes-usgs` (seismic markers)
+  11. `selected-feature-polygon-fill` (semi-transparent yellow fill)
+  12. `selected-feature-polygon-stroke` (high-contrast amber outline)
+  13. `selected-feature-point-outer-halo` (18px pulsing cyan/white outer ring)
+  14. `selected-feature-point-inner-pin` (10px bright amber dot)
+- **Viewport Behavior:**
+  - *Direct `/gis` Access:* Computes bounding box encompassing all operational geometries (`villages`, `routes`, `red_zones`, `sites`), excluding earthquake catalogs.
+  - *Selected Village Access (`/gis?village_id=<id>`):* Centers on the specific village geometry with an operational buffer (`±0.02°`), setting `maxZoom: 14`, enabling immediate identification while preserving adjacent hazard zones and corridors.
+  - *Invalid Village ID:* Gracefully logs warning and defaults to normal operational theater bounds.
+- **Selected-Village Navigation & Focus Mechanism:**
+  - `VillageIdentityHeader` links to `/gis?village_id=${habitation.id}`.
+  - `gis/page.tsx` extracts `village_id`, finds matching feature in `villagesGeoJSON`, extracts coordinates, sets initial `viewportBounds`, and populates `selectedFeature`.
+  - `MapCanvas.tsx` feeds feature geometry to `"selected-feature-source"` and renders top-layer halo markers.
+- **Multi-Village Verification Results (3 Distinct Villages):**
+  1. *Sunil (ID: 1):* Coordinates `[79.55621, 30.53357]` -> Centered viewport `[[79.53621, 30.51357], [79.57621, 30.55357]]`.
+  2. *Ravigram (ID: 2):* Coordinates `[79.59017, 30.51535]` -> Centered viewport `[[79.57017, 30.49535], [79.61017, 30.53535]]`.
+  3. *Marwari (ID: 3):* Coordinates `[79.55852, 30.58066]` -> Centered viewport `[[79.53852, 30.56066], [79.57852, 30.60066]]`.
+  - Confirmed distinct geographical centers and bounds for each village.
+- **Targeted Test Results:**
+  - `npx tsc --noEmit` in `frontend/`: 0 errors.
+  - `npm run test -- src/__tests__/MapCanvas.test.tsx`: **31 passed, 0 failed**.
+- **Browser Visual Verification Results:**
+  - Executed browser verification against live local stack (`http://localhost:3000/gis` and `http://localhost:3000/gis?village_id=1`).
+  - Verified: MapLibre tiles, 40 Habitations, 7 Red Zones, 53 Corridors, 12 Candidate Sites, layer controls, and focused inspector panel for Sunil (Census: 044101, Score: 55.63 High, Red Zone Warning).
+  - Screenshots recorded: `gis_map_initial_1788968271185.png`, `sunil_village_focused_1788968290821.png`.
+- **Remaining Limitations:**
+  - `village_boundaries` FeatureCollection contains 0 features in current database seed; rendered truthfully without fabricating synthetic polygons.
+  - Candidate site boundaries remain unavailable in source (point geometries only); truthfully indicated in layer controls.
+
 ---
 
 ## Last Updated
 
-- **Timestamp:** 2026-09-09 14:31:00 IST
-- **Updated By:** GIS Core Engine & Frontend Engineering Teams (P0-GIS-RENDER IMPLEMENTED — AWAITING INDEPENDENT REVIEW)
-- **Status Summary:** Fixed P0 GIS rendering failure. Solved MapLibre style lifecycle race condition, added strict layer ordering (`map.moveLayer`), implemented high-contrast operational vector styling for boundaries, red zones, routes, habitations, and candidate sites. Verified type checking (`npx tsc --noEmit` -> 0 errors) and targeted unit tests (`src/__tests__/MapCanvas.test.tsx` -> 25/25 passed). Changes committed and pushed to `main`.
-
+- **Timestamp:** 2026-09-09 21:10:00 IST
+- **Updated By:** GIS Core Engine & Frontend Engineering Teams (P0-GIS-COMPLETE IMPLEMENTED — AWAITING INDEPENDENT REVIEW)
+- **Status Summary:** Completed P0 operational GIS map correction and Settlement Analysis → View on GIS workflow. Replaced static navigation with dynamic `village_id` query param, resolved village coordinates dynamically, computed centered operational neighborhood viewport (`±0.02°`), added MapLibre top-level highlight vector layers, verified 3 distinct villages (Sunil, Ravigram, Marwari) with unique coordinates, passed all 31 unit/integration tests and TypeScript check, visually verified via browser subagent.

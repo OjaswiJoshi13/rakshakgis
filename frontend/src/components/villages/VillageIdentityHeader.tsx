@@ -79,7 +79,7 @@ export const VillageIdentityHeader: React.FC<VillageIdentityHeaderProps> = ({
         {/* Right: Map Quick-Link */}
         <div className="flex items-center gap-3 self-start lg:self-center">
           <Link
-            href="/gis"
+            href={`/gis?village_id=${encodeURIComponent(habitation.id)}`}
             className="inline-flex items-center gap-2 px-3 py-1.5 text-xs font-medium rounded-md border border-border-strong bg-surface-elevated text-text-primary hover:bg-surface-elevated/80 transition-colors focus:outline-none focus:ring-1 focus:ring-focus-ring"
             aria-label="View on GIS Canvas"
           >

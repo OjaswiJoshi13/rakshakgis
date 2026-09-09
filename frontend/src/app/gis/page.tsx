@@ -1,6 +1,7 @@
 "use client";
 
-import React, { useState, useMemo, useEffect, useRef } from "react";
+import React, { useState, useMemo, useEffect, useRef, Suspense } from "react";
+import { useSearchParams } from "next/navigation";
 import { ProtectedRoute } from "@/components/auth/ProtectedRoute";
 import { AppLayout } from "@/components/layout/AppLayout";
 import {
@@ -24,7 +25,9 @@ import {
   MapHeader,
 } from "@/components/map";
 
-export default function GisMapPage() {
+function GisMapContent() {
+  const searchParams = useSearchParams();
+  const villageIdParam = searchParams.get("village_id") || searchParams.get("id");
   const { activeRegion } = useOperational();
 
   const [selectedFeature, setSelectedFeature] = useState<SelectedFeatureInfo | null>(null);
@@ -33,6 +36,8 @@ export default function GisMapPage() {
     null
   );
   const lastFittedRegionRef = useRef<string | null>(null);
+  const lastFocusedVillageRef = useRef<string | null>(null);
+
   const [layerVisibility, setLayerVisibility] = useState<Record<string, boolean>>({
     "village-boundaries-polygons": true,
     "habitations-points": true,
@@ -50,6 +55,7 @@ export default function GisMapPage() {
     setSelectedFeature(null);
     setViewportBounds(null);
     lastFittedRegionRef.current = null;
+    lastFocusedVillageRef.current = null;
   }, [activeRegion]);
 
   // Canonical Vector Map Layers via GET /map/layers?region_id=...
@@ -229,13 +235,120 @@ export default function GisMapPage() {
     mapLayersEnvelope?.data?.bounds,
   ]);
 
-  // Automatically fit viewport to active region features when data arrives or region changes
+  // Selected Village Resolution & Viewport Focus (Settlement Analysis -> View on GIS)
   useEffect(() => {
-    if (computedBounds && lastFittedRegionRef.current !== effectiveRegion) {
+    if (!villageIdParam) {
+      lastFocusedVillageRef.current = null;
+      return;
+    }
+
+    // Wait until feature layers have arrived
+    const hasData = villagesGeoJSON.features.length > 0 || villageBoundariesGeoJSON.features.length > 0;
+    if (!hasData) return;
+
+    if (lastFocusedVillageRef.current === villageIdParam) return;
+
+    // Check for village boundary polygon first
+    const boundaryFeat = villageBoundariesGeoJSON.features.find(
+      (f) =>
+        String(f.id) === String(villageIdParam) ||
+        String(f.properties?.id) === String(villageIdParam) ||
+        String(f.properties?.boundary_id) === String(villageIdParam) ||
+        String(f.properties?.boundary_id) === `boundary-${villageIdParam}` ||
+        String(f.properties?.census_code) === String(villageIdParam)
+    );
+
+    // Check for village habitation centroid point
+    const pointFeat = villagesGeoJSON.features.find(
+      (f) =>
+        String(f.id) === String(villageIdParam) ||
+        String(f.properties?.id) === String(villageIdParam) ||
+        String(f.properties?.census_code) === String(villageIdParam)
+    );
+
+    const targetFeat = boundaryFeat || pointFeat;
+
+    if (!targetFeat) {
+      if (process.env.NODE_ENV !== "production") {
+        console.warn(
+          `[GIS] Requested village_id "${villageIdParam}" was not found in operational data; falling back to operational theater.`
+        );
+      }
+      return;
+    }
+
+    lastFocusedVillageRef.current = villageIdParam;
+
+    // Compute detailed operational viewport bounds around the village
+    let focusBounds: [[number, number], [number, number]] | null = null;
+
+    if (boundaryFeat && boundaryFeat.geometry) {
+      const b = calculateBounds([boundaryFeat]);
+      if (b) {
+        const lonSpan = Math.abs(b[1][0] - b[0][0]);
+        const latSpan = Math.abs(b[1][1] - b[0][1]);
+        const minSpan = 0.02; // preserve ~2km operational neighborhood
+        const centerLon = (b[0][0] + b[1][0]) / 2;
+        const centerLat = (b[0][1] + b[1][1]) / 2;
+        const finalLonSpan = Math.max(lonSpan * 1.5, minSpan);
+        const finalLatSpan = Math.max(latSpan * 1.5, minSpan);
+        focusBounds = [
+          [centerLon - finalLonSpan / 2, centerLat - finalLatSpan / 2],
+          [centerLon + finalLonSpan / 2, centerLat + finalLatSpan / 2],
+        ];
+      }
+    }
+
+    if (!focusBounds && pointFeat && pointFeat.geometry && pointFeat.geometry.type === "Point") {
+      const coords = pointFeat.geometry.coordinates;
+      if (Array.isArray(coords) && coords.length >= 2) {
+        const [lon, lat] = coords;
+        const delta = 0.02; // preserve ~2km surrounding context (hazard zones, evacuation routes, sites)
+        focusBounds = [
+          [lon - delta, lat - delta],
+          [lon + delta, lat + delta],
+        ];
+      }
+    }
+
+    if (focusBounds) {
+      setViewportBounds([[...focusBounds[0]], [...focusBounds[1]]]);
+    }
+
+    setSelectedFeature({
+      id: (targetFeat.id ?? targetFeat.properties?.id ?? villageIdParam) as string | number,
+      layerId: boundaryFeat ? "village-boundaries-polygons" : "habitations-points",
+      layerCategory: "habitations",
+      properties: targetFeat.properties || {},
+      geometryType: targetFeat.geometry.type,
+      coordinates: targetFeat.geometry.type === "Point" ? (targetFeat.geometry.coordinates as [number, number]) : undefined,
+      geometry: targetFeat.geometry,
+    });
+
+    if (process.env.NODE_ENV !== "production") {
+      console.log(
+        `[GIS] selected village: ${targetFeat.properties?.name || villageIdParam} (ID: ${villageIdParam})`
+      );
+      if (focusBounds) {
+        console.log(`[GIS] selected village bounds:`, focusBounds);
+      }
+    }
+  }, [villageIdParam, villagesGeoJSON, villageBoundariesGeoJSON]);
+
+  // Initial auto-fit viewport when NO village_id is specified
+  useEffect(() => {
+    if (!villageIdParam && computedBounds && lastFittedRegionRef.current !== effectiveRegion) {
       setViewportBounds([[...computedBounds[0]], [...computedBounds[1]]]);
       lastFittedRegionRef.current = effectiveRegion;
     }
-  }, [computedBounds, effectiveRegion]);
+  }, [computedBounds, effectiveRegion, villageIdParam]);
+
+  // Graceful fallback for invalid village_id or missing viewport bounds
+  useEffect(() => {
+    if (computedBounds && !viewportBounds && (!villageIdParam || !lastFocusedVillageRef.current)) {
+      setViewportBounds([[...computedBounds[0]], [...computedBounds[1]]]);
+    }
+  }, [computedBounds, viewportBounds, villageIdParam]);
 
   const handleResetView = () => {
     if (computedBounds) {
@@ -282,75 +395,89 @@ export default function GisMapPage() {
   const hasMapErrors = mapLayersError;
 
   return (
-    <ProtectedRoute>
-      <AppLayout>
-        <div className="space-y-4">
-          {/* Header & Operational Bar */}
-          <MapHeader
-            totalSites={sitesGeoJSON.features.length}
-            totalRoutes={routesGeoJSON.features.length}
-            totalRedZones={redZonesGeoJSON.features.length}
-            totalVillages={villagesGeoJSON.features.length}
-            isRefreshing={isRefreshing}
-            onRefresh={handleRefreshAll}
-            onResetView={handleResetView}
-          />
+    <div className="space-y-4">
+      {/* Header & Operational Bar */}
+      <MapHeader
+        totalSites={sitesGeoJSON.features.length}
+        totalRoutes={routesGeoJSON.features.length}
+        totalRedZones={redZonesGeoJSON.features.length}
+        totalVillages={villagesGeoJSON.features.length}
+        isRefreshing={isRefreshing}
+        onRefresh={handleRefreshAll}
+        onResetView={handleResetView}
+      />
 
-          {/* Section-level User-Safe Error Notice if an endpoint failed */}
-          {hasMapErrors && (
-            <div
-              data-testid="gis-error-banner"
-              className="rounded-lg border border-amber-500/30 bg-amber-500/10 p-3 text-xs text-amber-800 dark:text-amber-200 flex items-center justify-between font-mono"
-            >
-              <div>
-                <strong className="text-amber-700 dark:text-amber-400">Layer Notice:</strong> Spatial layers could
-                not be retrieved from backend: {mapLayersErrObj?.message || "Not available in source"}. Available layers remain operational.
-              </div>
-            </div>
-          )}
-
-          {/* Map Viewport Area */}
-          <div className="relative w-full h-[calc(100vh-210px)] min-h-[580px] rounded-xl overflow-hidden shadow-lg border border-border-subtle">
-            {/* Interactive Map Canvas */}
-            <MapCanvas
-              layers={GIS_ACTIVE_MAP_LAYERS}
-              layerVisibility={layerVisibility}
-              sourcesData={sourcesData}
-              onFeatureSelect={setSelectedFeature}
-              selectedFeature={selectedFeature}
-              initialCenter={[79.5, 30.4]}
-              initialZoom={10}
-              bounds={viewportBounds}
-              isLoading={isMapLoading}
-              className="w-full h-full"
-            />
-
-            {/* Floating Spatial Search Bar (Top-Center) */}
-            <div className="absolute top-4 left-1/2 -translate-x-1/2 z-20 w-80 md:w-96 pointer-events-auto">
-              <GisSearchBar onSelectResult={handleSelectSearchResult} />
-            </div>
-
-            {/* Floating Layer Control Panel (Top-Left) */}
-            <div className="absolute top-4 left-4 max-w-xs w-full pointer-events-auto">
-              <LayerControlPanel
-                layers={GIS_ACTIVE_MAP_LAYERS}
-                layerVisibility={layerVisibility}
-                onToggleLayer={handleToggleLayer}
-                featureCounts={featureCounts}
-              />
-            </div>
-
-            {/* Floating Feature Inspector (Bottom-Left / Top-Right) */}
-            {selectedFeature && (
-              <div className="absolute bottom-4 left-4 pointer-events-auto">
-                <FeatureDetailPanel
-                  feature={selectedFeature}
-                  onClose={() => setSelectedFeature(null)}
-                />
-              </div>
-            )}
+      {/* Section-level User-Safe Error Notice if an endpoint failed */}
+      {hasMapErrors && (
+        <div
+          data-testid="gis-error-banner"
+          className="rounded-lg border border-amber-500/30 bg-amber-500/10 p-3 text-xs text-amber-800 dark:text-amber-200 flex items-center justify-between font-mono"
+        >
+          <div>
+            <strong className="text-amber-700 dark:text-amber-400">Layer Notice:</strong> Some spatial layers could
+            not be retrieved from backend: {mapLayersErrObj?.message || "Not available in source"}. Available layers remain operational.
           </div>
         </div>
+      )}
+
+      {/* Map Viewport Area */}
+      <div className="relative w-full h-[calc(100vh-210px)] min-h-[580px] rounded-xl overflow-hidden shadow-lg border border-border-subtle">
+        {/* Interactive Map Canvas */}
+        <MapCanvas
+          layers={GIS_ACTIVE_MAP_LAYERS}
+          layerVisibility={layerVisibility}
+          sourcesData={sourcesData}
+          onFeatureSelect={setSelectedFeature}
+          selectedFeature={selectedFeature}
+          initialCenter={[79.5, 30.4]}
+          initialZoom={10}
+          bounds={viewportBounds}
+          isLoading={isMapLoading}
+          className="w-full h-full"
+        />
+
+        {/* Floating Spatial Search Bar (Top-Center) */}
+        <div className="absolute top-4 left-1/2 -translate-x-1/2 z-20 w-80 md:w-96 pointer-events-auto">
+          <GisSearchBar onSelectResult={handleSelectSearchResult} />
+        </div>
+
+        {/* Floating Layer Control Panel (Top-Left) */}
+        <div className="absolute top-4 left-4 max-w-xs w-full pointer-events-auto">
+          <LayerControlPanel
+            layers={GIS_ACTIVE_MAP_LAYERS}
+            layerVisibility={layerVisibility}
+            onToggleLayer={handleToggleLayer}
+            featureCounts={featureCounts}
+          />
+        </div>
+
+        {/* Floating Feature Inspector (Bottom-Left / Top-Right) */}
+        {selectedFeature && (
+          <div className="absolute bottom-4 left-4 pointer-events-auto">
+            <FeatureDetailPanel
+              feature={selectedFeature}
+              onClose={() => setSelectedFeature(null)}
+            />
+          </div>
+        )}
+      </div>
+    </div>
+  );
+}
+
+export default function GisMapPage() {
+  return (
+    <ProtectedRoute>
+      <AppLayout>
+        <Suspense
+          fallback={
+            <div className="p-12 text-center text-text-muted font-mono text-xs">
+              Loading GIS Command Center...
+            </div>
+          }
+        >
+          <GisMapContent />
+        </Suspense>
       </AppLayout>
     </ProtectedRoute>
   );

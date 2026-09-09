@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useEffect, useRef, useState, useCallback } from "react";
+import React, { useEffect, useRef, useState, useCallback, useMemo } from "react";
 import { Map as MapLibreMap, NavigationControl, GeoJSONSource } from "maplibre-gl";
 import "maplibre-gl/dist/maplibre-gl.css";
 import {
@@ -25,6 +25,10 @@ const STRICT_LAYER_ORDER = [
   "earthquakes-ncs",
   "earthquakes-usgs",
   "hazards-extents",
+  "selected-feature-polygon-fill",
+  "selected-feature-polygon-stroke",
+  "selected-feature-point-outer-halo",
+  "selected-feature-point-inner-pin",
 ];
 
 export interface MapCanvasProps {
@@ -150,6 +154,54 @@ export const MapCanvas: React.FC<MapCanvasProps> = ({
     return () => resizeObserver.disconnect();
   }, []);
 
+  // Memoize GeoJSON for selected feature highlight layer
+  const selectedFeatureGeoJSON: GeoJSONFeatureCollection = useMemo(() => {
+    if (!selectedFeature) {
+      return { type: "FeatureCollection", features: [] };
+    }
+    let geom = selectedFeature.geometry;
+    if (!geom) {
+      for (const col of Object.values(sourcesData)) {
+        const match = col?.features?.find(
+          (f) =>
+            String(f.id) === String(selectedFeature.id) ||
+            String(f.properties?.id) === String(selectedFeature.id) ||
+            (f.properties?.boundary_id && String(f.properties.boundary_id) === String(selectedFeature.id))
+        );
+        if (match?.geometry) {
+          geom = match.geometry;
+          break;
+        }
+      }
+    }
+    if (!geom && selectedFeature.coordinates) {
+      if (
+        selectedFeature.geometryType === "Point" ||
+        (Array.isArray(selectedFeature.coordinates) &&
+          selectedFeature.coordinates.length === 2 &&
+          typeof selectedFeature.coordinates[0] === "number")
+      ) {
+        geom = { type: "Point", coordinates: selectedFeature.coordinates as [number, number] };
+      } else if (selectedFeature.geometryType) {
+        geom = { type: selectedFeature.geometryType as any, coordinates: selectedFeature.coordinates as any };
+      }
+    }
+    if (!geom) {
+      return { type: "FeatureCollection", features: [] };
+    }
+    return {
+      type: "FeatureCollection",
+      features: [
+        {
+          type: "Feature",
+          id: `selected-feature-${selectedFeature.id}`,
+          geometry: geom,
+          properties: selectedFeature.properties || {},
+        },
+      ],
+    };
+  }, [selectedFeature, sourcesData]);
+
   // Synchronize GeoJSON sources and layers when style is ready or data updates
   useEffect(() => {
     const map = mapInstanceRef.current;
@@ -181,6 +233,26 @@ export const MapCanvas: React.FC<MapCanvasProps> = ({
         }
       }
     });
+
+    // 1b. Add or update Selected Feature Highlight Source
+    const HIGHLIGHT_SOURCE_ID = "selected-feature-source";
+    const existingHighlightSource = map.getSource(HIGHLIGHT_SOURCE_ID) as GeoJSONSource | undefined;
+    if (existingHighlightSource && typeof existingHighlightSource.setData === "function") {
+      try {
+        existingHighlightSource.setData(selectedFeatureGeoJSON);
+      } catch (err) {
+        console.error("[GIS] Error updating selected-feature-source:", err);
+      }
+    } else if (!existingHighlightSource) {
+      try {
+        map.addSource(HIGHLIGHT_SOURCE_ID, {
+          type: "geojson",
+          data: selectedFeatureGeoJSON,
+        });
+      } catch (err) {
+        console.error("[GIS] Error adding selected-feature-source:", err);
+      }
+    }
 
     // 2. Add or update Map Layers
     layers.forEach((layerConfig) => {
@@ -218,6 +290,7 @@ export const MapCanvas: React.FC<MapCanvasProps> = ({
               geometryType: feat.geometry.type,
               coordinates,
               properties: (feat.properties as Record<string, unknown>) || {},
+              geometry: feat.geometry as any,
             });
           });
 
@@ -286,6 +359,68 @@ export const MapCanvas: React.FC<MapCanvasProps> = ({
       }
     });
 
+    // 3b. Add or update High-Visibility Highlight Layers for Selected Feature
+    const HIGHLIGHT_LAYERS: any[] = [
+      {
+        id: "selected-feature-polygon-fill",
+        type: "fill",
+        source: HIGHLIGHT_SOURCE_ID,
+        filter: ["any", ["==", ["geometry-type"], "Polygon"], ["==", ["geometry-type"], "MultiPolygon"]],
+        paint: {
+          "fill-color": "#38bdf8",
+          "fill-opacity": 0.45,
+        },
+      },
+      {
+        id: "selected-feature-polygon-stroke",
+        type: "line",
+        source: HIGHLIGHT_SOURCE_ID,
+        filter: ["any", ["==", ["geometry-type"], "Polygon"], ["==", ["geometry-type"], "MultiPolygon"]],
+        paint: {
+          "line-color": "#0284c7",
+          "line-width": 4.5,
+          "line-opacity": 1.0,
+        },
+      },
+      {
+        id: "selected-feature-point-outer-halo",
+        type: "circle",
+        source: HIGHLIGHT_SOURCE_ID,
+        filter: ["==", ["geometry-type"], "Point"],
+        paint: {
+          "circle-radius": 15,
+          "circle-color": "#38bdf8",
+          "circle-opacity": 0.35,
+          "circle-stroke-width": 3,
+          "circle-stroke-color": "#0284c7",
+          "circle-stroke-opacity": 0.9,
+        },
+      },
+      {
+        id: "selected-feature-point-inner-pin",
+        type: "circle",
+        source: HIGHLIGHT_SOURCE_ID,
+        filter: ["==", ["geometry-type"], "Point"],
+        paint: {
+          "circle-radius": 8.5,
+          "circle-color": "#0284c7",
+          "circle-stroke-width": 2.5,
+          "circle-stroke-color": "#ffffff",
+          "circle-opacity": 1.0,
+        },
+      },
+    ];
+
+    HIGHLIGHT_LAYERS.forEach((hl) => {
+      if (!map.getLayer(hl.id)) {
+        try {
+          map.addLayer(hl);
+        } catch (err) {
+          console.error(`[GIS] Error adding highlight layer ${hl.id}:`, err);
+        }
+      }
+    });
+
     // 4. Enforce strict layer rendering order (bottom-to-top)
     for (const layerId of STRICT_LAYER_ORDER) {
       if (map.getLayer(layerId)) {
@@ -309,8 +444,11 @@ export const MapCanvas: React.FC<MapCanvasProps> = ({
       console.log(`[GIS] red_zones: ${rzCount} MultiPolygon features`);
       console.log(`[GIS] routes: ${rtCount} LineString features`);
       console.log(`[GIS] candidate_sites: ${csCount} Point features`);
+      if (selectedFeature) {
+        console.log(`[GIS] selected feature: ID ${selectedFeature.id} (${selectedFeature.layerCategory})`);
+      }
     }
-  }, [styleVersion, isStyleLoaded, sourcesData, layers, layerVisibility]);
+  }, [styleVersion, isStyleLoaded, sourcesData, layers, layerVisibility, selectedFeatureGeoJSON, selectedFeature]);
 
   // Fit bounds when bounds prop changes or geometry updates
   useEffect(() => {
