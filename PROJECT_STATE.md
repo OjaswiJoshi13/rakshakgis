@@ -39,6 +39,7 @@ The project uses the following formal lifecycle statuses across all tasks and ch
 - `AWAITING_REVIEW`: Implementation and tests have been completed and reported, pending independent review.
 - `VERIFIED`: The implementation has been independently reviewed and accepted against the specification.
 - `COMMITTED`: The verified implementation has been committed to the shared `main` branch.
+- `ACCEPTED_AUDIT_BASELINE`: An audit-only or non-code task whose findings, architecture analysis, and documented blockers have been independently reviewed and accepted as the baseline for downstream chunks. Indicates audit acceptance only; does not signify code implementation or blocker resolution.
 - `BLOCKED`: The chunk cannot proceed because one or more prerequisite dependencies are not yet `COMMITTED`.
 - `FAILED_REVIEW`: The implementation was reviewed and found incomplete or incorrect. Requires correction before commit.
 
@@ -127,7 +128,7 @@ M2-04 / M2-05  M3 Risk / GIS  M4 Relocation  M5 Frontend    M6 Operations
             DEP-01 / DOC-01 (Deploy & Docs)
 ```
 
-No chunk may transition to `IN_PROGRESS` until all its listed prerequisite dependencies are marked `COMMITTED` (or `VERIFIED` by review).
+No chunk may transition to `IN_PROGRESS` until all its listed prerequisite dependencies are marked `COMMITTED` (or `VERIFIED` by review, or `ACCEPTED_AUDIT_BASELINE` for non-code audit prerequisites).
 
 ---
 
@@ -182,18 +183,21 @@ No chunk may transition to `IN_PROGRESS` until all its listed prerequisite depen
 | **INT-03** | Integration | Full Automated Test Suite Execution | M1 | INT-02 | **COMMITTED** |
 | **REAL-01** | Integration | Real Data Path Integration (GIS + Relocation) | Platform | INT-03 | **IMPLEMENTED** |
 | **REAL-01B** | Integration | Forensic Frontend & Operational Data Path Fix | Platform | REAL-01 | **IMPLEMENTED** |
-| **DEP-01** | DevOps | Production Deployment & Containerization | M1 | INT-03 | **PLANNED** |
+| **DEP-01A** | DevOps | Docker and Deployment Readiness Audit | Platform | INT-03 | **ACCEPTED_AUDIT_BASELINE** |
+| **DEP-01B1** | DevOps | Docker Context and Frontend Containerization | Platform | DEP-01A | **AWAITING_REVIEW** |
+| **DEP-01B2** | DevOps | Backend Hardening & API Routing / Compose | Platform | DEP-01B1 | **PLANNED** |
+| **DEP-01** | DevOps | Production Deployment & EC2 Orchestration | Platform | DEP-01B2 | **PLANNED** |
 | **DOC-01** | Docs | Final Project Documentation & Demo Guide | M1 | INT-02 | **PLANNED** |
 
 ---
 
 ## Current Work
 
-- **Active Chunk:** `None` (Chunk INT-03 is COMMITTED)
-- **Data Provenance Audit:** Completed comprehensive forensic data provenance and UI content audit on commit `f28fb14` (2026-09-09). Detailed findings cataloged in `audit_report.md`.
-- **Status:** All implementation and integration quality-gate chunks (M1–M6, INT-01, INT-02, INT-03) are COMMITTED.
+- **Active Chunk:** `DEP-01B1: Docker Context and Frontend Containerization` (`AWAITING_REVIEW`)
+- **DEP-01A Audit Baseline:** Formally reviewed and accepted as `ACCEPTED_AUDIT_BASELINE` on 2026-09-19. Audit-only task; confirmed all deployment blockers (uncompressed context, missing frontend Dockerfile, exposed port 5432, hardcoded localhost client API URL, root backend execution, absent reverse proxy/Terraform). All documented blockers remain open for systematic resolution in follow-up deployment chunks.
+- **DEP-01B1 Status:** Unblocked by DEP-01A acceptance. Successfully implemented and verified root & frontend `.dockerignore` rules (reducing context from ~2.3 GB to 1.79 MB / 8.03 MB), configured Next.js `output: 'standalone'`, created production-ready multi-stage unprivileged `frontend/Dockerfile` (Alpine 3.20 / Node 20, UID 1001), built and verified frontend container runtime (HTTP 200 on all pages, container-to-container backend healthcheck passed), verified zero database disruption, passed full test suite (31 files, 293 tests passed, 0 type errors). Maintained at `AWAITING_REVIEW`. No commits or pushes made.
 - **Next Eligible Chunks:**
-  - **DEP-01:** Production Deployment & Containerization (Prerequisite: INT-03 — COMMITTED)
+  - **DEP-01B2:** Backend Hardening & API Routing / Compose (Prerequisite: DEP-01B1 review)
   - **DOC-01:** Final Project Documentation & Demo Guide (Prerequisite: INT-02 — COMMITTED)
 
 ---
@@ -201,7 +205,8 @@ No chunk may transition to `IN_PROGRESS` until all its listed prerequisite depen
 ## Blocked Work
 
 ### Next Eligible / Unblocked:
-- **DEP-01:** Production Deployment & Containerization (Unblocked — ready to start)
+- **DEP-01B1:** Docker Context and Frontend Containerization (Unblocked by DEP-01A audit baseline acceptance; currently `AWAITING_REVIEW`)
+- **DEP-01B2:** Backend Hardening & API Routing / Compose (Pending DEP-01B1 review acceptance)
 - **DOC-01:** Final Project Documentation & Demo Guide (Unblocked — ready to start)
 
 ### Still Blocked:
@@ -2857,8 +2862,88 @@ No chunk may transition to `IN_PROGRESS` until all its listed prerequisite depen
 
 ---
 
+## Chunk DEP-01A Implementation Record (Audit-Only)
+
+- **Status:** `ACCEPTED_AUDIT_BASELINE`
+- **Date:** 2026-09-19
+- **Owner:** Platform & DevOps Team (M1)
+- **Type:** Technical Audit Only (Zero application code, Docker, Terraform, or database changes made; no commits or pushes)
+- **Acceptance Rationale:** Independent audit findings and technical analysis have been reviewed and formally accepted as the authoritative deployment-readiness baseline. Acceptance explicitly acknowledges all documented architectural gaps and deployment blockers (missing frontend Dockerfile/service, 2.3 GB uncompressed build context, hardcoded localhost client API URL, exposed database port 5432, root backend execution with dev reload, and absence of reverse proxy/Terraform). This acceptance establishes the authoritative baseline for all subsequent deployment chunks (DEP-01B1 through DEP-01D) and does NOT signify that the platform is production-ready or that any documented blockers are resolved.
+- **Objective:** Independently audit the existing Docker setup, build reproducibility, runtime configurations, database architecture, Docker Hub readiness, and AWS EC2 deployment readiness.
+- **Key Findings:**
+  1. *BLOCKER: Missing Frontend Dockerfile & Service:* Next.js frontend has no Dockerfile and is entirely omitted from `docker-compose.yml`. Frontend currently runs exclusively as a host-level Node.js development process.
+  2. *BLOCKER: Complete Absence of `.dockerignore`:* No `.dockerignore` exists anywhere in the repository. Building `backend/Dockerfile` with context `.` triggers an uncompressed ~2.3 GB build context packaging `node_modules/`, `backend/venv/`, and `.next/`, resulting in extreme build latency and guaranteed OOM kills on small EC2 instances (t2.micro / t3.small).
+  3. *BLOCKER: Hardcoded Localhost API Base URL in Client Bundle:* `NEXT_PUBLIC_API_BASE_URL` in `auth.ts` falls back to `http://localhost:8000/api/v1` and is baked into static client bundles during `next build`. In public EC2 deployments, client browsers will call their own localhost instead of the server unless configured with a relative `/api/v1` behind a reverse proxy.
+  4. *HIGH: Public Exposure of PostgreSQL / PostGIS Port 5432:* `docker-compose.yml` publishes port 5432 directly to the host (`0.0.0.0:5432`), exposing the database to the internet unless restricted by external firewalls.
+  5. *HIGH: Missing Reverse Proxy / Single Public HTTPS Entrypoint:* No reverse proxy (Nginx / Caddy) is configured to terminate SSL, route `/api/v1` to FastAPI, and route `/` to Next.js.
+  6. *HIGH: Local Filesystem Bind-Mount Assumption:* `docker-compose.yml` mounts host `./backend:/app`, requiring source code to be cloned on EC2 rather than running standalone Docker Hub images.
+  7. *HIGH: Backend Runs as Root with Dev Hot-Reload Enabled:* `backend/Dockerfile` runs as UID 0 (root) and uses `CMD ["uvicorn", "app.main:app", "--reload"]`.
+  8. *MEDIUM: No Automated Migration on Startup:* Alembic migrations must be executed manually; `lifespan` in `main.py` only attempts demo seeding and assumes tables already exist.
+  9. *MEDIUM: Zero Terraform Infrastructure Code:* No `*.tf` files exist in the repository; EC2 and networking must be provisioned.
+- **Verification Evidence:**
+  - `wsl docker ps`: Confirmed `rakshakgis-backend` (FastAPI) and `rakshakgis-db` (PostGIS 16-3.4) running and healthy.
+  - `GET /health` -> HTTP 200 OK (x-request-id present).
+  - `GET /ready` -> HTTP 200 OK (`PostgreSQL 16.4`, `PostGIS 3.4.3 USE_GEOS=1 USE_PROJ=1 USE_STATS=1`).
+  - Database persistence: `rakshakgis_pgdata` volume verified containing 40 villages, 12 candidate sites, 7 red zones, 53 routes.
+  - `docker exec rakshakgis-backend pytest tests/test_health.py tests/test_database.py`: 15 passed, 0 failed in 2.05s.
+  - `docker exec rakshakgis-backend pytest tests/test_models.py`: 8 passed, 0 failed in 0.76s.
+  - Frontend type check (`npm run type-check`): Passed with 0 errors.
+  - Frontend build (`npm run build`): All 17 static routes compiled successfully.
+  - Frontend unit tests (`npm test -- src/__tests__/AuthService.test.ts`): 12 passed, 0 failed.
+- **Recommended Next Chunk:**
+  - `DEP-01B: Production Containerization & Build Hardening` (Create root & frontend `.dockerignore`, create multi-stage unprivileged `frontend/Dockerfile` with `standalone` output, harden `backend/Dockerfile` without `--reload` as non-root user, configure relative API routing `/api/v1`, and create local full-stack Compose configuration with frontend).
+
+---
+
+## Chunk DEP-01B1 Implementation Record
+
+- **Status:** `AWAITING_REVIEW`
+- **Date:** 2026-09-19
+- **Owner:** Platform & DevOps Team (M1)
+- **Objective:** Implement and verify the smallest safe set of changes needed to build and run the RakshakGIS frontend as a Docker container, while reducing unnecessary Docker build context.
+- **Files Created/Modified:**
+  1. `.dockerignore` [NEW]: Excludes `.git/`, `node_modules/`, `.next/`, `backend/venv/`, test caches, coverage output, and local `.env` files from root build context. Reduced root context from ~2.3 GB to 8.029 MB (99.65% reduction).
+  2. `frontend/.dockerignore` [NEW]: Excludes node modules, build caches, and test artifacts from frontend build context. Reduced frontend context from ~2.3 GB to 1.796 MB (99.92% reduction).
+  3. `frontend/next.config.mjs` [MODIFIED]: Configured `output: 'standalone'` to generate optimized standalone Node.js server bundles.
+  4. `frontend/Dockerfile` [NEW]: Production-ready multi-stage Dockerfile (`deps` -> `builder` -> `runner`) based on `node:20-alpine`, running as unprivileged user `nextjs` (UID 1001), exposing port 3000, with Alpine `wget` healthcheck and `CMD ["node", "server.js"]`.
+  5. `frontend/public/.gitkeep` [NEW]: Created directory placeholder ensuring asset copy succeeds deterministically in Docker builds.
+- **Docker Build & Runtime Verification:**
+  - **Build Command:** `docker build -t rakshakgis-frontend:audit .` (context: `frontend/`)
+  - **Build Result:** Exit code 0, image ID `785a0c237099`, image content size: 53.7 MB, virtual disk size: 228 MB.
+  - **Runtime Execution:** Tested container `rakshakgis-frontend-test` on network `rakshakgis_network` port 3000.
+  - **Health Status:** Container reached `Up (healthy)` in 15 seconds.
+  - **Non-Root Execution:** Confirmed `uid=1001(nextjs) gid=1001(nodejs)`.
+  - **HTTP Endpoints (all returned HTTP 200 OK):**
+    - `GET /` -> HTTP 200 OK
+    - `GET /dashboard` -> HTTP 200 OK
+    - `GET /login` -> HTTP 200 OK
+    - `GET /gis` -> HTTP 200 OK
+  - **Container-to-Container Network Connectivity:**
+    - Ran `wget -qO- http://rakshakgis-backend:8000/health` from inside `rakshakgis-frontend-test`: HTTP 200 OK returned (`{"status":"healthy","app":"RakshakGIS","environment":"development","data_mode":"demo","version":"0.1.0"}`).
+  - **Local Stack & Database Integrity:**
+    - `rakshakgis-db` (PostGIS 16-3.4) and `rakshakgis-backend` (FastAPI) remained healthy throughout.
+    - Persistent volume `rakshakgis_pgdata` verified completely untouched: 40 villages, 12 candidate sites, 7 red zones, 53 routes intact.
+    - Test container `rakshakgis-frontend-test` cleanly removed after verification to free port 3000.
+- **Automated Tests & Regression Checks:**
+  - **Frontend Type Check:** `npm run type-check` (`tsc --noEmit`) -> Passed with **0 errors**.
+  - **Frontend Test Suite:** `npm test` (`vitest run`) -> **31 test files passed, 293 tests passed, 0 failed** in 119.76s.
+  - **Production Next.js Build:** `npm run build` -> 17 static routes compiled successfully, standalone server emitted to `.next/standalone/server.js`.
+- **Known Limitations & Findings:**
+  1. *Client-side API Routing:* In browser environments, client-side requests still default to `NEXT_PUBLIC_API_BASE_URL` (`http://localhost:8000/api/v1`). On public EC2, client browsers will fail to reach the backend unless a reverse proxy (Caddy/Nginx) provides same-origin routing (`/api/v1`), scheduled for chunk DEP-01C.
+  2. *Local Compose Integration:* Frontend service has not yet been added to `docker-compose.yml` to preserve existing developer workflow; scheduled for subsequent chunk.
+- **Remaining Deployment Blockers:**
+  - Hardened backend Dockerfile (non-root UID, production entrypoint without `--reload`).
+  - Production reverse proxy configuration (Caddy / Nginx) with TLS.
+  - Docker Compose production profile / manifest.
+  - Automated database migration on container startup.
+  - Terraform infrastructure code (`*.tf`) for AWS EC2, VPC, and Security Groups.
+- **Recommended Next Chunk:**
+  - `DEP-01B2: Backend Hardening & API Routing / Compose`
+
+---
+
 ## Last Updated
 
-- **Timestamp:** 2026-09-10 01:21:00 IST
-- **Updated By:** GIS Frontend Engineering Team (REMOVAL-GIS-LAYER-CONTROLS-AND-LEGEND IMPLEMENTED / AWAITING_REVIEW)
-- **Status Summary:** Removed nonfunctional GIS Layer Controls panel and Operational Map Legend from `/gis`. Deleted `MapLegend.tsx`, cleaned imports/exports, updated GIS test suites to assert absence, verified TypeScript passes with 0 errors, all 34 `MapCanvas` and 18 `GisGeoJsonIntegration` vitest tests pass, and verified live browser state.
+- **Timestamp:** 2026-09-19 23:45:00 IST
+- **Updated By:** Platform & DevOps Team (DEP-01A ACCEPTED_AUDIT_BASELINE / DEP-01B1 AWAITING_REVIEW)
+- **Status Summary:** Formally resolved DEP-01A audit prerequisite by transitioning status to ACCEPTED_AUDIT_BASELINE in Status Definitions, Dependency Rules, Chunk Registry, and Chunk Implementation Record. Documented acceptance rationale and confirmed that documented deployment blockers remain open for follow-up chunks. DEP-01B1 is unblocked by the accepted audit baseline and maintained at AWAITING_REVIEW. Zero application code, compose, infrastructure, or database changes made; no commits or pushes.
