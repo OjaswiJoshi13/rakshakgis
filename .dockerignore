@@ -1,0 +1,64 @@
+# ==============================================================================
+# RakshakGIS Docker Ignore (.dockerignore)
+# ==============================================================================
+
+# Version Control
+.git
+.gitignore
+
+# Environment and Secrets (Never bake secrets into images)
+.env
+.env.*
+!.env.example
+*.env
+
+# Node.js & Frontend Artifacts
+node_modules/
+frontend/node_modules/
+.next/
+frontend/.next/
+*.tsbuildinfo
+frontend/*.tsbuildinfo
+
+# Python Virtual Environments, Bytecode & Caches
+venv/
+.venv/
+backend/venv/
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.pytest_cache/
+.mypy_cache/
+.ruff_cache/
+coverage/
+htmlcov/
+.coverage
+.coverage.*
+
+# Build, Packaging & Dist Output
+build/
+dist/
+dist-ssr/
+*.egg-info/
+
+# Logs, Databases & Runtime Files
+*.log
+*.sqlite
+*.sqlite3
+
+# Operating System and Editor Files
+.DS_Store
+Thumbs.db
+.idea/
+.vscode/
+*.swp
+*.swo
+*~
+
+# Temporary & Scratch Files
+scratch/
+
+# Large / Raw Datasets not needed in application container images
+data/raw/*
+!data/raw/.gitkeep

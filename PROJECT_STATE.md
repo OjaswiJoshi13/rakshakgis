@@ -195,7 +195,7 @@ No chunk may transition to `IN_PROGRESS` until all its listed prerequisite depen
 
 - **Active Chunk:** `DEP-01B1: Docker Context and Frontend Containerization` (`AWAITING_REVIEW`)
 - **DEP-01A Audit Baseline:** Formally reviewed and accepted as `ACCEPTED_AUDIT_BASELINE` on 2026-09-19. Audit-only task; confirmed all deployment blockers (uncompressed context, missing frontend Dockerfile, exposed port 5432, hardcoded localhost client API URL, root backend execution, absent reverse proxy/Terraform). All documented blockers remain open for systematic resolution in follow-up deployment chunks.
-- **DEP-01B1 Status:** Unblocked by DEP-01A acceptance. Successfully implemented and verified root & frontend `.dockerignore` rules (reducing context from ~2.3 GB to 1.79 MB / 8.03 MB), configured Next.js `output: 'standalone'`, created production-ready multi-stage unprivileged `frontend/Dockerfile` (Alpine 3.20 / Node 20, UID 1001), built and verified frontend container runtime (HTTP 200 on all pages, container-to-container backend healthcheck passed), verified zero database disruption, passed full test suite (31 files, 293 tests passed, 0 type errors). Maintained at `AWAITING_REVIEW`. No commits or pushes made.
+- **DEP-01B1 Status:** Unblocked by DEP-01A acceptance. Successfully implemented and verified root & frontend `.dockerignore` rules (reducing context from ~2.3 GB to 1.79 MB / 8.03 MB), configured Next.js `output: 'standalone'`, created production-ready multi-stage unprivileged `frontend/Dockerfile` (Alpine 3.20 / Node 20, UID 1001), built and verified frontend container runtime (HTTP 200 on all pages, container-to-container backend healthcheck passed), verified zero database disruption, passed full test suite (31 files, 293 tests passed, 0 type errors). Committed to main; maintained at `AWAITING_REVIEW` pending independent review. Known limitation preserved: client browser requests default to build-time localhost API URL until reverse proxy deployment.
 - **Next Eligible Chunks:**
   - **DEP-01B2:** Backend Hardening & API Routing / Compose (Prerequisite: DEP-01B1 review)
   - **DOC-01:** Final Project Documentation & Demo Guide (Prerequisite: INT-02 — COMMITTED)
@@ -2944,6 +2944,6 @@ No chunk may transition to `IN_PROGRESS` until all its listed prerequisite depen
 
 ## Last Updated
 
-- **Timestamp:** 2026-09-19 23:45:00 IST
-- **Updated By:** Platform & DevOps Team (DEP-01A ACCEPTED_AUDIT_BASELINE / DEP-01B1 AWAITING_REVIEW)
-- **Status Summary:** Formally resolved DEP-01A audit prerequisite by transitioning status to ACCEPTED_AUDIT_BASELINE in Status Definitions, Dependency Rules, Chunk Registry, and Chunk Implementation Record. Documented acceptance rationale and confirmed that documented deployment blockers remain open for follow-up chunks. DEP-01B1 is unblocked by the accepted audit baseline and maintained at AWAITING_REVIEW. Zero application code, compose, infrastructure, or database changes made; no commits or pushes.
+- **Timestamp:** 2026-09-20 00:05:00 IST
+- **Updated By:** Platform & DevOps Team (DEP-01B1 COMMITTED / AWAITING_REVIEW)
+- **Status Summary:** Committed DEP-01B1 implementation files (root and frontend .dockerignore, Next.js standalone output config, multi-stage unprivileged frontend/Dockerfile). Status maintained at AWAITING_REVIEW pending independent review. Known limitation preserved: browser API requests continue to use build-time localhost:8000/api/v1 URL; deployment routing will be resolved in a dedicated reverse proxy chunk.
