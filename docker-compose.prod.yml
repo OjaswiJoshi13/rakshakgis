@@ -1,16 +1,20 @@
+# ==============================================================================
+# RakshakGIS Production Docker Compose Manifest
+# Architecture: Isolated internal DB, unprivileged backend, standalone frontend
+# Security: Required explicit secrets, non-root execution, private DB networking
+# ==============================================================================
+
 services:
-  # Database Service: PostgreSQL 16 with PostGIS 3.4 spatial extensions
+  # Database Service: PostgreSQL 16 with PostGIS 3.4
+  # Access is strictly private to internal bridge network (no host ports published)
   db:
     image: postgis/postgis:16-3.4
-    container_name: rakshakgis-db
+    container_name: rakshakgis-prod-db
     restart: unless-stopped
     environment:
       POSTGRES_DB: ${POSTGRES_DB:-rakshakgis}
       POSTGRES_USER: ${POSTGRES_USER:-rakshak}
-      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-rakshak_dev_secret}
-    ports:
-      # Restrict PostgreSQL port to localhost loopback to prevent public exposure
-      - "127.0.0.1:${POSTGRES_PORT:-5432}:5432"
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:?POSTGRES_PASSWORD is required in production}
     volumes:
       - pgdata:/var/lib/postgresql/data
     healthcheck:
@@ -22,20 +26,18 @@ services:
     networks:
       - rakshak_network
 
-  # Backend Service: FastAPI application with GDAL/GEOS/PROJ geospatial support
+  # Backend Service: Hardened FastAPI service (unprivileged appuser, no --reload)
   backend:
     build:
       context: .
       dockerfile: backend/Dockerfile
-    container_name: rakshakgis-backend
+    container_name: rakshakgis-prod-backend
     restart: unless-stopped
-    # Development override: enable hot-reload for local development with mounted volume
-    command: ["uvicorn", "app.main:app", "--host", "0.0.0.0", "--port", "8000", "--reload"]
     environment:
-      DATABASE_URL: ${DATABASE_URL:-postgresql://${POSTGRES_USER:-rakshak}:${POSTGRES_PASSWORD:-rakshak_dev_secret}@db:5432/${POSTGRES_DB:-rakshakgis}}
-      APP_ENV: ${APP_ENV:-development}
+      DATABASE_URL: ${DATABASE_URL:-postgresql://${POSTGRES_USER:-rakshak}:${POSTGRES_PASSWORD:?POSTGRES_PASSWORD is required in production}@db:5432/${POSTGRES_DB:-rakshakgis}}
+      APP_ENV: ${APP_ENV:-production}
       DATA_MODE: ${DATA_MODE:-demo}
-      JWT_SECRET: ${JWT_SECRET:-}
+      JWT_SECRET: ${JWT_SECRET:?JWT_SECRET is required in production}
       IMD_API_KEY: ${IMD_API_KEY:-}
       IMD_BASE_URL: ${IMD_BASE_URL:-}
       GEOSERVER_URL: ${GEOSERVER_URL:-}
@@ -46,27 +48,21 @@ services:
       LLM_API_KEY: ${LLM_API_KEY:-}
     ports:
       - "${BACKEND_PORT:-8000}:8000"
-    volumes:
-      - ./backend:/app
-      - /app/venv
-    healthcheck:
-      test: ["CMD", "curl", "-f", "http://127.0.0.1:8000/health"]
-      interval: 10s
-      timeout: 5s
-      retries: 5
-      start_period: 10s
     depends_on:
       db:
         condition: service_healthy
     networks:
       - rakshak_network
 
-  # Frontend Service: Next.js 14 Standalone application
+  # Frontend Service: Next.js 14 Standalone runner with same-origin API proxying
   frontend:
     build:
       context: ./frontend
       dockerfile: Dockerfile
-    container_name: rakshakgis-frontend
+      args:
+        NEXT_PUBLIC_API_BASE_URL: ${NEXT_PUBLIC_API_BASE_URL:-/api/v1}
+        NEXT_PUBLIC_DATA_MODE: ${DATA_MODE:-demo}
+    container_name: rakshakgis-prod-frontend
     restart: unless-stopped
     environment:
       BACKEND_INTERNAL_URL: http://backend:8000
@@ -82,9 +78,9 @@ services:
 
 volumes:
   pgdata:
-    name: rakshakgis_pgdata
+    name: ${POSTGRES_PROD_VOLUME_NAME:-rakshakgis_prod_pgdata}
 
 networks:
   rakshak_network:
-    name: rakshakgis_network
+    name: ${PROD_NETWORK_NAME:-rakshakgis_prod_network}
     driver: bridge

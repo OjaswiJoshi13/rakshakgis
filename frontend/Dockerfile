@@ -29,8 +29,12 @@ COPY . .
 ENV NEXT_TELEMETRY_DISABLED=1
 ENV NODE_ENV=production
 
+# Internal backend URL used for Next.js server-side API proxy rewrites
+ARG BACKEND_INTERNAL_URL=http://backend:8000
+ENV BACKEND_INTERNAL_URL=$BACKEND_INTERNAL_URL
+
 # Public environment variables inlined into client bundle at build time
-ARG NEXT_PUBLIC_API_BASE_URL=http://localhost:8000/api/v1
+ARG NEXT_PUBLIC_API_BASE_URL=/api/v1
 ARG NEXT_PUBLIC_DATA_MODE=demo
 ARG NEXT_PUBLIC_ACTIVE_REGION=himalayan_pilot
 ARG NEXT_PUBLIC_MAP_STYLE_URL=https://demotiles.maplibre.org/style.json
@@ -60,6 +64,11 @@ ENV HOSTNAME="0.0.0.0"
 RUN addgroup --system --gid 1001 nodejs && \
     adduser --system --uid 1001 nextjs
 
+# Copy runtime configuration and entrypoint scripts
+COPY --chown=nextjs:nodejs configure-runtime.js /app/configure-runtime.js
+COPY --chown=nextjs:nodejs docker-entrypoint.sh /app/docker-entrypoint.sh
+RUN chmod +x /app/docker-entrypoint.sh
+
 # Copy static assets and standalone server output
 COPY --from=builder /app/public ./public
 
@@ -70,6 +79,10 @@ RUN mkdir .next && chown nextjs:nodejs .next
 COPY --from=builder --chown=nextjs:nodejs /app/.next/standalone ./
 COPY --from=builder --chown=nextjs:nodejs /app/.next/static ./.next/static
 
+# Create pristine template for runtime route rewrites
+RUN cp .next/routes-manifest.json .next/routes-manifest.template.json && \
+    chown nextjs:nodejs .next/routes-manifest.template.json
+
 # Run as unprivileged non-root user
 USER nextjs
 
@@ -78,6 +91,8 @@ EXPOSE 3000
 # Container healthcheck using Alpine busybox wget
 HEALTHCHECK --interval=30s --timeout=5s --start-period=5s --retries=3 \
     CMD wget --no-verbose --tries=1 --spider http://127.0.0.1:3000/ || exit 1
+
+ENTRYPOINT ["/app/docker-entrypoint.sh"]
 
 # Start Next.js standalone Node.js production server
 CMD ["node", "server.js"]

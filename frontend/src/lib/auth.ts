@@ -40,10 +40,14 @@ export function loginDemoUser(): { token: TokenResponse; user: User } {
  * Falls back to local development URL if not configured in environment.
  */
 export function getApiBaseUrl(): string {
-  return (
-    process.env.NEXT_PUBLIC_API_BASE_URL ||
-    "http://localhost:8000/api/v1"
-  ).replace(/\/+$/, "");
+  if (process.env.NEXT_PUBLIC_API_BASE_URL) {
+    return process.env.NEXT_PUBLIC_API_BASE_URL.replace(/\/+$/, "");
+  }
+  // Default to same-origin relative path in browser environments
+  if (typeof window !== "undefined") {
+    return "/api/v1";
+  }
+  return "http://localhost:8000/api/v1";
 }
 
 /**

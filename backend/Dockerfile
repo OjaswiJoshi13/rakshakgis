@@ -28,15 +28,28 @@ WORKDIR /app
 
 # Copy dependency definition and install Python dependencies
 COPY requirements.txt /app/requirements.txt
-RUN pip install --no-cache-dir --upgrade pip && \
-    pip install --no-cache-dir -r /app/requirements.txt
+RUN pip install --no-cache-dir --default-timeout=100 -r /app/requirements.txt
 
-# Copy backend application source code and tests
-COPY backend/ /app/
+# Create unprivileged system group and user
+RUN groupadd --gid 1001 appgroup && \
+    useradd --uid 1001 --gid appgroup --shell /bin/bash --create-home appuser
+
+# Copy backend application source code and tests with non-root ownership
+COPY --chown=appuser:appgroup backend/ /app/
+
+# Ensure application directory is owned by appuser
+RUN chown -R appuser:appgroup /app
+
+# Switch to unprivileged user
+USER appuser
 
 # Expose FastAPI application port
 EXPOSE 8000
 
-# Default command for development server with hot-reload enabled
-# Note: Complete FastAPI application entrypoint is implemented in Chunk M2-01
-CMD ["uvicorn", "app.main:app", "--host", "0.0.0.0", "--port", "8000", "--reload"]
+# Native container healthcheck probing application health endpoint
+HEALTHCHECK --interval=30s --timeout=5s --start-period=10s --retries=3 \
+    CMD curl -f http://127.0.0.1:8000/health || exit 1
+
+# Production command (unprivileged, single-process, without development hot-reload)
+# Note: In development Compose, --reload is enabled via command override
+CMD ["uvicorn", "app.main:app", "--host", "0.0.0.0", "--port", "8000"]
