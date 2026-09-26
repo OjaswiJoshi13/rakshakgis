@@ -39,6 +39,8 @@ htmlcov/
 *.log
 *.sqlite
 *.sqlite3
+*.dump
+backups/
 
 # Operating System and Editor Files
 .DS_Store

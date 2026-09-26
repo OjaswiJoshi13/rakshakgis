@@ -122,22 +122,17 @@ resource "aws_security_group" "app" {
     cidr_blocks = ["0.0.0.0/0"]
   }
 
-  # Inbound Frontend Application Port (Direct access to Next.js container)
-  ingress {
-    description = "Next.js frontend application port"
-    from_port   = 3000
-    to_port     = 3000
-    protocol    = "tcp"
-    cidr_blocks = ["0.0.0.0/0"]
-  }
-
-  # Inbound Backend API Port (Direct access for API consumers / debugging)
-  ingress {
-    description = "FastAPI backend API port"
-    from_port   = 8000
-    to_port     = 8000
-    protocol    = "tcp"
-    cidr_blocks = ["0.0.0.0/0"]
+  # Inbound Direct Application Ports (Optional diagnostic access, restricted to admin CIDR)
+  # Production standard: Public access is strictly via port 80/443; direct ports 3000/8000 are closed.
+  dynamic "ingress" {
+    for_each = var.enable_direct_app_ports ? [3000, 8000] : []
+    content {
+      description = "Diagnostic access for port ${ingress.value} (Admin CIDR only)"
+      from_port   = ingress.value
+      to_port     = ingress.value
+      protocol    = "tcp"
+      cidr_blocks = var.admin_ssh_cidr
+    }
   }
 
   # Outbound All Traffic (Package downloads, container registries, tile services)

@@ -63,3 +63,9 @@ variable "allocate_elastic_ip" {
   type        = bool
   default     = true
 }
+
+variable "enable_direct_app_ports" {
+  description = "Whether to allow inbound access on direct application ports (3000, 8000) from the admin CIDR for diagnostics. Default is false (hardened: all public traffic must use HTTP/HTTPS ports 80/443)."
+  type        = bool
+  default     = false
+}

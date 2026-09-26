@@ -29,18 +29,18 @@ output "ssh_connection_string" {
 }
 
 output "frontend_url" {
-  description = "Public URL to access the RakshakGIS Next.js frontend application."
-  value       = "http://${var.allocate_elastic_ip ? aws_eip.app[0].public_ip : aws_instance.app.public_ip}:3000"
+  description = "Public URL to access the RakshakGIS Next.js frontend application (HTTP port 80)."
+  value       = "http://${var.allocate_elastic_ip ? aws_eip.app[0].public_ip : aws_instance.app.public_ip}"
 }
 
 output "backend_api_url" {
-  description = "Public URL for the FastAPI backend API."
-  value       = "http://${var.allocate_elastic_ip ? aws_eip.app[0].public_ip : aws_instance.app.public_ip}:8000/api/v1"
+  description = "Public API URL routed securely via the Next.js same-origin reverse proxy."
+  value       = "http://${var.allocate_elastic_ip ? aws_eip.app[0].public_ip : aws_instance.app.public_ip}/api/v1"
 }
 
 output "backend_health_url" {
-  description = "Public URL for the backend health check probe."
-  value       = "http://${var.allocate_elastic_ip ? aws_eip.app[0].public_ip : aws_instance.app.public_ip}:8000/health"
+  description = "Health probe URL routed securely via the Next.js same-origin reverse proxy."
+  value       = "http://${var.allocate_elastic_ip ? aws_eip.app[0].public_ip : aws_instance.app.public_ip}/health"
 }
 
 output "database_isolation_note" {
