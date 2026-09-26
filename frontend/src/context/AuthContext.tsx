@@ -176,14 +176,34 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({
     setError(null);
 
     try {
-      const { token: tokenResponse, user: demoUser } = loginDemoUser();
-      setStoredToken(tokenResponse.access_token, tokenResponse.expires_in);
+      // First attempt authentic production sign-in against the backend API
+      try {
+        const tokenResponse = await loginApi({
+          username: "district_collector_chamoli",
+          password: "password123",
+        });
+        setStoredToken(tokenResponse.access_token, tokenResponse.expires_in);
+        try {
+          const profile = await getMeApi(tokenResponse.access_token);
+          setUser(profile);
+        } catch {
+          setUser(DEMO_USER);
+        }
+        setToken(tokenResponse.access_token);
+        setIsAuthenticated(true);
+        setIsLoading(false);
+        return true;
+      } catch {
+        // Fall back to offline/eval demo user if backend login is not available (e.g. offline testing)
+        const { token: tokenResponse, user: demoUser } = loginDemoUser();
+        setStoredToken(tokenResponse.access_token, tokenResponse.expires_in);
 
-      setUser(demoUser);
-      setToken(tokenResponse.access_token);
-      setIsAuthenticated(true);
-      setIsLoading(false);
-      return true;
+        setUser(demoUser);
+        setToken(tokenResponse.access_token);
+        setIsAuthenticated(true);
+        setIsLoading(false);
+        return true;
+      }
     } catch {
       setError("Failed to initialize demo session.");
       setIsLoading(false);

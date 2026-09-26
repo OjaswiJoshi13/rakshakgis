@@ -106,7 +106,7 @@ export const LoginForm: React.FC<LoginFormProps> = ({ onSuccess, className = "" 
             if (clientError) setClientError(null);
             if (serverError) clearError();
           }}
-          placeholder="e.g. officer@rakshakgis.gov.in"
+          placeholder="e.g. district_collector_chamoli or officer@rakshakgis.gov.in"
           required
           aria-required="true"
           aria-invalid={displayedError ? "true" : "false"}
@@ -196,6 +196,9 @@ export const LoginForm: React.FC<LoginFormProps> = ({ onSuccess, className = "" 
         </Button>
         <p className="mt-1.5 text-center text-[10px] font-mono text-text-muted">
           One-click evaluation access • District Collector (Chamoli)
+        </p>
+        <p className="mt-0.5 text-center text-[10px] font-mono text-text-muted">
+          Credentials: <span className="font-semibold text-emerald-700 dark:text-emerald-400">district_collector_chamoli</span> / <span className="font-semibold text-emerald-700 dark:text-emerald-400">password123</span>
         </p>
       </div>
 

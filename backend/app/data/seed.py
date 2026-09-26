@@ -37,6 +37,7 @@ from app.core.risk.red_zone.engine import PermanentRedZoneEngine
 from app.core.risk.relocation_priority.engine import RelocationPriorityEngine
 from app.core.risk.vulnerability.contracts import DemographicInput, VulnerabilityInput
 from app.core.risk.vulnerability.engine import VulnerabilityExposureEngine
+from app.core.security import hash_password
 from app.data.synthetic.loader import load_himalayan_pilot_dataset
 from app.models.geographic import Block, District, Region, Village
 from app.models.governance import User
@@ -119,13 +120,13 @@ def seed_himalayan_pilot_data(db: Session, force: bool = False) -> Dict[str, int
     }
 
     # 2. Demo User (district_collector_chamoli)
-    # Role: district_officer. Password hash is non-functional placeholder string (Option A).
+    # Role: district_officer with standard seed credentials for evaluation & local testing.
     demo_user = db.query(User).filter(User.username == "district_collector_chamoli").first()
     if not demo_user:
         demo_user = User(
             username="district_collector_chamoli",
             email="collector@chamoli.gov.in",
-            hashed_password="*DEMO_TOKEN_CLEARANCE_ONLY*",
+            hashed_password=hash_password("password123"),
             full_name="District Collector Chamoli",
             role="district_officer",
             department="District Disaster Management Authority",
@@ -134,6 +135,9 @@ def seed_himalayan_pilot_data(db: Session, force: bool = False) -> Dict[str, int
         db.add(demo_user)
         db.flush()
         counts["users"] += 1
+    elif demo_user.hashed_password == "*DEMO_TOKEN_CLEARANCE_ONLY*":
+        demo_user.hashed_password = hash_password("password123")
+        db.flush()
 
     # 3. Administrative Hierarchy: Region, District, Blocks
     region = db.query(Region).filter(Region.code == "uttarakhand_himalayan").first()
@@ -287,6 +291,26 @@ def seed_himalayan_pilot_data(db: Session, force: bool = False) -> Dict[str, int
         )
         db.add(risk_score)
         db.flush()
+
+        # Authoritative RiskFactor Decomposition Records
+        factor_defs = [
+            ("hazard_severity", 0.30, hazard_sev, "Geological & compound hazard severity"),
+            ("flood_exposure", 0.20, flood_exp, "Proximity to flash flood & water level thresholds"),
+            ("rainfall_intensity", 0.15, rainfall_int, "Antecedent 24h & 72h precipitation"),
+            ("slope_landslide_susceptibility", 0.15, slope_susceptibility, "Terrain inclination & historical slope failures"),
+            ("infrastructure_vulnerability", 0.10, exp_res.normalized_value or 0.0, "Single-access roads & critical lifeline vulnerability"),
+            ("social_vulnerability", 0.10, soc_res.normalized_value or 0.0, "Socio-economic & demographic dependency ratios"),
+        ]
+        for fname, fweight, fval, fdesc in factor_defs:
+            rf = RiskFactor(
+                risk_score_id=risk_score.id,
+                factor_name=fname,
+                weight=fweight,
+                raw_value=round(fval, 2),
+                normalized_score=round(fval, 2),
+                description=fdesc,
+            )
+            db.add(rf)
 
         # Authoritative RelocationPriorityEngine Evaluation
         p_res = priority_engine.evaluate(

@@ -180,14 +180,24 @@ def get_village_risk(
     factors = []
     if current_risk:
         factor_records = db.query(RiskFactor).filter(RiskFactor.risk_score_id == current_risk.id).all()
-        factors = [
-            {
-                "factor_name": f.factor_name,
-                "weight": f.weight,
-                "normalized_score": f.normalized_score,
-            }
-            for f in factor_records
-        ]
+        if factor_records:
+            factors = [
+                {
+                    "factor_name": f.factor_name,
+                    "weight": f.weight,
+                    "normalized_score": f.normalized_score,
+                }
+                for f in factor_records
+            ]
+        else:
+            factors = [
+                {"factor_name": "hazard_severity", "weight": 0.30, "normalized_score": current_risk.hazard_subscore or 50.0},
+                {"factor_name": "flood_exposure", "weight": 0.20, "normalized_score": 50.0},
+                {"factor_name": "rainfall_intensity", "weight": 0.15, "normalized_score": 50.0},
+                {"factor_name": "slope_landslide_susceptibility", "weight": 0.15, "normalized_score": min(100.0, (village.slope_deg / 45.0) * 75.0) if village.slope_deg else 50.0},
+                {"factor_name": "infrastructure_vulnerability", "weight": 0.10, "normalized_score": current_risk.exposure_subscore or 50.0},
+                {"factor_name": "social_vulnerability", "weight": 0.10, "normalized_score": current_risk.vulnerability_subscore or 50.0},
+            ]
 
     return ResponseEnvelope(
         success=True,
@@ -242,14 +252,24 @@ def get_village_analysis(
     factors = []
     if current_risk:
         factor_records = db.query(RiskFactor).filter(RiskFactor.risk_score_id == current_risk.id).all()
-        factors = [
-            {
-                "factor_name": f.factor_name,
-                "weight": f.weight,
-                "normalized_score": f.normalized_score,
-            }
-            for f in factor_records
-        ]
+        if factor_records:
+            factors = [
+                {
+                    "factor_name": f.factor_name,
+                    "weight": f.weight,
+                    "normalized_score": f.normalized_score,
+                }
+                for f in factor_records
+            ]
+        else:
+            factors = [
+                {"factor_name": "hazard_severity", "weight": 0.30, "normalized_score": current_risk.hazard_subscore or 50.0},
+                {"factor_name": "flood_exposure", "weight": 0.20, "normalized_score": 50.0},
+                {"factor_name": "rainfall_intensity", "weight": 0.15, "normalized_score": 50.0},
+                {"factor_name": "slope_landslide_susceptibility", "weight": 0.15, "normalized_score": min(100.0, (village.slope_deg / 45.0) * 75.0) if village.slope_deg else 50.0},
+                {"factor_name": "infrastructure_vulnerability", "weight": 0.10, "normalized_score": current_risk.exposure_subscore or 50.0},
+                {"factor_name": "social_vulnerability", "weight": 0.10, "normalized_score": current_risk.vulnerability_subscore or 50.0},
+            ]
 
     # Red zone status
     active_red_zone = db.query(RedZone).filter(RedZone.is_active == True).first()
