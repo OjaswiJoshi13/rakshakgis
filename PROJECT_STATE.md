@@ -3087,15 +3087,20 @@ No chunk may transition to `IN_PROGRESS` until all its listed prerequisite depen
 - **Date:** 2026-09-20
 - **Owner:** Platform & DevOps Team (M1)
 - **Objective:** Docker image building, immutable semantic tagging (`v0.1.0`), non-root execution verification, image layer credential audit, and Docker Hub registry preparation.
-- **Image Tags Created:**
-  - `rakshakgis-backend:v0.1.0` (Local) & `ojaswijoshi13/rakshakgis-backend:v0.1.0` (Docker Hub)
-  - `rakshakgis-frontend:v0.1.0` (Local) & `ojaswijoshi13/rakshakgis-frontend:v0.1.0` (Docker Hub)
+- **Image Tags Created & Published:**
+  - `rakshakgis-backend:v0.1.0` (Local) & `swapnil220705/rakshakgis-backend:v0.1.0` (Docker Hub)
+    - Push Status: **VERIFIED & PUBLISHED**
+    - Digest: `sha256:6297bb51952ab573ef69998792d35014279068151a4a6274c0af1c87d9015435`
+  - `rakshakgis-frontend:v0.1.0` (Local) & `swapnil220705/rakshakgis-frontend:v0.1.0` (Docker Hub)
+    - Push Status: **VERIFIED & PUBLISHED**
+    - Digest: `sha256:a5727ab16951239771f79023953b67bbfb115f6d1a818aa18c46ae1a15199bbd`
 - **Image Metadata & Security Verification:**
   - Backend user execution: `uid=1001(appuser) gid=1001(appgroup)`.
-  - Frontend user execution: `uid=1001(nextjs)`.
-  - Layer credential inspection (`docker inspect -f '{{json .Config.Env}}'`): Confirmed zero secrets or credentials embedded in environment or layers.
-  - Image size: Backend virtual disk 2.11 GB (466 MB uncompressed content); Frontend virtual disk 228 MB (53.7 MB standalone content).
-- **Registry Push Status:** Verified local tags; documented exact `docker login -u ojaswijoshi13` and `docker push` commands in `docs/DEPLOYMENT.md`. Remote push pending user registry login credentials.
+  - Frontend user execution: `uid=1001(nextjs) gid=65533(nogroup)`.
+  - Runtime scripts: `/app/docker-entrypoint.sh` and `/app/configure-runtime.js` verified present and executable.
+  - Layer credential inspection: Confirmed zero secrets or credentials embedded in environment or layers.
+  - Image size: Backend uncompressed content 466 MB; Frontend uncompressed content 53.7 MB.
+- **Registry Push Status:** Verified local tags; successfully authenticated and pushed both versioned images to Docker Hub under `swapnil220705`.
 
 ---
 
@@ -3104,16 +3109,24 @@ No chunk may transition to `IN_PROGRESS` until all its listed prerequisite depen
 - **Status:** `VERIFIED`
 - **Date:** 2026-09-20
 - **Owner:** Platform & DevOps Team (M1)
-- **Objective:** Comprehensive security hardening of AWS Terraform infrastructure, eliminating public exposure of direct application ports (3000, 8000), strictly isolating PostgreSQL port 5432, and preparing cloud-init swap bootstrap.
+- **Objective:** Comprehensive security hardening of AWS Terraform infrastructure, eliminating public exposure of direct application ports (3000, 8000), strictly isolating PostgreSQL port 5432, automated cloud-init swap bootstrap, and AWS preflight execution.
 - **Files Created/Modified:**
   1. `terraform/main.tf` [MODIFIED]: Removed public `0.0.0.0/0` ingress on ports 3000 and 8000; added dynamic ingress restricted to `admin_ssh_cidr` when `enable_direct_app_ports` is enabled; ensured public web ingress is strictly ports 80/443; maintained strict exclusion of port 5432.
   2. `terraform/variables.tf` [MODIFIED]: Added `enable_direct_app_ports` variable (default `false`).
   3. `terraform/outputs.tf` [MODIFIED]: Updated `frontend_url` to port 80 (`http://${public_ip}`), `backend_api_url` to same-origin `/api/v1`, and `backend_health_url` to `/health` with zero credential leaks.
-  4. `docker-compose.prod.yml` [MODIFIED]: Defaulted frontend port to 80 (`${FRONTEND_PORT:-80}:3000`) and bound backend port strictly to localhost loopback `127.0.0.1:${BACKEND_PORT:-8000}:8000`.
-- **Terraform Verification Evidence:**
+  4. `terraform/README.md` [MODIFIED]: Synchronized architecture diagrams and outputs to reflect hardened ports 80/443 and internal proxies.
+  5. `terraform/terraform.tfvars` [LOCAL]: Generated local deployment variables with operator SSH restricted to `admin_ssh_cidr = ["104.28.232.97/32"]` (gitignored).
+  6. `docker-compose.prod.yml` [MODIFIED]: Defaulted frontend port to 80 (`${FRONTEND_PORT:-80}:3000`) and bound backend port strictly to localhost loopback `127.0.0.1:${BACKEND_PORT:-8000}:8000`.
+- **AWS Preflight & Terraform Verification Evidence:**
+  - AWS CLI: Installed `aws-cli/2.37.4` on Windows host; confirmed `aws sts get-caller-identity` returns `NoCredentials` pending interactive configuration.
+  - Public IP Resolution: Operator public IPv4 determined as `104.28.232.97` via `checkip.amazonaws.com`; configured as `104.28.232.97/32` in `terraform.tfvars`.
   - `terraform fmt -check`: Clean, 0 format differences.
+  - `terraform init`: Successfully initialized with `hashicorp/aws v5.100.0`.
   - `terraform validate`: `Success! The configuration is valid.` (exit code 0).
-- **Cloud Deployment Status:** Cloud `terraform apply` pending user AWS credentials and cloud cost authorization.
+  - `terraform plan`: Executed; successfully evaluated provider schema and output changes; plan execution paused pending AWS credentials (`No valid credential sources found`).
+- **Deployment Status:**
+  - `LOCAL_ACCEPTANCE = VERIFIED`
+  - `AWS_ACCEPTANCE = PENDING` (awaiting AWS credentials and user cloud apply authorization; zero cloud resources created or billed).
 
 ---
 
@@ -3172,6 +3185,6 @@ No chunk may transition to `IN_PROGRESS` until all its listed prerequisite depen
 
 ## Last Updated
 
-- **Timestamp:** 2026-09-20 03:30:00 IST
-- **Updated By:** Platform & DevOps Team (DEP-04, DEP-05, DEP-06, DEP-07 VERIFIED)
-- **Status Summary:** DEP-04, DEP-05, DEP-06, and DEP-07 are fully VERIFIED. Images built and tagged locally for Docker Hub (`v0.1.0`), Terraform security review hardened (ports 3000/8000 closed publicly, port 5432 strictly omitted), Option A PostGIS persistence verified with atomic 168 KiB backup/restore, full end-to-end acceptance verified on local production Compose stack (all 40 villages, 12 sites, 7 red zones, 53 routes, P95 latency 14.2ms, non-destructive restart recovery), and 100% test pass rate across backend pytest (23) and frontend vitest (293). Ready for production cloud deployment upon AWS credentials and authorization.
+- **Timestamp:** 2026-09-20 04:30:00 IST
+- **Updated By:** Platform & DevOps Team (DEP-04 PUBLISHED, DEP-05 PREFLIGHT COMPLETE)
+- **Status Summary:** Production Docker images `v0.1.0` successfully built, hardened, and PUBLISHED to Docker Hub under `swapnil220705/rakshakgis-backend:v0.1.0` and `swapnil220705/rakshakgis-frontend:v0.1.0`. AWS CLI v2.37.4 installed. Terraform configuration initialized and validated; operator SSH restricted to `104.28.232.97/32`; ports 3000/8000 closed publicly; port 5432 strictly omitted. `LOCAL_ACCEPTANCE = VERIFIED`, `AWS_ACCEPTANCE = PENDING` awaiting AWS credentials and authorization for `terraform apply`.

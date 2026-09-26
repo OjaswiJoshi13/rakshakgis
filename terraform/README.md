@@ -16,9 +16,9 @@ This directory provides Terraform configurations to provision a secure, isolated
   |   |                                                            |   |
   |   |   Security Group:                                          |   |
   |   |   - Port 22: SSH (Restricted to admin_ssh_cidr)            |   |
-  |   |   - Port 80/443: HTTP/HTTPS (Public)                       |   |
-  |   |   - Port 3000: Next.js Frontend (Public)                   |   |
-  |   |   - Port 8000: FastAPI Backend (Public)                    |   |
+  |   |   - Port 80/443: HTTP/HTTPS (Public web access)            |   |
+  |   |   - Port 3000/8000: Direct App Ports (Closed by default;   |   |
+  |   |     restricted to admin CIDR if enable_direct_app_ports)   |   |
   |   |   - Port 5432: PostgreSQL/PostGIS (STRICTLY PROHIBITED)    |   |
   |   |                                                            |   |
   |   |   +----------------------------------------------------+   |   |
@@ -40,8 +40,9 @@ This directory provides Terraform configurations to provision a secure, isolated
 
 ### Security Posture & Guarantees
 1. **Database Isolation:** PostgreSQL port 5432 is **never** opened to the public Internet in the security group. Database queries remain strictly internal to the Docker bridge network on the host.
-2. **Access Control:** SSH (port 22) is configurable via `admin_ssh_cidr` so access can be restricted to operator IPs or corporate VPNs.
-3. **Automated Swap Allocation:** To prevent kernel Out-Of-Memory (OOM) terminations during memory-intensive PostGIS spatial indexing or Next.js compilation, the cloud-init bootstrap script configures a dedicated **2 GiB swapfile** on the encrypted root volume.
+2. **Reverse Proxy Architecture:** Public web traffic enters exclusively via HTTP (port 80) and HTTPS (port 443). FastAPI port 8000 and Next.js direct port 3000 are closed to the public Internet (`0.0.0.0/0`), eliminating unnecessary attack surface.
+3. **Access Control:** SSH (port 22) is restricted to operator IPs or corporate VPNs via `admin_ssh_cidr`.
+4. **Automated Swap Allocation:** To prevent kernel Out-Of-Memory (OOM) terminations during memory-intensive PostGIS spatial indexing or Next.js compilation, the cloud-init bootstrap script configures a dedicated **2 GiB swapfile** on the encrypted root volume.
 
 ---
 
@@ -85,8 +86,9 @@ terraform apply tfplan
 Terraform will display connection information upon completion:
 ```
 Outputs:
-frontend_url          = "http://13.232.xxx.xxx:3000"
-backend_api_url       = "http://13.232.xxx.xxx:8000/api/v1"
+frontend_url          = "http://13.232.xxx.xxx"
+backend_api_url       = "http://13.232.xxx.xxx/api/v1"
+backend_health_url    = "http://13.232.xxx.xxx/health"
 public_ip             = "13.232.xxx.xxx"
 ssh_connection_string = "ssh -i <your-key.pem> ubuntu@13.232.xxx.xxx"
 ```

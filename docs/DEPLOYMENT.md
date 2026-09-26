@@ -57,18 +57,22 @@ RakshakGIS releases follow Semantic Versioning (`vMAJOR.MINOR.PATCH`). Productio
 ### Release Image Tags (Baseline: `v0.1.0`)
 - **Backend Image:**
   - Local Tag: `rakshakgis-backend:v0.1.0`
-  - Registry Tag: `ojaswijoshi13/rakshakgis-backend:v0.1.0`
+  - Registry Tag: `swapnil220705/rakshakgis-backend:v0.1.0`
+  - Digest: `sha256:6297bb51952ab573ef69998792d35014279068151a4a6274c0af1c87d9015435`
+  - Status: **PUBLISHED to Docker Hub**
 - **Frontend Image:**
   - Local Tag: `rakshakgis-frontend:v0.1.0`
-  - Registry Tag: `ojaswijoshi13/rakshakgis-frontend:v0.1.0`
+  - Registry Tag: `swapnil220705/rakshakgis-frontend:v0.1.0`
+  - Digest: `sha256:a5727ab16951239771f79023953b67bbfb115f6d1a818aa18c46ae1a15199bbd`
+  - Status: **PUBLISHED to Docker Hub**
 
 ### Building Production Images Locally
 ```bash
 # Build & tag hardened backend image
-docker build -f backend/Dockerfile -t rakshakgis-backend:v0.1.0 -t ojaswijoshi13/rakshakgis-backend:v0.1.0 backend/
+docker build -f backend/Dockerfile -t rakshakgis-backend:v0.1.0 -t swapnil220705/rakshakgis-backend:v0.1.0 .
 
 # Build & tag standalone frontend image
-docker build -f frontend/Dockerfile -t rakshakgis-frontend:v0.1.0 -t ojaswijoshi13/rakshakgis-frontend:v0.1.0 frontend/
+docker build -f frontend/Dockerfile -t rakshakgis-frontend:v0.1.0 -t swapnil220705/rakshakgis-frontend:v0.1.0 ./frontend
 ```
 
 ### Container Verification Probes
@@ -92,11 +96,11 @@ docker inspect -f '{{json .Config.Env}}' rakshakgis-frontend:v0.1.0
 To publish the versioned images to the Docker Hub repository:
 ```bash
 # Authenticate to Docker Hub
-docker login -u ojaswijoshi13
+docker login -u swapnil220705
 
 # Push immutable versioned tags
-docker push ojaswijoshi13/rakshakgis-backend:v0.1.0
-docker push ojaswijoshi13/rakshakgis-frontend:v0.1.0
+docker push swapnil220705/rakshakgis-backend:v0.1.0
+docker push swapnil220705/rakshakgis-frontend:v0.1.0
 ```
 
 ---
