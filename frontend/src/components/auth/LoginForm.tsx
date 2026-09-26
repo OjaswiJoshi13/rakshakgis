@@ -20,6 +20,7 @@ export const LoginForm: React.FC<LoginFormProps> = ({ onSuccess, className = "" 
   const [password, setPassword] = useState<string>("");
   const [showPassword, setShowPassword] = useState<boolean>(false);
   const [clientError, setClientError] = useState<string | null>(null);
+  const [isQuickSigningIn, setIsQuickSigningIn] = useState<boolean>(false);
 
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
@@ -51,11 +52,14 @@ export const LoginForm: React.FC<LoginFormProps> = ({ onSuccess, className = "" 
     }
   };
 
-  const handleDemoLogin = async () => {
+  const handleQuickSignIn = async () => {
     setClientError(null);
     clearError();
+    setIsQuickSigningIn(true);
 
     const success = await loginDemo();
+    setIsQuickSigningIn(false);
+
     if (success) {
       if (onSuccess) {
         onSuccess();
@@ -66,6 +70,8 @@ export const LoginForm: React.FC<LoginFormProps> = ({ onSuccess, className = "" 
   };
 
   const displayedError = clientError || serverError;
+  const isSubmittingNormal = isLoading && !isQuickSigningIn;
+  const isSubmittingQuick = isQuickSigningIn || (isLoading && isQuickSigningIn);
 
   return (
     <form
@@ -163,11 +169,11 @@ export const LoginForm: React.FC<LoginFormProps> = ({ onSuccess, className = "" 
           type="submit"
           variant="primary"
           size="md"
-          isLoading={isLoading}
-          disabled={isLoading}
+          isLoading={isSubmittingNormal}
+          disabled={isLoading || isQuickSigningIn}
           className="w-full font-semibold shadow-sm"
         >
-          {isLoading ? "Authenticating Credentials..." : "Sign In to Command Center"}
+          {isSubmittingNormal ? "Authenticating Credentials..." : "Sign In to Command Center"}
         </Button>
       </div>
 
@@ -177,7 +183,7 @@ export const LoginForm: React.FC<LoginFormProps> = ({ onSuccess, className = "" 
         </div>
         <div className="relative flex justify-center text-xs uppercase">
           <span className="bg-surface-panel px-2 font-mono text-[10px] text-text-muted tracking-wider">
-            Evaluation &amp; Offline Access
+            Evaluation &amp; Command Access
           </span>
         </div>
       </div>
@@ -187,18 +193,19 @@ export const LoginForm: React.FC<LoginFormProps> = ({ onSuccess, className = "" 
           type="button"
           variant="outline"
           size="md"
-          disabled={isLoading}
-          onClick={handleDemoLogin}
+          isLoading={isSubmittingQuick}
+          disabled={isLoading || isQuickSigningIn}
+          onClick={handleQuickSignIn}
           className="w-full border-emerald-600/40 bg-emerald-50 text-emerald-800 dark:bg-emerald-950/30 dark:text-emerald-300 dark:border-emerald-600/50 hover:bg-emerald-100 dark:hover:bg-emerald-900/50 font-medium shadow-sm transition-all duration-150"
         >
-          <span>⚡ Quick Sign-In (District Officer)</span>
+          <span>{isSubmittingQuick ? "Authenticating Clearance..." : "⚡ Quick Sign-In (District Officer)"}</span>
           <span className="sr-only">Sign In as Demo District Officer</span>
         </Button>
         <p className="mt-1.5 text-center text-[10px] font-mono text-text-muted">
           One-click evaluation access • District Collector (Chamoli)
         </p>
         <p className="mt-0.5 text-center text-[10px] font-mono text-text-muted">
-          Credentials: <span className="font-semibold text-emerald-700 dark:text-emerald-400">district_collector_chamoli</span> / <span className="font-semibold text-emerald-700 dark:text-emerald-400">password123</span>
+          Evaluation Account: <span className="font-semibold text-emerald-700 dark:text-emerald-400">district_collector_chamoli</span>
         </p>
       </div>
 

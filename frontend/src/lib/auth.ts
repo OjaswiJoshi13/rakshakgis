@@ -36,6 +36,15 @@ export function loginDemoUser(): { token: TokenResponse; user: User } {
 }
 
 /**
+ * Canonical credentials for evaluation District Officer quick sign-in.
+ * Authenticates against the real backend POST /api/v1/auth/login endpoint.
+ */
+export const DEMO_OFFICER_CREDENTIALS: LoginRequest = {
+  username: process.env.NEXT_PUBLIC_DEMO_USERNAME || "district_collector_chamoli",
+  password: process.env.NEXT_PUBLIC_DEMO_PASSWORD || "password123",
+};
+
+/**
  * Returns the configured backend API base URL.
  * Falls back to local development URL if not configured in environment.
  */

@@ -220,7 +220,14 @@ describe("AuthContext and Session Lifecycle", () => {
     expect(authService.getStoredToken()).toBeNull();
   });
 
-  it("authenticates successfully via loginDemo and persists demo token", async () => {
+  it("authenticates successfully via loginDemo using the real loginApi flow", async () => {
+    const loginSpy = vi.spyOn(authService, "loginApi").mockResolvedValueOnce({
+      access_token: "genuine-jwt-token-eval-123",
+      token_type: "bearer",
+      expires_in: 3600,
+    });
+    const getMeSpy = vi.spyOn(authService, "getMeApi").mockResolvedValueOnce(mockOfficerUser);
+
     render(
       <AuthProvider>
         <TestConsumer />
@@ -235,11 +242,14 @@ describe("AuthContext and Session Lifecycle", () => {
       expect(screen.getByTestId("auth-state").textContent).toBe("authenticated");
     });
 
+    expect(loginSpy).toHaveBeenCalledWith(authService.DEMO_OFFICER_CREDENTIALS);
+    expect(getMeSpy).toHaveBeenCalledWith("genuine-jwt-token-eval-123");
     expect(screen.getByTestId("user-name").textContent).toBe(
       "District Collector Chamoli"
     );
     expect(screen.getByTestId("user-role").textContent).toBe("district_officer");
     expect(screen.getByTestId("has-officer-role").textContent).toBe("yes");
-    expect(authService.getStoredToken()).toBe(authService.DEMO_AUTH_TOKEN);
+    expect(authService.getStoredToken()).toBe("genuine-jwt-token-eval-123");
+    expect(authService.getStoredToken()).not.toBe(authService.DEMO_AUTH_TOKEN);
   });
 });

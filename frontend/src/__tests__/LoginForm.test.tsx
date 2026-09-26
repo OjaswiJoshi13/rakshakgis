@@ -143,7 +143,24 @@ describe("LoginForm Component", () => {
     ).not.toBeInTheDocument();
   });
 
-  it("authenticates via Demo District Officer button and triggers onSuccess", async () => {
+  it("authenticates via Demo District Officer button using real login flow and triggers onSuccess", async () => {
+    const loginSpy = vi.spyOn(authService, "loginApi").mockResolvedValueOnce({
+      access_token: "genuine-jwt-token-999",
+      token_type: "bearer",
+      expires_in: 3600,
+    });
+    const getMeSpy = vi.spyOn(authService, "getMeApi").mockResolvedValueOnce({
+      id: 1,
+      username: "district_collector_chamoli",
+      email: "collector@chamoli.gov.in",
+      full_name: "District Collector Chamoli",
+      role: "district_officer",
+      department: "District Administration",
+      is_active: true,
+      created_at: "2026-09-01T00:00:00Z",
+      updated_at: "2026-09-01T00:00:00Z",
+    });
+
     const onSuccessMock = vi.fn();
 
     render(
@@ -163,7 +180,112 @@ describe("LoginForm Component", () => {
       expect(onSuccessMock).toHaveBeenCalledTimes(1);
     });
 
+    // Proves Quick Sign-In called the real loginApi with evaluation credentials
+    expect(loginSpy).toHaveBeenCalledWith(authService.DEMO_OFFICER_CREDENTIALS);
+    // Proves getMeApi was called with the genuine token returned by loginApi
+    expect(getMeSpy).toHaveBeenCalledWith("genuine-jwt-token-999");
+    // Proves genuine token was stored, NOT the fake DEMO_AUTH_TOKEN
     expect(window.localStorage.getItem(authService.TOKEN_STORAGE_KEY)).toBe(
+      "genuine-jwt-token-999"
+    );
+    expect(window.localStorage.getItem(authService.TOKEN_STORAGE_KEY)).not.toBe(
+      authService.DEMO_AUTH_TOKEN
+    );
+  });
+
+  it("proves Quick Sign-In executes the exact same authentication flow as normal login", async () => {
+    // 1. Normal Login flow
+    const normalLoginSpy = vi.spyOn(authService, "loginApi").mockResolvedValueOnce({
+      access_token: "flow-verification-token",
+      token_type: "bearer",
+      expires_in: 3600,
+    });
+    const normalGetMeSpy = vi.spyOn(authService, "getMeApi").mockResolvedValueOnce({
+      id: 1,
+      username: "district_collector_chamoli",
+      email: "collector@chamoli.gov.in",
+      full_name: "District Collector Chamoli",
+      role: "district_officer",
+      department: "District Administration",
+      is_active: true,
+      created_at: "2026-09-01T00:00:00Z",
+      updated_at: "2026-09-01T00:00:00Z",
+    });
+
+    const normalSuccess = vi.fn();
+    const { unmount } = render(
+      <AuthProvider initialState={{ isLoading: false, isAuthenticated: false }}>
+        <LoginForm onSuccess={normalSuccess} />
+      </AuthProvider>
+    );
+
+    fireEvent.change(screen.getByLabelText(/Username or Official Email/i), {
+      target: { value: "district_collector_chamoli" },
+    });
+    fireEvent.change(screen.getByLabelText(/^Password$/i), {
+      target: { value: "password123" },
+    });
+    fireEvent.click(screen.getByRole("button", { name: /Sign In to Command Center/i }));
+
+    await waitFor(() => {
+      expect(normalSuccess).toHaveBeenCalledTimes(1);
+    });
+    expect(normalLoginSpy).toHaveBeenCalledWith({
+      username: "district_collector_chamoli",
+      password: "password123",
+    });
+    expect(normalGetMeSpy).toHaveBeenCalledWith("flow-verification-token");
+    expect(window.localStorage.getItem(authService.TOKEN_STORAGE_KEY)).toBe(
+      "flow-verification-token"
+    );
+
+    unmount();
+    window.localStorage.clear();
+    vi.restoreAllMocks();
+
+    // 2. Quick Sign-In flow
+    const quickLoginSpy = vi.spyOn(authService, "loginApi").mockResolvedValueOnce({
+      access_token: "flow-verification-token",
+      token_type: "bearer",
+      expires_in: 3600,
+    });
+    const quickGetMeSpy = vi.spyOn(authService, "getMeApi").mockResolvedValueOnce({
+      id: 1,
+      username: "district_collector_chamoli",
+      email: "collector@chamoli.gov.in",
+      full_name: "District Collector Chamoli",
+      role: "district_officer",
+      department: "District Administration",
+      is_active: true,
+      created_at: "2026-09-01T00:00:00Z",
+      updated_at: "2026-09-01T00:00:00Z",
+    });
+
+    const quickSuccess = vi.fn();
+    render(
+      <AuthProvider initialState={{ isLoading: false, isAuthenticated: false }}>
+        <LoginForm onSuccess={quickSuccess} />
+      </AuthProvider>
+    );
+
+    fireEvent.click(
+      screen.getByRole("button", { name: /Sign In as Demo District Officer/i })
+    );
+
+    await waitFor(() => {
+      expect(quickSuccess).toHaveBeenCalledTimes(1);
+    });
+
+    // Verify both call the exact same endpoint with the exact same payload
+    expect(quickLoginSpy).toHaveBeenCalledWith({
+      username: "district_collector_chamoli",
+      password: "password123",
+    });
+    expect(quickGetMeSpy).toHaveBeenCalledWith("flow-verification-token");
+    expect(window.localStorage.getItem(authService.TOKEN_STORAGE_KEY)).toBe(
+      "flow-verification-token"
+    );
+    expect(window.localStorage.getItem(authService.TOKEN_STORAGE_KEY)).not.toBe(
       authService.DEMO_AUTH_TOKEN
     );
   });

@@ -9,14 +9,12 @@ import React, {
   useState,
 } from "react";
 import {
-  DEMO_AUTH_TOKEN,
-  DEMO_USER,
   clearStoredToken,
+  DEMO_OFFICER_CREDENTIALS,
   getMeApi,
   getStoredToken,
   isTokenExpired,
   loginApi,
-  loginDemoUser,
   setStoredToken,
 } from "@/lib/auth";
 import { AuthState, LoginRequest, User, UserRole } from "@/types/auth";
@@ -102,12 +100,6 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({
       setToken(activeToken);
       setIsAuthenticated(true);
     } catch {
-      if (activeToken === DEMO_AUTH_TOKEN) {
-        setUser(DEMO_USER);
-        setToken(activeToken);
-        setIsAuthenticated(true);
-        return;
-      }
       logout();
     }
   }, [token, logout]);
@@ -148,13 +140,6 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({
         }
       } catch {
         if (isMounted) {
-          if (stored === DEMO_AUTH_TOKEN) {
-            setUser(DEMO_USER);
-            setToken(stored);
-            setIsAuthenticated(true);
-            setIsLoading(false);
-            return;
-          }
           clearStoredToken();
           setUser(null);
           setToken(null);
@@ -170,46 +155,6 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({
       isMounted = false;
     };
   }, [initialState]);
-
-  const loginDemo = useCallback(async (): Promise<boolean> => {
-    setIsLoading(true);
-    setError(null);
-
-    try {
-      // First attempt authentic production sign-in against the backend API
-      try {
-        const tokenResponse = await loginApi({
-          username: "district_collector_chamoli",
-          password: "password123",
-        });
-        setStoredToken(tokenResponse.access_token, tokenResponse.expires_in);
-        try {
-          const profile = await getMeApi(tokenResponse.access_token);
-          setUser(profile);
-        } catch {
-          setUser(DEMO_USER);
-        }
-        setToken(tokenResponse.access_token);
-        setIsAuthenticated(true);
-        setIsLoading(false);
-        return true;
-      } catch {
-        // Fall back to offline/eval demo user if backend login is not available (e.g. offline testing)
-        const { token: tokenResponse, user: demoUser } = loginDemoUser();
-        setStoredToken(tokenResponse.access_token, tokenResponse.expires_in);
-
-        setUser(demoUser);
-        setToken(tokenResponse.access_token);
-        setIsAuthenticated(true);
-        setIsLoading(false);
-        return true;
-      }
-    } catch {
-      setError("Failed to initialize demo session.");
-      setIsLoading(false);
-      return false;
-    }
-  }, []);
 
   const login = useCallback(
     async (credentials: LoginRequest): Promise<boolean> => {
@@ -228,26 +173,6 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({
         setIsLoading(false);
         return true;
       } catch (err) {
-        // Offline demo fallback: if backend is unreachable and credentials match demo accounts
-        const isOffline =
-          err instanceof Error &&
-          err.message.includes("Unable to connect to authentication server");
-        const isDemoUser =
-          credentials.username === "officer@rakshakgis.gov.in" ||
-          credentials.username === "collector@chamoli.gov.in" ||
-          credentials.username === "test_auth_officer";
-
-        if (isOffline && isDemoUser) {
-          const { token: tokenResponse, user: demoUser } = loginDemoUser();
-          setStoredToken(tokenResponse.access_token, tokenResponse.expires_in);
-
-          setUser(demoUser);
-          setToken(tokenResponse.access_token);
-          setIsAuthenticated(true);
-          setIsLoading(false);
-          return true;
-        }
-
         const message =
           err instanceof Error
             ? err.message
@@ -259,6 +184,11 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({
     },
     []
   );
+
+  const loginDemo = useCallback(async (): Promise<boolean> => {
+    // Quick Sign-In uses the EXACT SAME login flow, API endpoint, and session mechanism
+    return login(DEMO_OFFICER_CREDENTIALS);
+  }, [login]);
 
   const hasRole = useCallback(
     (roles: UserRole | UserRole[]): boolean => {

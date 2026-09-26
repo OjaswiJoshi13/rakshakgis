@@ -3264,8 +3264,41 @@ No chunk may transition to `IN_PROGRESS` until all its listed prerequisite depen
 
 ---
 
+## Chunk DEP-09 Implementation Record
+
+- **Status:** `VERIFIED`
+- **Date:** 2026-09-27
+- **Owner:** Frontend Team (M5), Platform & DevOps Team (M1)
+- **Objective:** Make "Quick Sign-In (District Officer)" use the EXACT SAME real backend authentication API (`POST /api/v1/auth/login`) and session mechanism as normal login, eliminating fake token generation, bypasses, or special frontend-only sessions.
+- **Architectural Implementation Details:**
+  - `frontend/src/lib/auth.ts`: Exported `DEMO_OFFICER_CREDENTIALS` representing the official evaluation District Officer account.
+  - `frontend/src/context/AuthContext.tsx`: Re-architected `loginDemo()` to directly delegate to `login(DEMO_OFFICER_CREDENTIALS)`, reusing 100% of the normal login code path (`loginApi` -> `setStoredToken` -> `getMeApi`). Removed all fake token fallbacks (`DEMO_AUTH_TOKEN`, `loginDemoUser`) from session initialization, refresh, and login workflows.
+  - `frontend/src/components/auth/LoginForm.tsx`: Added dedicated `isQuickSigningIn` button loading state during evaluation clearance authentication. Removed the raw password display from the UI, retaining only the evaluation account identifier (`Evaluation Account: district_collector_chamoli`).
+  - `docker-compose.prod.yml`: Bumped release images to immutable release `v0.1.2`.
+- **Regression Testing:**
+  - Added explicit test in `frontend/src/__tests__/LoginForm.test.tsx` proving that Quick Sign-In executes the exact same network requests (`loginApi` followed by `getMeApi`), with the exact same payload (`district_collector_chamoli`), stores the exact same genuine JWT, and strictly rejects any legacy fake tokens.
+  - Updated `frontend/src/__tests__/AuthContext.test.tsx` to verify `loginDemo()` uses the real `loginApi` flow and persists a real JWT.
+- **Test Suite Results:**
+  - Frontend Vitest: 31 test files passed, 294 tests passed, 0 failed in 118.12s.
+  - Backend Authentication: 25 tests passed in `backend/tests/test_auth.py` (10.64s).
+  - TypeScript Validation: `tsc --noEmit` passed with 0 errors.
+- **Released Production Images:**
+  - Frontend: `swapnil220705/rakshakgis-frontend:v0.1.2` (`sha256:0b7d2cf09b08f498a92aac093755cc23179ab02cc249f667b744587a86c23ea4`)
+  - Backend: `swapnil220705/rakshakgis-backend:v0.1.2` (`sha256:bff24576b90e03725c84e81d2c191947d9f97d298a0b9c393c5325aa5c4fe995`)
+  - Pushed to Docker Hub and running on AWS EC2 instance (`i-08adfc8ef24482d2c`).
+- **Live AWS Production E2E Verification (`http://65.2.84.177`):**
+  - *Login Screen (Step 1):* Password is NOT displayed in UI text or DOM. Evaluation account displayed.
+  - *Normal Login (Test A):* Logged in using `district_collector_chamoli` / `password123`. Redirected to `/dashboard` with 18 matched moves, 4 scenario pipelines, 0 error banners.
+  - *Logout (Test B):* Successfully logged out back to `/login`.
+  - *Quick Sign-In (Test C & D):* Clicked Quick Sign-In button; observed active loading state; redirected to `/dashboard`. Verified real JWT session.
+  - *Protected APIs & Access (Test E & F):* Backend logs confirmed `POST /api/v1/auth/login` (200 OK) followed by `GET /api/v1/auth/me` (200 OK). Dashboard loaded real PostGIS data without any 401 Unauthorized errors.
+  - *Full Feature Access (Test G):* Verified complete access across `/villages` (40 habitations, Sunil composite score 68.8/100, 6 factor bars), `/operations/relocation` (Relocation Planner), and `/gis` (MapLibre vector layers).
+  - *Console Logs:* 0 errors across all routes.
+
+---
+
 ## Last Updated
 
-- **Timestamp:** 2026-09-27 00:44:00 IST
-- **Updated By:** Platform & DevOps Team (M1), Frontend Team (M5/M6), Backend Team (M2) — LIVE E2E DIAGNOSTIC & REMEDIATION VERIFIED
-- **Status Summary:** Live AWS deployment at `http://65.2.84.177` fully operational on release `v0.1.1`. Resolved Quick Sign-In JWT authentication and village risk factor decomposition. Full browser-to-backend data flow verified across Dashboard, Habitations, Relocation Operations, and GIS Map. Hardened networking maintained with ports 3000, 5432, and 8000 completely blocked. All 5 browser checkpoints verified and passing with 0 console errors. `AWS_ACCEPTANCE = VERIFIED`.
+- **Timestamp:** 2026-09-27 01:41:00 IST
+- **Updated By:** Platform & DevOps Team (M1), Frontend Team (M5) — QUICK SIGN-IN REAL AUTHENTICATION FLOW VERIFIED
+- **Status Summary:** Live AWS deployment at `http://65.2.84.177` updated to release `v0.1.2`. Quick Sign-In now executes the exact same authentication flow as normal login via `POST /api/v1/auth/login` and receives a genuine signed JWT with full District Officer permissions. Password removed from UI. All 294 frontend tests and 25 backend auth tests passing. Live browser E2E verification complete with 0 console errors. `AWS_ACCEPTANCE = VERIFIED`.
