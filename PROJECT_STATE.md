@@ -3118,15 +3118,24 @@ No chunk may transition to `IN_PROGRESS` until all its listed prerequisite depen
   5. `terraform/terraform.tfvars` [LOCAL]: Generated local deployment variables with operator SSH restricted to `admin_ssh_cidr = ["104.28.232.97/32"]` (gitignored).
   6. `docker-compose.prod.yml` [MODIFIED]: Defaulted frontend port to 80 (`${FRONTEND_PORT:-80}:3000`) and bound backend port strictly to localhost loopback `127.0.0.1:${BACKEND_PORT:-8000}:8000`.
 - **AWS Preflight & Terraform Verification Evidence:**
-  - AWS CLI: Installed `aws-cli/2.37.4` on Windows host; confirmed `aws sts get-caller-identity` returns `NoCredentials` pending interactive configuration.
-  - Public IP Resolution: Operator public IPv4 determined as `104.28.232.97` via `checkip.amazonaws.com`; configured as `104.28.232.97/32` in `terraform.tfvars`.
+  - AWS CLI & Identity: Configured and verified via `aws sts get-caller-identity` (Account: `312106747752`, User: `rakshakgis-deployer`).
+  - EC2/VPC Permission Probes: Both `ec2:DescribeVpcs` and `ec2:DescribeImages` verified operational in `ap-south-1`.
+  - Operator Public IP: Resolved as `104.28.232.97` via `checkip.amazonaws.com`; locked in `terraform.tfvars` as `admin_ssh_cidr = ["104.28.232.97/32"]`.
   - `terraform fmt -check`: Clean, 0 format differences.
   - `terraform init`: Successfully initialized with `hashicorp/aws v5.100.0`.
   - `terraform validate`: `Success! The configuration is valid.` (exit code 0).
-  - `terraform plan`: Executed; successfully evaluated provider schema and output changes; plan execution paused pending AWS credentials (`No valid credential sources found`).
+  - `terraform plan`: Executed cleanly with exit code 0 (`Plan: 8 to add, 0 to change, 0 to destroy`).
+    - Ubuntu 22.04 LTS Jammy AMI resolved: `ami-05a7c953f702ad6dd`.
+    - EC2 Instance: `t3.small` (2 vCPU, 2 GiB RAM).
+    - Root Volume: 30 GiB gp3, `encrypted = true`.
+    - Bootstrap: Cloud-init script configured with 2 GiB swapfile, Docker Engine 26+, Compose v2 plugin.
+    - Network: Dedicated VPC (`10.0.0.0/16`), public subnet (`10.0.1.0/24`), IGW, public route table.
+    - Security Group: Ingress restricted strictly to ports 80 and 443 (`0.0.0.0/0`), and SSH port 22 (`104.28.232.97/32`). Ports 5432, 3000, and 8000 are completely closed/omitted from public access.
+    - Elastic IP: Attached for persistent public IPv4 address.
+    - Destructive Replacement: 0 to destroy.
 - **Deployment Status:**
   - `LOCAL_ACCEPTANCE = VERIFIED`
-  - `AWS_ACCEPTANCE = PENDING` (awaiting AWS credentials and user cloud apply authorization; zero cloud resources created or billed).
+  - `AWS_ACCEPTANCE = PENDING` (Plan verified and safe to apply; awaiting explicit user approval before running `terraform apply`; zero cloud resources created or billed).
 
 ---
 
@@ -3185,6 +3194,6 @@ No chunk may transition to `IN_PROGRESS` until all its listed prerequisite depen
 
 ## Last Updated
 
-- **Timestamp:** 2026-09-20 04:30:00 IST
-- **Updated By:** Platform & DevOps Team (DEP-04 PUBLISHED, DEP-05 PREFLIGHT COMPLETE)
-- **Status Summary:** Production Docker images `v0.1.0` successfully built, hardened, and PUBLISHED to Docker Hub under `swapnil220705/rakshakgis-backend:v0.1.0` and `swapnil220705/rakshakgis-frontend:v0.1.0`. AWS CLI v2.37.4 installed. Terraform configuration initialized and validated; operator SSH restricted to `104.28.232.97/32`; ports 3000/8000 closed publicly; port 5432 strictly omitted. `LOCAL_ACCEPTANCE = VERIFIED`, `AWS_ACCEPTANCE = PENDING` awaiting AWS credentials and authorization for `terraform apply`.
+- **Timestamp:** 2026-09-20 05:00:00 IST
+- **Updated By:** Platform & DevOps Team (DEP-04 PUBLISHED, DEP-05 PLAN VERIFIED)
+- **Status Summary:** Production Docker images `v0.1.0` published to Docker Hub under `swapnil220705/rakshakgis-backend:v0.1.0` and `swapnil220705/rakshakgis-frontend:v0.1.0`. AWS credentials configured and IAM permissions verified for user `rakshakgis-deployer` (Account: 312106747752). `terraform plan` executed cleanly with 0 errors (`Plan: 8 to add, 0 to change, 0 to destroy`). EC2 `t3.small` with 30 GiB gp3 encrypted storage, 2 GiB swap bootstrap, Elastic IP, and hardened network (ports 80/443 public, SSH locked to `104.28.232.97/32`, 5432/3000/8000 closed). `LOCAL_ACCEPTANCE = VERIFIED`, `AWS_ACCEPTANCE = PENDING` awaiting explicit user approval to run `terraform apply`. Zero cloud resources created.
