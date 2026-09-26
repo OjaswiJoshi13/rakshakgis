@@ -3117,76 +3117,105 @@ No chunk may transition to `IN_PROGRESS` until all its listed prerequisite depen
   4. `terraform/README.md` [MODIFIED]: Synchronized architecture diagrams and outputs to reflect hardened ports 80/443 and internal proxies.
   5. `terraform/terraform.tfvars` [LOCAL]: Generated local deployment variables with operator SSH restricted to `admin_ssh_cidr = ["104.28.232.97/32"]` (gitignored).
   6. `docker-compose.prod.yml` [MODIFIED]: Defaulted frontend port to 80 (`${FRONTEND_PORT:-80}:3000`) and bound backend port strictly to localhost loopback `127.0.0.1:${BACKEND_PORT:-8000}:8000`.
-- **AWS Preflight & Terraform Verification Evidence:**
-  - AWS CLI & Identity: Configured and verified via `aws sts get-caller-identity` (Account: `312106747752`, User: `rakshakgis-deployer`).
+- **AWS Production Deployment & Infrastructure Evidence (2026-09-26):**
+  - AWS CLI & Identity: Configured and verified via `aws sts get-caller-identity` (Account: `312106747752`, User: `rakshakgis-deployer`, Region: `ap-south-1`).
   - EC2/VPC Permission Probes: Both `ec2:DescribeVpcs` and `ec2:DescribeImages` verified operational in `ap-south-1`.
-  - Operator Public IP: Resolved as `104.28.232.97` via `checkip.amazonaws.com`; locked in `terraform.tfvars` as `admin_ssh_cidr = ["104.28.232.97/32"]`.
-  - `terraform fmt -check`: Clean, 0 format differences.
-  - `terraform init`: Successfully initialized with `hashicorp/aws v5.100.0`.
-  - `terraform validate`: `Success! The configuration is valid.` (exit code 0).
-  - `terraform plan`: Executed cleanly with exit code 0 (`Plan: 8 to add, 0 to change, 0 to destroy`).
-    - Ubuntu 22.04 LTS Jammy AMI resolved: `ami-05a7c953f702ad6dd`.
-    - EC2 Instance: `t3.small` (2 vCPU, 2 GiB RAM).
-    - Root Volume: 30 GiB gp3, `encrypted = true`.
-    - Bootstrap: Cloud-init script configured with 2 GiB swapfile, Docker Engine 26+, Compose v2 plugin.
-    - Network: Dedicated VPC (`10.0.0.0/16`), public subnet (`10.0.1.0/24`), IGW, public route table.
-    - Security Group: Ingress restricted strictly to ports 80 and 443 (`0.0.0.0/0`), and SSH port 22 (`104.28.232.97/32`). Ports 5432, 3000, and 8000 are completely closed/omitted from public access.
-    - Elastic IP: Attached for persistent public IPv4 address.
-    - Destructive Replacement: 0 to destroy.
+  - Operator Public IPs: Dual-homed ISP egress (`103.55.74.154/32` and `45.127.199.155/32`) whitelisted for SSH administrative access.
+  - Key Pair: AWS key pair `rakshakgis-deploy-key` provisioned.
+  - Terraform Plan: Confirmed exactly `8 to add, 0 to change, 0 to destroy` immediately before apply.
+  - Terraform Apply: Executed interactively (`"yes"` confirmation without `-auto-approve`), completed with exit code 0 (`Resources: 8 added, 0 changed, 0 destroyed`).
+  - Realized AWS Resource IDs:
+    - EC2 Instance ID: `i-08adfc8ef24482d2c` (`t3.small`, Ubuntu 22.04 LTS `ami-05a7c953f702ad6dd`, 30 GiB gp3 encrypted, 2 GiB swap bootstrap)
+    - Elastic IP / Public IP: `65.2.84.177`
+    - VPC ID: `vpc-00a13a3cb81b83ef5` (`10.0.0.0/16`)
+    - Public Subnet ID: `subnet-005d8416c26390804` (`10.0.1.0/24`)
+    - Internet Gateway ID: `igw-0b8455ea9f7930fbf`
+    - Route Table ID: `rtb-0b50f31b529ddbb0b`
+    - Security Group ID: `sg-0cd14af4962a62874` (`rakshakgis-prod-sg`)
+    - Elastic IP Allocation ID: `eipalloc-0953d684ce927135d`
+  - Cloud-Init Bootstrap: Verified `cloud-init status = done`, Docker 29.8.1, Docker Compose v5.5.1, 2.0 GiB swapfile (`/swapfile`), `/opt/rakshakgis` directory owned by `ubuntu:ubuntu`.
 - **Deployment Status:**
   - `LOCAL_ACCEPTANCE = VERIFIED`
-  - `AWS_ACCEPTANCE = PENDING` (Plan verified and safe to apply; awaiting explicit user approval before running `terraform apply`; zero cloud resources created or billed).
+  - `AWS_ACCEPTANCE = VERIFIED`
 
 ---
 
 ## Chunk DEP-06 Implementation Record
 
 - **Status:** `VERIFIED`
-- **Date:** 2026-09-20
+- **Date:** 2026-09-20 (Local) / 2026-09-26 (AWS Production)
 - **Owner:** Platform & DevOps Team (M1)
 - **Objective:** Persistent PostGIS database architecture evaluation (Option A vs Option B), automated startup migrations, and verified backup/restore runbooks.
 - **Architecture Evaluation:**
-  - Option A (Selected): Containerized PostgreSQL 16 + PostGIS 3.4 on EC2 host with named volume `rakshakgis_prod_pgdata` and internal bridge network. Chosen for zero cloud cost overhead and complete environment parity.
+  - Option A (Selected & Deployed on AWS): Containerized PostgreSQL 16 + PostGIS 3.4 on EC2 host with named volume `rakshakgis_prod_pgdata` and internal bridge network. Chosen for zero cloud cost overhead and complete environment parity.
   - Option B: AWS RDS PostgreSQL + PostGIS documented in `docs/DEPLOYMENT.md` for future multi-AZ cloud scale.
 - **Backup & Restore Verification Evidence:**
   - Executed atomic `pg_dump -F c -b` on live PostGIS database container -> emitted 168 KiB custom-format archive (`test_backup.dump`).
   - Inspected TOC via `pg_restore -l`: verified all 374 TOC entries including PostGIS extensions, schemas, spatial geometry tables, indexes, and constraints.
   - Documented complete `pg_dump` and `pg_restore` commands in `docs/DEPLOYMENT.md`.
-- **Database Data Integrity Evidence:**
-  - Verified exact row counts: `villages: 40`, `candidate_sites: 12`, `red_zones: 7`, `routes: 53`.
-  - Confirmed development database volume `rakshakgis_pgdata` preserved with zero regressions.
+- **Database Data Integrity Evidence (Live AWS PostGIS):**
+  - Verified exact row counts directly inside `rakshakgis-prod-db`:
+    - `villages: 40`
+    - `candidate_sites: 12`
+    - `red_zones: 7`
+    - `routes: 53`
+  - Zero data loss across container restarts; named volume `rakshakgis_prod_pgdata` fully persistent.
 
 ---
 
 ## Chunk DEP-07 Implementation Record
 
 - **Status:** `VERIFIED`
-- **Date:** 2026-09-20
+- **Date:** 2026-09-20 (Local) / 2026-09-26 (AWS Production)
 - **Owner:** Platform & DevOps Team (M1)
-- **Objective:** Full deployed end-to-end application acceptance testing on local production Compose stack (`docker-compose.prod.yml`), controlled restart persistence testing, and resource/latency benchmarking.
-- **End-to-End Application Acceptance Findings:**
-  1. *Landing & Pages:* `GET /`, `GET /dashboard`, `GET /gis` all returned `HTTP 200 OK` HTML.
-  2. *Health Endpoints:* Backend `/health` and frontend proxy `/health` returned `HTTP 200 OK {"status":"healthy"}`.
-  3. *Public API Endpoints (via Frontend Proxy):*
-     - `/api/v1/villages`: HTTP 200 OK (40 total villages, 20 per page).
-     - `/api/v1/sites`: HTTP 200 OK (12 candidate relocation sites).
-     - `/api/v1/red-zones`: HTTP 200 OK (7 demarcated red zones).
-     - `/api/v1/alerts`: HTTP 200 OK (4 real-time alerts).
-     - `/api/v1/telemetry/sources`: HTTP 200 OK (11 telemetry data sources).
-     - `/api/v1/risk/summary`: HTTP 200 OK (6 risk metrics).
-  4. *Protected API Endpoints:* `/api/v1/routes` returned HTTP 401 Unauthorized without auth; returned HTTP 200 OK with 53 routes when called with `demo-authority-access-token`.
-  5. *Map Provider Audit:* Confirmed MapLibre GL uses OpenStreetMap raster tiles (100% credential-free).
-- **Restart & Persistence Testing:**
-  - Frontend container restart: proxy rewrites immediately functional, returned HTTP 200.
-  - Backend container restart: Alembic migrations cleanly verified, returned HTTP 200.
-  - Database container restart: zero data loss, returned HTTP 200 with 40 villages.
-  - Idempotence verification: backend startup logged `Database already contains 40 villages. Skipping seed.` (no destructive reset).
-- **Resource & Latency Benchmarks:**
-  - Total container memory usage: ~228 MiB (backend 153 MiB, db 48.6 MiB, frontend 26.3 MiB).
-  - API proxy latency (50 requests): min 8.91 ms, avg 12.76 ms, median 10.73 ms, P95 14.17 ms.
+- **Objective:** Full deployed end-to-end application acceptance testing on local production Compose stack (`docker-compose.prod.yml`) and live AWS EC2 cloud deployment (`http://65.2.84.177`), controlled restart persistence testing, and resource/latency benchmarking.
+- **AWS Production Deployment & E2E Application Acceptance Findings:**
+  1. *Immutable Released Images Deployed:*
+     - Backend: `swapnil220705/rakshakgis-backend:v0.1.0` (`sha256:6297bb51952ab573ef69998792d35014279068151a4a6274c0af1c87d9015435`)
+     - Frontend: `swapnil220705/rakshakgis-frontend:v0.1.0` (`sha256:a5727ab16951239771f79023953b67bbfb115f6d1a818aa18c46ae1a15199bbd`)
+  2. *Landing & Pages:* `http://65.2.84.177/` returned `HTTP 200 OK` HTML (Next.js SSR/Static hydration).
+  3. *Health Endpoint:* `http://65.2.84.177/health` returned `HTTP 200 OK {"status":"healthy","app":"RakshakGIS","environment":"production","data_mode":"demo","version":"0.1.0"}`.
+  4. *Public API Endpoints (via Frontend Proxy):*
+     - `http://65.2.84.177/api/v1/villages`: HTTP 200 OK (40 total villages with GeoJSON Point coordinates and pagination).
+     - `http://65.2.84.177/api/v1/sites`: HTTP 200 OK (12 candidate relocation sites with GeoJSON Polygon boundaries).
+     - `http://65.2.84.177/api/v1/red-zones`: HTTP 200 OK (7 permanent red zones with GeoJSON MultiPolygon geometries).
+  5. *Protected API Endpoints & Authentication:*
+     - Unauthenticated `GET http://65.2.84.177/api/v1/routes`: Returned `HTTP 401 Unauthorized` (`"code":"UNAUTHORIZED","message":"Authentication credentials were not provided."`).
+     - Production Security Verification: Hardcoded demo token `demo-authority-access-token` was correctly rejected with HTTP 401 Unauthorized in production environment (`APP_ENV=production`).
+     - Valid Production JWT: Calling `GET http://65.2.84.177/api/v1/routes` with a valid JWT token signed by production `JWT_SECRET` returned `HTTP 200 OK` with all 53 evacuation routes.
+     - User Profile: `GET http://65.2.84.177/api/v1/auth/me` with production JWT returned authenticated user profile (`district_collector_chamoli`, role `district_officer`).
+  6. *Live PostgreSQL Database Counts (Verified via psql in container):*
+     - `villages`: 40
+     - `candidate_sites`: 12
+     - `red_zones`: 7
+     - `routes`: 53
+- **Restart & Persistence Testing (Live AWS Production):**
+  - Executed `docker compose restart` on EC2 instance `/opt/rakshakgis`.
+  - All three containers restarted cleanly and returned to `healthy` state in 22 seconds:
+    - `rakshakgis-prod-backend`: Up (healthy)
+    - `rakshakgis-prod-db`: Up (healthy)
+    - `rakshakgis-prod-frontend`: Up (healthy)
+  - Raw PostgreSQL counts immediately post-restart: 40 villages, 12 sites, 7 red zones, 53 routes (100% data intact, zero data loss).
+  - Public `/health` and `/api/v1/villages` endpoints responded immediately post-restart with 40 villages.
+- **Network Exposure & Security Group Verification:**
+  - Port 80 (HTTP Web): `TcpTestSucceeded = True` (Expected & Open).
+  - Port 443 (HTTPS Web): `TcpTestSucceeded = False` (Closed / TLS not yet terminated on MVP node).
+  - Port 22 (SSH Admin): Strictly restricted to operator CIDRs (`103.55.74.154/32` & `45.127.199.155/32`).
+  - Port 3000 (Direct Next.js): `TcpTestSucceeded = False` (Closed / Blocked by Security Group).
+  - Port 8000 (Direct FastAPI): `TcpTestSucceeded = False` (Closed / Bound to loopback `127.0.0.1:8000` only).
+  - Port 5432 (Direct PostgreSQL): `TcpTestSucceeded = False` (Closed / Unexposed; strictly internal to Docker bridge network).
+- **Resource Footprint (Live AWS EC2 `t3.small`):**
+  - System Memory: 434 MiB used / 1.9 GiB total (1.2 GiB available).
+  - Swap: 2.0 GiB configured, 0 KiB used.
+  - Disk: 7.5 GiB used / 29 GiB total (26% used).
+  - Container Memory:
+    - `rakshakgis-prod-frontend`: 23.86 MiB (1.25%)
+    - `rakshakgis-prod-backend`: 111.4 MiB (5.83%)
+    - `rakshakgis-prod-db`: 23.86 MiB (1.25%)
+    - **Total Container Memory:** ~159 MiB.
+  - CPU Utilization: 0.17% backend, 0.00% frontend, 0.00% DB.
 - **Regression Test Suite Results:**
-  - Backend Pytest: 23 passed, 0 failed in 1.28s.
-  - Frontend Vitest: 31 test files passed, 293 tests passed, 0 failed in 100.91s.
+  - Frontend Vitest: 31 test files passed, 293 tests passed, 0 failed in 118.26s.
   - Frontend Type-Check: `tsc --noEmit` passed with 0 errors.
   - Terraform Validation: `terraform fmt -check` clean, `terraform validate` passed.
 
@@ -3194,6 +3223,6 @@ No chunk may transition to `IN_PROGRESS` until all its listed prerequisite depen
 
 ## Last Updated
 
-- **Timestamp:** 2026-09-20 05:00:00 IST
-- **Updated By:** Platform & DevOps Team (DEP-04 PUBLISHED, DEP-05 PLAN VERIFIED)
-- **Status Summary:** Production Docker images `v0.1.0` published to Docker Hub under `swapnil220705/rakshakgis-backend:v0.1.0` and `swapnil220705/rakshakgis-frontend:v0.1.0`. AWS credentials configured and IAM permissions verified for user `rakshakgis-deployer` (Account: 312106747752). `terraform plan` executed cleanly with 0 errors (`Plan: 8 to add, 0 to change, 0 to destroy`). EC2 `t3.small` with 30 GiB gp3 encrypted storage, 2 GiB swap bootstrap, Elastic IP, and hardened network (ports 80/443 public, SSH locked to `104.28.232.97/32`, 5432/3000/8000 closed). `LOCAL_ACCEPTANCE = VERIFIED`, `AWS_ACCEPTANCE = PENDING` awaiting explicit user approval to run `terraform apply`. Zero cloud resources created.
+- **Timestamp:** 2026-09-26 23:00:00 IST
+- **Updated By:** Platform & DevOps Team (M1) — AWS PRODUCTION DEPLOYMENT & ACCEPTANCE VERIFIED
+- **Status Summary:** Full production stack deployed to AWS `ap-south-1` on EC2 instance `i-08adfc8ef24482d2c` (`65.2.84.177`). Immutable Docker Hub release images `v0.1.0` running with non-root privileges (`uid=1001`). Hardened networking verified (ports 3000, 8000, 5432 completely closed to public; port 80 public; SSH restricted to operator CIDRs). Automated startup migrations and PostGIS database persistent with 40 villages, 12 sites, 7 red zones, 53 routes. Container restart and persistence test passed with zero data loss. `LOCAL_ACCEPTANCE = VERIFIED`, `AWS_ACCEPTANCE = VERIFIED`.

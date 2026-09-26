@@ -41,6 +41,8 @@ htmlcov/
 *.sqlite3
 *.dump
 backups/
+*.pem
+*.key
 
 # Operating System and Editor Files
 .DS_Store

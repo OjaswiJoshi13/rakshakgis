@@ -30,6 +30,7 @@ services:
 
   # Backend Service: Hardened FastAPI service (unprivileged appuser, no --reload)
   backend:
+    image: ${BACKEND_IMAGE:-swapnil220705/rakshakgis-backend:v0.1.0}
     build:
       context: .
       dockerfile: backend/Dockerfile
@@ -62,6 +63,7 @@ services:
 
   # Frontend Service: Next.js 14 Standalone runner with same-origin API proxying
   frontend:
+    image: ${FRONTEND_IMAGE:-swapnil220705/rakshakgis-frontend:v0.1.0}
     build:
       context: ./frontend
       dockerfile: Dockerfile
