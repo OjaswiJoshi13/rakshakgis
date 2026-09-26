@@ -61,7 +61,13 @@ def seed_himalayan_pilot_data(db: Session, force: bool = False) -> Dict[str, int
     Guarded: Only runs in development/demo mode.
     Idempotent: Skips if data already exists unless force=True.
     """
-    if settings.APP_ENV != "development" or settings.DATA_MODE != "demo":
+    import os
+
+    allow_seed = (
+        (settings.APP_ENV == "development" and settings.DATA_MODE == "demo")
+        or (settings.DATA_MODE == "demo" and os.environ.get("ALLOW_DEMO_SEED") == "true")
+    )
+    if not allow_seed:
         raise RuntimeError(
             f"Seeding Himalayan pilot data is strictly restricted to development/demo mode. "
             f"Current APP_ENV='{settings.APP_ENV}', DATA_MODE='{settings.DATA_MODE}'."
@@ -512,3 +518,15 @@ def seed_himalayan_pilot_data(db: Session, force: bool = False) -> Dict[str, int
     db.commit()
     logger.info("Successfully seeded Himalayan Pilot Dataset: %s", counts)
     return counts
+
+
+if __name__ == "__main__":
+    from app.core.database import SessionLocal
+
+    logging.basicConfig(level=logging.INFO)
+    db = SessionLocal()
+    try:
+        results = seed_himalayan_pilot_data(db)
+        print(f"Himalayan pilot seed completed: {results}")
+    finally:
+        db.close()

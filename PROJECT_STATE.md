@@ -185,20 +185,26 @@ No chunk may transition to `IN_PROGRESS` until all its listed prerequisite depen
 | **REAL-01B** | Integration | Forensic Frontend & Operational Data Path Fix | Platform | REAL-01 | **IMPLEMENTED** |
 | **DEP-01A** | DevOps | Docker and Deployment Readiness Audit | Platform | INT-03 | **ACCEPTED_AUDIT_BASELINE** |
 | **DEP-01B1** | DevOps | Docker Context and Frontend Containerization | Platform | DEP-01A | **AWAITING_REVIEW** |
-| **DEP-01B2** | DevOps | Backend Hardening & API Routing / Compose | Platform | DEP-01B1 | **VERIFIED** |
-| **DEP-01** | DevOps | Production Deployment & EC2 Orchestration | Platform | DEP-01B2 | **PLANNED** |
+| **DEP-01B2** | DevOps | Backend Hardening & API Routing / Compose | Platform | DEP-01B1 | **COMMITTED** |
+| **DEP-01B3** | DevOps | Local Production Readiness & Compose Smoke Test | Platform | DEP-01B2 | **VERIFIED** |
+| **DEP-02** | DevOps | Production Deployment Configuration & Runbooks | Platform | DEP-01B3 | **VERIFIED** |
+| **DEP-03** | DevOps | AWS Terraform Infrastructure Code | Platform | DEP-02 | **VERIFIED** |
+| **DEP-01** | DevOps | Production Deployment & EC2 Live Orchestration | Platform | DEP-03 | **PLANNED** |
 | **DOC-01** | Docs | Final Project Documentation & Demo Guide | M1 | INT-02 | **PLANNED** |
 
 ---
 
 ## Current Work
 
-- **Active Chunk:** `DEP-01B2: Backend Hardening & API Routing / Compose` (`VERIFIED`)
+- **Active Chunks:** `DEP-01B3`, `DEP-02`, `DEP-03` (`VERIFIED`)
 - **DEP-01A Audit Baseline:** Formally reviewed and accepted as `ACCEPTED_AUDIT_BASELINE` on 2026-09-19. Audit-only task; confirmed all deployment blockers.
 - **DEP-01B1 Status:** Completed and committed to main (`feat(docker): add dockerignore rules and frontend dockerfile`); status `AWAITING_REVIEW`.
-- **DEP-01B2 Status:** Completed and fully verified. Hardened `backend/Dockerfile` with non-root execution (`appuser:1001`), production entrypoint without `--reload`, and native curl `HEALTHCHECK`. Configured Next.js rewrites and relative `/api/v1` base URL with safe JSON template-based runtime proxying (`configure-runtime.js`) verified idempotent across restarts. Restriced PostgreSQL host exposure in `docker-compose.yml` to `127.0.0.1:${POSTGRES_PORT:-5432}:5432` and preserved local developer hot-reload. Created isolated `docker-compose.prod.yml` requiring explicit production secrets (`POSTGRES_PASSWORD`, `JWT_SECRET`), no host DB port publication, and isolated volume `rakshakgis_prod_pgdata`. Verified production environment in `/health`, database row counts (40, 12, 7, 53), 293 frontend tests, 23 backend tests, and 0 type errors. Status: **VERIFIED**.
+- **DEP-01B2 Status:** Completed, verified, and committed to main; backend runtime hardening, relative API proxying, and production Compose manifest.
+- **DEP-01B3 Status:** Completed and fully verified. Hardened `backend/Dockerfile` with non-root entrypoint executing `alembic upgrade head`, optional demo data seeding, built & tagged `v0.1.0` images, executed full local production smoke test (`docker-compose.prod.yml`) validating DB private network isolation, non-root execution (`appuser:1001`, `nextjs:1001`), end-to-end API proxying (`/api/v1/villages`), container restart idempotence, and 0 dev volume regressions. Status: **VERIFIED**.
+- **DEP-02 Status:** Completed and verified. Authored comprehensive `docs/DEPLOYMENT.md` detailing architecture, dev vs prod env separation, mandatory secrets policy (`POSTGRES_PASSWORD:?`, `JWT_SECRET:?`), Compose runbooks, database backup/restore procedures (`pg_dump`/`pg_restore`), and conducted basemap audit confirming MapLibre GL with OpenStreetMap tiles is 100% credential-free. Status: **VERIFIED**.
+- **DEP-03 Status:** Completed and verified. Created complete AWS Terraform infrastructure code in `terraform/` (VPC, public subnet, IGW, route table, security group with port 5432 strictly omitted, EC2 instance with Ubuntu 22.04 and 2GB swap cloud-init, EIP, outputs, tfvars example, and README). Added Terraform rules to `.gitignore`. Validated via `terraform fmt -check` (clean) and `terraform validate` (valid). Status: **VERIFIED**.
 - **Next Eligible Chunks:**
-  - **DEP-01:** Production Deployment & EC2 Orchestration (Unblocked by DEP-01B2 verification)
+  - **DEP-01:** Production Deployment & EC2 Live Orchestration (Unblocked by DEP-03 verification)
   - **DOC-01:** Final Project Documentation & Demo Guide (Prerequisite: INT-02 — COMMITTED)
 
 ---
@@ -2994,8 +3000,84 @@ No chunk may transition to `IN_PROGRESS` until all its listed prerequisite depen
 
 ---
 
+## Chunk DEP-01B3 Implementation Record
+
+- **Status:** `VERIFIED`
+- **Date:** 2026-09-20
+- **Owner:** Platform & DevOps Team (M1)
+- **Objective:** Full local production-style smoke test of the PostgreSQL/PostGIS -> FastAPI Backend -> Next.js Frontend stack using `docker-compose.prod.yml`, automated database migrations on container startup, unprivileged container execution, and zero data loss on developer volumes.
+- **Files Created/Modified:**
+  1. `backend/docker-entrypoint.sh` [NEW]: POSIX entrypoint executing `alembic upgrade head` automatically before launching Uvicorn, with optional demo data seeding triggered if `ALLOW_DEMO_SEED=true` and `SEED_DEMO_DATA=true`.
+  2. `backend/Dockerfile` [MODIFIED]: Added `backend/docker-entrypoint.sh` with execution permissions, configured `ENTRYPOINT ["/app/docker-entrypoint.sh"]`, built and tagged as `rakshakgis-backend:v0.1.0`.
+  3. `backend/app/data/seed.py` [MODIFIED]: Added guard checking `ALLOW_DEMO_SEED=true` before running destructive demo seed, and enabled direct CLI execution via `python -m app.data.seed`.
+  4. `backend/app/main.py` [MODIFIED]: Updated lifespan startup routine to respect `ALLOW_DEMO_SEED=true`.
+  5. `docker-compose.prod.yml` [MODIFIED]: Set explicit Compose project name `name: rakshakgis-prod`, mapped internal database URL fallback `${PROD_DATABASE_URL:-postgresql://rakshak:${POSTGRES_PASSWORD}@db:5432/rakshakgis}` preventing host `.env` `localhost:5433` pollution, and enforced mandatory secrets (`POSTGRES_PASSWORD:?`, `JWT_SECRET:?`).
+- **Smoke Test & Verification Evidence:**
+  1. *Images Built & Tagged:* `rakshakgis-backend:v0.1.0` (Image ID `6297bb51952a`), `rakshakgis-frontend:v0.1.0` (Image ID `cc6ff58c097a`).
+  2. *Container Non-Root UIDs:* Backend `uid=1001(appuser) gid=1001(appgroup)`, Frontend `uid=1001(nextjs) gid=1001(nodejs)`.
+  3. *Isolated Production Stack Launch:* Started on `BACKEND_PORT=8001`, `FRONTEND_PORT=3001` with `rakshakgis_prod_network` and `rakshakgis_prod_pgdata`.
+  4. *Automated Migrations:* `alembic upgrade head` executed cleanly on backend container startup.
+  5. *Database Isolation:* Confirmed `rakshakgis-prod-db` has no published host port (`5432/tcp` internal only).
+  6. *Healthchecks & End-to-End API Proxy:*
+     - Backend `/health`: HTTP 200 OK `{"status":"healthy","app":"RakshakGIS","environment":"production","data_mode":"demo","version":"0.1.0"}`.
+     - Frontend rewrite `/api/v1/villages`: HTTP 200 OK returning live village records.
+  7. *Container Restarts & Persistence:*
+     - Frontend restart (`docker restart rakshakgis-prod-frontend`): proxy rewrites intact, returned HTTP 200.
+     - Backend restart (`docker restart rakshakgis-prod-backend`): automatic migration re-evaluated, returned HTTP 200.
+     - Database restart (`docker restart rakshakgis-prod-db`): data persisted without corruption, returned HTTP 200.
+  8. *Developer Volume Integrity:* Confirmed `rakshakgis_pgdata` remained 100% intact: 40 villages, 12 candidate sites, 7 red zones, 53 routes.
+  9. *Clean Teardown:* Stopped test stack with `docker compose down` (preserved volumes).
+
+---
+
+## Chunk DEP-02 Implementation Record
+
+- **Status:** `VERIFIED`
+- **Date:** 2026-09-20
+- **Owner:** Platform & DevOps Team (M1)
+- **Objective:** Production deployment operations guide, environment variable separation, production secrets handling policies, container lifecycle runbooks, map provider key audit, and database backup/restore procedures.
+- **Files Created/Modified:**
+  1. `docs/DEPLOYMENT.md` [NEW]: Authoritative operations and deployment runbook covering:
+     - Architecture overview and non-root security guarantees.
+     - Container image tagging standard (`v0.1.0`) and building instructions.
+     - Environment matrix detailing dev (`.env`) vs prod (`docker-compose.prod.yml`).
+     - Secrets management policy: zero-secrets in git, Compose `:?` mandatory validation, generation (`openssl rand`), and secure host/SSM storage.
+     - Local production operations runbook (`up -d`, `ps`, `down` without `-v`).
+     - Database backup (`pg_dump`) and restore (`pg_restore`) procedures.
+     - Map tile provider audit and production recommendations.
+     - Cloud deployment sequence linking to Terraform.
+- **Map Provider & Basemap Audit Findings:**
+  - Audited `frontend/src/components/map/mapStyle.ts` and GIS map components.
+  - Confirmed default basemap uses OpenStreetMap standard raster tiles (`https://tile.openstreetmap.org/{z}/{x}/{y}.png`).
+  - **Result:** **100% credential-free.** Zero API keys or cloud tokens required out of the box.
+  - Documented `NEXT_PUBLIC_MAP_STYLE` configuration for custom vector/raster tiles in production.
+
+---
+
+## Chunk DEP-03 Implementation Record
+
+- **Status:** `VERIFIED`
+- **Date:** 2026-09-20
+- **Owner:** Platform & DevOps Team (M1)
+- **Objective:** Complete AWS Terraform infrastructure code (`terraform/`) for single-node isolated cloud deployment, security group isolation, automated cloud-init Docker/Compose bootstrap, swap allocation, and `.gitignore` governance.
+- **Files Created/Modified:**
+  1. `terraform/main.tf` [NEW]: Pinned AWS provider (~> 5.0), Ubuntu 22.04 LTS AMI data source, dedicated VPC (`10.0.0.0/16`), public subnet (`10.0.1.0/24`), Internet Gateway, Route Table & Association, Security Group (SSH on 22 restricted to `admin_ssh_cidr`, HTTP 80, HTTPS 443, Next.js 3000, FastAPI 8000; **port 5432 strictly omitted**), EC2 instance (`t3.small` default, 30GB gp3 encrypted root volume), and Elastic IP.
+  2. `terraform/variables.tf` [NEW]: Modular input variables with descriptions (`aws_region`, `environment`, `project_name`, `vpc_cidr`, `public_subnet_cidr`, `instance_type`, `key_name`, `admin_ssh_cidr`, `root_volume_size`, `root_volume_type`, `allocate_elastic_ip`). Documents memory requirements and `t2.micro` OOM caveats.
+  3. `terraform/outputs.tf` [NEW]: Infrastructure outputs (`vpc_id`, `public_subnet_id`, `security_group_id`, `instance_id`, `public_ip`, `ssh_connection_string`, `frontend_url`, `backend_api_url`, `backend_health_url`, `database_isolation_note`).
+  4. `terraform/user_data.sh` [NEW]: Cloud-init shell script configuring 2 GiB swapfile (`/swapfile`), updating apt packages, installing Docker Engine and Docker Compose v2 plugin from official Docker repositories, enabling Docker systemd service, adding `ubuntu` to `docker` group, and preparing `/opt/rakshakgis`.
+  5. `terraform/terraform.tfvars.example` [NEW]: Production-ready example configuration file.
+  6. `terraform/README.md` [NEW]: End-to-end cloud provisioning guide, prerequisites, step-by-step deploy instructions, application launch runbook, and teardown instructions.
+  7. `.gitignore` [MODIFIED]: Added Terraform exclusions (`**/.terraform/*`, `*.tfstate*`, `*.tfvars`, `crash.log`, etc.).
+- **Terraform Verification Evidence:**
+  - `terraform fmt -check` in `terraform/`: Clean, 0 formatting issues (exit code 0).
+  - `terraform init -backend=false`: Successfully installed `hashicorp/aws v5.100.0`.
+  - `terraform validate`: `Success! The configuration is valid.` (exit code 0).
+  - Git status check: Confirmed `.terraform/` and state files are properly ignored.
+
+---
+
 ## Last Updated
 
-- **Timestamp:** 2026-09-20 01:25:00 IST
-- **Updated By:** Platform & DevOps Team (DEP-01B2 VERIFIED)
-- **Status Summary:** DEP-01B2 is fully VERIFIED. Backend hardened (non-root UID 1001, production CMD without `--reload`, native Docker HEALTHCHECK), same-origin Next.js API proxy routing verified with safe template JSON configuration and restart idempotence, Compose dev preserved with hot-reload, production Compose manifest isolated with explicit secrets enforcement and private database networking. All 293 frontend tests and 23 backend tests passing with 0 database regressions. Ready for DEP-01 production orchestration.
+- **Timestamp:** 2026-09-20 02:45:00 IST
+- **Updated By:** Platform & DevOps Team (DEP-01B3, DEP-02, DEP-03 VERIFIED)
+- **Status Summary:** DEP-01B3, DEP-02, and DEP-03 are fully VERIFIED. Local production Compose stack passed all automated migration, database isolation, non-root user execution, restart idempotence, and API proxy smoke tests with zero developer volume regressions. Operational deployment documentation and credential-free map audit published in `docs/DEPLOYMENT.md`. Complete AWS Terraform infrastructure created in `terraform/`, validated with `terraform fmt` and `terraform validate`. Full regression test suite passing: 293 frontend tests (vitest), 23 backend tests (pytest), 0 TypeScript errors. Ready for live EC2 production deployment.

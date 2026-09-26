@@ -37,8 +37,9 @@ RUN groupadd --gid 1001 appgroup && \
 # Copy backend application source code and tests with non-root ownership
 COPY --chown=appuser:appgroup backend/ /app/
 
-# Ensure application directory is owned by appuser
-RUN chown -R appuser:appgroup /app
+# Ensure application directory and entrypoint are owned by appuser
+RUN chmod +x /app/docker-entrypoint.sh && \
+    chown -R appuser:appgroup /app
 
 # Switch to unprivileged user
 USER appuser
@@ -49,6 +50,8 @@ EXPOSE 8000
 # Native container healthcheck probing application health endpoint
 HEALTHCHECK --interval=30s --timeout=5s --start-period=10s --retries=3 \
     CMD curl -f http://127.0.0.1:8000/health || exit 1
+
+ENTRYPOINT ["/app/docker-entrypoint.sh"]
 
 # Production command (unprivileged, single-process, without development hot-reload)
 # Note: In development Compose, --reload is enabled via command override

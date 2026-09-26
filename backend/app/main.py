@@ -28,7 +28,9 @@ async def lifespan(app: FastAPI) -> AsyncGenerator[None, None]:
         settings.APP_ENV,
         settings.DATA_MODE,
     )
-    if settings.APP_ENV == "development" and settings.DATA_MODE == "demo":
+    import os
+
+    if settings.DATA_MODE == "demo" and (settings.APP_ENV == "development" or os.environ.get("ALLOW_DEMO_SEED") == "true"):
         try:
             from app.core.database import SessionLocal
             from app.data.seed import seed_himalayan_pilot_data
