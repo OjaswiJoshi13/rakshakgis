@@ -23,7 +23,9 @@
 
 <br/>
 
-[Overview](#-overview) · [Features](#-key-features) · [Architecture](#-system-architecture) · [Workflows](#-core-workflows) · [Methodology](#-risk-assessment-methodology) · [Roadmap](#-aiml-roadmap) · [Stack](#-technology-stack) · [Quick Start](#-quick-start) · [Data](#-data-sources--attribution) · [Status](#-project-status)
+[Overview](#-overview) · [Features](#-key-features) · [Architecture](#-system-architecture) · [Workflows](#-core-workflows) · [Methodology](#-risk-assessment-methodology) · [Roadmap](#-aiml-roadmap) · [Stack](#-technology-stack)
+
+[Requirements](#-system-requirements) · [Quickstart](#-quickstart--local-setup) · [Commands](#-development-commands) · [Structure](#-repository-structure) · [Data](#-data-architecture--bootstrap-workflow) · [Collaboration](#-team-collaboration-workflow) · [Status](#-project-status)
 
 </div>
 
@@ -32,6 +34,8 @@
 ## 📖 Overview
 
 Disaster response teams often work with fragmented hazard data, uncertain evacuation routes, and limited information about relocation-site capacity. RakshakGIS brings these workflows together in one platform, helping authorities assess settlement-level risk, visualize Red Zones, compare potential relocation sites, and review evacuation corridors.
+
+**RakshakGIS** is designed to provide actionable intelligence for disaster management authorities and district administration officers. It combines geospatial data analysis, deterministic multi-hazard risk modeling, vulnerability indices, and constrained relocation site suitability to support critical decision-making before, during, and after disasters.
 
 > [!IMPORTANT]
 > **Human oversight:** RakshakGIS provides analytical recommendations, not autonomous emergency dispatch. Authorized officials must review and approve Red Zone boundaries, relocation assignments, and evacuation routes.
@@ -57,48 +61,42 @@ Disaster response teams often work with fragmented hazard data, uncertain evacua
 The platform follows a clear flow: external datasets are validated and processed by backend services, persisted in a spatial database, and exposed through the API to the interactive map and dashboard.
 
 ```mermaid
-%%{init: {'theme':'base','flowchart':{'curve':'linear','nodeSpacing':28,'rankSpacing':56,'padding':16},'themeVariables':{'fontFamily':'Inter, Segoe UI, Helvetica, Arial, sans-serif','fontSize':'14px','lineColor':'#475569'}}}%%
+%%{init: {'flowchart':{'curve':'basis','nodeSpacing':30,'rankSpacing':55}}}%%
 flowchart TB
-    subgraph INPUTS["DATA SOURCES"]
-        direction LR
-        weather["<b>Weather</b><br/>Open-Meteo"]
-        flood["<b>Flood Gauges</b><br/>CWC"]
-        seismic["<b>Seismic Feeds</b><br/>USGS / NCS"]
-        geo["<b>Boundaries & Demographics</b><br/>SOI / Census / LGD"]
-        roads["<b>Road Network</b><br/>OpenStreetMap"]
+    subgraph INPUTS["Data Sources"]
+        weather["Weather<br/>Open-Meteo"]
+        flood["Flood Gauges<br/>CWC"]
+        seismic["Seismic Feeds<br/>USGS / NCS"]
+        geo["Boundaries & Demographics<br/>SOI / Census / LGD"]
+        roads["Road Network<br/>OpenStreetMap"]
     end
 
-    subgraph PLATFORM["RAKSHAKGIS PLATFORM"]
-        direction TB
-        ingest["<b>Data Validation & Ingestion</b>"]
-        subgraph SERVICES["FASTAPI SERVICES"]
-            direction LR
+    subgraph PLATFORM["RakshakGIS Platform"]
+        ingest["Data Validation & Ingestion"]
+        db[("PostgreSQL + PostGIS<br/>Spatial Data Store")]
+        subgraph SERVICES["FastAPI Services"]
             risk["Risk & Red Zone Engine"]
             relocate["Relocation & Capacity Engine"]
             routing["Hazard-Aware Routing"]
             simulate["Scenario Simulator"]
             auth["Authentication & Audit"]
         end
-        api["<b>REST API</b><br/>JSON / GeoJSON"]
+        api["REST API<br/>JSON / GeoJSON"]
     end
 
-    db[("<b>PostgreSQL + PostGIS</b><br/>Spatial Data Store")]
-
-    subgraph CLIENT["USER INTERFACE"]
-        direction LR
+    subgraph CLIENT["User Interface"]
         dashboard["Operations Dashboard"]
         map["MapLibre Interactive Map"]
     end
 
-    officials(["<b>Disaster Management Officials</b>"])
+    officials(["Disaster Management Officials"])
 
-    INPUTS --> ingest
+    weather & flood & seismic & geo & roads --> ingest
     ingest --> db
-    db <--> SERVICES
-    SERVICES --> api
-    auth --> api
-    api <--> CLIENT
-    CLIENT --> officials
+    db <--> risk & relocate & routing & simulate & auth
+    risk & relocate & routing & simulate & auth --> api
+    api <--> dashboard & map
+    dashboard & map --> officials
 
     classDef source fill:#F8FAFC,stroke:#94A3B8,stroke-width:1.5px,color:#0F172A
     classDef pipeline fill:#EEF2FF,stroke:#4F46E5,stroke-width:1.5px,color:#312E81
@@ -118,7 +116,50 @@ flowchart TB
     style PLATFORM fill:#F5F3FF,stroke:#C7D2FE,stroke-width:1.5px,color:#3730A3
     style SERVICES fill:#FFFFFF,stroke:#A5F3FC,stroke-width:1.5px,color:#0E7490
     style CLIENT fill:#FFFFFF,stroke:#BAE6FD,stroke-width:1.5px,stroke-dasharray:4 4,color:#0369A1
-    linkStyle default stroke:#475569,stroke-width:1.5px
+    linkStyle default stroke:#64748B,stroke-width:1.5px
+```
+
+### Layered View
+
+The system is structured across four primary layers:
+
+```mermaid
+%%{init: {'flowchart':{'curve':'basis','nodeSpacing':30,'rankSpacing':60}}}%%
+flowchart TB
+    subgraph FRONTEND["Frontend Layer"]
+        ui["Next.js / MapLibre GL GIS Canvas / Ops Dashboard"]
+    end
+
+    subgraph BACKEND["Backend API & Core Engines"]
+        fastapi["FastAPI (Python 3.11) + Pydantic"]
+        risk["Risk Engine"]
+        reloc["Relocation & Routing Engine"]
+        redzone["Red Zone Engine"]
+        adapters["Adapters & Ingestion Pipeline"]
+    end
+
+    subgraph DBLAYER["Spatial Database Engine"]
+        pg[("PostgreSQL 16 + PostGIS 3.4<br/>Spatial Database")]
+    end
+
+    FRONTEND -->|"REST / GeoJSON"| BACKEND
+    BACKEND -->|"SQLAlchemy / GeoAlchemy2"| DBLAYER
+    fastapi ~~~ risk & reloc & redzone & adapters
+
+    classDef ui fill:#F0F9FF,stroke:#0284C7,stroke-width:1.5px,color:#0C4A6E
+    classDef pipeline fill:#EEF2FF,stroke:#4F46E5,stroke-width:1.5px,color:#312E81
+    classDef service fill:#ECFEFF,stroke:#0891B2,stroke-width:1.5px,color:#164E63
+    classDef store fill:#FFFBEB,stroke:#D97706,stroke-width:1.5px,color:#78350F
+
+    class ui ui
+    class fastapi pipeline
+    class risk,reloc,redzone,adapters service
+    class pg store
+
+    style FRONTEND fill:#FFFFFF,stroke:#BAE6FD,stroke-width:1.5px,stroke-dasharray:4 4,color:#0369A1
+    style BACKEND fill:#F5F3FF,stroke:#C7D2FE,stroke-width:1.5px,color:#3730A3
+    style DBLAYER fill:#FFFFFF,stroke:#FDE68A,stroke-width:1.5px,stroke-dasharray:4 4,color:#92400E
+    linkStyle default stroke:#64748B,stroke-width:1.5px
 ```
 
 ---
@@ -128,17 +169,17 @@ flowchart TB
 ### 1️⃣ Risk Assessment & Red Zone Identification
 
 ```mermaid
-%%{init: {'theme':'base','flowchart':{'curve':'linear','nodeSpacing':36,'rankSpacing':44,'padding':14},'themeVariables':{'fontFamily':'Inter, Segoe UI, Helvetica, Arial, sans-serif','fontSize':'14px','lineColor':'#475569'}}}%%
+%%{init: {'flowchart':{'curve':'linear','nodeSpacing':36,'rankSpacing':44}}}%%
 flowchart TD
-    A(["<b>Select village or area</b>"]) --> B["Collect available hazard,<br/>terrain, access and vulnerability data"]
+    A(["Select village or area"]) --> B["Collect available hazard,<br/>terrain, access and vulnerability data"]
     B --> C{"Are required inputs available?"}
-    C -- No --> D["Mark result as<br/><b>INSUFFICIENT_DATA</b>"]
+    C -- No --> D["Mark result as<br/>INSUFFICIENT_DATA"]
     C -- Yes --> E["Normalize factors and<br/>calculate composite risk"]
     E --> F["Assign risk band"]
     F --> G["Generate or update<br/>Red Zone layers"]
     D --> H["Display result with<br/>data-status explanation"]
     G --> I["Show map, score and<br/>factor-level explanation"]
-    H --> J(["<b>Officer review</b>"])
+    H --> J(["Officer review"])
     I --> J
 
     classDef start fill:#1E3A8A,stroke:#1E3A8A,stroke-width:1.5px,color:#FFFFFF
@@ -155,7 +196,7 @@ flowchart TD
     class G,I pos
     class J review
 
-    linkStyle default stroke:#475569,stroke-width:1.5px
+    linkStyle default stroke:#64748B,stroke-width:1.5px
     linkStyle 2 stroke:#DC2626,stroke-width:2px
     linkStyle 3 stroke:#16A34A,stroke-width:2px
 ```
@@ -163,9 +204,9 @@ flowchart TD
 ### 2️⃣ Relocation & Evacuation Planning
 
 ```mermaid
-%%{init: {'theme':'base','flowchart':{'curve':'linear','nodeSpacing':36,'rankSpacing':44,'padding':14},'themeVariables':{'fontFamily':'Inter, Segoe UI, Helvetica, Arial, sans-serif','fontSize':'14px','lineColor':'#475569'}}}%%
+%%{init: {'flowchart':{'curve':'linear','nodeSpacing':36,'rankSpacing':44}}}%%
 flowchart TD
-    A(["<b>Identify affected population</b>"]) --> B["Find candidate relocation sites"]
+    A(["Identify affected population"]) --> B["Find candidate relocation sites"]
     B --> C["Check hazard and terrain safety"]
     C --> D{"Does the site pass<br/>safety constraints?"}
     D -- No --> E["Exclude site"]
@@ -174,7 +215,7 @@ flowchart TD
     G -- No --> E
     G -- Yes --> H["Evaluate road access<br/>and route risk"]
     H --> I["Present feasible sites<br/>and evacuation corridors"]
-    I --> J(["<b>Officer review and approval</b>"])
+    I --> J(["Officer review and approval"])
     E -.-> B
 
     classDef start fill:#1E3A8A,stroke:#1E3A8A,stroke-width:1.5px,color:#FFFFFF
@@ -191,7 +232,7 @@ flowchart TD
     class I pos
     class J review
 
-    linkStyle default stroke:#475569,stroke-width:1.5px
+    linkStyle default stroke:#64748B,stroke-width:1.5px
     linkStyle 3,6 stroke:#DC2626,stroke-width:2px
     linkStyle 4,7 stroke:#16A34A,stroke-width:2px
     linkStyle 10 stroke:#94A3B8,stroke-width:1.5px
@@ -252,19 +293,69 @@ A CNN-LSTM model is planned for a future research phase: CNN layers would extrac
 
 ---
 
-## ⚡ Quick Start
+## 🧱 System Requirements
+
+To run and develop RakshakGIS locally, the following tools are required:
+
+| Tool | Recommended Version | Purpose |
+|---|---|---|
+| **Git** | 2.40+ | Version control & synchronization |
+| **Docker Desktop / Engine** | 24.0+ (Docker 29+) | Containerized services |
+| **Docker Compose** | v2.20+ (Compose v5+) | Multi-container orchestration |
+| **Python** *(optional for host dev)* | 3.11.x | Local virtual environment & script execution |
+| **Node.js & npm** *(for frontend)* | Node v20+ / v22+, npm 10+ | Frontend development (when implemented) |
+
+---
+
+## ⚡ Quickstart & Local Setup
+
+### 1. Clone the Repository
 
 ```bash
 git clone https://github.com/OjaswiJoshi13/rakshakgis.git
 cd rakshakgis
+```
+
+### 2. Configure Environment Variables
+
+Copy the example configuration to `.env`:
+
+**Linux / macOS / Git Bash:**
+
+```bash
 cp .env.example .env
+```
+
+**Windows (PowerShell):**
+
+```powershell
+Copy-Item .env.example .env
+```
+
+> [!CAUTION]
+> **Security Reminder:** Never commit `.env` or any real API keys, passwords, or credentials into version control. `.env` is ignored by `.gitignore`.
+
+### 3. Build and Start Services via Docker Compose
+
+```bash
 docker compose up --build -d
 ```
 
-Check service status and the backend health endpoint:
+Check the status of running services:
 
 ```bash
 docker compose ps
+```
+
+View real-time service logs:
+
+```bash
+docker compose logs -f
+```
+
+Check the backend health endpoint:
+
+```bash
 curl http://localhost:8000/health
 ```
 
@@ -277,17 +368,119 @@ For full data ingestion and end-to-end validation, see `docs/DEPLOYMENT.md`.
 
 ---
 
+## 🛠️ Development Commands
+
+| Action | Command |
+|---|---|
+| **Validate Compose Config** | `docker compose config` |
+| **Build Images** | `docker compose build` |
+| **Start Services (Detached)** | `docker compose up -d` |
+| **Start with Rebuild** | `docker compose up --build -d` |
+| **Stop Services** | `docker compose down` |
+| **Stop and Remove Volumes** | `docker compose down -v` *(Caution: resets database)* |
+| **View Service Status** | `docker compose ps` |
+| **View Logs (All Services)** | `docker compose logs -f` |
+| **View Database Logs** | `docker compose logs -f db` |
+| **View Backend Logs** | `docker compose logs -f backend` |
+
+---
+
+## 📁 Repository Structure
+
+```text
+rakshakgis/
+├── .env.example          # Template for local environment variables
+├── .gitignore            # Git exclusion rules for secrets, caches, and builds
+├── docker-compose.yml    # Docker Compose definition (PostGIS db + backend)
+├── PROJECT_STATE.md      # Authoritative project progress and chunk registry
+├── README.md             # Project documentation and developer setup guide
+├── requirements.txt      # Python dependencies with geospatial pins
+├── backend/              # FastAPI application core
+│   ├── Dockerfile        # Python 3.11 container definition with GDAL/GEOS/PROJ
+│   ├── app/              # Application source code
+│   │   ├── adapters/     # External data providers (IMD, telemetry, GeoServer)
+│   │   ├── api/          # FastAPI routers and route handlers
+│   │   ├── core/         # Settings, database session, security
+│   │   ├── models/       # SQLAlchemy / GeoAlchemy2 spatial models
+│   │   ├── schemas/      # Pydantic data validation schemas
+│   │   └── services/     # Computational engines (Risk, Red Zone, Relocation)
+│   └── tests/            # Automated test suite (pytest)
+├── frontend/             # Next.js / React user interface (to be scaffolded in M5-01)
+├── data/                 # Regional profiles, synthetic demo data, schemas
+├── docs/                 # Architecture specifications and technical documentation
+└── scripts/              # Utility scripts for data generation and database setup
+```
+
+---
+
+## 🗃️ Data Architecture & Bootstrap Workflow
+
+RakshakGIS operates under four strictly isolated data modes configured via `DATA_MODE` in `.env`:
+
+| Mode | Use Case | Behavior |
+|---|---|---|
+| **`demo`** | SIH Presentation & Offline Development | Uses pre-packaged deterministic datasets (`app/data/synthetic/`). Zero external network dependencies. |
+| **`full_data`** | Authoritative Planning & Analysis | Powered by PostgreSQL/PostGIS database populated from Census 2011, LGD administrative hierarchy, Survey of India village boundaries, and NCS seismology catalogs. **Missing data is explicit (`DATA_UNAVAILABLE`)**; calculations never assume missing values are zero or synthetic. |
+| **`live`** | Operational Multi-Hazard Monitoring | Connects to real-time external providers:<br/>• **Open-Meteo**: Live precipitation and rainfall forecasts (CC-BY 4.0; *not labelled as IMD*).<br/>• **Central Water Commission (CWC) Flood AFF**: Live river gauge levels, danger thresholds, and flood forecasts.<br/>• **USGS Real-time Earthquakes**: Live seismic hazard observations for India bounding box. |
+| **`simulation`** | Dynamic What-If Analysis | Modifies hazard/rainfall/road blockage parameters and reruns the real backend computational risk, Red Zone, priority, and matching engines deterministically. |
+
+### Teammate Data Bootstrap (Reproducible Setup)
+
+To bootstrap the local data environment on a fresh clone without manual hunting:
+
+```bash
+# 1. Start backing PostgreSQL / PostGIS container
+docker compose up -d db
+
+# 2. Run data directory bootstrap & register manifests
+python scripts/setup_data.py
+
+# 3. Verify local dataset checksums against verified SHA-256 manifest
+python scripts/verify_data.py --quick
+
+# 4. Ingest authoritative data (Census 2011, LGD, Survey of India, NCS) into PostGIS
+python scripts/ingest_all.py
+
+# 5. Run full 22-step Golden SIH demo flow verification
+python scripts/validate_golden_sih_flow.py
+```
+
+---
+
 ## 🗂️ Data Sources & Attribution
 
-| Source | Data | License / Note |
+| Source | Data | License / Attribution |
 |---|---|---|
-| **Census of India (2011) and LGD** | Demographics and administrative data | Government Open Data License – India (GODL-India) |
-| **Survey of India** | Administrative boundaries | Refer to the applicable Government of India terms |
-| **National Centre for Seismology (NCS)** | Seismic catalogs | — |
+| **Census of India (2011) and LGD** | Census data and administrative hierarchy | Government Open Data License – India (GODL-India) |
+| **Survey of India** | Administrative boundaries | Department of Science & Technology, Government of India; refer to the applicable Government of India terms |
+| **National Centre for Seismology (NCS)** | Seismic catalogs | Ministry of Earth Sciences, Government of India |
 | **Open-Meteo** | Meteorological data | CC BY 4.0; it is an open provider, not IMD |
 | **Central Water Commission (CWC)** | River-gauge information and danger levels | — |
 | **USGS Earthquakes** | Seismic event feeds | Public domain |
-| **OpenStreetMap** | Road-network data | ODbL 1.0; attribution is required |
+| **OpenStreetMap** | Road-network data | © OpenStreetMap contributors, licensed under the Open Database License (ODbL) 1.0; attribution is required |
+| **Copernicus DEM (GLO-30)** | Elevation | Manifests tracked; DEM rasters deferred due to automated 403. Physical slope/elevation explicitly reported as unavailable in `full_data` mode. |
+| **Bhuvan / GSI Landslide** | Landslide information | Official portal UI only; machine-readable endpoints not fabricated. |
+
+---
+
+## 🤝 Team Collaboration Workflow
+
+All team members follow strict Git synchronization practices to prevent merge conflicts:
+
+### 1. Synchronize Before Starting Work
+
+```bash
+git status
+git fetch origin
+git pull --rebase origin main
+```
+
+### 2. Implementation Rules
+
+- Verify dependencies in [PROJECT_STATE.md](PROJECT_STATE.md) before starting any chunk.
+- Stage only modified files explicitly (`git add <file>`), never `git add .`.
+- **Never force-push (`git push --force`) to `main`.**
+- If an ambiguous semantic merge conflict occurs during rebase, stop and report immediately.
 
 ---
 
@@ -295,11 +488,28 @@ For full data ingestion and end-to-end validation, see `docs/DEPLOYMENT.md`.
 
 The repository's `PROJECT_STATE.md` is the source of truth for milestone status.
 
+**Status:** Full Platform Implementation & Authoritative Data Pipeline Complete
+
+> [!NOTE]
+> **System Readiness Status:** The complete end-to-end platform is implemented, integrated, and validated across all tiers: PostgreSQL 16 + PostGIS 3.4 spatial database, FastAPI computational engines, live telemetry provider adapters, interactive MapLibre GIS canvas, and Next.js operations dashboard.
+
 | Status | Milestones |
 |:-:|---|
 | ✅ **Completed** | Core risk, Red Zone, relocation, routing, dashboard, integration, and cloud-deployment milestones |
 | 🗓️ **Planned** | CNN-LSTM forecasting and multi-state expansion |
 | ⏸️ **Deferred** | Copernicus DEM raster downloads |
+
+**Milestones completed:**
+
+| Milestone | Scope |
+|---|---|
+| **M1 – M6** | Core Foundation, Risk, Vulnerability, Relocation, Routing, GIS Canvas, Operational Workflows |
+| **INT-01, INT-02, INT-03** | Integration, SIH Flow Validation, Automated Quality Gates |
+| **DATA-01** | Real-World Dataset Inventory & Manifest Distribution |
+| **DATA-02** | Database Ingestion, Authoritative Adapters & Backend REST Endpoints |
+| **INT-04** | End-to-End Real Data Integration, GIS Search, Governance Persistence & Pipeline Hardening |
+
+For granular task statuses and formal audit records, refer to [PROJECT_STATE.md](PROJECT_STATE.md).
 
 > [!WARNING]
 > Elevation data must be treated as unavailable where it has not been ingested.
